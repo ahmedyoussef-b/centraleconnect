@@ -40,6 +40,7 @@ import {
 import { ScadaRealtime } from '@/components/scada-realtime';
 import { Logbook } from '@/components/logbook';
 import { CcppDiagram } from '@/components/ccpp-diagram';
+import { VocalAssistant } from '@/components/vocal-assistant';
 
 function EquipmentsTable() {
   const [equipments, setEquipments] = useState<Equipment[]>([]);
@@ -211,11 +212,14 @@ export default function Home() {
         <header className="flex h-12 items-center justify-between border-b bg-background/50 px-4 backdrop-blur-sm">
           <SidebarTrigger />
           <h1 className="text-lg font-semibold">Tableau de Bord</h1>
-          <Button variant="outline" size="sm">
-            Rapport d'incident
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm">
+              Rapport d'incident
+            </Button>
+            <VocalAssistant />
+          </div>
         </header>
-        <main className="flex-1 p-4 space-y-4">
+        <main className="flex-1 space-y-4 p-4">
           <CcppDiagram />
           <ScadaRealtime />
           <EquipmentsTable />
