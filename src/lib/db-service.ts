@@ -29,6 +29,16 @@ CREATE TABLE IF NOT EXISTS alarms (
     UNIQUE(equipment_id, code)
 );
 
+CREATE TABLE IF NOT EXISTS log_entries (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+    type TEXT NOT NULL CHECK(type IN ('AUTO', 'MANUAL')),
+    source TEXT NOT NULL,
+    message TEXT NOT NULL,
+    equipment_id TEXT,
+    FOREIGN KEY (equipment_id) REFERENCES equipments(id)
+);
+
 INSERT OR IGNORE INTO equipments (id, name, description, type) VALUES
 ('TG1', 'Turbine à Gaz 1', 'Turbine à gaz principale 1', 'GAS_TURBINE'),
 ('TG2', 'Turbine à Gaz 2', 'Turbine à gaz principale 2', 'GAS_TURBINE'),
@@ -63,22 +73,23 @@ export async function initializeDatabase() {
     const db = await getDb();
 
     try {
-        const result: {count: number}[] = await db.select('SELECT COUNT(*) as count FROM equipments');
-        if (result.length > 0 && result[0].count > 0) {
-            console.log('Database already seeded.');
-            isInitialized = true;
-            return;
-        }
-    } catch (e) {
-        console.log('Tables not found, seeding database...');
-    }
-
-    try {
         await db.execute(SEED_SQL);
-        console.log('Database seeded successfully.');
+        
+        // Check if this is the very first seed
+        const result: {count: number}[] = await db.select("SELECT count(*) as count FROM log_entries WHERE message = 'Initialisation et remplissage de la base de données.'");
+        
+        if (result[0].count === 0) {
+            await db.execute("INSERT INTO log_entries (type, source, message) VALUES (?, ?, ?)", ['AUTO', 'SYSTEM', 'Initialisation et remplissage de la base de données.']);
+        }
+        
+        await db.execute("INSERT INTO log_entries (type, source, message) VALUES (?, ?, ?)", ['AUTO', 'SYSTEM', 'Application démarrée.']);
+
+        console.log('Database initialized successfully.');
         isInitialized = true;
     } catch (error) {
-        console.error('Failed to seed database:', error);
+        console.error('Failed to initialize database:', error);
+        // Re-throw the error to be caught by the caller
+        throw error;
     }
 }
 
@@ -89,8 +100,37 @@ export interface Equipment {
     type: string;
 }
 
+export interface LogEntry {
+    id: number;
+    timestamp: string;
+    type: 'AUTO' | 'MANUAL';
+    source: string;
+    message: string;
+    equipment_id: string | null;
+}
+
 export async function getEquipments(): Promise<Equipment[]> {
     await initializeDatabase();
     const db = await getDb();
     return await db.select('SELECT * FROM equipments');
+}
+
+export async function getLogEntries(): Promise<LogEntry[]> {
+    await initializeDatabase();
+    const db = await getDb();
+    // Order by most recent
+    return await db.select('SELECT * FROM log_entries ORDER BY timestamp DESC');
+}
+
+export async function addLogEntry(entry: {
+    type: 'MANUAL';
+    source: string;
+    message: string;
+    equipment_id?: string;
+}): Promise<void> {
+    const db = await getDb();
+    await db.execute(
+        'INSERT INTO log_entries (type, source, message, equipment_id) VALUES (?, ?, ?, ?)',
+        [entry.type, entry.source, entry.message, entry.equipment_id || null]
+    );
 }

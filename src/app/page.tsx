@@ -38,8 +38,9 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { ScadaRealtime } from '@/components/scada-realtime';
+import { Logbook } from '@/components/logbook';
 
-function DashboardContent() {
+function EquipmentsTable() {
   const [equipments, setEquipments] = useState<Equipment[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isTauri, setIsTauri] = useState(false);
@@ -214,7 +215,8 @@ export default function Home() {
         </header>
         <main className="flex-1 p-4 space-y-4">
           <ScadaRealtime />
-          <DashboardContent />
+          <EquipmentsTable />
+          <Logbook />
         </main>
       </SidebarInset>
     </SidebarProvider>

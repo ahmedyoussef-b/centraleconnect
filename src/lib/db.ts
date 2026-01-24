@@ -14,7 +14,7 @@ export async function getDb(): Promise<DbInstance> {
   }
 
   // The dynamic import prevents Next.js from trying to resolve this module at build time.
-  const { default: Database } = await import('@tauri-apps/api/sql');
+  const { default: Database } = await import('tauri-plugin-sql');
   
   // This will load the database from the app's data directory.
   // The extension is important, otherwise it will be created as a directory.
