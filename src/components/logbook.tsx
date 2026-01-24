@@ -17,7 +17,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Textarea } from '@/components/ui/textarea';
-import { addLogEntry, getLogEntries, type LogEntry } from '@/lib/db-service';
+import type { LogEntry } from '@/lib/db-service';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from './ui/badge';
 
@@ -30,6 +30,7 @@ export function Logbook() {
   const fetchEntries = async () => {
     if (window.__TAURI__) {
       try {
+        const { getLogEntries } = await import('@/lib/db-service');
         const data = await getLogEntries();
         setEntries(data);
       } catch (e) {
@@ -52,6 +53,7 @@ export function Logbook() {
     if (!newMessage.trim()) return;
 
     try {
+      const { addLogEntry } = await import('@/lib/db-service');
       await addLogEntry({
         type: 'MANUAL',
         source: 'Opérateur 1', // This should be dynamic in a real app

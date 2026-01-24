@@ -27,7 +27,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { useEffect, useState } from 'react';
-import { getEquipments, type Equipment } from '@/lib/db-service';
+import type { Equipment } from '@/lib/db-service';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Table,
@@ -39,6 +39,7 @@ import {
 } from '@/components/ui/table';
 import { ScadaRealtime } from '@/components/scada-realtime';
 import { Logbook } from '@/components/logbook';
+import { CcppDiagram } from '@/components/ccpp-diagram';
 
 function EquipmentsTable() {
   const [equipments, setEquipments] = useState<Equipment[]>([]);
@@ -52,6 +53,7 @@ function EquipmentsTable() {
     async function loadData() {
       if (!!window.__TAURI__) {
         try {
+          const { getEquipments } = await import('@/lib/db-service');
           const data = await getEquipments();
           setEquipments(data);
         } catch (e) {
@@ -214,6 +216,7 @@ export default function Home() {
           </Button>
         </header>
         <main className="flex-1 p-4 space-y-4">
+          <CcppDiagram />
           <ScadaRealtime />
           <EquipmentsTable />
           <Logbook />
