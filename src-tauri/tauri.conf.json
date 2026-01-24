@@ -1,0 +1,55 @@
+{
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "beforeBuildCommand": "npm run build",
+    "devPath": "http://localhost:9002",
+    "distDir": "../out",
+    "withGlobalTauri": true
+  },
+  "package": {
+    "productName": "ccpp-monitor",
+    "version": "0.1.0"
+  },
+  "tauri": {
+    "allowlist": {
+      "all": false,
+      "shell": {
+        "open": true
+      },
+      "path": {
+        "all": true
+      },
+      "sql": {
+        "all": true,
+        "load": true
+      }
+    },
+    "plugins": {
+      "sql": {
+        "preload": [
+          "sqlite:ccpp.db"
+        ]
+      }
+    },
+    "bundle": {
+      "active": true,
+      "identifier": "com.ccpp.monitor",
+      "icon": []
+    },
+    "security": {
+      "csp": null
+    },
+    "updater": {
+      "active": false
+    },
+    "windows": [
+      {
+        "fullscreen": false,
+        "height": 800,
+        "resizable": true,
+        "title": "CCPP Monitor",
+        "width": 1280
+      }
+    ]
+  }
+}
