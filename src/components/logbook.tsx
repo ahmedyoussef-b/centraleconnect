@@ -17,7 +17,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Textarea } from '@/components/ui/textarea';
-import type { LogEntry } from '@/lib/db-service';
+import type { LogEntry } from '@/types/db';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from './ui/badge';
 
@@ -80,7 +80,24 @@ export function Logbook() {
   };
 
   if (!isTauri) {
-    return null; // Don't render this component in the web version for now
+    return (
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Book className="h-6 w-6" />
+            <CardTitle>Journal de Bord</CardTitle>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="flex h-[380px] items-center justify-center rounded-lg border-2 border-dashed border-border p-4">
+            <p className="text-center text-muted-foreground">
+              La fonctionnalité de journal de bord n'est disponible que dans
+              l'application de bureau Tauri.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    );
   }
 
   return (

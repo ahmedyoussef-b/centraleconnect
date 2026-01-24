@@ -27,7 +27,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { useEffect, useState } from 'react';
-import type { Equipment } from '@/lib/db-service';
+import type { Equipment } from '@/types/db';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Table,
@@ -41,6 +41,7 @@ import { ScadaRealtime } from '@/components/scada-realtime';
 import { Logbook } from '@/components/logbook';
 import { CcppDiagram } from '@/components/ccpp-diagram';
 import { VocalAssistant } from '@/components/vocal-assistant';
+import { CameraView } from '@/components/camera-view';
 
 function EquipmentsTable() {
   const [equipments, setEquipments] = useState<Equipment[]>([]);
@@ -223,7 +224,10 @@ export default function Home() {
           <CcppDiagram />
           <ScadaRealtime />
           <EquipmentsTable />
-          <Logbook />
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+            <Logbook />
+            <CameraView />
+          </div>
         </main>
       </SidebarInset>
     </SidebarProvider>

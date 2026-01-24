@@ -1,3 +1,4 @@
+
 import type { Database as DbInstance } from '@tauri-apps/api/sql';
 
 let db: DbInstance | null = null;
@@ -13,10 +14,11 @@ export async function getDb(): Promise<DbInstance> {
     throw new Error("Database can only be accessed in a Tauri environment.");
   }
 
-  // The dynamic import prevents Next.js from trying to resolve this module at build time.
-  // Using a variable prevents the bundler from statically analyzing the import.
-  const module = 'tauri-plugin-sql';
-  const { default: Database } = await import(module);
+  // This is a workaround to prevent the Next.js bundler from trying to resolve
+  // this module at build time. By constructing the module name dynamically,
+  // we ensure it's only imported at runtime within the Tauri environment.
+  const moduleName = 'tauri-plugin-sql';
+  const { default: Database } = await import(moduleName);
   
   // This will load the database from the app's data directory.
   // The extension is important, otherwise it will be created as a directory.

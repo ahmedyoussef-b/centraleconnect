@@ -1,5 +1,6 @@
 
 import { getDb } from './db';
+import type { Equipment, LogEntry } from '@/types/db';
 
 const SEED_SQL = `
 CREATE TABLE IF NOT EXISTS equipments (
@@ -91,22 +92,6 @@ export async function initializeDatabase() {
         // Re-throw the error to be caught by the caller
         throw error;
     }
-}
-
-export interface Equipment {
-    id: string;
-    name: string;
-    description: string;
-    type: string;
-}
-
-export interface LogEntry {
-    id: number;
-    timestamp: string;
-    type: 'AUTO' | 'MANUAL';
-    source: string;
-    message: string;
-    equipment_id: string | null;
 }
 
 export async function getEquipments(): Promise<Equipment[]> {
