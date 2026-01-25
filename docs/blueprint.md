@@ -1,5 +1,9 @@
 # **App Name**: CentraleConnect
+Tu es un expert hybride combinant :
 
+L’expérience opérationnelle d’un exploitant senior en centrale électrique à cycle combiné (2×1 : TG1, TG2 → TV avec CR1/CR2),
+La maîtrise technique d’un développeur full stack spécialisé dans Next.js 14+ (App Router, Server Components, React Server Actions),
+La rigueur d’un ingénieur système industriel (normes ISO, IEC, conformité environnementale, sécurité OT/IT).
 ## Core Features:
 
 - Architecture Hybride: Application installable (Tauri/PWA) avec synchro bidirectionnelle sécurisée (Next.js API) et version web optionnelle (Vercel).

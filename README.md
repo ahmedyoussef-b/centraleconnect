@@ -83,9 +83,8 @@ Voici une analyse de l'état d'avancement du projet par rapport aux 8 fonctionna
 
 **4. Assistant Vocal Industriel (Voice Q&A)**
 *   ✅ **Fait :** Interface de l'assistant intégrée avec historique de conversation.
-*   ✅ **Fait :** Reconnaissance vocale (en ligne via le navigateur) et synthèse vocale (TTS) fonctionnelles.
+*   ✅ **Fait :** Reconnaissance vocale **hors-ligne** (STT offline avec Vosk) et synthèse vocale (TTS) fonctionnelles.
 *   ⏳ **À faire :** Connexion de l'assistant à la base de données locale pour des réponses contextuelles (ex: "Quelle est la pression de TG1 ?").
-*   ⏳ **À faire :** Intégration d'un modèle de reconnaissance vocale hors-ligne (STT offline).
 
 **5. Supervision Temps Réel SCADA**
 *   ✅ **Fait :** Widget de supervision affichant des données simulées en temps réel via Ably.
@@ -103,6 +102,6 @@ Voici une analyse de l'état d'avancement du projet par rapport aux 8 fonctionna
 *   ✅ **Fait :** Journal de bord fonctionnel avec enregistrement des événements automatiques (démarrage, ajout de document) et manuels.
 *   ✅ **Fait :** Chaque entrée est horodatée et liée à une source.
 *   ✅ **Fait :** Fonctionnalité d'export "Imprimer en PDF".
-*   ⏳ **À faire :** Mécanismes avancés de conformité (signature numérique, infalsifiabilité).
+*   ✅ **Fait :** Mécanismes d'infalsifiabilité via une chaîne de signatures cryptographiques (intégrité vérifiable).
 
-**Conclusion :** Le MVP est dans un état très avancé. Les fondations sont solides et les 5 premières fonctionnalités majeures sont implémentées et fonctionnelles, bien qu'avec des axes d'amélioration identifiés pour de futures versions (connexion aux données réelles, IA offline, etc.). Les fonctionnalités 6 et 7 représentent les prochains grands chantiers.
+**Conclusion :** Le MVP est dans un état très avancé et robuste. Les fondations sont solides, les fonctionnalités clés sont implémentées et fonctionnelles, incluant des capacités hors-ligne et de traçabilité avancées. Les axes d'amélioration identifiés (connexion aux données réelles, "Mode Contrôle") et les nouvelles fonctionnalités (procédures, collaboration) constituent les prochaines étapes logiques.
