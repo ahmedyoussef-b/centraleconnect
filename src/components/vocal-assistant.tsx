@@ -15,10 +15,11 @@ import { Input } from './ui/input';
 import { ScrollArea } from './ui/scroll-area';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { cn } from '@/lib/utils';
-import { askAssistant } from '@/ai/flows/assistant-flow';
+import { askAssistant, type AssistantInput } from '@/ai/flows/assistant-flow';
 import { useToast } from '@/hooks/use-toast';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { useVoskRecognizer, RecognizerState } from '@/hooks/use-vosk-recognizer';
+import { getEquipmentsWithParameters } from '@/lib/db-service';
 
 interface Message {
   id: string;
@@ -32,6 +33,8 @@ export function VocalAssistant() {
   const [input, setInput] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [isTtsEnabled, setIsTtsEnabled] = useState(true);
+  const [isTauri, setIsTauri] = useState(false);
+  const [masterDataContext, setMasterDataContext] = useState<any | null>(null);
   
   const userAvatar = PlaceHolderImages.find((p) => p.id === 'user-avatar');
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -45,11 +48,37 @@ export function VocalAssistant() {
 
   // Update input field with transcript from Vosk
   useEffect(() => {
-    setInput(transcript.partial);
+    if (transcript.partial) {
+        setInput(transcript.partial);
+    }
     if (transcript.final) {
         handleSend(transcript.final);
     }
   }, [transcript]);
+
+  // Load master data on mount if in Tauri
+  useEffect(() => {
+    const tauriEnv = !!window.__TAURI__;
+    setIsTauri(tauriEnv);
+
+    async function loadData() {
+      if (tauriEnv) {
+        try {
+          const data = await getEquipmentsWithParameters();
+          setMasterDataContext(data);
+          console.log('Master data context loaded for assistant.');
+        } catch (e) {
+          console.error(e);
+          toast({
+            variant: 'destructive',
+            title: 'Erreur de base de données',
+            description: "Impossible de charger les données de référence pour l'assistant.",
+          });
+        }
+      }
+    }
+    loadData();
+  }, [toast]);
 
   // Auto-scroll to bottom
   useEffect(() => {
@@ -72,7 +101,13 @@ export function VocalAssistant() {
     setIsProcessing(true);
 
     try {
-      const assistantResponse = await askAssistant(trimmedInput);
+        const assistantInput: AssistantInput = {
+            query: trimmedInput,
+        };
+        if (isTauri && masterDataContext) {
+            assistantInput.context = masterDataContext;
+        }
+      const assistantResponse = await askAssistant(assistantInput);
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
@@ -100,7 +135,7 @@ export function VocalAssistant() {
     } finally {
       setIsProcessing(false);
     }
-  }, [isProcessing, isTtsEnabled, toast]);
+  }, [isProcessing, isTtsEnabled, toast, masterDataContext, isTauri]);
   
   const handleSubmit = (e: React.FormEvent) => {
       e.preventDefault();

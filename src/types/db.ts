@@ -6,6 +6,7 @@ export interface Equipment {
     name: string;
     description: string;
     type: string;
+    parameters?: Parameter[];
 }
 
 export interface Parameter {

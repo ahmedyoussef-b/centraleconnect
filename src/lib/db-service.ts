@@ -232,6 +232,24 @@ export async function getEquipments(): Promise<Equipment[]> {
     return await db.select('SELECT * FROM equipments');
 }
 
+export async function getEquipmentsWithParameters(): Promise<Equipment[]> {
+    await initializeDatabase();
+    const db = await getDbInstance();
+    const equipments: Equipment[] = await db.select('SELECT * FROM equipments');
+    const parameters: Parameter[] = await db.select('SELECT * FROM parameters');
+
+    const equipmentMap = new Map<string, Equipment>(equipments.map(e => [e.id, {...e, parameters: []}]));
+
+    for (const param of parameters) {
+        const equipment = equipmentMap.get(param.equipment_id);
+        if (equipment && equipment.parameters) {
+            equipment.parameters.push(param);
+        }
+    }
+
+    return Array.from(equipmentMap.values());
+}
+
 export async function getLogEntries(): Promise<LogEntry[]> {
     await initializeDatabase();
     const db = await getDbInstance();
