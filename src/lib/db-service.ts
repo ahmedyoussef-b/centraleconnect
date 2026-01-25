@@ -1,7 +1,11 @@
 
 import type { Database as DbInstance } from '@tauri-apps/api/sql';
-import type { Equipment, LogEntry, LogEntryType } from '@/types/db';
+import type { Equipment, LogEntry, LogEntryType, Parameter, Alarm } from '@/types/db';
 
+// Import JSON data which will be bundled by the build process
+import equipmentData from './master-data/equipments.json';
+import parameterData from './master-data/parameters.json';
+import alarmData from './master-data/alarms.json';
 
 let db: DbInstance | null = null;
 let dbInitializationPromise: Promise<DbInstance> | null = null;
@@ -11,7 +15,7 @@ async function getDbInstance(): Promise<DbInstance> {
   if (db) {
     return db;
   }
-  
+
   // If another call is already initializing, wait for it to complete.
   if (dbInitializationPromise) {
     return dbInitializationPromise;
@@ -21,14 +25,13 @@ async function getDbInstance(): Promise<DbInstance> {
   if (typeof window === 'undefined' || !window.__TAURI__) {
     throw new Error("Database can only be accessed in a Tauri environment.");
   }
-  
+
   // Create a new promise to initialize the database.
   dbInitializationPromise = (async () => {
     try {
-      // By dynamically importing the module name as a variable,
-      // we ensure it's only imported at runtime within the Tauri environment.
-      const moduleName = 'tauri-plugin-sql';
-      const { default: Database } = await import(moduleName);
+      // Dynamically import the tauri-plugin-sql module.
+      // This ensures it's only imported at runtime within the Tauri environment.
+      const { default: Database } = await import('tauri-plugin-sql');
       const loadedDb = await Database.load('sqlite:ccpp.db');
       db = loadedDb;
       return db;
@@ -37,12 +40,11 @@ async function getDbInstance(): Promise<DbInstance> {
       dbInitializationPromise = null;
     }
   })();
-  
+
   return dbInitializationPromise;
 }
 
-
-const SEED_SQL = `
+const CREATE_TABLES_SQL = `
 CREATE TABLE IF NOT EXISTS equipments (
     id TEXT PRIMARY KEY,
     name TEXT NOT NULL,
@@ -91,29 +93,6 @@ CREATE TABLE IF NOT EXISTS documents (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (equipment_id) REFERENCES equipments(id) ON DELETE CASCADE
 );
-
-INSERT OR IGNORE INTO equipments (id, name, description, type) VALUES
-('TG1', 'Turbine à Gaz 1', 'Turbine à gaz principale 1', 'GAS_TURBINE'),
-('TG2', 'Turbine à Gaz 2', 'Turbine à gaz principale 2', 'GAS_TURBINE'),
-('TV', 'Turbine à Vapeur', 'Turbine à vapeur du cycle combiné', 'STEAM_TURBINE'),
-('CR1', 'Chaudière de Récupération 1', 'Chaudière associée à la TG1', 'HRSG'),
-('CR2', 'Chaudière de Récupération 2', 'Chaudière associée à la TG2', 'HRSG');
-
-INSERT OR IGNORE INTO parameters (equipment_id, name, unit, min_value, max_value, nominal_value) VALUES
-('TG1', 'Vitesse de rotation', 'tr/min', 2800, 3200, 3000),
-('TG1', 'Température échappement', '°C', 550, 650, 620),
-('TG1', 'Puissance active', 'MW', 0, 150, 130),
-('TG1', 'Pression compresseur', 'bar', 10, 20, 15),
-('TV', 'Pression vapeur HP', 'bar', 100, 140, 120),
-('TV', 'Température vapeur HP', '°C', 500, 580, 565),
-('TV', 'Puissance active', 'MW', 0, 200, 180);
-
-INSERT OR IGNORE INTO alarms (equipment_id, code, description, severity) VALUES
-('TG1', 'TG1-VIB-HIGH', 'Vibration palier avant élevée', 'WARNING'),
-('TG1', 'TG1-TEMP-EXH-HIGH', 'Température échappement > 650°C', 'CRITICAL'),
-('TG1', 'TG1-FLAME-OUT', 'Perte de flamme en chambre de combustion', 'CRITICAL'),
-('CR1', 'CR1-LVL-BALLON-LOW', 'Niveau bas ballon HP', 'WARNING'),
-('CR1', 'CR1-PRESS-VAP-HIGH', 'Pression vapeur surchauffée HP trop haute', 'CRITICAL');
 `;
 
 let isInitialized = false;
@@ -139,6 +118,30 @@ async function createEntrySignature(
   return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
 }
 
+async function seedMasterData(db: DbInstance) {
+    // Seed equipments
+    for (const eq of (equipmentData as Equipment[])) {
+        await db.execute(
+            "INSERT OR IGNORE INTO equipments (id, name, description, type) VALUES (?, ?, ?, ?)",
+            [eq.id, eq.name, eq.description, eq.type]
+        );
+    }
+    // Seed parameters
+    for (const param of (parameterData as Parameter[])) {
+         await db.execute(
+            "INSERT OR IGNORE INTO parameters (equipment_id, name, unit, min_value, max_value, nominal_value) VALUES (?, ?, ?, ?, ?, ?)",
+            [param.equipment_id, param.name, param.unit, param.min_value, param.max_value, param.nominal_value]
+        );
+    }
+    // Seed alarms
+    for (const alarm of (alarmData as Alarm[])) {
+         await db.execute(
+            "INSERT OR IGNORE INTO alarms (equipment_id, code, description, severity) VALUES (?, ?, ?, ?)",
+            [alarm.equipment_id, alarm.code, alarm.description, alarm.severity]
+        );
+    }
+}
+
 export async function initializeDatabase() {
     if (isInitialized) {
         return;
@@ -146,15 +149,27 @@ export async function initializeDatabase() {
     const db = await getDbInstance();
 
     try {
-        await db.execute(SEED_SQL);
-        
-        const result: {count: number}[] = await db.select("SELECT count(*) as count FROM log_entries");
-        
+        await db.execute(CREATE_TABLES_SQL);
+
+        const result: {count: number}[] = await db.select("SELECT count(*) as count FROM equipments");
+
+        // Seed master data only if the equipments table is empty
         if (result[0].count === 0) {
+            await seedMasterData(db);
+
             await addLogEntry({
                 type: 'AUTO',
                 source: 'SYSTEM',
-                message: 'Initialisation et remplissage de la base de données.',
+                message: 'Base de données initialisée avec les données maîtres.',
+            });
+        }
+
+        const logResult: {count: number}[] = await db.select("SELECT count(*) as count FROM log_entries");
+        if (logResult[0].count === 0) {
+             await addLogEntry({
+                type: 'AUTO',
+                source: 'SYSTEM',
+                message: 'Premier démarrage du journal de bord.',
             });
         }
         
@@ -214,7 +229,6 @@ export async function addLogEntry(entry: {
         [timestamp, newEntryData.type, newEntryData.source, newEntryData.message, newEntryData.equipment_id, signature]
     );
 }
-
 
 export async function addEquipmentAndDocument(
     equipment: Omit<Equipment, 'description'> & { description?: string },

@@ -8,6 +8,24 @@ export interface Equipment {
     type: string;
 }
 
+export interface Parameter {
+    id?: number;
+    equipment_id: string;
+    name: string;
+    unit: string;
+    min_value: number | null;
+    max_value: number | null;
+    nominal_value: number | null;
+}
+
+export interface Alarm {
+    id?: number;
+    equipment_id: string;
+    code: string;
+    description: string;
+    severity: 'INFO' | 'WARNING' | 'CRITICAL';
+}
+
 export interface LogEntry {
     id: number;
     timestamp: string;
