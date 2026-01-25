@@ -5,7 +5,6 @@ import { Cog, Factory, Wind } from 'lucide-react';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { cn } from '@/lib/utils';
-import { HistoryChart } from './history-chart';
 
 const EquipmentWidget = ({
   name,
@@ -46,8 +45,7 @@ export function CcppDiagram() {
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-      <Card className="relative lg:col-span-2">
+    <Card className="relative">
         <CardHeader>
             <CardTitle>Schéma Synoptique du Cycle Combiné</CardTitle>
         </CardHeader>
@@ -81,9 +79,5 @@ export function CcppDiagram() {
           </div>
         </CardContent>
       </Card>
-      <div className="lg:col-span-2">
-        <HistoryChart />
-      </div>
-    </div>
   );
 }
