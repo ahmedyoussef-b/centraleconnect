@@ -1,6 +1,45 @@
 
-import { getDb } from './db';
+import type { Database as DbInstance } from '@tauri-apps/api/sql';
 import type { Equipment, LogEntry } from '@/types/db';
+
+
+let db: DbInstance | null = null;
+let dbInitializationPromise: Promise<DbInstance> | null = null;
+
+// This function gets the DB instance, handling the Tauri-specific import.
+async function getDbInstance(): Promise<DbInstance> {
+  if (db) {
+    return db;
+  }
+  
+  // If another call is already initializing, wait for it to complete.
+  if (dbInitializationPromise) {
+    return dbInitializationPromise;
+  }
+
+  // This check is crucial.
+  if (typeof window === 'undefined' || !window.__TAURI__) {
+    throw new Error("Database can only be accessed in a Tauri environment.");
+  }
+  
+  // Create a new promise to initialize the database.
+  dbInitializationPromise = (async () => {
+    try {
+      // The problematic import is now inside a function that's only called on the client.
+      const moduleName = 'tauri-plugin-sql';
+      const { default: Database } = await import(moduleName);
+      const loadedDb = await Database.load('sqlite:ccpp.db');
+      db = loadedDb;
+      return db;
+    } finally {
+      // Clear the promise once it's resolved or rejected.
+      dbInitializationPromise = null;
+    }
+  })();
+  
+  return dbInitializationPromise;
+}
+
 
 const SEED_SQL = `
 CREATE TABLE IF NOT EXISTS equipments (
@@ -70,13 +109,11 @@ export async function initializeDatabase() {
     if (isInitialized) {
         return;
     }
-
-    const db = await getDb();
+    const db = await getDbInstance();
 
     try {
         await db.execute(SEED_SQL);
         
-        // Check if this is the very first seed
         const result: {count: number}[] = await db.select("SELECT count(*) as count FROM log_entries WHERE message = 'Initialisation et remplissage de la base de données.'");
         
         if (result[0].count === 0) {
@@ -96,13 +133,13 @@ export async function initializeDatabase() {
 
 export async function getEquipments(): Promise<Equipment[]> {
     await initializeDatabase();
-    const db = await getDb();
+    const db = await getDbInstance();
     return await db.select('SELECT * FROM equipments');
 }
 
 export async function getLogEntries(): Promise<LogEntry[]> {
     await initializeDatabase();
-    const db = await getDb();
+    const db = await getDbInstance();
     // Order by most recent
     return await db.select('SELECT * FROM log_entries ORDER BY timestamp DESC');
 }
@@ -113,7 +150,7 @@ export async function addLogEntry(entry: {
     message: string;
     equipment_id?: string;
 }): Promise<void> {
-    const db = await getDb();
+    const db = await getDbInstance();
     await db.execute(
         'INSERT INTO log_entries (type, source, message, equipment_id) VALUES (?, ?, ?, ?)',
         [entry.type, entry.source, entry.message, entry.equipment_id || null]
