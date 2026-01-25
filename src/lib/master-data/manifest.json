@@ -1,6 +1,8 @@
 
 {
-    "version": "1.0.0",
-    "date": "2024-07-29",
-    "description": "Initial master data set for CCPP Monitor application."
+    "version": "1.0.1",
+    "date": "2026-01-26",
+    "description": "Initial master data set for CCPP Monitor application.",
+    "approvedBy": "ing.systems@plant.com",
+    "checksum": "sha256:d1788775435805625515783348398436153677443184347a505417e13292497d"
 }

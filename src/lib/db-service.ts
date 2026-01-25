@@ -6,6 +6,8 @@ import type { Equipment, LogEntry, LogEntryType, Parameter, Alarm } from '@/type
 import equipmentData from './master-data/equipments.json';
 import parameterData from './master-data/parameters.json';
 import alarmData from './master-data/alarms.json';
+import manifest from './master-data/manifest.json';
+
 
 let db: DbInstance | null = null;
 let dbInitializationPromise: Promise<DbInstance> | null = null;
@@ -118,6 +120,27 @@ async function createEntrySignature(
   return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
 }
 
+async function computeCombinedChecksum(data: any[]): Promise<string> {
+    // Sort keys in each object to ensure consistent stringification
+    const replacer = (key: any, value: any) =>
+      value instanceof Object && !(value instanceof Array) ? 
+      Object.keys(value)
+      .sort()
+      .reduce((sorted: any, key: any) => {
+        sorted[key] = value[key];
+        return sorted 
+      }, {}) :
+      value;
+
+    const combinedString = data.map(item => JSON.stringify(item, replacer)).join('');
+    const encoder = new TextEncoder();
+    const encodedData = encoder.encode(combinedString);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', encodedData);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return `sha256:${hashArray.map(b => b.toString(16).padStart(2, '0')).join('')}`;
+}
+
+
 async function seedMasterData(db: DbInstance) {
     // Seed equipments
     for (const eq of (equipmentData as Equipment[])) {
@@ -150,10 +173,35 @@ export async function initializeDatabase() {
 
     try {
         await db.execute(CREATE_TABLES_SQL);
+        
+        // 1. Verify master data integrity before any operation
+        const dataToCheck = [equipmentData, parameterData, alarmData];
+        const computedChecksum = await computeCombinedChecksum(dataToCheck);
 
+        if (computedChecksum !== manifest.checksum) {
+            const errorMessage = `Vérification de l'intégrité des données maîtres a échoué. Attendu: ${manifest.checksum}, Calculé: ${computedChecksum}. Le contenu a peut-être été altéré.`;
+            console.error(errorMessage);
+            // In a real app, you might want a more graceful failure.
+            // Here we prevent the app from starting with corrupted data.
+            throw new Error(errorMessage);
+        }
+
+        const logResult: {count: number}[] = await db.select("SELECT count(*) as count FROM log_entries");
+        if (logResult[0].count === 0) {
+             await addLogEntry({
+                type: 'AUTO',
+                source: 'SYSTEM',
+                message: 'Premier démarrage du journal de bord.',
+            });
+             await addLogEntry({
+                type: 'AUTO',
+                source: 'SYSTEM',
+                message: `Intégrité des données maîtres v${manifest.version} vérifiée (checksum: ${manifest.checksum.substring(0, 15)}...).`,
+            });
+        }
+
+        // 2. Seed master data only if the equipments table is empty
         const result: {count: number}[] = await db.select("SELECT count(*) as count FROM equipments");
-
-        // Seed master data only if the equipments table is empty
         if (result[0].count === 0) {
             await seedMasterData(db);
 
@@ -164,15 +212,6 @@ export async function initializeDatabase() {
             });
         }
 
-        const logResult: {count: number}[] = await db.select("SELECT count(*) as count FROM log_entries");
-        if (logResult[0].count === 0) {
-             await addLogEntry({
-                type: 'AUTO',
-                source: 'SYSTEM',
-                message: 'Premier démarrage du journal de bord.',
-            });
-        }
-        
         await addLogEntry({
             type: 'AUTO',
             source: 'SYSTEM',
