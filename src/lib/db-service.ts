@@ -1,6 +1,6 @@
 
 import type { Database as DbInstance } from '@tauri-apps/api/sql';
-import type { Equipment, LogEntry } from '@/types/db';
+import type { Equipment, LogEntry, LogEntryType } from '@/types/db';
 
 
 let db: DbInstance | null = null;
@@ -25,7 +25,8 @@ async function getDbInstance(): Promise<DbInstance> {
   // Create a new promise to initialize the database.
   dbInitializationPromise = (async () => {
     try {
-      // The problematic import is now inside a function that's only called on the client.
+      // By dynamically importing the module name as a variable,
+      // we ensure it's only imported at runtime within the Tauri environment.
       const moduleName = 'tauri-plugin-sql';
       const { default: Database } = await import(moduleName);
       const loadedDb = await Database.load('sqlite:ccpp.db');
@@ -72,11 +73,22 @@ CREATE TABLE IF NOT EXISTS alarms (
 CREATE TABLE IF NOT EXISTS log_entries (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-    type TEXT NOT NULL CHECK(type IN ('AUTO', 'MANUAL')),
+    type TEXT NOT NULL CHECK(type IN ('AUTO', 'MANUAL', 'DOCUMENT_ADDED')),
     source TEXT NOT NULL,
     message TEXT NOT NULL,
     equipment_id TEXT,
     FOREIGN KEY (equipment_id) REFERENCES equipments(id)
+);
+
+CREATE TABLE IF NOT EXISTS documents (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    equipment_id TEXT NOT NULL,
+    type TEXT NOT NULL CHECK(type IN ('PHOTO_ID_PLATE', 'MANUAL_PAGE', 'P&ID_SNIPPET')),
+    description TEXT,
+    image_data TEXT,
+    ocr_text TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (equipment_id) REFERENCES equipments(id) ON DELETE CASCADE
 );
 
 INSERT OR IGNORE INTO equipments (id, name, description, type) VALUES
@@ -145,7 +157,7 @@ export async function getLogEntries(): Promise<LogEntry[]> {
 }
 
 export async function addLogEntry(entry: {
-    type: 'MANUAL';
+    type: LogEntryType;
     source: string;
     message: string;
     equipment_id?: string;
@@ -155,4 +167,34 @@ export async function addLogEntry(entry: {
         'INSERT INTO log_entries (type, source, message, equipment_id) VALUES (?, ?, ?, ?)',
         [entry.type, entry.source, entry.message, entry.equipment_id || null]
     );
+}
+
+
+export async function addEquipmentAndDocument(
+    equipment: Omit<Equipment, 'description'> & { description?: string },
+    document: { imageData: string; ocrText: string; description: string }
+): Promise<void> {
+    const db = await getDbInstance();
+    // In a real app, you'd use a transaction here.
+    // For now, we execute queries sequentially.
+    
+    // 1. Add equipment
+    await db.execute(
+        'INSERT INTO equipments (id, name, description, type) VALUES (?, ?, ?, ?)',
+        [equipment.id, equipment.name, equipment.description ?? '', equipment.type]
+    );
+
+    // 2. Add document
+    await db.execute(
+        'INSERT INTO documents (equipment_id, type, description, image_data, ocr_text) VALUES (?, ?, ?, ?, ?)',
+        [equipment.id, 'PHOTO_ID_PLATE', document.description, document.imageData, document.ocrText]
+    );
+    
+    // 3. Add log entry
+    await addLogEntry({
+        type: 'DOCUMENT_ADDED',
+        source: 'Opérateur 1', // This should be dynamic in a real app
+        message: `Nouvel équipement '${equipment.id}' ajouté via caméra.`,
+        equipment_id: equipment.id,
+    });
 }

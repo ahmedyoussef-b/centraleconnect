@@ -1,4 +1,6 @@
 
+export type LogEntryType = 'AUTO' | 'MANUAL' | 'DOCUMENT_ADDED';
+
 export interface Equipment {
     id: string;
     name: string;
@@ -9,7 +11,7 @@ export interface Equipment {
 export interface LogEntry {
     id: number;
     timestamp: string;
-    type: 'AUTO' | 'MANUAL';
+    type: LogEntryType;
     source: string;
     message: string;
     equipment_id: string | null;

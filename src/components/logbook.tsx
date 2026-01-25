@@ -17,9 +17,16 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Textarea } from '@/components/ui/textarea';
-import type { LogEntry } from '@/types/db';
+import type { LogEntry, LogEntryType } from '@/types/db';
 import { useToast } from '@/hooks/use-toast';
-import { Badge } from './ui/badge';
+import { Badge, type BadgeProps } from './ui/badge';
+
+const typeVariantMap: Record<LogEntryType, BadgeProps['variant']> = {
+  AUTO: 'secondary',
+  MANUAL: 'default',
+  DOCUMENT_ADDED: 'outline',
+};
+
 
 export function Logbook() {
   const [entries, setEntries] = useState<LogEntry[]>([]);
@@ -50,7 +57,7 @@ export function Logbook() {
   }, []);
 
   const handleAddEntry = async () => {
-    if (!newMessage.trim()) return;
+    if (!newMessage.trim() || !isTauri) return;
 
     try {
       const { addLogEntry } = await import('@/lib/db-service');
@@ -133,7 +140,7 @@ export function Logbook() {
               <TableHeader className="sticky top-0 bg-muted">
                 <TableRow>
                   <TableHead className="w-[180px]">Horodatage</TableHead>
-                  <TableHead className="w-[120px]">Type</TableHead>
+                  <TableHead className="w-[150px]">Type</TableHead>
                   <TableHead className="w-[150px]">Source</TableHead>
                   <TableHead>Message</TableHead>
                 </TableRow>
@@ -148,8 +155,8 @@ export function Logbook() {
                         })}
                       </TableCell>
                       <TableCell>
-                        <Badge variant={entry.type === 'AUTO' ? 'secondary' : 'default'}>
-                            {entry.type}
+                        <Badge variant={typeVariantMap[entry.type] ?? 'default'} className="capitalize">
+                            {entry.type.replace('_', ' ').toLowerCase()}
                         </Badge>
                       </TableCell>
                       <TableCell className="font-medium">{entry.source}</TableCell>
