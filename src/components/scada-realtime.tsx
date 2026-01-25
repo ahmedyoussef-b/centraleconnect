@@ -2,7 +2,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { ably } from '@/lib/ably-client';
+import { getAblyClient } from '@/lib/ably-client';
 import type { Types } from 'ably';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
@@ -65,6 +65,8 @@ export function ScadaRealtime() {
     useState<Types.ConnectionState>('initializing');
 
   useEffect(() => {
+    const ably = getAblyClient();
+
     // Listener for connection state changes
     const onConnectionChange = (stateChange: Types.ConnectionStateChange) => {
       setConnectionState(stateChange.current);

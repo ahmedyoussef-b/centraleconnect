@@ -7,8 +7,14 @@ const apiKey = process.env.NEXT_PUBLIC_ABLY_API_KEY;
 
 let ably: Types.RealtimePromise;
 
-if (!apiKey || apiKey === 'YOUR_ABLY_API_KEY') {
-  console.warn(`
+// This function ensures the Ably client is a singleton and only created on the client side.
+const getAblyClient = (): Types.RealtimePromise => {
+    if (ably) {
+        return ably;
+    }
+
+    if (!apiKey || apiKey === 'YOUR_ABLY_API_KEY') {
+      console.warn(`
     *****************************************************************
     * Ably API key not configured. Real-time data will be disabled. *
     *                                                               *
@@ -18,32 +24,35 @@ if (!apiKey || apiKey === 'YOUR_ABLY_API_KEY') {
     *****************************************************************
   `);
 
-  // Create a mock client that does nothing to prevent the app from crashing.
-  // All channel operations will be no-ops.
-  const mockChannel = {
-    subscribe: () => {},
-    unsubscribe: () => {},
-    publish: async () => {},
-  };
+      // Create a mock client that does nothing to prevent the app from crashing.
+      const mockChannel = {
+        subscribe: () => {},
+        unsubscribe: () => {},
+        publish: async () => {},
+      };
 
-  ably = {
-    channels: {
-      get: () => mockChannel,
-    },
-    connection: {
-      on: () => {},
-      off: () => {},
-      state: 'failed',
-      close: () => {},
-    },
-  } as any;
-  
-} else {
-  // Use the real Ably client if the API key is provided
-  ably = new Ably.Realtime.Promise({
-    key: apiKey,
-    clientId: `ccpp-monitor-client-${Math.random().toString(36).substr(2, 9)}`,
-  });
-}
+      ably = {
+        channels: {
+          get: () => mockChannel,
+        },
+        connection: {
+          on: () => {},
+          off: () => {},
+          state: 'failed',
+          close: () => {},
+        },
+      } as any;
+      
+    } else {
+      // Use the real Ably client if the API key is provided
+      ably = new Ably.Realtime.Promise({
+        key: apiKey,
+        clientId: `ccpp-monitor-client-${Math.random().toString(36).substr(2, 9)}`,
+      });
+    }
+    
+    return ably;
+};
 
-export { ably };
+
+export { getAblyClient };

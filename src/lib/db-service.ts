@@ -77,6 +77,7 @@ CREATE TABLE IF NOT EXISTS log_entries (
     source TEXT NOT NULL,
     message TEXT NOT NULL,
     equipment_id TEXT,
+    signature TEXT,
     FOREIGN KEY (equipment_id) REFERENCES equipments(id)
 );
 
@@ -117,6 +118,27 @@ INSERT OR IGNORE INTO alarms (equipment_id, code, description, severity) VALUES
 
 let isInitialized = false;
 
+async function createEntrySignature(
+  entryData: {
+    timestamp: string;
+    type: LogEntryType;
+    source: string;
+    message: string;
+    equipment_id: string | null;
+  },
+  previousSignature: string
+): Promise<string> {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(
+    `${previousSignature}|${entryData.timestamp}|${entryData.type}|${entryData.source}|${entryData.message}|${
+      entryData.equipment_id ?? ''
+    }`
+  );
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+
 export async function initializeDatabase() {
     if (isInitialized) {
         return;
@@ -126,19 +148,26 @@ export async function initializeDatabase() {
     try {
         await db.execute(SEED_SQL);
         
-        const result: {count: number}[] = await db.select("SELECT count(*) as count FROM log_entries WHERE message = 'Initialisation et remplissage de la base de données.'");
+        const result: {count: number}[] = await db.select("SELECT count(*) as count FROM log_entries");
         
         if (result[0].count === 0) {
-            await db.execute("INSERT INTO log_entries (type, source, message) VALUES (?, ?, ?)", ['AUTO', 'SYSTEM', 'Initialisation et remplissage de la base de données.']);
+            await addLogEntry({
+                type: 'AUTO',
+                source: 'SYSTEM',
+                message: 'Initialisation et remplissage de la base de données.',
+            });
         }
         
-        await db.execute("INSERT INTO log_entries (type, source, message) VALUES (?, ?, ?)", ['AUTO', 'SYSTEM', 'Application démarrée.']);
+        await addLogEntry({
+            type: 'AUTO',
+            source: 'SYSTEM',
+            message: 'Application démarrée.',
+        });
 
         console.log('Database initialized successfully.');
         isInitialized = true;
     } catch (error) {
         console.error('Failed to initialize database:', error);
-        // Re-throw the error to be caught by the caller
         throw error;
     }
 }
@@ -152,7 +181,6 @@ export async function getEquipments(): Promise<Equipment[]> {
 export async function getLogEntries(): Promise<LogEntry[]> {
     await initializeDatabase();
     const db = await getDbInstance();
-    // Order by most recent
     return await db.select('SELECT * FROM log_entries ORDER BY timestamp DESC');
 }
 
@@ -163,9 +191,27 @@ export async function addLogEntry(entry: {
     equipment_id?: string;
 }): Promise<void> {
     const db = await getDbInstance();
+
+    const lastEntry: { signature: string }[] = await db.select(
+        'SELECT signature FROM log_entries ORDER BY id DESC LIMIT 1'
+    );
+    const previousSignature = lastEntry.length > 0 && lastEntry[0].signature ? lastEntry[0].signature : 'GENESIS';
+
+    const timestamp = new Date().toISOString().replace('T', ' ').slice(0, 19);
+
+    const newEntryData = {
+        type: entry.type,
+        source: entry.source,
+        message: entry.message,
+        equipment_id: entry.equipment_id || null,
+        timestamp: timestamp
+    };
+    
+    const signature = await createEntrySignature(newEntryData, previousSignature);
+
     await db.execute(
-        'INSERT INTO log_entries (type, source, message, equipment_id) VALUES (?, ?, ?, ?)',
-        [entry.type, entry.source, entry.message, entry.equipment_id || null]
+        'INSERT INTO log_entries (timestamp, type, source, message, equipment_id, signature) VALUES (?, ?, ?, ?, ?, ?)',
+        [timestamp, newEntryData.type, newEntryData.source, newEntryData.message, newEntryData.equipment_id, signature]
     );
 }
 
@@ -175,25 +221,20 @@ export async function addEquipmentAndDocument(
     document: { imageData: string; ocrText: string; description: string }
 ): Promise<void> {
     const db = await getDbInstance();
-    // In a real app, you'd use a transaction here.
-    // For now, we execute queries sequentially.
     
-    // 1. Add equipment
     await db.execute(
         'INSERT INTO equipments (id, name, description, type) VALUES (?, ?, ?, ?)',
         [equipment.id, equipment.name, equipment.description ?? '', equipment.type]
     );
 
-    // 2. Add document
     await db.execute(
         'INSERT INTO documents (equipment_id, type, description, image_data, ocr_text) VALUES (?, ?, ?, ?, ?)',
         [equipment.id, 'PHOTO_ID_PLATE', document.description, document.imageData, document.ocrText]
     );
     
-    // 3. Add log entry
     await addLogEntry({
         type: 'DOCUMENT_ADDED',
-        source: 'Opérateur 1', // This should be dynamic in a real app
+        source: 'Opérateur 1',
         message: `Nouvel équipement '${equipment.id}' ajouté via caméra.`,
         equipment_id: equipment.id,
     });

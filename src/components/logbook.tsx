@@ -4,7 +4,7 @@
 import { useEffect, useState } from 'react';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { Book, FileDown, Send } from 'lucide-react';
+import { Book, FileDown, Send, ShieldCheck, ShieldX, LoaderCircle, Shield } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -20,6 +20,7 @@ import { Textarea } from '@/components/ui/textarea';
 import type { LogEntry, LogEntryType } from '@/types/db';
 import { useToast } from '@/hooks/use-toast';
 import { Badge, type BadgeProps } from './ui/badge';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 
 const typeVariantMap: Record<LogEntryType, BadgeProps['variant']> = {
   AUTO: 'secondary',
@@ -33,6 +34,10 @@ export function Logbook() {
   const [newMessage, setNewMessage] = useState('');
   const [isTauri, setIsTauri] = useState(false);
   const { toast } = useToast();
+
+  const [verificationStatus, setVerificationStatus] = useState<Map<number, boolean>>(new Map());
+  const [isVerifying, setIsVerifying] = useState(false);
+
 
   const fetchEntries = async () => {
     if (window.__TAURI__) {
@@ -68,6 +73,7 @@ export function Logbook() {
       });
       setNewMessage('');
       await fetchEntries(); // Refresh the list
+      setVerificationStatus(new Map()); // Reset verification status
       toast({
         title: 'Succès',
         description: 'Entrée ajoutée au journal de bord.',
@@ -84,6 +90,65 @@ export function Logbook() {
 
   const handlePrint = () => {
     window.print();
+  };
+
+  const handleVerify = async () => {
+    setIsVerifying(true);
+    setVerificationStatus(new Map());
+
+    async function createEntrySignature(
+        entryData: Omit<LogEntry, 'id' | 'signature'>,
+        previousSignature: string
+      ): Promise<string> {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(
+          `${previousSignature}|${entryData.timestamp}|${entryData.type}|${entryData.source}|${entryData.message}|${
+            entryData.equipment_id ?? ''
+          }`
+        );
+        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    const sortedEntries = [...entries].reverse(); // Oldest first
+    let previousSignature = 'GENESIS';
+    const newStatus = new Map<number, boolean>();
+    let isChainValid = true;
+
+    for (const entry of sortedEntries) {
+        if (!isChainValid) {
+            newStatus.set(entry.id, false);
+            continue;
+        }
+        
+        if (!entry.signature) {
+            newStatus.set(entry.id, false);
+            isChainValid = false;
+            console.warn(`Entry ${entry.id} has no signature. Chain broken.`);
+            continue;
+        }
+
+        const expectedSignature = await createEntrySignature(entry, previousSignature);
+
+        if (expectedSignature === entry.signature) {
+            newStatus.set(entry.id, true);
+        } else {
+            newStatus.set(entry.id, false);
+            isChainValid = false;
+            console.error(`Signature mismatch for entry ${entry.id}. Expected ${expectedSignature}, got ${entry.signature}`);
+        }
+        previousSignature = entry.signature;
+    }
+    
+    setVerificationStatus(newStatus);
+    setIsVerifying(false);
+
+    toast({
+        title: "Vérification d'intégrité terminée",
+        description: isChainValid ? "L'intégrité du journal de bord est confirmée." : "Rupture de chaîne détectée ! Le journal a peut-être été altéré.",
+        variant: isChainValid ? 'default' : 'destructive',
+      });
   };
 
   if (!isTauri) {
@@ -115,10 +180,20 @@ export function Logbook() {
             <Book className="h-6 w-6" />
             <CardTitle>Journal de Bord</CardTitle>
           </div>
-          <Button variant="outline" size="sm" onClick={handlePrint}>
-            <FileDown className="mr-2" />
-            Exporter en PDF
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={handleVerify} disabled={isVerifying}>
+                {isVerifying ? (
+                    <LoaderCircle className="mr-2 animate-spin" />
+                ) : (
+                    <ShieldCheck className="mr-2" />
+                )}
+                Vérifier l'intégrité
+            </Button>
+            <Button variant="outline" size="sm" onClick={handlePrint}>
+              <FileDown className="mr-2" />
+              Exporter en PDF
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
           <div className="flex w-full items-start gap-2">
@@ -139,6 +214,7 @@ export function Logbook() {
             <Table>
               <TableHeader className="sticky top-0 bg-muted">
                 <TableRow>
+                  <TableHead className="w-[40px]">Statut</TableHead>
                   <TableHead className="w-[180px]">Horodatage</TableHead>
                   <TableHead className="w-[150px]">Type</TableHead>
                   <TableHead className="w-[150px]">Source</TableHead>
@@ -149,6 +225,31 @@ export function Logbook() {
                 {entries.length > 0 ? (
                   entries.map((entry) => (
                     <TableRow key={entry.id}>
+                      <TableCell>
+                        <TooltipProvider>
+                            <Tooltip>
+                                <TooltipTrigger>
+                                {isVerifying ? (
+                                    <LoaderCircle className="animate-spin text-muted-foreground" />
+                                ) : verificationStatus.has(entry.id) ? (
+                                    verificationStatus.get(entry.id) ? (
+                                        <ShieldCheck className="text-green-500" />
+                                    ) : (
+                                        <ShieldX className="text-destructive" />
+                                    )
+                                ) : (
+                                    <Shield className="text-muted-foreground" />
+                                )}
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    {isVerifying ? "Vérification en cours..." :
+                                     verificationStatus.has(entry.id) ? 
+                                     (verificationStatus.get(entry.id) ? "Signature valide" : "Signature INVALIDE") : 
+                                     "Non vérifié"}
+                                </TooltipContent>
+                            </Tooltip>
+                        </TooltipProvider>
+                      </TableCell>
                       <TableCell className="font-mono text-xs">
                         {format(new Date(entry.timestamp.replace(' ', 'T')), 'dd/MM/yy HH:mm:ss', {
                           locale: fr,
@@ -165,7 +266,7 @@ export function Logbook() {
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={4} className="text-center">
+                    <TableCell colSpan={5} className="text-center">
                       Aucune entrée dans le journal.
                     </TableCell>
                   </TableRow>

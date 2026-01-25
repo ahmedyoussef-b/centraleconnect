@@ -15,4 +15,5 @@ export interface LogEntry {
     source: string;
     message: string;
     equipment_id: string | null;
+    signature: string | null;
 }

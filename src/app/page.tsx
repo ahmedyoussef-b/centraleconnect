@@ -5,11 +5,13 @@ import {
   Activity,
   Book,
   Bot,
+  Camera,
   ClipboardCheck,
   Database,
   LayoutDashboard,
   Settings,
 } from 'lucide-react';
+import dynamic from 'next/dynamic';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -37,11 +39,59 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { ScadaRealtime } from '@/components/scada-realtime';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Logbook } from '@/components/logbook';
 import { CcppDiagram } from '@/components/ccpp-diagram';
-import { VocalAssistant } from '@/components/vocal-assistant';
-import { CameraView } from '@/components/camera-view';
+
+const ScadaRealtime = dynamic(
+  () => import('@/components/scada-realtime').then((mod) => mod.ScadaRealtime),
+  {
+    ssr: false,
+    loading: () => (
+       <Card>
+        <CardHeader>
+          <CardTitle>Supervision Temps Réel (SCADA)</CardTitle>
+        </CardHeader>
+        <CardContent>
+           <Skeleton className="h-24 w-full" />
+        </CardContent>
+      </Card>
+    ),
+  }
+);
+
+const VocalAssistant = dynamic(
+  () =>
+    import('@/components/vocal-assistant').then((mod) => mod.VocalAssistant),
+  {
+    ssr: false,
+    loading: () => (
+      <Button variant="outline" size="icon" className="rounded-full" disabled>
+        <Bot />
+      </Button>
+    ),
+  }
+);
+
+const CameraView = dynamic(
+  () => import('@/components/camera-view').then((mod) => mod.CameraView),
+  {
+    ssr: false,
+    loading: () => (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Camera />
+            Vue Caméra & Provisionnement
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Skeleton className="aspect-video w-full" />
+        </CardContent>
+      </Card>
+    ),
+  }
+);
 
 function EquipmentsTable() {
   const [equipments, setEquipments] = useState<Equipment[]>([]);
