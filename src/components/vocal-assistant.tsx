@@ -1,8 +1,8 @@
 
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import { Bot, Mic, MicOff, Send, Volume2, VolumeX } from 'lucide-react';
+import { useEffect, useRef, useState, useCallback } from 'react';
+import { Bot, Mic, MicOff, Send, Volume2, VolumeX, LoaderCircle } from 'lucide-react';
 import {
   Sheet,
   SheetContent,
@@ -18,6 +18,7 @@ import { cn } from '@/lib/utils';
 import { askAssistant } from '@/ai/flows/assistant-flow';
 import { useToast } from '@/hooks/use-toast';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
+import { useVoskRecognizer, RecognizerState } from '@/hooks/use-vosk-recognizer';
 
 interface Message {
   id: string;
@@ -25,71 +26,31 @@ interface Message {
   text: string;
 }
 
-// Check for SpeechRecognition API
-const SpeechRecognition =
-  typeof window !== 'undefined'
-    ? window.SpeechRecognition || window.webkitSpeechRecognition
-    : undefined;
-
 export function VocalAssistant() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
-  const [isListening, setIsListening] = useState(false);
   const [isTtsEnabled, setIsTtsEnabled] = useState(true);
   
   const userAvatar = PlaceHolderImages.find((p) => p.id === 'user-avatar');
   const audioRef = useRef<HTMLAudioElement>(null);
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
-  // Speech Recognition Effect
+  const { recognizerState, transcript, start, stop } = useVoskRecognizer({
+      modelUrl: '/models/vosk-model-small-fr-0.22.zip',
+      sampleRate: 16000
+  });
+
+  // Update input field with transcript from Vosk
   useEffect(() => {
-    if (!SpeechRecognition) {
-      console.warn('Speech Recognition API not supported in this browser.');
-      return;
+    setInput(transcript.partial);
+    if (transcript.final) {
+        handleSend(transcript.final);
     }
+  }, [transcript]);
 
-    const recognition = new SpeechRecognition();
-    recognition.continuous = false;
-    recognition.interimResults = false;
-    recognition.lang = 'fr-FR';
-
-    recognition.onresult = (event) => {
-      const transcript = event.results[0][0].transcript;
-      setInput(transcript);
-      handleSend(transcript); // Automatically send after recognition
-    };
-
-    recognition.onerror = (event) => {
-      console.error('Speech recognition error:', event.error);
-      toast({
-        variant: 'destructive',
-        title: 'Erreur de reconnaissance vocale',
-        description: event.error,
-      });
-      setIsListening(false);
-    };
-    
-    recognition.onend = () => {
-      setIsListening(false);
-    };
-
-    recognitionRef.current = recognition;
-  }, [toast]);
-
-  const toggleListening = () => {
-    if (!recognitionRef.current) return;
-    if (isListening) {
-      recognitionRef.current.stop();
-    } else {
-      recognitionRef.current.start();
-    }
-    setIsListening(!isListening);
-  };
-  
   // Auto-scroll to bottom
   useEffect(() => {
     if (scrollAreaRef.current) {
@@ -97,9 +58,9 @@ export function VocalAssistant() {
     }
   }, [messages]);
 
-  const handleSend = async (query: string) => {
+  const handleSend = useCallback(async (query: string) => {
     const trimmedInput = query.trim();
-    if (!trimmedInput) return;
+    if (!trimmedInput || isProcessing) return;
 
     setInput('');
     const userMessage: Message = {
@@ -139,11 +100,53 @@ export function VocalAssistant() {
     } finally {
       setIsProcessing(false);
     }
-  };
+  }, [isProcessing, isTtsEnabled, toast]);
   
   const handleSubmit = (e: React.FormEvent) => {
       e.preventDefault();
       handleSend(input);
+  }
+
+  const toggleListening = () => {
+    if (recognizerState === RecognizerState.LISTENING) {
+        stop();
+    } else {
+        start();
+    }
+  }
+
+  const getMicButton = () => {
+    switch(recognizerState) {
+        case RecognizerState.LOADING:
+            return (
+                <Button type="button" variant="ghost" size="icon" disabled>
+                    <LoaderCircle className="animate-spin" />
+                    <span className="sr-only">Chargement du modèle...</span>
+                </Button>
+            );
+        case RecognizerState.READY:
+            return (
+                 <Button type="button" variant="ghost" size="icon" onClick={toggleListening} disabled={isProcessing}>
+                    <Mic />
+                    <span className="sr-only">Commencer l'écoute</span>
+                </Button>
+            );
+        case RecognizerState.LISTENING:
+            return (
+                 <Button type="button" variant="ghost" size="icon" onClick={toggleListening} disabled={isProcessing}>
+                    <MicOff className="text-destructive" />
+                    <span className="sr-only">Arrêter l'écoute</span>
+                </Button>
+            );
+        case RecognizerState.ERROR:
+        default:
+             return (
+                <Button type="button" variant="ghost" size="icon" disabled>
+                    <MicOff className="text-muted-foreground" />
+                    <span className="sr-only">Reconnaissance vocale non disponible</span>
+                </Button>
+            );
+    }
   }
 
   return (
@@ -207,15 +210,10 @@ export function VocalAssistant() {
                 <Input 
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
-                    placeholder="Posez votre question..."
-                    disabled={isProcessing}
+                    placeholder={recognizerState === RecognizerState.READY ? "Posez votre question..." : "Chargement de l'assistant..."}
+                    disabled={isProcessing || recognizerState !== RecognizerState.READY}
                 />
-                {SpeechRecognition && (
-                    <Button type="button" variant="ghost" size="icon" onClick={toggleListening} disabled={isProcessing}>
-                        {isListening ? <MicOff className="text-destructive"/> : <Mic />}
-                        <span className="sr-only">{isListening ? 'Arrêter l\'écoute' : 'Commencer l\'écoute'}</span>
-                    </Button>
-                )}
+                {getMicButton()}
                  <Button type="submit" size="icon" disabled={isProcessing || !input.trim()}>
                     <Send />
                     <span className="sr-only">Envoyer</span>

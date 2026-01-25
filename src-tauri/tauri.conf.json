@@ -22,6 +22,9 @@
       "sql": {
         "all": true,
         "load": true
+      },
+      "microphone": {
+        "all": true
       }
     },
     "plugins": {
