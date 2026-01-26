@@ -14,10 +14,10 @@ import { Label } from './ui/label';
 import { Progress } from './ui/progress';
 import { Textarea } from './ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import type { Equipment } from '@/types/db';
+import type { Component } from '@/types/db';
 
 type ViewState = 'idle' | 'processing' | 'confirming';
-type NewEquipmentFormData = Omit<Equipment, 'description'> & {
+type NewComponentFormData = Omit<Component, 'description'> & {
   description?: string;
 };
 
@@ -29,10 +29,10 @@ function ProvisioningForm({
 }: {
   imageData: string;
   ocrText: string;
-  onSave: (equipment: NewEquipmentFormData) => Promise<void>;
+  onSave: (component: NewComponentFormData) => Promise<void>;
   onCancel: () => void;
 }) {
-  const [formData, setFormData] = useState<NewEquipmentFormData>({
+  const [formData, setFormData] = useState<NewComponentFormData>({
     id: '',
     name: '',
     type: '',
@@ -58,9 +58,9 @@ function ProvisioningForm({
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div className="space-y-2">
-          <h4 className="font-medium">Nouvel équipement</h4>
+          <h4 className="font-medium">Nouveau composant</h4>
           <div className="space-y-2">
-            <Label htmlFor="id">ID Équipement (Tag)</Label>
+            <Label htmlFor="id">ID Composant (Tag)</Label>
             <Input
               id="id"
               name="id"
@@ -98,7 +98,7 @@ function ProvisioningForm({
           <div className="overflow-hidden rounded-md border">
             <Image
               src={imageData}
-              alt="Capture d'équipement"
+              alt="Capture de composant"
               width={300}
               height={225}
               className="h-auto w-full"
@@ -244,17 +244,17 @@ export function CameraView() {
     setViewState('confirming');
   };
 
-  const handleSave = async (equipment: NewEquipmentFormData) => {
+  const handleSave = async (component: NewComponentFormData) => {
     try {
-      const { addEquipmentAndDocument } = await import('@/lib/db-service');
-      await addEquipmentAndDocument(equipment, {
+      const { addComponentAndDocument } = await import('@/lib/db-service');
+      await addComponentAndDocument(component, {
         imageData: capturedImage,
         ocrText: analysisResult,
-        description: `Plaque signalétique pour ${equipment.id}`,
+        description: `Plaque signalétique pour ${component.id}`,
       });
       toast({
         title: 'Succès',
-        description: `La fiche pour l'équipement ${equipment.id} a été ajoutée.`,
+        description: `La fiche pour le composant ${component.id} a été ajoutée.`,
       });
       handleReset();
     } catch (error: any) {
@@ -264,7 +264,7 @@ export function CameraView() {
         title: 'Erreur de sauvegarde',
         description:
           error.message ||
-          "Impossible d'enregistrer le nouvel équipement.",
+          "Impossible d'enregistrer le nouveau composant.",
       });
     }
   };

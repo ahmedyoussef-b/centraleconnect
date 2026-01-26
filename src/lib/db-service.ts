@@ -1,12 +1,15 @@
 
 import type { Database as DbInstance } from '@tauri-apps/api/sql';
-import type { Equipment, LogEntry, LogEntryType, Parameter, Alarm } from '@/types/db';
+import type { Component, LogEntry, LogEntryType, Parameter, Alarm } from '@/types/db';
 
 // Import JSON data which will be bundled by the build process
-import equipmentData from './master-data/equipments.json';
-import parameterData from './master-data/parameters.json';
-import alarmData from './master-data/alarms.json';
-import manifest from './master-data/manifest.json';
+import centralData from '@/assets/master-data/central.json';
+import zonesData from '@/assets/master-data/zones.json';
+import groupsData from '@/assets/master-data/groups.json';
+import componentsData from '@/assets/master-data/components.json';
+import parameterData from '@/assets/master-data/parameters.json';
+import alarmData from '@/assets/master-data/alarms.json';
+import manifest from '@/assets/master-data/manifest.json';
 
 
 let db: DbInstance | null = null;
@@ -47,7 +50,7 @@ async function getDbInstance(): Promise<DbInstance> {
 }
 
 const CREATE_TABLES_SQL = `
-CREATE TABLE IF NOT EXISTS equipments (
+CREATE TABLE IF NOT EXISTS components (
     id TEXT PRIMARY KEY,
     name TEXT NOT NULL,
     description TEXT,
@@ -56,22 +59,22 @@ CREATE TABLE IF NOT EXISTS equipments (
 
 CREATE TABLE IF NOT EXISTS parameters (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    equipment_id TEXT NOT NULL,
+    component_id TEXT NOT NULL,
     name TEXT NOT NULL,
     unit TEXT,
     min_value REAL,
     max_value REAL,
     nominal_value REAL,
-    FOREIGN KEY (equipment_id) REFERENCES equipments(id)
+    FOREIGN KEY (component_id) REFERENCES components(id)
 );
 
 CREATE TABLE IF NOT EXISTS alarms (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    equipment_id TEXT NOT NULL,
+    component_id TEXT NOT NULL,
     code TEXT NOT NULL,
     description TEXT,
     severity TEXT CHECK(severity IN ('INFO', 'WARNING', 'CRITICAL')),
-    UNIQUE(equipment_id, code)
+    UNIQUE(component_id, code)
 );
 
 CREATE TABLE IF NOT EXISTS log_entries (
@@ -80,20 +83,20 @@ CREATE TABLE IF NOT EXISTS log_entries (
     type TEXT NOT NULL CHECK(type IN ('AUTO', 'MANUAL', 'DOCUMENT_ADDED')),
     source TEXT NOT NULL,
     message TEXT NOT NULL,
-    equipment_id TEXT,
+    component_id TEXT,
     signature TEXT,
-    FOREIGN KEY (equipment_id) REFERENCES equipments(id)
+    FOREIGN KEY (component_id) REFERENCES components(id)
 );
 
 CREATE TABLE IF NOT EXISTS documents (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    equipment_id TEXT NOT NULL,
+    component_id TEXT NOT NULL,
     type TEXT NOT NULL CHECK(type IN ('PHOTO_ID_PLATE', 'MANUAL_PAGE', 'P&ID_SNIPPET')),
     description TEXT,
     image_data TEXT,
     ocr_text TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (equipment_id) REFERENCES equipments(id) ON DELETE CASCADE
+    FOREIGN KEY (component_id) REFERENCES components(id) ON DELETE CASCADE
 );
 `;
 
@@ -105,14 +108,14 @@ async function createEntrySignature(
     type: LogEntryType;
     source: string;
     message: string;
-    equipment_id: string | null;
+    component_id: string | null;
   },
   previousSignature: string
 ): Promise<string> {
   const encoder = new TextEncoder();
   const data = encoder.encode(
     `${previousSignature}|${entryData.timestamp}|${entryData.type}|${entryData.source}|${entryData.message}|${
-      entryData.equipment_id ?? ''
+      entryData.component_id ?? ''
     }`
   );
   const hashBuffer = await crypto.subtle.digest('SHA-256', data);
@@ -142,24 +145,24 @@ async function computeCombinedChecksum(data: any[]): Promise<string> {
 
 
 async function seedMasterData(db: DbInstance) {
-    // Seed equipments
-    for (const eq of (equipmentData as Equipment[])) {
+    // Seed components
+    for (const eq of (componentsData as any[])) {
         await db.execute(
-            "INSERT OR IGNORE INTO equipments (id, name, description, type) VALUES (?, ?, ?, ?)",
+            "INSERT OR IGNORE INTO components (id, name, description, type) VALUES (?, ?, ?, ?)",
             [eq.id, eq.name, eq.description, eq.type]
         );
     }
     // Seed parameters
-    for (const param of (parameterData as Parameter[])) {
+    for (const param of (parameterData as any[])) {
          await db.execute(
-            "INSERT OR IGNORE INTO parameters (equipment_id, name, unit, min_value, max_value, nominal_value) VALUES (?, ?, ?, ?, ?, ?)",
+            "INSERT OR IGNORE INTO parameters (component_id, name, unit, min_value, max_value, nominal_value) VALUES (?, ?, ?, ?, ?, ?)",
             [param.equipment_id, param.name, param.unit, param.min_value, param.max_value, param.nominal_value]
         );
     }
     // Seed alarms
-    for (const alarm of (alarmData as Alarm[])) {
+    for (const alarm of (alarmData as any[])) {
          await db.execute(
-            "INSERT OR IGNORE INTO alarms (equipment_id, code, description, severity) VALUES (?, ?, ?, ?)",
+            "INSERT OR IGNORE INTO alarms (component_id, code, description, severity) VALUES (?, ?, ?, ?)",
             [alarm.equipment_id, alarm.code, alarm.description, alarm.severity]
         );
     }
@@ -175,7 +178,7 @@ export async function initializeDatabase() {
         await db.execute(CREATE_TABLES_SQL);
         
         // 1. Verify master data integrity before any operation
-        const dataToCheck = [equipmentData, parameterData, alarmData];
+        const dataToCheck = [centralData, zonesData, groupsData, componentsData, parameterData, alarmData];
         const computedChecksum = await computeCombinedChecksum(dataToCheck);
 
         if (computedChecksum !== manifest.checksum) {
@@ -200,8 +203,8 @@ export async function initializeDatabase() {
             });
         }
 
-        // 2. Seed master data only if the equipments table is empty
-        const result: {count: number}[] = await db.select("SELECT count(*) as count FROM equipments");
+        // 2. Seed master data only if the components table is empty
+        const result: {count: number}[] = await db.select("SELECT count(*) as count FROM components");
         if (result[0].count === 0) {
             await seedMasterData(db);
 
@@ -226,28 +229,28 @@ export async function initializeDatabase() {
     }
 }
 
-export async function getEquipments(): Promise<Equipment[]> {
+export async function getComponents(): Promise<Component[]> {
     await initializeDatabase();
     const db = await getDbInstance();
-    return await db.select('SELECT * FROM equipments');
+    return await db.select('SELECT * FROM components');
 }
 
-export async function getEquipmentsWithParameters(): Promise<Equipment[]> {
+export async function getComponentsWithParameters(): Promise<Component[]> {
     await initializeDatabase();
     const db = await getDbInstance();
-    const equipments: Equipment[] = await db.select('SELECT * FROM equipments');
+    const components: Component[] = await db.select('SELECT * FROM components');
     const parameters: Parameter[] = await db.select('SELECT * FROM parameters');
 
-    const equipmentMap = new Map<string, Equipment>(equipments.map(e => [e.id, {...e, parameters: []}]));
+    const componentMap = new Map<string, Component>(components.map(c => [c.id, {...c, parameters: []}]));
 
     for (const param of parameters) {
-        const equipment = equipmentMap.get(param.equipment_id);
-        if (equipment && equipment.parameters) {
-            equipment.parameters.push(param);
+        const component = componentMap.get(param.component_id);
+        if (component && component.parameters) {
+            component.parameters.push(param);
         }
     }
 
-    return Array.from(equipmentMap.values());
+    return Array.from(componentMap.values());
 }
 
 export async function getLogEntries(): Promise<LogEntry[]> {
@@ -260,7 +263,7 @@ export async function addLogEntry(entry: {
     type: LogEntryType;
     source: string;
     message: string;
-    equipment_id?: string;
+    component_id?: string;
 }): Promise<void> {
     const db = await getDbInstance();
 
@@ -275,38 +278,38 @@ export async function addLogEntry(entry: {
         type: entry.type,
         source: entry.source,
         message: entry.message,
-        equipment_id: entry.equipment_id || null,
+        component_id: entry.component_id || null,
         timestamp: timestamp
     };
     
     const signature = await createEntrySignature(newEntryData, previousSignature);
 
     await db.execute(
-        'INSERT INTO log_entries (timestamp, type, source, message, equipment_id, signature) VALUES (?, ?, ?, ?, ?, ?)',
-        [timestamp, newEntryData.type, newEntryData.source, newEntryData.message, newEntryData.equipment_id, signature]
+        'INSERT INTO log_entries (timestamp, type, source, message, component_id, signature) VALUES (?, ?, ?, ?, ?, ?)',
+        [timestamp, newEntryData.type, newEntryData.source, newEntryData.message, newEntryData.component_id, signature]
     );
 }
 
-export async function addEquipmentAndDocument(
-    equipment: Omit<Equipment, 'description'> & { description?: string },
+export async function addComponentAndDocument(
+    component: Omit<Component, 'description'> & { description?: string },
     document: { imageData: string; ocrText: string; description: string }
 ): Promise<void> {
     const db = await getDbInstance();
     
     await db.execute(
-        'INSERT INTO equipments (id, name, description, type) VALUES (?, ?, ?, ?)',
-        [equipment.id, equipment.name, equipment.description ?? '', equipment.type]
+        'INSERT INTO components (id, name, description, type) VALUES (?, ?, ?, ?)',
+        [component.id, component.name, component.description ?? '', component.type]
     );
 
     await db.execute(
-        'INSERT INTO documents (equipment_id, type, description, image_data, ocr_text) VALUES (?, ?, ?, ?, ?)',
-        [equipment.id, 'PHOTO_ID_PLATE', document.description, document.imageData, document.ocrText]
+        'INSERT INTO documents (component_id, type, description, image_data, ocr_text) VALUES (?, ?, ?, ?, ?)',
+        [component.id, 'PHOTO_ID_PLATE', document.description, document.imageData, document.ocrText]
     );
     
     await addLogEntry({
         type: 'DOCUMENT_ADDED',
         source: 'Opérateur 1',
-        message: `Nouvel équipement '${equipment.id}' ajouté via caméra.`,
-        equipment_id: equipment.id,
+        message: `Nouveau composant '${component.id}' ajouté via caméra.`,
+        component_id: component.id,
     });
 }

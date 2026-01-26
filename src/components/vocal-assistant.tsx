@@ -19,7 +19,7 @@ import { askAssistant, type AssistantInput } from '@/ai/flows/assistant-flow';
 import { useToast } from '@/hooks/use-toast';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { useVoskRecognizer, RecognizerState } from '@/hooks/use-vosk-recognizer';
-import { getEquipmentsWithParameters } from '@/lib/db-service';
+import { getComponentsWithParameters } from '@/lib/db-service';
 
 interface Message {
   id: string;
@@ -64,7 +64,7 @@ export function VocalAssistant() {
     async function loadData() {
       if (tauriEnv) {
         try {
-          const data = await getEquipmentsWithParameters();
+          const data = await getComponentsWithParameters();
           setMasterDataContext(data);
           console.log('Master data context loaded for assistant.');
         } catch (e) {

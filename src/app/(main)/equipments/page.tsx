@@ -2,7 +2,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import type { Equipment } from '@/types/db';
+import type { Component as ComponentType } from '@/types/db';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Table,
@@ -13,8 +13,8 @@ import {
   TableRow,
 } from '@/components/ui/table';
 
-function EquipmentsTable() {
-  const [equipments, setEquipments] = useState<Equipment[]>([]);
+function ComponentsTable() {
+  const [components, setComponents] = useState<ComponentType[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isTauri, setIsTauri] = useState(false);
 
@@ -25,12 +25,12 @@ function EquipmentsTable() {
     async function loadData() {
       if (!!window.__TAURI__) {
         try {
-          const { getEquipments } = await import('@/lib/db-service');
-          const data = await getEquipments();
-          setEquipments(data);
+          const { getComponents } = await import('@/lib/db-service');
+          const data = await getComponents();
+          setComponents(data);
         } catch (e) {
           console.error(e);
-          setError('Failed to load equipment data from local database.');
+          setError('Failed to load component data from local database.');
         }
       }
     }
@@ -59,7 +59,7 @@ function EquipmentsTable() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Équipements Principaux</CardTitle>
+        <CardTitle>Composants Principaux</CardTitle>
       </CardHeader>
       <CardContent>
         <Table>
@@ -72,8 +72,8 @@ function EquipmentsTable() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {equipments.length > 0 ? (
-              equipments.map((eq) => (
+            {components.length > 0 ? (
+              components.map((eq) => (
                 <TableRow key={eq.id}>
                   <TableCell className="font-medium">{eq.id}</TableCell>
                   <TableCell>{eq.name}</TableCell>
@@ -96,5 +96,5 @@ function EquipmentsTable() {
 }
 
 export default function EquipmentsPage() {
-  return <EquipmentsTable />;
+  return <ComponentsTable />;
 }

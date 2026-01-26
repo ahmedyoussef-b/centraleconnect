@@ -1,0 +1,27 @@
+
+[
+    {
+        "id": "TG1_SYS",
+        "name": "Système Turbine à Gaz 1",
+        "description": "Ensemble des équipements liés à TG1.",
+        "zoneId": "PROD_GAZ"
+    },
+    {
+        "id": "TG2_SYS",
+        "name": "Système Turbine à Gaz 2",
+        "description": "Ensemble des équipements liés à TG2.",
+        "zoneId": "PROD_GAZ"
+    },
+    {
+        "id": "TV_SYS",
+        "name": "Système Turbine à Vapeur",
+        "description": "Ensemble des équipements liés à TV.",
+        "zoneId": "PROD_VAPEUR"
+    },
+    {
+        "id": "EAU_ALIM_HP",
+        "name": "Système Eau Alimentaire HP",
+        "description": "Pompes d'alimentation haute pression.",
+        "zoneId": "PROD_VAPEUR"
+    }
+]

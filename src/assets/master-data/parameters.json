@@ -1,0 +1,10 @@
+
+[
+    {"equipment_id": "TG1", "name": "Vitesse de rotation", "unit": "tr/min", "min_value": 2800, "max_value": 3200, "nominal_value": 3000},
+    {"equipment_id": "TG1", "name": "Température échappement", "unit": "°C", "min_value": 550, "max_value": 650, "nominal_value": 620},
+    {"equipment_id": "TG1", "name": "Puissance active", "unit": "MW", "min_value": 0, "max_value": 150, "nominal_value": 130},
+    {"equipment_id": "TG1", "name": "Pression compresseur", "unit": "bar", "min_value": 10, "max_value": 20, "nominal_value": 15},
+    {"equipment_id": "TV", "name": "Pression vapeur HP", "unit": "bar", "min_value": 100, "max_value": 140, "nominal_value": 120},
+    {"equipment_id": "TV", "name": "Température vapeur HP", "unit": "°C", "min_value": 500, "max_value": 580, "nominal_value": 565},
+    {"equipment_id": "TV", "name": "Puissance active", "unit": "MW", "min_value": 0, "max_value": 200, "nominal_value": 180}
+]

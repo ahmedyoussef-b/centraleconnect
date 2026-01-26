@@ -1,0 +1,15 @@
+
+[
+    {
+        "id": "PROD_GAZ",
+        "name": "Zone Production Gaz",
+        "description": "Section des turbines à gaz et chaudières de récupération.",
+        "centralId": "CCPP"
+    },
+    {
+        "id": "PROD_VAPEUR",
+        "name": "Zone Production Vapeur",
+        "description": "Section de la turbine à vapeur et circuits d'eau.",
+        "centralId": "CCPP"
+    }
+]
