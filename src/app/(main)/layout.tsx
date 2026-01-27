@@ -8,6 +8,7 @@ import {
   Camera,
   ClipboardCheck,
   Database,
+  FlaskConical,
   LayoutDashboard,
   Settings,
 } from 'lucide-react';
@@ -52,6 +53,7 @@ const pageTitles: { [key: string]: string } = {
     '/logbook': 'Journal de Bord',
     '/provisioning': 'Provisionnement par Caméra',
     '/settings': 'Paramètres',
+    '/test': 'Page de Test',
 };
 
 export default function MainLayout({
@@ -98,7 +100,7 @@ export default function MainLayout({
                 </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-                <SidebarMenuButton asChild tooltip="Procédures" isActive={pathname === '/procedures'}>
+                <SidebarMenuButton asChild tooltip="Procédures" isActive={pathname.startsWith('/procedures')}>
                     <Link href="/procedures">
                         <ClipboardCheck />
                         Procédures
@@ -126,6 +128,14 @@ export default function MainLayout({
                     <Link href="/provisioning">
                         <Camera />
                         Provisionnement
+                    </Link>
+                </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+                <SidebarMenuButton asChild tooltip="Test" isActive={pathname === '/test'}>
+                    <Link href="/test">
+                        <FlaskConical />
+                        Test
                     </Link>
                 </SidebarMenuButton>
             </SidebarMenuItem>
