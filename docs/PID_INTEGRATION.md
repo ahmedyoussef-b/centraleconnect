@@ -52,6 +52,17 @@ L'intégration des données P&ID est basée sur une chaîne de validation et de 
 
 -   **Exemple (`B2/lubrication-filtration.svg`)**: Le fichier d'exemple existant contient déjà des styles CSS, des calques et des hotspots structurés selon ce modèle.
 
+#### Conversion de PDF en SVG (Génération automatique)
+
+Pour obtenir une base de travail, il est possible de convertir les P&ID originaux (souvent au format PDF) en SVG à l'aide d'outils en ligne de commande comme Inkscape.
+
+```bash
+# Utiliser Inkscape en ligne de commande
+inkscape input.pdf --export-type=svg --export-filename=output.svg
+```
+
+Le fichier SVG généré devra ensuite être édité manuellement pour y ajouter la structure de calques et les "hotspots" interactifs décrits ci-dessus afin de le rendre compatible avec l'application.
+
 ### 4. Composants et Hooks React
 -   **`src/components/PidViewer.tsx`**: Composant React qui :
     -   Détermine quel fichier SVG charger en fonction de l'`externalId`.
