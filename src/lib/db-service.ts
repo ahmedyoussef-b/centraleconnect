@@ -1,6 +1,6 @@
 
 import type { Database as DbInstance } from '@tauri-apps/api/sql';
-import type { Component, LogEntry, LogEntryType, Parameter, Alarm } from '@/types/db';
+import type { Component, LogEntry, LogEntryType, Parameter, Alarm, FunctionalNode } from '@/types/db';
 
 // Import JSON data which will be bundled by the build process
 import centralData from '@/assets/master-data/central.json';
@@ -10,6 +10,7 @@ import componentsData from '@/assets/master-data/components.json';
 import parameterData from '@/assets/master-data/parameters.json';
 import alarmData from '@/assets/master-data/alarms.json';
 import manifest from '@/assets/master-data/manifest.json';
+import pidAssetsData from '@/assets/master-data/pid-assets.json';
 
 
 let db: DbInstance | null = null;
@@ -99,6 +100,29 @@ CREATE TABLE IF NOT EXISTS documents (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (component_id) REFERENCES components(id) ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS functional_nodes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    external_id TEXT NOT NULL UNIQUE,
+    system TEXT NOT NULL,
+    subsystem TEXT NOT NULL,
+    document TEXT,
+    tag TEXT,
+    type TEXT NOT NULL,
+    name TEXT NOT NULL,
+    description TEXT,
+    location TEXT,
+    coordinates TEXT,
+    linked_parameters TEXT,
+    svg_layer TEXT,
+    fire_zone TEXT,
+    status TEXT NOT NULL,
+    checksum TEXT NOT NULL,
+    created_at DATETIME NOT NULL,
+    updated_at DATETIME NOT NULL,
+    approved_by TEXT,
+    approved_at DATETIME
+);
 `;
 
 let isInitialized = false;
@@ -123,6 +147,74 @@ async function createEntrySignature(
   const hashArray = Array.from(new Uint8Array(hashBuffer));
   return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
 }
+
+
+async function createNodeChecksum(node: Omit<FunctionalNode, 'id' | 'checksum' | 'created_at' | 'updated_at' | 'approved_by' | 'approved_at'>): Promise<string> {
+    const nodeString = JSON.stringify(node);
+    const encoder = new TextEncoder();
+    const data = encoder.encode(nodeString);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function seedFunctionalNodes(db: DbInstance) {
+    const result: {count: number}[] = await db.select("SELECT count(*) as count FROM functional_nodes");
+    if (result[0].count > 0) {
+        console.log('Functional nodes already seeded.');
+        return;
+    }
+
+    console.log('Seeding functional nodes...');
+    for (const node of (pidAssetsData.nodes as FunctionalNode[])) {
+        const checksum = await createNodeChecksum(node);
+        await db.execute(
+            `INSERT INTO functional_nodes 
+            (external_id, system, subsystem, document, tag, type, name, description, location, coordinates, linked_parameters, svg_layer, fire_zone, status, checksum, created_at, updated_at) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            [
+                node.external_id, node.system, node.subsystem, node.document, node.tag, node.type,
+                node.name, node.description, node.location, JSON.stringify(node.coordinates),
+                JSON.stringify(node.linked_parameters), node.svg_layer, node.fire_zone, node.status,
+                checksum, new Date().toISOString(), new Date().toISOString()
+            ]
+        );
+    }
+    console.log(`${pidAssetsData.nodes.length} functional nodes seeded.`);
+}
+
+async function verifyFunctionalNodesIntegrity(db: DbInstance) {
+    const nodesFromDb = await db.select<FunctionalNode[]>('SELECT * from functional_nodes');
+    if (nodesFromDb.length === 0) return; // Nothing to verify
+
+    console.log(`Verifying integrity of ${nodesFromDb.length} functional nodes...`);
+
+    for (const nodeDb of nodesFromDb) {
+        const originalNode = {
+            external_id: nodeDb.external_id,
+            system: nodeDb.system,
+            subsystem: nodeDb.subsystem,
+            document: nodeDb.document,
+            tag: nodeDb.tag,
+            type: nodeDb.type,
+            name: nodeDb.name,
+            description: nodeDb.description,
+            location: nodeDb.location,
+            coordinates: JSON.parse(nodeDb.coordinates as any),
+            linked_parameters: JSON.parse(nodeDb.linked_parameters as any),
+            svg_layer: nodeDb.svg_layer,
+            fire_zone: nodeDb.fire_zone,
+            status: nodeDb.status,
+        };
+
+        const expectedChecksum = await createNodeChecksum(originalNode as FunctionalNode);
+        if (expectedChecksum !== nodeDb.checksum) {
+            throw new Error(`[CRITICAL] Data integrity compromised for node ${nodeDb.external_id}. Checksum mismatch. Halting application.`);
+        }
+    }
+    console.log('Functional nodes integrity verified successfully.');
+}
+
 
 async function computeCombinedChecksum(data: any[]): Promise<string> {
     // Sort keys in each object to ensure consistent stringification
@@ -178,12 +270,12 @@ export async function initializeDatabase() {
     try {
         await db.execute(CREATE_TABLES_SQL);
         
-        // 1. Verify master data integrity before any operation
-        const dataToCheck = [centralData, zonesData, groupsData, componentsData, parameterData, alarmData];
+        // 1. Verify master data files integrity before any operation
+        const dataToCheck = [centralData, zonesData, groupsData, componentsData, parameterData, alarmData, pidAssetsData];
         const computedChecksum = await computeCombinedChecksum(dataToCheck);
 
         if (computedChecksum !== manifest.checksum) {
-            const errorMessage = `Vérification de l'intégrité des données maîtres a échoué. Attendu: ${manifest.checksum}, Calculé: ${computedChecksum}. Le contenu a peut-être été altéré.`;
+            const errorMessage = `Vérification de l'intégrité des fichiers maîtres a échoué. Attendu: ${manifest.checksum}, Calculé: ${computedChecksum}. Le contenu a peut-être été altéré.`;
             console.error(errorMessage);
             // In a real app, you might want a more graceful failure.
             // Here we prevent the app from starting with corrupted data.
@@ -200,11 +292,11 @@ export async function initializeDatabase() {
              await addLogEntry({
                 type: 'AUTO',
                 source: 'SYSTEM',
-                message: `Intégrité des données maîtres v${manifest.version} vérifiée (checksum: ${manifest.checksum.substring(0, 15)}...).`,
+                message: `Intégrité des fichiers maîtres v${manifest.version} vérifiée (checksum: ${manifest.checksum.substring(0, 24)}...).`,
             });
         }
 
-        // 2. Seed master data only if the components table is empty
+        // 2. Seed non-P&ID master data if components table is empty
         const result: {count: number}[] = await db.select("SELECT count(*) as count FROM components");
         if (result[0].count === 0) {
             await seedMasterData(db);
@@ -212,14 +304,19 @@ export async function initializeDatabase() {
             await addLogEntry({
                 type: 'AUTO',
                 source: 'SYSTEM',
-                message: 'Base de données initialisée avec les données maîtres.',
+                message: 'Base de données initialisée avec les données maîtres (composants, alarmes, etc.).',
             });
         }
+
+        // 3. Seed and verify P&ID functional nodes
+        await seedFunctionalNodes(db);
+        await verifyFunctionalNodesIntegrity(db);
+
 
         await addLogEntry({
             type: 'AUTO',
             source: 'SYSTEM',
-            message: 'Application démarrée.',
+            message: 'Application démarrée. Intégrité des données vérifiée.',
         });
 
         console.log('Database initialized successfully.');
