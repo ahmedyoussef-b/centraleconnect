@@ -1,1 +1,117 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080"></svg>
+<svg viewBox="0 0 800 600" xmlns="http://www.w3.org/2000/svg">
+  <!-- Styles -->
+  <defs>
+    <style>
+      .pid-hotspot {
+        cursor: pointer;
+        transition: all 0.3s ease;
+        fill: #3b82f6;
+        opacity: 0.6;
+      }
+      .pid-hotspot:hover {
+        opacity: 1;
+        stroke: #2563eb;
+        stroke-width: 2;
+      }
+      .pid-hotspot.active {
+        fill: #ef4444;
+        opacity: 1;
+        stroke: #dc2626;
+        stroke-width: 3;
+      }
+      .pid-label {
+        font-family: Arial, sans-serif;
+        font-size: 12px;
+        fill: #1f2937;
+      }
+    </style>
+  </defs>
+
+  <!-- Calque fond (gris clair) -->
+  <g id="layer-background" opacity="0.3">
+    <!-- Image de fond nettoyée -->
+    <rect width="800" height="600" fill="#f3f4f6"/>
+  </g>
+
+  <!-- Calque lubrification - TPF -->
+  <g id="layer-lubrication">
+    <!-- Hotspot B2.LUB.TPF -->
+    <rect 
+      id="hotspot-B2-LUB-TPF" 
+      x="280" y="230" width="40" height="40"
+      rx="5"
+      class="pid-hotspot"
+      data-external-id="B2.LUB.TPF"
+      data-type="filtration_system"
+      data-parameters="LUB.PRESSURE.IN,LUB.PRESSURE.OUT,LUB.TEMP,LUB.FILTER.DP"
+    />
+    <text x="300" y="220" text-anchor="middle" class="pid-label">B2.TPF</text>
+
+    <!-- Hotspot B2.LUB.FILT.SKID -->
+    <rect 
+      id="hotspot-B2-LUB-FILT-SKID" 
+      x="340" y="250" width="40" height="40"
+      rx="5"
+      class="pid-hotspot"
+      data-external-id="B2.LUB.FILT.SKID"
+      data-type="skid_module"
+      data-parameters="FILT.STATUS,FILT.BYPASS.ACTIVE"
+    />
+    <text x="360" y="240" text-anchor="middle" class="pid-label">SKID</text>
+
+    <!-- Hotspot B2.LUB.PUMP.MAIN -->
+    <circle 
+      id="hotspot-B2-LUB-PUMP-MAIN" 
+      cx="400" cy="270" r="20"
+      class="pid-hotspot"
+      data-external-id="B2.LUB.PUMP.MAIN"
+      data-type="oil_pump"
+      data-parameters="PUMP.RUNNING,PUMP.FAULT,PUMP.DISCHARGE.PRESS"
+    />
+    <text x="400" y="255" text-anchor="middle" class="pid-label">POMPE</text>
+
+    <!-- Hotspot B2.LUB.PUMP.STBY -->
+    <circle 
+      id="hotspot-B2-LUB-PUMP-STBY" 
+      cx="450" cy="270" r="20"
+      class="pid-hotspot"
+      data-external-id="B2.LUB.PUMP.STBY"
+      data-type="oil_pump"
+      data-parameters="PUMP.STBY.READY,PUMP.AUTO.START"
+    />
+    <text x="450" y="255" text-anchor="middle" class="pid-label">STBY</text>
+
+    <!-- Hotspot B2.LUB.TANK -->
+    <rect 
+      id="hotspot-B2-LUB-TANK" 
+      x="500" y="260" width="60" height="80"
+      rx="5"
+      class="pid-hotspot"
+      data-external-id="B2.LUB.TANK"
+      data-type="oil_tank"
+      data-parameters="TANK.LEVEL,TANK.TEMP,TANK.PRESSURE"
+    />
+    <text x="530" y="250" text-anchor="middle" class="pid-label">RÉSERVOIR</text>
+
+    <!-- Hotspot B2.LUB.PSV202F -->
+    <circle 
+      id="hotspot-B2-LUB-PSV202F" 
+      cx="320" cy="320" r="15"
+      class="pid-hotspot"
+      data-external-id="B2.LUB.PSV202F"
+      data-type="safety_valve"
+      data-parameters="PSV.STATUS,PSV.LIFTED"
+    />
+    <text x="320" y="305" text-anchor="middle" class="pid-label">PSV202F</text>
+  </g>
+
+  <!-- Légende -->
+  <g id="layer-legend" transform="translate(20, 20)">
+    <rect width="200" height="120" fill="white" stroke="#9ca3af" rx="5"/>
+    <text x="100" y="25" text-anchor="middle" font-weight="bold" class="pid-label">Lubrification TG2</text>
+    <text x="10" y="50" class="pid-label">• Filtration huile (TPF)</text>
+    <text x="10" y="70" class="pid-label">• Skid filtration compact</text>
+    <text x="10" y="90" class="pid-label">• Pompe principale + secours</text>
+    <text x="10" y="110" class="pid-label">• Réservoir huile</text>
+  </g>
+</svg>
