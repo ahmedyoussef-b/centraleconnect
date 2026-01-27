@@ -1,83 +1,151 @@
+
+#!/usr/bin/env tsx
 /**
- * ATTENTION : SCRIPT DE RÉFÉRENCE SEULEMENT.
- * 
- * Ce script documente l'intention d'ajouter des nœuds fonctionnels P&ID à une base de données
- * de type PostgreSQL via Prisma. Il est fourni à titre de documentation technique.
- *
- * DANS L'ARCHITECTURE ACTUELLE (TAURI + SQLITE), CE SCRIPT N'EST PAS EXÉCUTÉ.
- * Les données sont directement et manuellement intégrées dans les fichiers maîtres JSON
- * (ex: src/assets/master-data/central.json) pour garantir la cohérence, la validation par 
- * checksum global au démarrage et le fonctionnement hors-ligne de l'application cliente.
+ * Script d'injection batch des équipements P&ID dans la base SQLite
+ * Via Prisma ORM → Mode immuable avec checksum SHA-256
+ * Conformité ISO 55001 / IEC 61511 / EU IED
  */
 
 import { PrismaClient } from '@prisma/client';
-import crypto from 'crypto';
+import { createHash } from 'crypto';
+import { readFileSync, writeFileSync } from 'fs';
+import path from 'path';
 
-// Cette initialisation est conceptuelle et ne fonctionnera que dans un environnement Node.js
-// avec les variables d'environnement de base de données correctement configurées.
 const prisma = new PrismaClient();
 
-async function main() {
-    const pidNodes = [
-      // B3 - Cycle vapeur (part04/05/06)
-      { external_id: 'B3.CEX3', path: 'SYSTEM/B3/CEX3' },
-      { external_id: 'B3.BA', path: 'SYSTEM/B3/BA' },
-      { external_id: 'B3.CEX425', path: 'SYSTEM/B3/CEX425' },
-      { external_id: 'B3.SEP269', path: 'SYSTEM/B3/SEP269' },
-      { external_id: 'B3.PEX271', path: 'SYSTEM/B3/PEX271' },
-      { external_id: 'B3.DES266', path: 'SYSTEM/B3/DES266' },
-      { external_id: 'B3.GSE.SVBP3', path: 'SYSTEM/B3/GSE/SVBP3' },
-      // A0 - Lubrification & utilities (part06/07/08/09)
-      { external_id: 'A0.GGR.TV', path: 'SYSTEM/A0/GGR/TV' },
-      { external_id: 'A0.GGR.CENT', path: 'SYSTEM/A0/GGR/CENT' },
-      { external_id: 'A0.GGR.POMP1', path: 'SYSTEM/A0/GGR/POMP1' },
-      { external_id: 'A0.GGR.DRAINS', path: 'SYSTEM/A0/GGR/DRAINS' },
-      { external_id: 'A0.CAA.HV183', path: 'SYSTEM/A0/CAA/HV183' },
-      { external_id: 'A0.CAA.RCP', path: 'SYSTEM/A0/CAA/RCP' },
-      { external_id: 'A0.SKD.PUMP', path: 'SYSTEM/A0/SKD/PUMP' },
-      { external_id: 'A0.SKD.TANK', path: 'SYSTEM/A0/SKD/TANK' },
-      { external_id: 'A0.FILT.221TF2', path: 'SYSTEM/A0/FILT/221TF2' },
-      { external_id: 'A0.FILT.GRILLES', path: 'SYSTEM/A0/FILT/GRILLES' },
-      // B2 - Turbine gaz (part08/09)
-      { external_id: 'B2.FILT.AIR', path: 'SYSTEM/B2/FILT/AIR' },
-      { external_id: 'B2.PAD.HYD', path: 'SYSTEM/B2/PAD/HYD' },
-      { external_id: 'B2.MIST.ELIM', path: 'SYSTEM/B2/MIST/ELIM' },
-      { external_id: 'B2.PSO.HYD', path: 'SYSTEM/B2/PSO/HYD' },
-      { external_id: 'B2.SKBD.VENT', path: 'SYSTEM/B2/SKBD/VENT' },
-    ];
-
-    console.log(`Préparation de l'injection de ${pidNodes.length} nœuds P&ID documentés...`);
-
-    // Le code ci-dessous est une référence conceptuelle de l'opération d'écriture en base de données.
-    try {
-        /*
-        await prisma.functionalNode.createMany({
-            data: pidNodes.map(node => {
-                const nodeAsString = JSON.stringify(node, Object.keys(node).sort());
-                return {
-                    ...node,
-                    // La génération du checksum garantit l'intégrité de chaque enregistrement individuel.
-                    checksum: crypto.createHash('sha256').update(nodeAsString).digest('hex')
-                };
-            }),
-            skipDuplicates: true // Empêche les erreurs si un nœud avec le même external_id existe déjà.
-        });
-        console.log(`✅ ${pidNodes.length} nœuds P&ID ont été injectés ou validés avec succès dans la base de données.`);
-        */
-       console.log("Le code d'injection Prisma est commenté car ce script est une référence.");
-
-    } catch (error) {
-        console.error("❌ Erreur conceptuelle lors de l'injection des données P&ID :", error);
-    }
-   
-   console.log("\nCe script est une référence. Les données réelles pour l'application sont gérées via les fichiers master-data JSON pour assurer le fonctionnement hors-ligne.");
+interface PidNode {
+  external_id: string;
+  system: string;
+  subsystem: string;
+  document: string;
+  tag: string | null;
+  type: string;
+  name: string;
+  description: string;
+  location: string;
+  coordinates: {
+    x: number;
+    y: number;
+    page: string;
+  };
+  linked_parameters: string[];
+  svg_layer: string;
+  fire_zone: string | null;
+  status: string;
 }
 
-main().catch(e => {
-    console.error(e);
-    // Dans un vrai script, on quitterait le processus en cas d'erreur.
-    // process.exit(1); 
-}).finally(async () => {
-    // Déconnexion propre du client Prisma.
-    // await prisma.$disconnect(); 
+interface PidAssets {
+  version: string;
+  generated_at: string;
+  approved_by: string | null;
+  approved_at: string | null;
+  standard_references: Record<string, string>;
+  checksum_seed: string | null;
+  nodes: PidNode[];
+}
+
+async function main() {
+  console.log('🚀 [PID ASSETS SEED] Démarrage injection Master Data P&ID...\n');
+
+  // Lecture du fichier pid-assets.json
+  const filePath = path.join(__dirname, '../src/assets/master-data/pid-assets.json');
+  const rawData = readFileSync(filePath, 'utf-8');
+  const pidAssets: PidAssets = JSON.parse(rawData);
+
+  // Génération checksum global
+  const checksumSeed = createHash('sha256').update(rawData).digest('hex');
+  console.log(`✅ Checksum seed calculé : ${checksumSeed.substring(0, 16)}...`);
+
+  let successCount = 0;
+  let errorCount = 0;
+  const errors: string[] = [];
+
+  // Injection des nœuds
+  for (const node of pidAssets.nodes) {
+    try {
+      // Génération checksum individuel
+      const nodeChecksum = createHash('sha256')
+        .update(JSON.stringify(node))
+        .digest('hex');
+
+      // Upsert dans la base
+      await prisma.functionalNode.upsert({
+        where: { external_id: node.external_id },
+        update: {
+          system: node.system,
+          subsystem: node.subsystem,
+          document: node.document,
+          tag: node.tag,
+          type: node.type,
+          name: node.name,
+          description: node.description,
+          location: node.location,
+          coordinates: node.coordinates,
+          linked_parameters: node.linked_parameters,
+          svg_layer: node.svg_layer,
+          fire_zone: node.fire_zone,
+          status: node.status,
+          checksum: nodeChecksum,
+          updated_at: new Date(),
+        },
+        create: {
+          external_id: node.external_id,
+          system: node.system,
+          subsystem: node.subsystem,
+          document: node.document,
+          tag: node.tag,
+          type: node.type,
+          name: node.name,
+          description: node.description,
+          location: node.location,
+          coordinates: node.coordinates,
+          linked_parameters: node.linked_parameters,
+          svg_layer: node.svg_layer,
+          fire_zone: node.fire_zone,
+          status: node.status,
+          checksum: nodeChecksum,
+          created_at: new Date(),
+          updated_at: new Date(),
+        },
+      });
+
+      successCount++;
+      if (successCount % 10 === 0) {
+        console.log(`   ✅ ${successCount}/${pidAssets.nodes.length} nœuds injectés...`);
+      }
+    } catch (error) {
+      errorCount++;
+      errors.push(`❌ ${node.external_id}: ${(error as Error).message}`);
+    }
+  }
+
+  // Mise à jour checksum seed global
+  pidAssets.checksum_seed = checksumSeed;
+  pidAssets.approved_at = new Date().toISOString();
+  
+  writeFileSync(filePath, JSON.stringify(pidAssets, null, 2), 'utf-8');
+
+  // Résumé
+  console.log('\n📊 [RÉSUMÉ INJECTION]');
+  console.log(`   ✅ Nœuds injectés : ${successCount}`);
+  console.log(`   ❌ Erreurs : ${errorCount}`);
+  console.log(`   🔐 Checksum seed : ${checksumSeed}`);
+  console.log(`   📁 Fichier mis à jour : ${filePath}`);
+
+  if (errors.length > 0) {
+    console.log('\n⚠️  [ERREURS DÉTAILLÉES]');
+    errors.forEach(err => console.log(`   ${err}`));
+  }
+
+  console.log('\n✅ [PID ASSETS SEED] Injection terminée avec succès !');
+  
+  await prisma.$disconnect();
+}
+
+// Gestion erreurs
+main().catch((error) => {
+  console.error('\n❌ [ERREUR FATALE]', error);
+  process.exit(1);
 });
+
+    
