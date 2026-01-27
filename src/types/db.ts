@@ -61,3 +61,24 @@ export interface Procedure {
     version: string;
     steps: ProcedureStep[];
 }
+
+export interface FunctionalNode {
+    external_id: string;
+    system: string;
+    subsystem: string;
+    document: string;
+    tag: string | null;
+    type: string;
+    name: string;
+    description: string;
+    location: string;
+    coordinates: {
+      x: number;
+      y: number;
+      page: string;
+    };
+    linked_parameters: string[];
+    svg_layer: string;
+    fire_zone: string | null;
+    status: string;
+  }
