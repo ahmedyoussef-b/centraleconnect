@@ -1,0 +1,25 @@
+tag,external_id,document,system,type,name
+DF002,A0.FIRE.DET.DF002,part10,A0,smoke_detector,Détecteur fumée zone 41
+DF003,A0.FIRE.DET.DF003,part10,A0,smoke_detector,Détecteur fumée zone 41
+DF004,A0.FIRE.DET.DF004,part10,A0,smoke_detector,Détecteur fumée zone 41
+DF005,A0.FIRE.DET.DF005,part10,A0,smoke_detector,Détecteur fumée zone 41
+DF006,A0.FIRE.DET.DF006,part10,A0,smoke_detector,Détecteur fumée zone 41
+DF007,A0.FIRE.DET.DF007,part10,A0,smoke_detector,Détecteur fumée zone 42
+DF008,A0.FIRE.DET.DF008,part10,A0,smoke_detector,Détecteur fumée zone 42
+DF009,A0.FIRE.DET.DF009,part10,A0,smoke_detector,Détecteur fumée zone 42
+MS222,A0.FIRE.DET.MS222,part10,A0,heat_detector,Détecteur thermique
+PHN801,A0.FIRE.ALARM.PHN801,part10,A0,acoustic_alarm,Système diffusion sonore
+T61,B1.FIRE.CO2.T61,part11,B1,co2_container,Conteneur CO₂ TG1
+B1,B1.GAS.DET.B1,part11,B1,gas_detector,Détecteur gaz TG1
+CR,B1.FIRE.CO2.CR,part11,B1,release_valve,Vanne libération CO₂ TG1
+B1.FAZ,B1.FUEL.FAZ,part13,B1,fuel_admission_zone,Zone admission gaz TG1
+HV001A,B1.FUEL.VALVE.HV001A,part13,B1,motorized_valve,Vanne motorisée gaz TG1
+V001T,B1.FUEL.VALVE.V001T,part13,B1,isolation_valve,Vanne isolement DN25 TG1
+T62,B2.FIRE.CO2.T62,part11,B2,co2_container,Conteneur CO₂ TG2
+B2,B2.GAS.DET.B2,part11,B2,gas_detector,Détecteur gaz TG2
+CR,B2.FIRE.CO2.CR,part11,B2,release_valve,Vanne libération CO₂ TG2
+B2.TPF,B2.LUB.TPF,part12,B2,filtration_system,Turbine Protection Filtration TG2
+PSV202F,B2.LUB.PSV202F,part12,B2,safety_valve,Soupape sécurité filtration TG2
+B2.FAZ,B2.FUEL.FAZ,part13,B2,fuel_admission_zone,Zone admission gaz TG2
+HV012,B2.FUEL.VALVE.HV012,part13,B2,motorized_valve,Vanne motorisée gaz TG2
+N2x4.55,B3.FUEL.PREHEAT.N2x4.55,part14,B3,gas_preheater,Réchauffeur gaz N2×4.55
