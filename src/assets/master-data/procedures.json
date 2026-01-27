@@ -171,5 +171,92 @@
         "type": "check"
       }
     ]
+  },
+  {
+    "id": "gas-turbine-startup",
+    "name": "Démarrage Turbine à Gaz",
+    "description": "Procédure de démarrage de la turbine à gaz, du lancement à la synchronisation.",
+    "version": "1.0.0",
+    "steps": [
+      {
+        "id": "tg-s1",
+        "title": "Préparation et Permissifs",
+        "type": "group",
+        "details": "Vérification des sécurités de base par le système Speedtronic Mark IV.",
+        "steps": [
+          { "id": "tg-s1a", "title": "Viscosité de l'huile < 800 SSU", "type": "check", "details": "Garantit la lubrification des paliers." },
+          { "id": "tg-s1b", "title": "Température de l'huile correcte (Thermostat 26 QN-1)", "type": "check", "details": "Interdit le démarrage si l'huile est trop froide." },
+          { "id": "tg-s1c", "title": "Vannes anti-pompage (x4) confirmées 100% ouvertes (33 CB-1 à 4)", "type": "check" },
+          { "id": "tg-s1d", "title": "Aubes orientables (I.G.V.) en position fermée (34°)", "type": "check" }
+        ]
+      },
+      {
+        "id": "tg-s2",
+        "title": "Lancement et Décollement (Breakaway)",
+        "type": "group",
+        "steps": [
+          { "id": "tg-s2a", "title": "Circuit maître 'L4' activé, embrayage engagé, moteur de lancement en rotation", "type": "check" },
+          { "id": "tg-s2b", "title": "Signal de vitesse nulle (L14HR) désactivé", "type": "check", "details": "Se désactive dès que la rotation commence (> 0 t/min)." }
+        ]
+      },
+      {
+        "id": "tg-s3",
+        "title": "Cycle de Purge",
+        "type": "group",
+        "steps": [
+          { "id": "tg-s3a", "title": "Turbine maintenue à la vitesse de purge (~18%, 540 t/min, L14HM)", "type": "check" },
+          { "id": "tg-s3b", "title": "Fin de la temporisation de sécurité (L2TV)", "type": "check", "details": "Assure l'évacuation des gaz combustibles résiduels." }
+        ]
+      },
+      {
+        "id": "tg-s4",
+        "title": "Allumage et Détection de Flamme",
+        "type": "group",
+        "steps": [
+          { "id": "tg-s4a", "title": "Débit de combustible (FSR) au niveau 'débit d'allumage'", "type": "check" },
+          { "id": "tg-s4b", "title": "Bougies d'allumage (95SP) activées", "type": "check" },
+          { "id": "tg-s4c", "title": "Présence de flamme validée par au moins 2/4 détecteurs UV (L28FD)", "type": "check", "details": "Doit être confirmé avant la fin de la temporisation L2F." }
+        ]
+      },
+      {
+        "id": "tg-s5",
+        "title": "Phase de Réchauffement (Warm-up)",
+        "type": "group",
+        "steps": [
+          { "id": "tg-s5a", "title": "FSR réduit au niveau 'MONTEE EN TEMPERATURE'", "type": "check" },
+          { "id": "tg-s5b", "title": "Fin de la temporisation de réchauffement (L2W)", "type": "check", "details": "Minimise les contraintes thermiques." }
+        ]
+      },
+      {
+        "id": "tg-s6",
+        "title": "Accélération de la Turbine",
+        "type": "group",
+        "steps": [
+          { "id": "tg-s6a", "type": "instruction", "title": "Phase d'accélération active (L14HA: 40-50%)", "details": "Seuil entre 1200-1500 t/min. Le débit de combustible augmente progressivement." },
+          { "id": "tg-s6b", "type": "instruction", "title": "Retrait automatique des bougies d'allumage", "details": "Se produit à 1500 t/min (50%)." },
+          { "id": "tg-s6c", "title": "Turbine auto-sustentée, moteur de lancement arrêté", "type": "check", "details": "Seuil L14HC (50-70%). L'embrayage se désengage." }
+        ]
+      },
+      {
+        "id": "tg-s7",
+        "title": "Pleine Vitesse à Vide (FSNL)",
+        "type": "group",
+        "steps": [
+          { "id": "tg-s7a", "title": "Vitesse de service atteinte (~95%, 2850 t/min, L14HS)", "type": "check" },
+          { "id": "tg-s7b", "title": "Vannes anti-pompage fermées automatiquement", "type": "check" },
+          { "id": "tg-s7c", "title": "Aubes orientables (I.G.V.) ouvertes à l'angle minimal de pleine vitesse (~57°)", "type": "check" },
+          { "id": "tg-s7d", "title": "Signal 'Séquence complète' émis (vitesse stabilisée à 3000 t/min)", "type": "check" }
+        ]
+      },
+      {
+        "id": "tg-s8",
+        "title": "Synchronisation",
+        "type": "group",
+        "steps": [
+          { "id": "tg-s8a", "title": "Référence de vitesse (TNR) portée à 100.3% (3009 t/min)", "type": "check" },
+          { "id": "tg-s8b", "title": "Disjoncteur de l'alternateur fermé après validation du synchronisme", "type": "check" }
+        ]
+      }
+    ]
   }
 ]
