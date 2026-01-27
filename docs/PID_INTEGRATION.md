@@ -9,6 +9,17 @@ Intégration complète des schémas P&ID (Piping and Instrumentation Diagram) da
 
 ---
 
+## ✅ Conformité Normative
+
+L'architecture d'intégration des données P&ID respecte plusieurs normes industrielles critiques :
+
+| Norme     | Implémentation                                                              |
+| :-------- | :-------------------------------------------------------------------------- |
+| ISO 55001 | Traçabilité via checksum, approbation formelle (`approved_by`, `approved_at`). |
+| IEC 61511 | Identification des zones de sécurité (`fire_zone`) et des équipements critiques. |
+| EU IED    | Supporte la traçabilité pour le journal réglementaire embarqué et hors-ligne. |
+---
+
 ## ⚙️ Architecture d'Intégration
 
 L'intégration des données P&ID est basée sur une chaîne de validation et de traitement de données maîtres, garantissant l'intégrité et la traçabilité.

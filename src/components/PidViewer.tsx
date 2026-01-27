@@ -24,6 +24,11 @@ export default function PidViewer({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeHotspots, setActiveHotspots] = useState<string[]>([]);
+  const [isTauri, setIsTauri] = useState(false);
+
+  useEffect(() => {
+    setIsTauri(!!window.__TAURI__);
+  }, []);
 
   const getSvgPath = useCallback((id: string): string | null => {
     if (!id) return null;
@@ -97,13 +102,22 @@ export default function PidViewer({
             throw new Error(`Aucun schéma SVG n'est mappé pour l'ID : ${externalId}`);
         }
         
-        const response = await fetch(path);
+        let svgText: string;
 
-        if (!response.ok) {
-          throw new Error(`SVG non trouvé : ${path} (status: ${response.status})`);
+        if (isTauri) {
+            const { invoke } = await import('@tauri-apps/api/tauri');
+            // Path for invoke should be relative to the resource root (which is the `public` folder)
+            const resourcePath = path.startsWith('/') ? path.substring(1) : path;
+            svgText = await invoke('get_pid_svg', { path: resourcePath });
+        } else {
+            const response = await fetch(path);
+
+            if (!response.ok) {
+              throw new Error(`SVG non trouvé : ${path} (status: ${response.status})`);
+            }
+            svgText = await response.text();
         }
 
-        const svgText = await response.text();
         setSvgContent(svgText);
       } catch (err) {
         setError((err as Error).message);
@@ -115,7 +129,7 @@ export default function PidViewer({
     if (externalId) {
         loadSvg();
     }
-  }, [externalId, getSvgPath]);
+  }, [externalId, getSvgPath, isTauri]);
 
   const handleSvgClick = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
