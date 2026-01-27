@@ -1,0 +1,16 @@
+tag,unit,description,status_in_central,suggested_external_id
+CEX3-001,B3,Condenseur basse pression,absent,B3.CEX3
+BACHE ALIMENTAIRE,B3,Réservoir eau alimentaire,absent,B3.BA
+POMPES D'EXTRACTION,B3,Pompes extraction condensat,absent,B3.PEX
+POMPES DE REFRIGERATION,B3,Pompes refroidissement auxiliaire,absent,B3.PR
+UNITE HYDRAULIQUE 2,B3,Unité hydraulique 2,absent,B3.UH2
+UNITE HYDRAULIQUE 3,B3,Unité hydraulique 3,absent,B3.UH3
+REFRIGERATION AUXILIAIRE,B3,Système refroidissement auxiliaire,absent,B3.RA
+FBP,B3,Préchauffage eau condensée,présent,B3.FBP
+B3PE20,B3,Stockage d'eau déminé,présent,B3.PE20
+B1TG11,B1,Turbine Gaz 1 - Vue générale,présent,B1.TG11
+B2TG11,B2,Turbine Gaz 2 - Vue générale,présent,B2.TG11
+B1CR11,B1,Chaudière récupération 1,présent,B1.CR11
+B2CR11,B2,Chaudière récupération 2,présent,B2.CR11
+B3TV21,B3,Turbine vapeur - Section 1,présent,B3.TV21
+B3TV46EXP,B3,Turbine vapeur - Version expérimentale,présent,B3.TV46EXP

@@ -91,5 +91,41 @@
       "subtype": "Temperature",
       "manufacturer": "Rosemount",
       "location": "Poste d'eau - Sortie circuit secondaire"
+    },
+    {
+      "tag": "CEX3-001",
+      "name": "Condenseur basse pression",
+      "type": "CONDENSER",
+      "subtype": "P&ID Mapped",
+      "manufacturer": "",
+      "serialNumber": "",
+      "location": "B3"
+    },
+    {
+      "tag": "BACHE-ALIMENTAIRE",
+      "name": "Réservoir eau alimentaire",
+      "type": "TANK",
+      "subtype": "P&ID Mapped",
+      "manufacturer": "",
+      "serialNumber": "",
+      "location": "B3"
+    },
+    {
+      "tag": "POMPES-DEXTRACTION",
+      "name": "Pompes extraction condensat",
+      "type": "PUMP",
+      "subtype": "P&ID Mapped",
+      "manufacturer": "",
+      "serialNumber": "",
+      "location": "B3"
+    },
+    {
+      "tag": "POMPES-DE-REFRIGERATION",
+      "name": "Pompes refroidissement auxiliaire",
+      "type": "PUMP",
+      "subtype": "P&ID Mapped",
+      "manufacturer": "",
+      "serialNumber": "",
+      "location": "B3"
     }
   ]
