@@ -6,6 +6,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { cn } from '@/lib/utils';
 import { Loader2 } from 'lucide-react';
+import { getPidSvgContent } from '@/lib/pid-service';
 
 interface PidViewerProps {
   externalId: string;
@@ -24,18 +25,11 @@ export default function PidViewer({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeHotspots, setActiveHotspots] = useState<string[]>([]);
-  const [isTauri, setIsTauri] = useState(false);
-
-  useEffect(() => {
-    setIsTauri(!!window.__TAURI__);
-  }, []);
 
   const getSvgPath = useCallback((id: string): string | null => {
     if (!id) return null;
     
-    // This mapping links a system/subsystem prefix to a specific SVG file.
     const mappings: Record<string, string> = {
-        // A0
         'A0.FIRE': 'A0/fire-protection.svg',
         'A0.GAS': 'A0/gas-regulation.svg',
         'A0.FUEL': 'A0/fuel-transfer.svg',
@@ -50,13 +44,11 @@ export default function PidViewer({
         'A0.GGR.DRAINS': 'A0/GGR/DRAINS.svg',
         'A0.SKD.PUMP': 'A0/SKD/PUMP.svg',
         'A0.SKD.TANK': 'A0/SKD/TANK.svg',
-        // B1
         'B1.FIRE': 'B1/co2-extinction.svg',
         'B1.GAS': 'B1/gas-detection.svg',
         'B1.FUEL': 'B1/fuel-system.svg',
         'B1.SAFETY': 'B1/nitrogen-injection.svg',
         'B1.SEPARATOR': 'B1/separator.svg',
-        // B2
         'B2.LUB': 'B2/lubrication-filtration.svg',
         'B2.FIRE': 'B2/co2-extinction.svg',
         'B2.GAS': 'B2/gas-detection.svg',
@@ -68,7 +60,6 @@ export default function PidViewer({
         'B2.MIST.ELIM': 'B2/MIST.ELIM.svg',
         'B2.PSO.HYD': 'B2/PSO.HYD.svg',
         'B2.SKBD.VENT': 'B2/SKBD.VENT.svg',
-        // B3
         'B3.FUEL': 'B3/gas-preheat.svg',
         'B3.BOILER.COOL': 'B3/boiler-cooling.svg',
         'B3.BOILER': 'B3/boiler-gas.svg',
@@ -102,23 +93,9 @@ export default function PidViewer({
             throw new Error(`Aucun schéma SVG n'est mappé pour l'ID : ${externalId}`);
         }
         
-        let svgText: string;
-
-        if (isTauri) {
-            const { invoke } = await import('@tauri-apps/api/tauri');
-            // Path for invoke should be relative to the resource root (which is the `public` folder)
-            const resourcePath = path.startsWith('/') ? path.substring(1) : path;
-            svgText = await invoke('get_pid_svg', { path: resourcePath });
-        } else {
-            const response = await fetch(path);
-
-            if (!response.ok) {
-              throw new Error(`SVG non trouvé : ${path} (status: ${response.status})`);
-            }
-            svgText = await response.text();
-        }
-
+        const svgText = await getPidSvgContent(path);
         setSvgContent(svgText);
+
       } catch (err) {
         setError((err as Error).message);
       } finally {
@@ -129,7 +106,7 @@ export default function PidViewer({
     if (externalId) {
         loadSvg();
     }
-  }, [externalId, getSvgPath, isTauri]);
+  }, [externalId, getSvgPath]);
 
   const handleSvgClick = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
