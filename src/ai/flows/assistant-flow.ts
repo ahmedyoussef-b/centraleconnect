@@ -21,9 +21,15 @@ const AssistantInputSchema = z.object({
 export type AssistantInput = z.infer<typeof AssistantInputSchema>;
 
 
+const AssistantActionSchema = z.object({
+  action: z.literal('show_pid'),
+  target: z.string().describe("The external_id of the equipment P&ID to show."),
+});
+
 const AssistantOutputSchema = z.object({
   text: z.string().describe('The text response from the assistant.'),
   audio: z.string().describe('The data URI of the audio response (WAV format).'),
+  action: AssistantActionSchema.optional().describe('An optional action for the client to perform, like displaying a P&ID diagram.'),
 });
 
 export type AssistantOutput = z.infer<typeof AssistantOutputSchema>;
@@ -46,9 +52,20 @@ Be concise and professional.
 The current time is ${new Date().toLocaleString('fr-FR')}.
 The plant is a 2x1 Combined Cycle Power Plant with two gas turbines (TG1, TG2), two heat recovery steam generators (CR1, CR2) and one steam turbine (TV).
 
+If the user asks to see, view, display or "montre-moi" an equipment, a P&ID, a diagram, or a schema, you must trigger a display action. To do this:
+1. Find the corresponding equipment in the \`functional_nodes\` array from the context, based on the user's query.
+2. Get its \`external_id\`.
+3. Set the 'action' field in your output to \`{ "action": "show_pid", "target": "THE_EXTERNAL_ID" }\`.
+4. Your text response should confirm the action, for example: "Affichage du schéma pour [equipment name]".
+
 {{#if context}}
-You have been provided with the following master data from the plant's local database. Use this data to answer specific questions about equipment parameters, nominal values, units, etc.
-If the user asks for a value, refer to this data. For example, if asked for the nominal power of TG1, find the 'Puissance active' parameter for equipment 'TG1' and use its 'nominal_value'.
+You have been provided with the following master data from the plant's local database. Use this data to answer specific questions.
+
+- \`components\`: List of main physical components.
+- \`parameters\`: Technical parameters for components.
+- \`functional_nodes\`: Detailed list of all equipment from P&ID diagrams. Use this to find equipment for display requests.
+
+Example for a "show" request: User says "Montre-moi le détecteur de fumée DF002". You find DF002 in \`functional_nodes\`, get its \`external_id\` which is "A0.FIRE.DET.DF002", and set the action.
 
 Database Context:
 \`\`\`json
@@ -57,7 +74,7 @@ Database Context:
 {{/if}}
 `,
   input: { schema: AssistantInputSchema },
-  output: { schema: z.object({ response: z.string() }) },
+  output: { schema: z.object({ response: z.string(), action: AssistantActionSchema.optional() }) },
   prompt: 'The operator asks: {{{query}}}',
 });
 
@@ -69,9 +86,12 @@ const assistantFlow = ai.defineFlow(
     outputSchema: AssistantOutputSchema,
   },
   async (input) => {
-    // 1. Get text response from LLM
+    // 1. Get text response and action from LLM
     const llmResponse = await assistantPrompt(input);
-    const textResponse = llmResponse.output?.response ?? "Je n'ai pas compris, pouvez-vous reformuler ?";
+    const output = llmResponse.output;
+
+    const textResponse = output?.response ?? "Je n'ai pas compris, pouvez-vous reformuler ?";
+    const action = output?.action;
 
     // 2. Generate audio from the text response
     const { media } = await ai.generate({
@@ -97,6 +117,7 @@ const assistantFlow = ai.defineFlow(
     return {
       text: textResponse,
       audio: `data:audio/wav;base64,${wavData}`,
+      action: action,
     };
   }
 );

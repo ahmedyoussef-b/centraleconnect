@@ -351,6 +351,33 @@ export async function getComponentsWithParameters(): Promise<Component[]> {
     return Array.from(componentMap.values());
 }
 
+export async function getAssistantContextData(): Promise<any> {
+    await initializeDatabase();
+    const db = await getDbInstance();
+
+    const components = await db.select<Component[]>('SELECT * FROM components');
+    const parameters = await db.select<Parameter[]>('SELECT * FROM parameters');
+    const functionalNodes = await db.select<FunctionalNode[]>('SELECT * FROM functional_nodes');
+    
+    const parsedFunctionalNodes = functionalNodes.map(node => {
+        const parsedNode = {...node};
+        try {
+            if (node.coordinates) parsedNode.coordinates = JSON.parse(node.coordinates as any);
+            if (node.linked_parameters) parsedNode.linked_parameters = JSON.parse(node.linked_parameters as any);
+        } catch (e) {
+            console.error(`Failed to parse JSON for node ${node.external_id}`, e);
+        }
+        return parsedNode;
+    });
+
+    return {
+        components,
+        parameters,
+        functional_nodes: parsedFunctionalNodes,
+    };
+}
+
+
 export async function getLogEntries(): Promise<LogEntry[]> {
     await initializeDatabase();
     const db = await getDbInstance();

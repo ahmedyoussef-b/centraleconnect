@@ -19,7 +19,8 @@ import { askAssistant, type AssistantInput } from '@/ai/flows/assistant-flow';
 import { useToast } from '@/hooks/use-toast';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { useVoskRecognizer, RecognizerState } from '@/hooks/use-vosk-recognizer';
-import { getComponentsWithParameters } from '@/lib/db-service';
+import { getAssistantContextData } from '@/lib/db-service';
+import { usePidViewer } from '@/contexts/pid-viewer-context';
 
 interface Message {
   id: string;
@@ -40,6 +41,7 @@ export function VocalAssistant() {
   const audioRef = useRef<HTMLAudioElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
+  const { showPid } = usePidViewer();
 
   const { recognizerState, transcript, start, stop } = useVoskRecognizer({
       modelUrl: '/models/vosk-model-small-fr-0.22.zip',
@@ -64,7 +66,7 @@ export function VocalAssistant() {
     async function loadData() {
       if (tauriEnv) {
         try {
-          const data = await getComponentsWithParameters();
+          const data = await getAssistantContextData();
           setMasterDataContext(data);
           console.log('Master data context loaded for assistant.');
         } catch (e) {
@@ -115,6 +117,10 @@ export function VocalAssistant() {
       };
       setMessages((prev) => [...prev, assistantMessage]);
 
+      if (assistantResponse.action?.action === 'show_pid') {
+        showPid(assistantResponse.action.target);
+      }
+
       if (isTtsEnabled && audioRef.current) {
         audioRef.current.src = assistantResponse.audio;
         audioRef.current.play().catch(e => console.error("Audio playback failed", e));
@@ -135,7 +141,7 @@ export function VocalAssistant() {
     } finally {
       setIsProcessing(false);
     }
-  }, [isProcessing, isTtsEnabled, toast, masterDataContext, isTauri]);
+  }, [isProcessing, isTtsEnabled, toast, masterDataContext, isTauri, showPid]);
   
   const handleSubmit = (e: React.FormEvent) => {
       e.preventDefault();
