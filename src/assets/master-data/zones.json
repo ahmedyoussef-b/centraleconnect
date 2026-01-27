@@ -1,15 +1,44 @@
-
 [
     {
-        "id": "PROD_GAZ",
-        "name": "Zone Production Gaz",
-        "description": "Section des turbines à gaz et chaudières de récupération.",
-        "centralId": "CCPP"
+      "code": "SYSTEM",
+      "name": "Système global",
+      "description": "Éléments communs à toute la centrale",
+      "level": 0
     },
     {
-        "id": "PROD_VAPEUR",
-        "name": "Zone Production Vapeur",
-        "description": "Section de la turbine à vapeur et circuits d'eau.",
-        "centralId": "CCPP"
+      "code": "SHARE",
+      "name": "Partagé",
+      "description": "Équipements ou fonctions utilisés par plusieurs blocs",
+      "level": 0
+    },
+    {
+      "code": "A0",
+      "name": "Bloc A - Niveau 0",
+      "description": "Niveau inférieur du bloc A (pompes, alimentation)",
+      "level": 0
+    },
+    {
+      "code": "B0",
+      "name": "Bloc B - Niveau 0",
+      "description": "Niveau inférieur du bloc B",
+      "level": 0
+    },
+    {
+      "code": "B1",
+      "name": "Bloc B - Niveau 1",
+      "description": "Niveau intermédiaire du bloc B (turbines à gaz)",
+      "level": 1
+    },
+    {
+      "code": "B2",
+      "name": "Bloc B - Niveau 2",
+      "description": "Niveau supérieur du bloc B (turbine à vapeur)",
+      "level": 2
+    },
+    {
+      "code": "B3",
+      "name": "Bloc B - Niveau 3",
+      "description": "Niveau de distribution et contrôle (poste d'eau, régulation)",
+      "level": 3
     }
-]
+  ]

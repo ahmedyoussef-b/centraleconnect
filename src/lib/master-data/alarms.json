@@ -1,8 +1,0 @@
-
-[
-    {"equipment_id": "TG1", "code": "TG1-VIB-HIGH", "description": "Vibration palier avant élevée", "severity": "WARNING"},
-    {"equipment_id": "TG1", "code": "TG1-TEMP-EXH-HIGH", "description": "Température échappement > 650°C", "severity": "CRITICAL"},
-    {"equipment_id": "TG1", "code": "TG1-FLAME-OUT", "description": "Perte de flamme en chambre de combustion", "severity": "CRITICAL"},
-    {"equipment_id": "CR1", "code": "CR1-LVL-BALLON-LOW", "description": "Niveau bas ballon HP", "severity": "WARNING"},
-    {"equipment_id": "CR1", "code": "CR1-PRESS-VAP-HIGH", "description": "Pression vapeur surchauffée HP trop haute", "severity": "CRITICAL"}
-]

@@ -1,8 +1,37 @@
-
 [
-    {"equipment_id": "TG1", "code": "TG1-VIB-HIGH", "description": "Vibration palier avant élevée", "severity": "WARNING"},
-    {"equipment_id": "TG1", "code": "TG1-TEMP-EXH-HIGH", "description": "Température échappement > 650°C", "severity": "CRITICAL"},
-    {"equipment_id": "TG1", "code": "TG1-FLAME-OUT", "description": "Perte de flamme en chambre de combustion", "severity": "CRITICAL"},
-    {"equipment_id": "CR1", "code": "CR1-LVL-BALLON-LOW", "description": "Niveau bas ballon HP", "severity": "WARNING"},
-    {"equipment_id": "CR1", "code": "CR1-PRESS-VAP-HIGH", "description": "Pression vapeur surchauffée HP trop haute", "severity": "CRITICAL"}
-]
+    {
+      "code": "ALM-TG1-VIB-HI",
+      "componentTag": "TG1",
+      "severity": "CRITICAL",
+      "message": "Vibration excessive sur palier N1 TG1",
+      "standardRef": "ISO 10814 §5.2"
+    },
+    {
+      "code": "ALM-TG1-EXHTEMP-HI",
+      "componentTag": "TG1",
+      "severity": "WARNING",
+      "message": "Température échappement TG1 élevée",
+      "standardRef": "IEC 60034-1 Annex C"
+    },
+    {
+      "code": "ALM-HRSG1-PRESS-HI",
+      "componentTag": "HRSG1",
+      "severity": "EMERGENCY",
+      "message": "Surpression tambour HP HRSG1 – risque de rupture",
+      "standardRef": "PED 2014/68/EU"
+    },
+    {
+      "code": "ALM-CR1-VAC-LO",
+      "componentTag": "CR1",
+      "severity": "WARNING",
+      "message": "Perte de vide condenseur CR1",
+      "standardRef": "ASME PTC 12.2"
+    },
+    {
+      "code": "ALM-NOX-EMISSION-HI",
+      "componentTag": "TG1",
+      "severity": "WARNING",
+      "message": "Émissions NOx au-dessus de la limite réglementaire",
+      "standardRef": "EU 2010/75/EU Art. 31"
+    }
+  ]

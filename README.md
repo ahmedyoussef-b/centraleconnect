@@ -1,3 +1,4 @@
+
 Tu es un expert hybride combinant :
 
 L’expérience opérationnelle d’un exploitant senior en centrale électrique à cycle combiné (2×1 : TG1, TG2 → TV avec CR1/CR2),
@@ -74,7 +75,7 @@ Voici une analyse de l'état d'avancement du projet par rapport aux 8 fonctionna
 
 **2. Base de Données Statique Locale (Master Data)**
 *   ✅ **Fait :** Structure de la base de données (équipements, paramètres, alarmes, journal, documents) implémentée et initialisée au démarrage.
-*   ✅ **Fait :** Les tables sont relationnelles.
+*   ✅ **Fait :** Les tables sont relationnelles et les données sont chargées depuis des fichiers JSON versionnés et validés par checksum.
 
 **3. Auto-Provisionnement Multimédia Intelligent**
 *   ✅ **Fait :** "Mode Peuplement" implémenté, permettant de capturer une image, d'extraire des données via OCR/QR code, et de valider/enregistrer un nouvel équipement dans la base de données.
@@ -84,13 +85,13 @@ Voici une analyse de l'état d'avancement du projet par rapport aux 8 fonctionna
 **4. Assistant Vocal Industriel (Voice Q&A)**
 *   ✅ **Fait :** Interface de l'assistant intégrée avec historique de conversation.
 *   ✅ **Fait :** Reconnaissance vocale **hors-ligne** (STT offline avec Vosk) et synthèse vocale (TTS) fonctionnelles.
-*   ⏳ **À faire :** Connexion de l'assistant à la base de données locale pour des réponses contextuelles (ex: "Quelle est la pression de TG1 ?").
+*   ✅ **Fait :** L'assistant est connecté à la base de données locale pour des réponses contextuelles (ex: "Quelle est la puissance nominale de TG1 ?").
 
 **5. Supervision Temps Réel SCADA**
 *   ✅ **Fait :** Widget de supervision affichant des données simulées en temps réel via Ably.
 *   ✅ **Fait :** Schéma P&ID simplifié et interactif (`CcppDiagram`).
 *   ✅ **Fait :** Graphique affichant l'historique de puissance sur 24h (données simulées).
-*   ⏳ **À faire :** Connexion à une source de données historique réelle (ex: TimescaleDB) et détection d'anomalies.
+*   ⏳ **À faire :** Connexion à une source de données réelle, détection d'anomalies en comparant les données temps réel aux seuils de la base locale.
 
 **6. Procédures Guidées Interactives**
 *   ❌ **Non implémenté.** Cette fonctionnalité est une prochaine étape majeure.
@@ -102,6 +103,38 @@ Voici une analyse de l'état d'avancement du projet par rapport aux 8 fonctionna
 *   ✅ **Fait :** Journal de bord fonctionnel avec enregistrement des événements automatiques (démarrage, ajout de document) et manuels.
 *   ✅ **Fait :** Chaque entrée est horodatée et liée à une source.
 *   ✅ **Fait :** Fonctionnalité d'export "Imprimer en PDF".
-*   ✅ **Fait :** Mécanismes d'infalsifiabilité via une chaîne de signatures cryptographiques (intégrité vérifiable).
+*   ✅ **Fait :** Mécanismes d'infalsifiabilité via une chaîne de signatures cryptographiques (intégrité vérifiable par l'opérateur).
 
-**Conclusion :** Le MVP est dans un état très avancé et robuste. Les fondations sont solides, les fonctionnalités clés sont implémentées et fonctionnelles, incluant des capacités hors-ligne et de traçabilité avancées. Les axes d'amélioration identifiés (connexion aux données réelles, "Mode Contrôle") et les nouvelles fonctionnalités (procédures, collaboration) constituent les prochaines étapes logiques.
+**Conclusion :** Le MVP est dans un état très avancé et robuste. Les fondations sont solides, les fonctionnalités clés sont implémentées et fonctionnelles, incluant des capacités hors-ligne et de traçabilité avancées. Le plan de progression ci-dessous définit les prochaines étapes logiques.
+
+---
+
+## Plan de Progression
+
+Voici un plan de progression logique pour faire évoluer ce MVP robuste vers une solution encore plus complète.
+
+**1. Implémenter les Procédures Guidées Interactives :**
+*   **Objectif :** Transformer la page `/procedures` en une fonctionnalité centrale. L'opérateur doit pouvoir sélectionner une procédure (ex: "Démarrage à froid TG1") et être guidé pas à pas.
+*   **Étapes clés :**
+    1.  **Modèle de Données :** Créer un fichier `procedures.json` dans `src/assets/master-data/` pour définir la structure des procédures (étapes, descriptions, types de validation).
+    2.  **Interface Utilisateur :** Sur la page `/procedures`, afficher la liste des procédures disponibles. Créer une nouvelle vue pour l'exécution d'une procédure, avec des checklists, des champs de saisie et des boutons de validation.
+    3.  **Intégration SCADA :** Permettre aux étapes de se valider automatiquement en vérifiant les données temps réel (ex: "Attendre que la température de sortie de CR1 > 150°C").
+    4.  **Traçabilité :** Enregistrer automatiquement chaque action (démarrage de la procédure, validation d'une étape, etc.) dans le journal de bord pour un audit complet.
+
+**2. Enrichir la Supervision et la Détection d'Anomalies :**
+*   **Objectif :** Rendre la supervision plus intelligente en la connectant plus profondément aux données de référence.
+*   **Étapes clés :**
+    1.  **Détection d'Anomalies :** Dans le composant `ScadaRealtime`, comparer les valeurs en direct avec les seuils `min_value` et `max_value` des paramètres lus depuis la base de données locale. Si un seuil est dépassé, l'affichage de la valeur changera de couleur (ex: orange pour un avertissement, rouge pour une alarme).
+    2.  **Journalisation Automatique des Alarmes :** Lorsqu'une anomalie est détectée, créer automatiquement une entrée de type `AUTO` dans le journal de bord, en y associant le code de l'alarme et l'identifiant du composant concerné.
+
+**3. Créer des Vues Détaillées par Équipement :**
+*   **Objectif :** Permettre à l'opérateur de consulter une "fiche d'identité" complète pour chaque équipement.
+*   **Étapes clés :**
+    1.  **Navigation :** Rendre les lignes de la table sur la page `/equipments` cliquables.
+    2.  **Page de Détail :** Créer une nouvelle page dynamique (ex: `/equipments/[id]`). Cette page affichera toutes les informations relatives à un composant : ses paramètres nominaux, les alarmes qui lui sont associées, tous les documents et photos (issus du provisionnement), et un historique filtré des entrées du journal de bord le concernant.
+
+**4. Mettre en Place la Collaboration en Temps Réel (Phase 1) :**
+*   **Objectif :** Initier les fonctionnalités collaboratives, en commençant par un chat contextualisé.
+*   **Étapes clés :**
+    1.  **Chat Contextuel :** Sur la future page de détail d'un équipement ou lors d'une procédure, ajouter un widget de chat simple.
+    2.  **Canaux Ably :** Utiliser des canaux Ably dédiés (ex: `chat:equipment:TG1` ou `chat:procedure:demarrage-froid-tg1`) pour que les messages soient pertinents au contexte de travail.

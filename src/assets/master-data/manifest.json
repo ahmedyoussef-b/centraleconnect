@@ -1,8 +1,12 @@
-
 {
-    "version": "1.1.0",
-    "date": "2026-01-26",
-    "description": "Hierarchical master data set for CCPP Monitor application.",
+    "version": "1.0.0",
+    "description": "Configuration initiale centrale cycle combiné 2x1",
     "approvedBy": "ing.systems@plant.com",
-    "checksum": "sha256:49061d3f0a33c2a688969e223f218f731889a74b4198904795b8712128864701"
-}
+    "date": "2026-01-26",
+    "checksum": "sha256:placeholder",
+    "normativeReferences": [
+      "ISO 55000:2014",
+      "IEC 61511-1:2016",
+      "EU 2010/75/EU"
+    ]
+  }

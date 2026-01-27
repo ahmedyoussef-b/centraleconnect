@@ -1,11 +1,95 @@
-
 [
-    {"id": "TG1", "name": "Turbine à Gaz 1", "description": "Turbine à gaz principale 1", "type": "GAS_TURBINE", "groupId": "TG1_SYS"},
-    {"id": "CR1", "name": "Chaudière de Récupération 1", "description": "Chaudière associée à la TG1", "type": "HRSG", "groupId": "TG1_SYS"},
-    {"id": "TG2", "name": "Turbine à Gaz 2", "description": "Turbine à gaz principale 2", "type": "GAS_TURBINE", "groupId": "TG2_SYS"},
-    {"id": "CR2", "name": "Chaudière de Récupération 2", "description": "Chaudière associée à la TG2", "type": "HRSG", "groupId": "TG2_SYS"},
-    {"id": "TV", "name": "Turbine à Vapeur", "description": "Turbine à vapeur du cycle combiné", "type": "STEAM_TURBINE", "groupId": "TV_SYS"},
-    {"id": "P-101A", "name": "Pompe d'alimentation HP 1", "description": "Pompe principale d'alimentation du ballon HP de la chaudière 1", "type": "PUMP", "groupId": "EAU_ALIM_HP"},
-    {"id": "P-101B", "name": "Pompe d'alimentation HP 2", "description": "Pompe de secours d'alimentation du ballon HP de la chaudière 1", "type": "PUMP", "groupId": "EAU_ALIM_HP"},
-    {"id": "V-205", "name": "Vanne de réglage vapeur TV", "description": "Vanne principale d'admission vapeur HP vers la turbine à vapeur", "type": "VALVE", "groupId": "TV_SYS"}
-]
+    {
+      "tag": "TG1",
+      "name": "Turbine à gaz 1",
+      "type": "GAS_TURBINE",
+      "subtype": "Heavy-duty",
+      "manufacturer": "Siemens",
+      "serialNumber": "SGT5-4000F-001",
+      "location": "Bloc A - Niveau 2"
+    },
+    {
+      "tag": "TG2",
+      "name": "Turbine à gaz 2",
+      "type": "GAS_TURBINE",
+      "subtype": "Heavy-duty",
+      "manufacturer": "Siemens",
+      "serialNumber": "SGT5-4000F-002",
+      "location": "Bloc A - Niveau 2"
+    },
+    {
+      "tag": "HRSG1",
+      "name": "Chaudière récupératrice TG1",
+      "type": "HRSG",
+      "subtype": "Triple-pressure",
+      "manufacturer": "NEM",
+      "serialNumber": "HRSG-TG1-2020",
+      "location": "Bloc A - Niveau 1"
+    },
+    {
+      "tag": "HRSG2",
+      "name": "Chaudière récupératrice TG2",
+      "type": "HRSG",
+      "subtype": "Triple-pressure",
+      "manufacturer": "NEM",
+      "serialNumber": "HRSG-TG2-2020",
+      "location": "Bloc A - Niveau 1"
+    },
+    {
+      "tag": "TV",
+      "name": "Turbine à vapeur",
+      "type": "STEAM_TURBINE",
+      "subtype": "Condensing-reheat",
+      "manufacturer": "Siemens",
+      "serialNumber": "SST-900-001",
+      "location": "Bloc A - Niveau 1"
+    },
+    {
+      "tag": "CR1",
+      "name": "Condenseur 1",
+      "type": "CONDENSER",
+      "subtype": "Surface",
+      "manufacturer": "Alstom",
+      "location": "Bloc A - Sous-sol"
+    },
+    {
+      "tag": "CR2",
+      "name": "Condenseur 2",
+      "type": "CONDENSER",
+      "subtype": "Surface",
+      "manufacturer": "Alstom",
+      "location": "Bloc A - Sous-sol"
+    },
+    {
+      "tag": "PUMP-FEEDWATER-01",
+      "name": "Pompe d'alimentation chaudière 1",
+      "type": "PUMP",
+      "subtype": "Centrifugal-multistage",
+      "manufacturer": "KSB",
+      "location": "Bloc A - Niveau 0"
+    },
+    {
+      "tag": "VALVE-BYPASS-HRSG1",
+      "name": "Vanne de bypass HRSG1",
+      "type": "VALVE",
+      "subtype": "Butterfly-control",
+      "manufacturer": "Flowserve",
+      "location": "HRSG1 - Sortie vapeur"
+    },
+    {
+      "tag": "B3PE11",
+      "name": "Point d'eau 11 - Pression entrée",
+      "type": "SENSOR",
+      "subtype": "Pressure",
+      "manufacturer": "Endress+Hauser",
+      "location": "Poste d'eau - Entrée circuit principal"
+    },
+    {
+      "tag": "B3PE20",
+      "name": "Point d'eau 20 - Température sortie",
+      "type": "SENSOR",
+      "subtype": "Temperature",
+      "manufacturer": "Rosemount",
+      "location": "Poste d'eau - Sortie circuit secondaire"
+    }
+  ]

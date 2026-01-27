@@ -1,8 +1,1679 @@
-
 [
-    {
-        "id": "CCPP",
-        "name": "Centrale à Cycle Combiné 2x1",
-        "description": "Centrale de production électrique à cycle combiné gaz-vapeur."
-    }
+  {
+    "external_id": "SYSTEM",
+    "name": "SYSTEM",
+    "type": "functional_unit",
+    "parent_id": null,
+    "path": "SYSTEM",
+    "level": 0,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27",
+    "standard_refs": ["IEC 61511-3", "ISO 55001"]
+  },
+  {
+    "external_id": "SHARE",
+    "name": "SHARE",
+    "type": "functional_unit",
+    "parent_id": null,
+    "path": "SHARE",
+    "level": 0,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27",
+    "standard_refs": ["IEC 61511-3", "ISO 55001"]
+  },
+  {
+    "external_id": "A0",
+    "name": "A0",
+    "type": "functional_unit",
+    "parent_id": null,
+    "path": "A0",
+    "level": 0,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27",
+    "standard_refs": ["IEC 61511-3", "ISO 55001"]
+  },
+  {
+    "external_id": "B0",
+    "name": "B0",
+    "type": "functional_unit",
+    "parent_id": null,
+    "path": "B0",
+    "level": 0,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27",
+    "standard_refs": ["IEC 61511-3", "ISO 55001"]
+  },
+  {
+    "external_id": "B0.CFI",
+    "name": "CFI",
+    "type": "subsystem",
+    "parent_id": "B0",
+    "path": "B0/CFI",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B0.CRF",
+    "name": "CRF",
+    "type": "subsystem",
+    "parent_id": "B0",
+    "path": "B0/CRF",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B0.DVC",
+    "name": "DVC",
+    "type": "subsystem",
+    "parent_id": "B0",
+    "path": "B0/DVC",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B0.GIS",
+    "name": "GIS",
+    "type": "subsystem",
+    "parent_id": "B0",
+    "path": "B0/GIS",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B0.KBS",
+    "name": "KBS",
+    "type": "subsystem",
+    "parent_id": "B0",
+    "path": "B0/KBS",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B0.KCZ",
+    "name": "KCZ",
+    "type": "subsystem",
+    "parent_id": "B0",
+    "path": "B0/KCZ",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B0.KIT",
+    "name": "KIT",
+    "type": "subsystem",
+    "parent_id": "B0",
+    "path": "B0/KIT",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B0.KRG",
+    "name": "KRG",
+    "type": "subsystem",
+    "parent_id": "B0",
+    "path": "B0/KRG",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B0.KSA",
+    "name": "KSA",
+    "type": "subsystem",
+    "parent_id": "B0",
+    "path": "B0/KSA",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B0.KSC",
+    "name": "KSC",
+    "type": "subsystem",
+    "parent_id": "B0",
+    "path": "B0/KSC",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B0.LBA",
+    "name": "LBA",
+    "type": "subsystem",
+    "parent_id": "B0",
+    "path": "B0/LBA",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B0.LBB",
+    "name": "LBB",
+    "type": "subsystem",
+    "parent_id": "B0",
+    "path": "B0/LBB",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B0.LCA",
+    "name": "LCA",
+    "type": "subsystem",
+    "parent_id": "B0",
+    "path": "B0/LCA",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B0.LCB",
+    "name": "LCB",
+    "type": "subsystem",
+    "parent_id": "B0",
+    "path": "B0/LCB",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B0.LGA",
+    "name": "LGA",
+    "type": "subsystem",
+    "parent_id": "B0",
+    "path": "B0/LGA",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B0.LJP",
+    "name": "LJP",
+    "type": "subsystem",
+    "parent_id": "B0",
+    "path": "B0/LJP",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B0.LKA",
+    "name": "LKA",
+    "type": "subsystem",
+    "parent_id": "B0",
+    "path": "B0/LKA",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B0.LKB",
+    "name": "LKB",
+    "type": "subsystem",
+    "parent_id": "B0",
+    "path": "B0/LKB",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B0.LKN",
+    "name": "LKN",
+    "type": "subsystem",
+    "parent_id": "B0",
+    "path": "B0/LKN",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B0.LLA",
+    "name": "LLA",
+    "type": "subsystem",
+    "parent_id": "B0",
+    "path": "B0/LLA",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B0.LLB",
+    "name": "LLB",
+    "type": "subsystem",
+    "parent_id": "B0",
+    "path": "B0/LLB",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B0.LLN",
+    "name": "LLN",
+    "type": "subsystem",
+    "parent_id": "B0",
+    "path": "B0/LLN",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B0.LLP",
+    "name": "LLP",
+    "type": "subsystem",
+    "parent_id": "B0",
+    "path": "B0/LLP",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B0.LNA",
+    "name": "LNA",
+    "type": "subsystem",
+    "parent_id": "B0",
+    "path": "B0/LNA",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B0.LSI",
+    "name": "LSI",
+    "type": "subsystem",
+    "parent_id": "B0",
+    "path": "B0/LSI",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B0.TEST_MODBUS",
+    "name": "TEST_MODBUS",
+    "type": "subsystem",
+    "parent_id": "B0",
+    "path": "B0/TEST_MODBUS",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B0.SAP",
+    "name": "SAP",
+    "type": "subsystem",
+    "parent_id": "B0",
+    "path": "B0/SAP",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B0.SAR",
+    "name": "SAR",
+    "type": "subsystem",
+    "parent_id": "B0",
+    "path": "B0/SAR",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B1",
+    "name": "B1",
+    "type": "functional_unit",
+    "parent_id": null,
+    "path": "B1",
+    "level": 0,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27",
+    "standard_refs": ["IEC 61511-3", "ISO 55001"]
+  },
+  {
+    "external_id": "B1.ACO",
+    "name": "ACO",
+    "type": "subsystem",
+    "parent_id": "B1",
+    "path": "B1/ACO",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B1.CRF",
+    "name": "CRF",
+    "type": "subsystem",
+    "parent_id": "B1",
+    "path": "B1/CRF",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B1.DIAGRAMMES",
+    "name": "DIAGRAMMES",
+    "type": "folder",
+    "parent_id": "B1",
+    "path": "B1/DIAGRAMMES",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B1.ELE",
+    "name": "ELE",
+    "type": "subsystem",
+    "parent_id": "B1",
+    "path": "B1/ELE",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B1.FBP",
+    "name": "FBP",
+    "type": "subsystem",
+    "parent_id": "B1",
+    "path": "B1/FBP",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B1.FLB",
+    "name": "FLB",
+    "type": "subsystem",
+    "parent_id": "B1",
+    "path": "B1/FLB",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B1.FRG",
+    "name": "FRG",
+    "type": "subsystem",
+    "parent_id": "B1",
+    "path": "B1/FRG",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B1.FSE",
+    "name": "FSE",
+    "type": "subsystem",
+    "parent_id": "B1",
+    "path": "B1/FSE",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B1.FSR",
+    "name": "FSR",
+    "type": "subsystem",
+    "parent_id": "B1",
+    "path": "B1/FSR",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B1.GBP",
+    "name": "GBP",
+    "type": "subsystem",
+    "parent_id": "B1",
+    "path": "B1/GBP",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B1.GHP",
+    "name": "GHP",
+    "type": "subsystem",
+    "parent_id": "B1",
+    "path": "B1/GHP",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B1.GIS",
+    "name": "GIS",
+    "type": "subsystem",
+    "parent_id": "B1",
+    "path": "B1/GIS",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B1.KBS",
+    "name": "KBS",
+    "type": "subsystem",
+    "parent_id": "B1",
+    "path": "B1/KBS",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B1.KCZ",
+    "name": "KCZ",
+    "type": "subsystem",
+    "parent_id": "B1",
+    "path": "B1/KCZ",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B1.KOS",
+    "name": "KOS",
+    "type": "subsystem",
+    "parent_id": "B1",
+    "path": "B1/KOS",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B1.KRG",
+    "name": "KRG",
+    "type": "subsystem",
+    "parent_id": "B1",
+    "path": "B1/KRG",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B1.LGA",
+    "name": "LGA",
+    "type": "subsystem",
+    "parent_id": "B1",
+    "path": "B1/LGA",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B1.LJP",
+    "name": "LJP",
+    "type": "subsystem",
+    "parent_id": "B1",
+    "path": "B1/LJP",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B1.LKA",
+    "name": "LKA",
+    "type": "subsystem",
+    "parent_id": "B1",
+    "path": "B1/LKA",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B1.LLA",
+    "name": "LLA",
+    "type": "subsystem",
+    "parent_id": "B1",
+    "path": "B1/LLA",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B1.SIT",
+    "name": "SIT",
+    "type": "subsystem",
+    "parent_id": "B1",
+    "path": "B1/SIT",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B1.TCA",
+    "name": "TCA",
+    "type": "subsystem",
+    "parent_id": "B1",
+    "path": "B1/TCA",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B1.TEV",
+    "name": "TEV",
+    "type": "subsystem",
+    "parent_id": "B1",
+    "path": "B1/TEV",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B1.TEX",
+    "name": "TEX",
+    "type": "subsystem",
+    "parent_id": "B1",
+    "path": "B1/TEX",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B1.TGR",
+    "name": "TGR",
+    "type": "subsystem",
+    "parent_id": "B1",
+    "path": "B1/TGR",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B1.TGU",
+    "name": "TGU",
+    "type": "subsystem",
+    "parent_id": "B1",
+    "path": "B1/TGU",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B1.TNT",
+    "name": "TNT",
+    "type": "subsystem",
+    "parent_id": "B1",
+    "path": "B1/TNT",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B1.TPA",
+    "name": "TPA",
+    "type": "subsystem",
+    "parent_id": "B1",
+    "path": "B1/TPA",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B1.TPF",
+    "name": "TPF",
+    "type": "subsystem",
+    "parent_id": "B1",
+    "path": "B1/TPF",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B1.TPG",
+    "name": "TPG",
+    "type": "subsystem",
+    "parent_id": "B1",
+    "path": "B1/TPG",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B1.TPT",
+    "name": "TPT",
+    "type": "subsystem",
+    "parent_id": "B1",
+    "path": "B1/TPT",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B1.TRA",
+    "name": "TRA",
+    "type": "subsystem",
+    "parent_id": "B1",
+    "path": "B1/TRA",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B1.TRE",
+    "name": "TRE",
+    "type": "subsystem",
+    "parent_id": "B1",
+    "path": "B1/TRE",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B1.TRI",
+    "name": "TRI",
+    "type": "subsystem",
+    "parent_id": "B1",
+    "path": "B1/TRI",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B1.TRT",
+    "name": "TRT",
+    "type": "subsystem",
+    "parent_id": "B1",
+    "path": "B1/TRT",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B1.TTA",
+    "name": "TTA",
+    "type": "subsystem",
+    "parent_id": "B1",
+    "path": "B1/TTA",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B1.TVC",
+    "name": "TVC",
+    "type": "subsystem",
+    "parent_id": "B1",
+    "path": "B1/TVC",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B1.TVM",
+    "name": "TVM",
+    "type": "subsystem",
+    "parent_id": "B1",
+    "path": "B1/TVM",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B1.WP",
+    "name": "WP",
+    "type": "subsystem",
+    "parent_id": "B1",
+    "path": "B1/WP",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B2",
+    "name": "B2",
+    "type": "functional_unit",
+    "parent_id": null,
+    "path": "B2",
+    "level": 0,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27",
+    "standard_refs": ["IEC 61511-3", "ISO 55001"]
+  },
+  {
+    "external_id": "B2.ACO",
+    "name": "ACO",
+    "type": "subsystem",
+    "parent_id": "B2",
+    "path": "B2/ACO",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B2.CET",
+    "name": "CET",
+    "type": "subsystem",
+    "parent_id": "B2",
+    "path": "B2/CET",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B2.CRF",
+    "name": "CRF",
+    "type": "subsystem",
+    "parent_id": "B2",
+    "path": "B2/CRF",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B2.DIAGRAMMES",
+    "name": "DIAGRAMMES",
+    "type": "folder",
+    "parent_id": "B2",
+    "path": "B2/DIAGRAMMES",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B2.ELE",
+    "name": "ELE",
+    "type": "subsystem",
+    "parent_id": "B2",
+    "path": "B2/ELE",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B2.FBP",
+    "name": "FBP",
+    "type": "subsystem",
+    "parent_id": "B2",
+    "path": "B2/FBP",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B2.FLB",
+    "name": "FLB",
+    "type": "subsystem",
+    "parent_id": "B2",
+    "path": "B2/FLB",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B2.FRG",
+    "name": "FRG",
+    "type": "subsystem",
+    "parent_id": "B2",
+    "path": "B2/FRG",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B2.FSE",
+    "name": "FSE",
+    "type": "subsystem",
+    "parent_id": "B2",
+    "path": "B2/FSE",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B2.FSR",
+    "name": "FSR",
+    "type": "subsystem",
+    "parent_id": "B2",
+    "path": "B2/FSR",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B2.GBP",
+    "name": "GBP",
+    "type": "subsystem",
+    "parent_id": "B2",
+    "path": "B2/GBP",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B2.GHP",
+    "name": "GHP",
+    "type": "subsystem",
+    "parent_id": "B2",
+    "path": "B2/GHP",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B2.GIS",
+    "name": "GIS",
+    "type": "subsystem",
+    "parent_id": "B2",
+    "path": "B2/GIS",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B2.KBS",
+    "name": "KBS",
+    "type": "subsystem",
+    "parent_id": "B2",
+    "path": "B2/KBS",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B2.KCZ",
+    "name": "KCZ",
+    "type": "subsystem",
+    "parent_id": "B2",
+    "path": "B2/KCZ",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B2.KOS",
+    "name": "KOS",
+    "type": "subsystem",
+    "parent_id": "B2",
+    "path": "B2/KOS",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B2.KRG",
+    "name": "KRG",
+    "type": "subsystem",
+    "parent_id": "B2",
+    "path": "B2/KRG",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B2.LGA",
+    "name": "LGA",
+    "type": "subsystem",
+    "parent_id": "B2",
+    "path": "B2/LGA",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B2.LJP",
+    "name": "LJP",
+    "type": "subsystem",
+    "parent_id": "B2",
+    "path": "B2/LJP",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B2.LKA",
+    "name": "LKA",
+    "type": "subsystem",
+    "parent_id": "B2",
+    "path": "B2/LKA",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B2.LLA",
+    "name": "LLA",
+    "type": "subsystem",
+    "parent_id": "B2",
+    "path": "B2/LLA",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B2.SIT",
+    "name": "SIT",
+    "type": "subsystem",
+    "parent_id": "B2",
+    "path": "B2/SIT",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B2.TCA",
+    "name": "TCA",
+    "type": "subsystem",
+    "parent_id": "B2",
+    "path": "B2/TCA",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B2.TEV",
+    "name": "TEV",
+    "type": "subsystem",
+    "parent_id": "B2",
+    "path": "B2/TEV",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B2.TEX",
+    "name": "TEX",
+    "type": "subsystem",
+    "parent_id": "B2",
+    "path": "B2/TEX",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B2.TGR",
+    "name": "TGR",
+    "type": "subsystem",
+    "parent_id": "B2",
+    "path": "B2/TGR",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B2.TGU",
+    "name": "TGU",
+    "type": "subsystem",
+    "parent_id": "B2",
+    "path": "B2/TGU",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B2.TNT",
+    "name": "TNT",
+    "type": "subsystem",
+    "parent_id": "B2",
+    "path": "B2/TNT",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B2.TPA",
+    "name": "TPA",
+    "type": "subsystem",
+    "parent_id": "B2",
+    "path": "B2/TPA",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B2.TPF",
+    "name": "TPF",
+    "type": "subsystem",
+    "parent_id": "B2",
+    "path": "B2/TPF",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B2.TPG",
+    "name": "TPG",
+    "type": "subsystem",
+    "parent_id": "B2",
+    "path": "B2/TPG",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B2.TPT",
+    "name": "TPT",
+    "type": "subsystem",
+    "parent_id": "B2",
+    "path": "B2/TPT",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B2.TRA",
+    "name": "TRA",
+    "type": "subsystem",
+    "parent_id": "B2",
+    "path": "B2/TRA",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B2.TRE",
+    "name": "TRE",
+    "type": "subsystem",
+    "parent_id": "B2",
+    "path": "B2/TRE",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B2.TRI",
+    "name": "TRI",
+    "type": "subsystem",
+    "parent_id": "B2",
+    "path": "B2/TRI",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B2.TRT",
+    "name": "TRT",
+    "type": "subsystem",
+    "parent_id": "B2",
+    "path": "B2/TRT",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B2.TTA",
+    "name": "TTA",
+    "type": "subsystem",
+    "parent_id": "B2",
+    "path": "B2/TTA",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B2.TVC",
+    "name": "TVC",
+    "type": "subsystem",
+    "parent_id": "B2",
+    "path": "B2/TVC",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B2.TVM",
+    "name": "TVM",
+    "type": "subsystem",
+    "parent_id": "B2",
+    "path": "B2/TVM",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B2.WP",
+    "name": "WP",
+    "type": "subsystem",
+    "parent_id": "B2",
+    "path": "B2/WP",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B3",
+    "name": "B3",
+    "type": "functional_unit",
+    "parent_id": null,
+    "path": "B3",
+    "level": 0,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27",
+    "standard_refs": ["IEC 61511-3", "ISO 55001"]
+  },
+  {
+    "external_id": "B3.ACO",
+    "name": "ACO",
+    "type": "subsystem",
+    "parent_id": "B3",
+    "path": "B3/ACO",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B3.ADG",
+    "name": "ADG",
+    "type": "subsystem",
+    "parent_id": "B3",
+    "path": "B3/ADG",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B3.APB",
+    "name": "APB",
+    "type": "subsystem",
+    "parent_id": "B3",
+    "path": "B3/APB",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B3.APH",
+    "name": "APH",
+    "type": "subsystem",
+    "parent_id": "B3",
+    "path": "B3/APH",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B3.ARG",
+    "name": "ARG",
+    "type": "subsystem",
+    "parent_id": "B3",
+    "path": "B3/ARG",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B3.CAP",
+    "name": "CAP",
+    "type": "subsystem",
+    "parent_id": "B3",
+    "path": "B3/CAP",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B3.CAR",
+    "name": "CAR",
+    "type": "subsystem",
+    "parent_id": "B3",
+    "path": "B3/CAR",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B3.CET",
+    "name": "CET",
+    "type": "subsystem",
+    "parent_id": "B3",
+    "path": "B3/CET",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B3.CEX",
+    "name": "CEX",
+    "type": "subsystem",
+    "parent_id": "B3",
+    "path": "B3/CEX",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B3.CFI",
+    "name": "CFI",
+    "type": "subsystem",
+    "parent_id": "B3",
+    "path": "B3/CFI",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B3.CJK",
+    "name": "CJK",
+    "type": "subsystem",
+    "parent_id": "B3",
+    "path": "B3/CJK",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B3.CRF",
+    "name": "CRF",
+    "type": "subsystem",
+    "parent_id": "B3",
+    "path": "B3/CRF",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B3.CTA",
+    "name": "CTA",
+    "type": "subsystem",
+    "parent_id": "B3",
+    "path": "B3/CTA",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B3.CVI",
+    "name": "CVI",
+    "type": "subsystem",
+    "parent_id": "B3",
+    "path": "B3/CVI",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B3.DIAGRAMMES",
+    "name": "DIAGRAMMES",
+    "type": "folder",
+    "parent_id": "B3",
+    "path": "B3/DIAGRAMMES",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B3.ELE",
+    "name": "ELE",
+    "type": "subsystem",
+    "parent_id": "B3",
+    "path": "B3/ELE",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B3.FBP",
+    "name": "FBP",
+    "type": "subsystem",
+    "parent_id": "B3",
+    "path": "B3/FBP",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B3.GBP",
+    "name": "GBP",
+    "type": "subsystem",
+    "parent_id": "B3",
+    "path": "B3/GBP",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B3.GEV",
+    "name": "GEV",
+    "type": "subsystem",
+    "parent_id": "B3",
+    "path": "B3/GEV",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B3.GEX",
+    "name": "GEX",
+    "type": "subsystem",
+    "parent_id": "B3",
+    "path": "B3/GEX",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B3.GFR",
+    "name": "GFR",
+    "type": "subsystem",
+    "parent_id": "B3",
+    "path": "B3/GFR",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B3.GGR",
+    "name": "GGR",
+    "type": "subsystem",
+    "parent_id": "B3",
+    "path": "B3/GGR",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B3.GHP",
+    "name": "GHP",
+    "type": "subsystem",
+    "parent_id": "B3",
+    "path": "B3/GHP",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B3.GMA",
+    "name": "GMA",
+    "type": "subsystem",
+    "parent_id": "B3",
+    "path": "B3/GMA",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B3.GPA",
+    "name": "GPA",
+    "type": "subsystem",
+    "parent_id": "B3",
+    "path": "B3/GPA",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B3.GPV",
+    "name": "GPV",
+    "type": "subsystem",
+    "parent_id": "B3",
+    "path": "B3/GPV",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B3.GRA",
+    "name": "GRA",
+    "type": "subsystem",
+    "parent_id": "B3",
+    "path": "B3/GRA",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B3.GRE",
+    "name": "GRE",
+    "type": "subsystem",
+    "parent_id": "B3",
+    "path": "B3/GRE",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B3.GSE",
+    "name": "GSE",
+    "type": "subsystem",
+    "parent_id": "B3",
+    "path": "B3/GSE",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B3.GSY",
+    "name": "GSY",
+    "type": "subsystem",
+    "parent_id": "B3",
+    "path": "B3/GSY",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B3.GTH",
+    "name": "GTH",
+    "type": "subsystem",
+    "parent_id": "B3",
+    "path": "B3/GTH",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B3.HMI",
+    "name": "HMI",
+    "type": "subsystem",
+    "parent_id": "B3",
+    "path": "B3/HMI",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B3.KBS",
+    "name": "KBS",
+    "type": "subsystem",
+    "parent_id": "B3",
+    "path": "B3/KBS",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B3.KCA",
+    "name": "KCA",
+    "type": "subsystem",
+    "parent_id": "B3",
+    "path": "B3/KCA",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B3.KCZ",
+    "name": "KCZ",
+    "type": "subsystem",
+    "parent_id": "B3",
+    "path": "B3/KCZ",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B3.KOS",
+    "name": "KOS",
+    "type": "subsystem",
+    "parent_id": "B3",
+    "path": "B3/KOS",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B3.KRG",
+    "name": "KRG",
+    "type": "subsystem",
+    "parent_id": "B3",
+    "path": "B3/KRG",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B3.KSC",
+    "name": "KSC",
+    "type": "subsystem",
+    "parent_id": "B3",
+    "path": "B3/KSC",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B3.LBA",
+    "name": "LBA",
+    "type": "subsystem",
+    "parent_id": "B3",
+    "path": "B3/LBA",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B3.LBB",
+    "name": "LBB",
+    "type": "subsystem",
+    "parent_id": "B3",
+    "path": "B3/LBB",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B3.LCA",
+    "name": "LCA",
+    "type": "subsystem",
+    "parent_id": "B3",
+    "path": "B3/LCA",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B3.LCB",
+    "name": "LCB",
+    "type": "subsystem",
+    "parent_id": "B3",
+    "path": "B3/LCB",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B3.LGA",
+    "name": "LGA",
+    "type": "subsystem",
+    "parent_id": "B3",
+    "path": "B3/LGA",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B3.LJP",
+    "name": "LJP",
+    "type": "subsystem",
+    "parent_id": "B3",
+    "path": "B3/LJP",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B3.LKA",
+    "name": "LKA",
+    "type": "subsystem",
+    "parent_id": "B3",
+    "path": "B3/LKA",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B3.LNA",
+    "name": "LNA",
+    "type": "subsystem",
+    "parent_id": "B3",
+    "path": "B3/LNA",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B3.SER",
+    "name": "SER",
+    "type": "subsystem",
+    "parent_id": "B3",
+    "path": "B3/SER",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B3.SIT",
+    "name": "SIT",
+    "type": "subsystem",
+    "parent_id": "B3",
+    "path": "B3/SIT",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B3.SRI",
+    "name": "SRI",
+    "type": "subsystem",
+    "parent_id": "B3",
+    "path": "B3/SRI",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B3.SVA",
+    "name": "SVA",
+    "type": "subsystem",
+    "parent_id": "B3",
+    "path": "B3/SVA",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B3.SXS",
+    "name": "SXS",
+    "type": "subsystem",
+    "parent_id": "B3",
+    "path": "B3/SXS",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B3.VRI",
+    "name": "VRI",
+    "type": "subsystem",
+    "parent_id": "B3",
+    "path": "B3/VRI",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "B3.WP",
+    "name": "WP",
+    "type": "subsystem",
+    "parent_id": "B3",
+    "path": "B3/WP",
+    "level": 1,
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-27"
+  }
 ]
