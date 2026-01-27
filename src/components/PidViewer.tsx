@@ -10,11 +10,32 @@ interface PidViewerProps {
 export default function PidViewer({ externalId }: PidViewerProps) {
   const [error, setError] = useState(false);
   const pidMap: Record<string, string> = {
-    'B3.CEX3': '/assets/pids/B3/CEX3-001.svg',
-    'B3.BA': '/assets/pids/B3/BACHE_ALIMENTAIRE.svg',
+    // B3 - Cycle vapeur (part04/05/06)
+    'B3.CEX3': '/assets/pids/B3/CEX3.svg',
+    'B3.BA': '/assets/pids/B3/BA.svg',
+    'B3.CEX425': '/assets/pids/B3/CEX425.svg',
+    'B3.SEP269': '/assets/pids/B3/SEP269.svg',
+    'B3.DES266': '/assets/pids/B3/DES266.svg',
+    'B3.GSE.SVBP3': '/assets/pids/B3/SVBP3.svg',
+    
+    // A0 - Lubrification & utilities (part06/07/08)
+    'A0.GGR.TV': '/assets/pids/A0/GGR/TV.svg',
+    'A0.GGR.CENT': '/assets/pids/A0/GGR/CENT.svg',
+    'A0.GGR.POMP1': '/assets/pids/A0/GGR/POMP1.svg',
+    'A0.GGR.DRAINS': '/assets/pids/A0/GGR/DRAINS.svg',
+    'A0.CAA.HV183': '/assets/pids/A0/CAA/HV183.svg',
+    'A0.CAA.RCP': '/assets/pids/A0/CAA/RCP.svg',
+    'A0.SKD.PUMP': '/assets/pids/A0/SKD/PUMP.svg',
+    'A0.SKD.TANK': '/assets/pids/A0/SKD/TANK.svg',
+
+    // B2 - Turbine gaz (part08)
+    'B2.FILT.AIR': '/assets/pids/B2/FILT.AIR.svg',
+    'B2.PAD.HYD': '/assets/pids/B2/PAD.HYD.svg',
+    'B2.MIST.ELIM': '/assets/pids/B2/MIST.ELIM.svg',
+
+    // Legacy paths
     'B3.PEX': '/assets/pids/B3/POMPES_EXTRACTION.svg',
     'B3.PE20': '/assets/pids/B3/B3PE20.svg',
-    'A0.CAA.HV183': '/assets/pids/A0/HV183.svg',
   };
 
   const src = pidMap[externalId] || null;
