@@ -1,14 +1,74 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+// prisma/schema.prisma
 
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model FunctionalNode {
+  // Champs existants
+  id                Int       @id @default(autoincrement())
+  external_id       String    @unique
+  system            String    // A0, B1, B2, B3
+  subsystem         String    // FIRE, LUB, FUEL, etc.
+  type              String    // equipment type
+  name              String
+  description       String?
+  status            String    @default("ACTIVE")
+  
+  // Champs SCADA existants
+  parameters        Json?     // paramètres temps réel liés
+  alarms            Json?     // alarmes associées
+  
+  // NOUVEAUX CHAMPS P&ID
+  document          String?   // part10, part11, etc.
+  tag               String?   // DF002, HV001A, T61, etc.
+  location          String?   // localisation physique
+  coordinates       Json?     // { x: Int, y: Int, page: String }
+  svg_layer         String?   // detection, fuel, lubrication, etc.
+  fire_zone         String?   // ZONE41, ZONE_TG1, etc.
+  
+  // Traçabilité et conformité
+  checksum          String    // SHA-256 checksum immuable
+  created_at        DateTime  @default(now())
+  updated_at        DateTime  @updatedAt
+  approved_by       String?   // ENG-SCADA-TEAM
+  approved_at       DateTime?
+  
+  @@index([system])
+  @@index([subsystem])
+  @@index([external_id])
+  @@index([tag])
+}
+
+model Alarm {
+  id              Int       @id @default(autoincrement())
+  tag             String    @unique
+  description     String
+  priority        Int
+  node_id         Int?
+  
+  node            FunctionalNode? @relation(fields: [node_id], references: [id], onDelete: SetNull)
+  
+  created_at      DateTime  @default(now())
+  
+  @@index([priority])
+}
+
+model Parameter {
+  id              Int       @id @default(autoincrement())
+  tag             String    @unique
+  description     String
+  unit            String?
+  min_value       Float?
+  max_value       Float?
+  node_id         Int?
+  
+  node            FunctionalNode? @relation(fields: [node_id], references: [id], onDelete: SetNull)
+  
+  @@index([tag])
 }
