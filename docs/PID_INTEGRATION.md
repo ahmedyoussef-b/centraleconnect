@@ -49,7 +49,7 @@ L'intégration des données P&ID est basée sur une chaîne de validation et de 
     <g id="layer-{nom_du_calque}">
       <rect 
         class="pid-hotspot"
-        data-external-id="{external_id_de_l_équipement}"
+        data-external-id="{external_id_de_l_equipement}"
         data-parameters="{paramètre1,paramètre2,paramètre3}"
       />
       <!-- ... autres hotspots ... -->
@@ -109,3 +109,10 @@ Ce `checksum` est stocké avec chaque nœud dans la base de données. Toute modi
 2.  **Connecter le Hook `usePidNavigation`**: Intégrer le hook dans la page de supervision principale pour visualiser les alarmes en temps réel sur les schémas.
 3.  **Créer les Pages de Détail d'Équipement**: Développer la route ` /equipments/[id]` qui sera la destination des clics sur les hotspots, affichant une fiche détaillée pour chaque équipement.
 4.  **Enrichir l'Assistant Vocal**: Ajouter une nouvelle capacité à l'assistant pour qu'il puisse interroger la base de données `FunctionalNode` et répondre à des questions comme "Où se trouve la vanne HV001A ?".
+5.  **Mettre en Place la Comparaison de Versions P&ID**:
+    *   **Objectif** : Permettre l'audit et la validation des modifications apportées aux schémas P&ID.
+    *   **État Actuel** : Le fichier `src/lib/pid/version-compare.ts` a été créé comme une ébauche conceptuelle.
+    *   **Étapes Futures** :
+        1.  Mettre en place un système de versioning pour les fichiers SVG (ex: `lubrication-filtration_v1.0.svg`, `lubrication-filtration_v1.1.svg`).
+        2.  Implémenter un moteur de "diff" SVG capable de parser et de comparer structurellement deux schémas pour identifier les ajouts, suppressions et modifications d'éléments.
+        3.  Créer une interface utilisateur pour visualiser ces différences de manière claire.
