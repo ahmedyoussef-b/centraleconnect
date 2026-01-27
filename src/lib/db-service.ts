@@ -166,7 +166,7 @@ async function seedFunctionalNodes(db: DbInstance) {
     }
 
     console.log('Seeding functional nodes...');
-    for (const node of (pidAssetsData.nodes as FunctionalNode[])) {
+    for (const node of (pidAssetsData.nodes as any[])) {
         const checksum = await createNodeChecksum(node);
         await db.execute(
             `INSERT INTO functional_nodes 
@@ -184,7 +184,7 @@ async function seedFunctionalNodes(db: DbInstance) {
 }
 
 async function verifyFunctionalNodesIntegrity(db: DbInstance) {
-    const nodesFromDb = await db.select<FunctionalNode[]>('SELECT * from functional_nodes');
+    const nodesFromDb: any[] = await db.select('SELECT * from functional_nodes');
     if (nodesFromDb.length === 0) return; // Nothing to verify
 
     console.log(`Verifying integrity of ${nodesFromDb.length} functional nodes...`);
@@ -351,29 +351,41 @@ export async function getComponentsWithParameters(): Promise<Component[]> {
     return Array.from(componentMap.values());
 }
 
-export async function getAssistantContextData(): Promise<any> {
+export async function getFunctionalNodes(): Promise<FunctionalNode[]> {
     await initializeDatabase();
     const db = await getDbInstance();
-
-    const components = await db.select<Component[]>('SELECT * FROM components');
-    const parameters = await db.select<Parameter[]>('SELECT * FROM parameters');
-    const functionalNodes = await db.select<FunctionalNode[]>('SELECT * FROM functional_nodes');
+    const functionalNodes = await db.select<any[]>('SELECT * FROM functional_nodes');
     
     const parsedFunctionalNodes = functionalNodes.map(node => {
         const parsedNode = {...node};
         try {
-            if (node.coordinates) parsedNode.coordinates = JSON.parse(node.coordinates as any);
-            if (node.linked_parameters) parsedNode.linked_parameters = JSON.parse(node.linked_parameters as any);
+            if (node.coordinates && typeof node.coordinates === 'string') {
+                parsedNode.coordinates = JSON.parse(node.coordinates);
+            }
+            if (node.linked_parameters && typeof node.linked_parameters === 'string') {
+                parsedNode.linked_parameters = JSON.parse(node.linked_parameters);
+            }
         } catch (e) {
             console.error(`Failed to parse JSON for node ${node.external_id}`, e);
         }
         return parsedNode;
     });
 
+    return parsedFunctionalNodes;
+}
+
+export async function getAssistantContextData(): Promise<any> {
+    await initializeDatabase();
+    const db = await getDbInstance();
+
+    const components = await db.select<Component[]>('SELECT * FROM components');
+    const parameters = await db.select<Parameter[]>('SELECT * FROM parameters');
+    const functionalNodes = await getFunctionalNodes();
+    
     return {
         components,
         parameters,
-        functional_nodes: parsedFunctionalNodes,
+        functional_nodes: functionalNodes,
     };
 }
 

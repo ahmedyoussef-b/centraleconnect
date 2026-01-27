@@ -63,22 +63,24 @@ export interface Procedure {
 }
 
 export interface FunctionalNode {
+    id: number;
     external_id: string;
     system: string;
     subsystem: string;
-    document: string;
+    document: string | null;
     tag: string | null;
     type: string;
     name: string;
-    description: string;
-    location: string;
-    coordinates: {
-      x: number;
-      y: number;
-      page: string;
-    };
-    linked_parameters: string[];
-    svg_layer: string;
+    description: string | null;
+    location: string | null;
+    coordinates: any;
+    linked_parameters: any;
+    svg_layer: string | null;
     fire_zone: string | null;
     status: string;
+    checksum: string;
+    created_at: string;
+    updated_at: string;
+    approved_by: string | null;
+    approved_at: string | null;
   }
