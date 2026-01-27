@@ -1,4 +1,5 @@
-// prisma/schema.prisma
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
   provider = "prisma-client-js"
@@ -6,69 +7,95 @@ generator client {
 
 datasource db {
   provider = "sqlite"
-  url      = "file:./dev.db"
+  url      = "file:../src-tauri/ccpp.db"
 }
 
-model FunctionalNode {
-  // Champs existants
-  id                Int       @id @default(autoincrement())
-  external_id       String    @unique
-  system            String    // A0, B1, B2, B3
-  subsystem         String    // FIRE, LUB, FUEL, etc.
-  type              String    // equipment type
-  name              String
-  description       String?
-  status            String    @default("ACTIVE")
-  
-  // Champs SCADA existants
-  parameters        Json?     // paramètres temps réel liés
-  alarms            Alarm[]   // alarmes associées
-  
-  // NOUVEAUX CHAMPS P&ID
-  document          String?   // part10, part11, etc.
-  tag               String?   // DF002, HV001A, T61, etc.
-  location          String?   // localisation physique
-  coordinates       Json?     // { x: Int, y: Int, page: String }
-  svg_layer         String?   // detection, fuel, lubrication, etc.
-  fire_zone         String?   // ZONE41, ZONE_TG1, etc.
-  
-  // Traçabilité et conformité
-  checksum          String    // SHA-256 checksum immuable
-  created_at        DateTime  @default(now())
-  updated_at        DateTime  @updatedAt
-  approved_by       String?   // ENG-SCADA-TEAM
-  approved_at       DateTime?
-  
-  @@index([system])
-  @@index([subsystem])
-  @@index([external_id])
-  @@index([tag])
-}
-
-model Alarm {
-  id              Int       @id @default(autoincrement())
-  tag             String    @unique
-  description     String
-  priority        Int
-  node_id         Int?
-  
-  node            FunctionalNode? @relation(fields: [node_id], references: [id], onDelete: SetNull)
-  
-  created_at      DateTime  @default(now())
-  
-  @@index([priority])
+model Component {
+  id          String     @id
+  name        String
+  description String?
+  type        String
+  parameters  Parameter[]
+  alarms      Alarm[]
+  log_entries LogEntry[]
+  documents   Document[]
 }
 
 model Parameter {
-  id              Int       @id @default(autoincrement())
-  tag             String    @unique
-  description     String
-  unit            String?
-  min_value       Float?
-  max_value       Float?
-  node_id         Int?
-  
-  node            FunctionalNode? @relation(fields: [node_id], references: [id], onDelete: SetNull)
-  
-  @@index([tag])
+  id            Int     @id @default(autoincrement())
+  component_id  String
+  name          String
+  unit          String?
+  min_value     Float?
+  max_value     Float?
+  nominal_value Float?
+  component     Component @relation(fields: [component_id], references: [id])
+}
+
+model Alarm {
+  id           Int     @id @default(autoincrement())
+  component_id String
+  code         String
+  description  String?
+  severity     String // 'INFO', 'WARNING', 'CRITICAL'
+  component    Component @relation(fields: [component_id], references: [id])
+
+  @@unique([component_id, code])
+}
+
+model LogEntry {
+  id           Int      @id @default(autoincrement())
+  timestamp    DateTime @default(now())
+  type         String // 'AUTO', 'MANUAL', 'DOCUMENT_ADDED'
+  source       String
+  message      String
+  component_id String?
+  signature    String?
+  component    Component? @relation(fields: [component_id], references: [id])
+}
+
+model Document {
+  id           Int      @id @default(autoincrement())
+  component_id String
+  type         String // 'PHOTO_ID_PLATE', 'MANUAL_PAGE', 'P&ID_SNIPPET'
+  description  String?
+  image_data   String? // Base64 encoded image
+  ocr_text     String?
+  created_at   DateTime @default(now())
+  component    Component @relation(fields: [component_id], references: [id])
+}
+
+model FunctionalNode {
+  id                  Int          @id @default(autoincrement())
+  external_id         String       @unique
+  system              String
+  subsystem           String
+  document            String?
+  tag                 String?
+  type                String
+  name                String
+  description         String?
+  location            String?
+  coordinates         String? // Stored as JSON string
+  linked_parameters   String? // Stored as JSON string
+  svg_layer           String?
+  fire_zone           String?
+  status              String
+  checksum            String
+  created_at          DateTime
+  updated_at          DateTime
+  approved_by         String?
+  approved_at         DateTime?
+  annotations         Annotation[]
+}
+
+model Annotation {
+  id                          Int      @id @default(autoincrement())
+  functional_node_external_id String
+  text                        String
+  operator                    String
+  timestamp                   DateTime @default(now())
+  x_pos                       Float
+  y_pos                       Float
+  functional_node             FunctionalNode @relation(fields: [functional_node_external_id], references: [external_id])
 }
