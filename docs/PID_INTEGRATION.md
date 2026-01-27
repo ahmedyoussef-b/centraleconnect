@@ -30,9 +30,27 @@ L'intégration des données P&ID est basée sur une chaîne de validation et de 
 ### 2. Script de Référence pour l'Injection
 -   **`scripts/seed-pid-assets.ts`**: Script TypeScript de référence pour un environnement serveur (Node.js + Prisma). **Il n'est pas exécuté par l'application Tauri** mais sert de documentation technique. Il lit `pid-assets.json`, calcule un checksum pour chaque nœud et les injecte dans la base.
 
-### 3. Fichiers de Schémas SVG
--   **`public/assets/pids/`**: Dossier contenant les 18 schémas SVG, organisés par système (`A0`, `B1`, `B2`, `B3`). Chaque SVG contient des "hotspots" (zones cliquables) avec des attributs `data-*` pour les lier aux données.
--   **Exemple (`B2/lubrication-filtration.svg`)**: Contient les styles CSS pour les états `hover` et `active`, des calques structurés et des hotspots avec les métadonnées (`data-external-id`, `data-parameters`).
+### 3. Fichiers de Schémas SVG et Structure d'Interaction
+-   **`public/assets/pids/`**: Dossier contenant les 18 schémas SVG, organisés par système (`A0`, `B1`, `B2`, `B3`).
+-   **Structure interne d'un SVG** : Pour être interactif, chaque SVG doit contenir des "hotspots" (zones cliquables). Ces hotspots sont des éléments SVG (`<rect>`, `<circle>`, etc.) enrichis avec des attributs `data-*`. Il est recommandé de les grouper dans des calques (`<g>`) pour une meilleure organisation.
+
+    ```xml
+    <g id="layer-{nom_du_calque}">
+      <rect 
+        class="pid-hotspot"
+        data-external-id="{external_id_de_l_équipement}"
+        data-parameters="{paramètre1,paramètre2,paramètre3}"
+      />
+      <!-- ... autres hotspots ... -->
+    </g>
+    ```
+
+-   **Attributs `data-*` essentiels** :
+    -   `class="pid-hotspot"`: Identifie l'élément comme une zone interactive. Les styles CSS pour les états `hover` et `active` (définis dans le SVG) sont automatiquement appliqués.
+    -   `data-external-id`: **Clé de liaison critique**. Doit correspondre à l'`external_id` d'un équipement dans `pid-assets.json`. C'est ce qui permet au `PidViewer` de faire le lien entre un clic sur le SVG et les données de la base.
+    -   `data-parameters`: Une liste de paramètres (séparés par des virgules) liés à cet équipement. Utilisé par le hook `usePidNavigation` pour le surlignage automatique en cas d'alarme.
+
+-   **Exemple (`B2/lubrication-filtration.svg`)**: Le fichier d'exemple existant contient déjà des styles CSS, des calques et des hotspots structurés selon ce modèle.
 
 ### 4. Composants et Hooks React
 -   **`src/components/PidViewer.tsx`**: Composant React qui :
