@@ -89,18 +89,46 @@ Le fichier SVG généré devra ensuite être édité manuellement pour y ajouter
 
 ## 🔐 Sécurité & Immuabilité
 
-### Checksum SHA-256
-Pour garantir l'intégrité et l'immuabilité des données de référence, chaque nœud P&ID possède un checksum calculé à partir de son contenu JSON. Cela permet de s'assurer que les données n'ont pas été altérées.
+L'intégrité des données de référence P&ID est une pierre angulaire de la fiabilité de l'application. Elle est assurée par un double mécanisme de validation par checksum SHA-256, garantissant l'immuabilité des données depuis leur source jusqu'à leur utilisation dans l'application.
 
-La logique de calcul (implémentée dans `scripts/seed-pid-assets.ts`) est la suivante :
+### 1. Checksum à l'Injection (Client Tauri)
+
+C'est le mécanisme principal utilisé par l'application de bureau.
+
+-   **Où** : La logique est implémentée dans `src/lib/db-service.ts`.
+-   **Quand** : Au premier démarrage de l'application.
+-   **Comment** :
+    1.  Le service lit le fichier source `src/assets/master-data/pid-assets.json`.
+    2.  Pour chaque nœud (équipement) dans le fichier, un checksum SHA-256 est calculé à partir du contenu JSON de l'objet du nœud.
+    3.  Le nœud et son checksum sont ensuite insérés dans la base de données SQLite locale.
+
+La logique de calcul utilise les API web standard `crypto.subtle` pour fonctionner dans l'environnement du navigateur de Tauri :
+
 ```typescript
-import { createHash } from 'crypto';
-
-// 'node' est l'objet JSON représentant un équipement P&ID
-const checksum = createHash('sha256').update(JSON.stringify(node)).digest('hex');
+// Logique simplifiée de src/lib/db-service.ts
+const nodeString = JSON.stringify(node);
+const encoder = new TextEncoder();
+const data = encoder.encode(nodeString);
+const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+// ... conversion en hexadécimal
 ```
-Ce `checksum` est stocké avec chaque nœud dans la base de données. Toute modification ultérieure des données d'un nœud nécessiterait un recalcul de son checksum, rendant les altérations non autorisées facilement détectables.
 
+### 2. Validation à l'Exécution (Client Tauri)
+
+Pour se prémunir contre toute corruption de la base de données locale (altération manuelle, corruption de fichier), une vérification est effectuée **à chaque démarrage de l'application**.
+
+-   **Où** : Logique implémentée dans la fonction `verifyFunctionalNodesIntegrity` de `src/lib/db-service.ts`.
+-   **Comment** :
+    1.  Le service charge tous les nœuds depuis la base de données SQLite.
+    2.  Pour chaque nœud, il reconstruit l'objet de données original et recalcule son checksum SHA-256.
+    3.  Ce checksum calculé est comparé à celui stocké en base de données.
+    4.  **En cas de non-concordance, l'application s'arrête immédiatement avec une erreur critique**, empêchant toute opération sur des données non fiables.
+
+### 3. Script de Référence pour Environnement Serveur
+
+Le fichier `scripts/seed-pid-assets.ts` est un **script de référence** destiné à un environnement backend (Node.js + Prisma). Il n'est **pas** exécuté par l'application Tauri, mais sert de documentation et d'outil pour des cas d'usage serveur. Il utilise le module `crypto` de Node.js pour effectuer une opération de checksum similaire.
+
+Ce triple niveau de contrôle assure une chaîne de confiance complète pour les données P&ID, depuis le fichier source jusqu'à l'affichage à l'opérateur.
 ---
 
 ## 🚀 Prochaines Étapes Logiques
