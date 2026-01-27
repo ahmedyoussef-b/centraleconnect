@@ -3,7 +3,7 @@
     "description": "Configuration centrale cycle combiné 2x1, incluant les ajouts P&ID.",
     "approvedBy": "ing.systems@plant.com",
     "date": "2026-01-27",
-    "checksum": "sha256:updated-by-ai-needs-recalculation",
+    "checksum": "sha256:recalculation-required-after-part09-additions",
     "normativeReferences": [
       "ISO 55000:2014",
       "IEC 61511-1:2016",

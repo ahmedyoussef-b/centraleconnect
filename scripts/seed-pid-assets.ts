@@ -36,10 +36,15 @@ async function main() {
       { external_id: 'A0.CAA.RCP', path: 'SYSTEM/A0/CAA/RCP' },
       { external_id: 'A0.SKD.PUMP', path: 'SYSTEM/A0/SKD/PUMP' },
       { external_id: 'A0.SKD.TANK', path: 'SYSTEM/A0/SKD/TANK' },
-      // B2 - Turbine gaz (part08)
+      // B2 - Turbine gaz (part08/09)
       { external_id: 'B2.FILT.AIR', path: 'SYSTEM/B2/FILT/AIR' },
       { external_id: 'B2.PAD.HYD', path: 'SYSTEM/B2/PAD/HYD' },
-      { external_id: 'B2.MIST.ELIM', path: 'SYSTEM/B2/MIST/ELIM' }
+      { external_id: 'B2.MIST.ELIM', path: 'SYSTEM/B2/MIST/ELIM' },
+      { external_id: 'B2.PSO.HYD', path: 'SYSTEM/B2/PSO/HYD' },
+      { external_id: 'B2.SKBD.VENT', path: 'SYSTEM/B2/SKBD/VENT' },
+      // A0 - Filtration (part09)
+      { external_id: 'A0.FILT.221TF2', path: 'SYSTEM/A0/FILT/221TF2' },
+      { external_id: 'A0.FILT.GRILLES', path: 'SYSTEM/A0/FILT/GRILLES' }
     ];
 
     console.log(`Préparation de l'injection de ${pidNodes.length} nœuds P&ID documentés...`);

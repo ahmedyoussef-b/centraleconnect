@@ -1828,5 +1828,81 @@
     "approved_by": "ENG-SCADA-TEAM",
     "approval_date": "2026-01-28",
     "standard_refs": ["ISO_55001", "PED_2014/68/EU"]
+  },
+  {
+    "external_id": "B2.PSO.HYD",
+    "path": "SYSTEM/B2/PSO/HYD",
+    "level": 3,
+    "type": "EQUIPMENT",
+    "subtype": "HYDRAULIC_SYSTEM",
+    "label_fr": "Système hydraulique sécurité commande soupapes TG2",
+    "label_en": "Hydraulic safety system valve actuation TG2",
+    "parent_id": "B2",
+    "tags": ["P.S.O.", "HYDRAULIC_SAFETY", "SOUB3KSSSEI-SM440"],
+    "parameters": [
+      { "name": "pression_service", "unit": "bar", "critical": true, "min": 180, "max": 220 },
+      { "name": "volume_reservoir", "unit": "litres", "critical": true, "value": 150 },
+      { "name": "temps_reponse", "unit": "ms", "critical": true, "max": 100 }
+    ],
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-28",
+    "standard_refs": ["ISO_55001", "IEC_61511", "API_614"]
+  },
+  {
+    "external_id": "B2.SKBD.VENT",
+    "path": "SYSTEM/B2/SKBD/VENT",
+    "level": 3,
+    "type": "EQUIPMENT",
+    "subtype": "VENTILATION_SYSTEM",
+    "label_fr": "Système ventilation gaz résiduels carter TG2",
+    "label_en": "Carter gas ventilation system TG2",
+    "parent_id": "B2",
+    "tags": ["SKBD", "VENTILATION_GAZ", "B1_B2"],
+    "parameters": [
+      { "name": "debit_ventilation", "unit": "Nm³/h", "critical": true, "min": 800, "max": 1500 },
+      { "name": "concentration_max_h2", "unit": "% vol", "critical": true, "max": 1.0 },
+      { "name": "pression_consigne", "unit": "mbar", "critical": true, "value": -5 }
+    ],
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-28",
+    "standard_refs": ["ISO_55001", "IEC_60079-13", "EU_IED_2010/75/EC"]
+  },
+  {
+    "external_id": "A0.FILT.221TF2",
+    "path": "SYSTEM/A0/FILT/221TF2",
+    "level": 3,
+    "type": "EQUIPMENT",
+    "subtype": "FILTRATION_SYSTEM",
+    "label_fr": "Station de filtration eau process à flotteurs",
+    "label_en": "Float-type water process filtration station",
+    "parent_id": "A0",
+    "tags": ["221TF2", "221TF23", "PERTE_CHARGE", "SOUB3MSCEL-SM435"],
+    "parameters": [
+      { "name": "perte_charge_max", "unit": "bar", "critical": true, "max": 0.8 },
+      { "name": "debit_nominal", "unit": "m³/h", "critical": true, "min": 400, "max": 600 },
+      { "name": "granulometrie", "unit": "µm", "critical": true, "value": 100 }
+    ],
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-28",
+    "standard_refs": ["ISO_55001", "ISO_14644-1", "EU_IED_2010/75/EC"]
+  },
+  {
+    "external_id": "A0.FILT.GRILLES",
+    "path": "SYSTEM/A0/FILT/GRILLES",
+    "level": 3,
+    "type": "EQUIPMENT",
+    "subtype": "SCREEN_FILTER",
+    "label_fr": "Grilles filtrantes pour protection batardeaux",
+    "label_en": "Screen filters for stop-log protection",
+    "parent_id": "A0",
+    "tags": ["GRILLE_FILTRANTE", "BATARDEAU", "PANIER"],
+    "parameters": [
+      { "name": "perte_charge_max", "unit": "bar", "critical": true, "max": 0.2 },
+      { "name": "vitesse_passage_max", "unit": "m/s", "critical": true, "max": 2.0 },
+      { "name": "etat_encrassement", "unit": "%", "critical": true, "max": 75 }
+    ],
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-28",
+    "standard_refs": ["ISO_55001", "ISO_13709"]
   }
 ]
