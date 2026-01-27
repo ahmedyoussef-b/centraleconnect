@@ -47,6 +47,22 @@ L'intégration des données P&ID est basée sur une chaîne de validation et de 
 
 ---
 
+## 🔐 Sécurité & Immuabilité
+
+### Checksum SHA-256
+Pour garantir l'intégrité et l'immuabilité des données de référence, chaque nœud P&ID possède un checksum calculé à partir de son contenu JSON. Cela permet de s'assurer que les données n'ont pas été altérées.
+
+La logique de calcul (implémentée dans `scripts/seed-pid-assets.ts`) est la suivante :
+```typescript
+import { createHash } from 'crypto';
+
+// 'node' est l'objet JSON représentant un équipement P&ID
+const checksum = createHash('sha256').update(JSON.stringify(node)).digest('hex');
+```
+Ce `checksum` est stocké avec chaque nœud dans la base de données. Toute modification ultérieure des données d'un nœud nécessiterait un recalcul de son checksum, rendant les altérations non autorisées facilement détectables.
+
+---
+
 ## 🚀 Prochaines Étapes Logiques
 
 1.  **Finaliser les Schémas SVG**: Compléter le dessin des 18 fichiers SVG en se basant sur les P&ID originaux et en y intégrant les hotspots interactifs.
