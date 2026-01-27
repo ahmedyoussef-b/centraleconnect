@@ -1,16 +1,14 @@
-tag,unit,description,status_in_central,suggested_external_id
-CEX3-001,B3,Condenseur basse pression,absent,B3.CEX3
-BACHE ALIMENTAIRE,B3,Réservoir eau alimentaire,absent,B3.BA
-POMPES D'EXTRACTION,B3,Pompes extraction condensat,absent,B3.PEX
-POMPES DE REFRIGERATION,B3,Pompes refroidissement auxiliaire,absent,B3.PR
-UNITE HYDRAULIQUE 2,B3,Unité hydraulique 2,absent,B3.UH2
-UNITE HYDRAULIQUE 3,B3,Unité hydraulique 3,absent,B3.UH3
-REFRIGERATION AUXILIAIRE,B3,Système refroidissement auxiliaire,absent,B3.RA
-FBP,B3,Préchauffage eau condensée,présent,B3.FBP
-B3PE20,B3,Stockage d'eau déminé,présent,B3.PE20
-B1TG11,B1,Turbine Gaz 1 - Vue générale,présent,B1.TG11
-B2TG11,B2,Turbine Gaz 2 - Vue générale,présent,B2.TG11
-B1CR11,B1,Chaudière récupération 1,présent,B1.CR11
-B2CR11,B2,Chaudière récupération 2,présent,B2.CR11
-B3TV21,B3,Turbine vapeur - Section 1,présent,B3.TV21
-B3TV46EXP,B3,Turbine vapeur - Version expérimentale,présent,B3.TV46EXP
+tag_id,external_id,system,x_coord,y_coord,drawing_ref,functional_role
+CEX-001,B3.CEX3,B3,420,180,SOU-B3-P04,main_condenser
+B3PE20,B3.BA,B3,150,310,SOU-B3-P04,feedwater_tank
+CEX-425,B3.CEX425,B3,320,240,SOU-B3-P05,gland_condenser
+HV-269,B3.SEP269,B3,410,180,SOU-B3-P05,gland_separator
+HV-271,B3.PEX271,B3,520,310,SOU-B3-P05,gland_pump
+HV-266,B3.DES266,B3,180,420,SOU-B3-P05,desuperheater
+HY-134,B3.GSE.SVBP3,B3,380,150,SOU-B3-P06,safety_valve_bp3
+TV,A0.GGR.TV,A0,200,350,SOU-A0-P06,lube_oil_tank
+CENT,A0.GGR.CENT,A0,450,280,SOU-A0-P06,oil_centrifuge
+HV-088,A0.GGR.POMP1,A0,620,410,SOU-A0-P06,hp_pump_1
+DRAINS,A0.GGR.DRAINS,A0,750,520,SOU-A0-P07,drain_collector
+HV-183,A0.CAA.HV183,A0,300,200,SOU-A0-P07,air_compressor
+RCP,A0.CAA.RCP,A0,500,250,SOU-A0-P07,air_receiver
