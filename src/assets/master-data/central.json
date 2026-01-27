@@ -1675,5 +1675,63 @@
     "level": 1,
     "approved_by": "ENG-SCADA-TEAM",
     "approval_date": "2026-01-27"
+  },
+  {
+    "external_id": "A0.CAA.HV183",
+    "path": "SYSTEM/A0/CAA/HV183",
+    "level": 3,
+    "type": "EQUIPMENT",
+    "subtype": "COMPRESSOR",
+    "label_fr": "Compresseur d'air service instrument",
+    "label_en": "Instrument air service compressor",
+    "parent_id": "A0",
+    "tags": ["HV-183", "COMPRESSEUR_AIR", "100%_CAPACITY"],
+    "parameters": [
+      { "name": "pression_sortie", "unit": "bar", "critical": true, "min": 6.0, "max": 8.5 },
+      { "name": "debit", "unit": "Nm³/h", "critical": true, "min": 1200, "max": 1800 },
+      { "name": "point_rosee", "unit": "°C", "critical": true, "max": -20 },
+      { "name": "puissance_moteur", "unit": "kW", "critical": false, "value": 160 }
+    ],
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-28",
+    "standard_refs": ["ISO_55001", "ISO_8573-1", "IEC_61511"]
+  },
+  {
+    "external_id": "A0.CAA.RCP",
+    "path": "SYSTEM/A0/CAA/RCP",
+    "level": 3,
+    "type": "EQUIPMENT",
+    "subtype": "TANK",
+    "label_fr": "Récepteur d'air comprimé tampon",
+    "label_en": "Instrument air receiver tank",
+    "parent_id": "A0",
+    "tags": ["RECEPTEUR_AIR", "AIR_BUFFER"],
+    "parameters": [
+      { "name": "volume", "unit": "m³", "critical": false, "value": 10.0 },
+      { "name": "pression_max", "unit": "bar", "critical": true, "value": 10.0 },
+      { "name": "pression_consigne", "unit": "bar", "critical": true, "min": 6.5, "max": 7.5 }
+    ],
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-28",
+    "standard_refs": ["ISO_55001", "PED_2014/68/EU", "ASME_VIII"]
+  },
+  {
+    "external_id": "A0.GGR.DRAINS",
+    "path": "SYSTEM/A0/GGR/DRAINS",
+    "level": 3,
+    "type": "EQUIPMENT",
+    "subtype": "COLLECTOR",
+    "label_fr": "Collecteur drains/purges système lubrification TA",
+    "label_en": "Lube oil system drain collector",
+    "parent_id": "A0",
+    "tags": ["DRAINS_GGR", "PURGES_HUILE", "SOUB3MSGTH-SM460"],
+    "parameters": [
+      { "name": "niveau_max", "unit": "%", "critical": true, "max": 80 },
+      { "name": "temp_condensat", "unit": "°C", "critical": false },
+      { "name": "debit_purge", "unit": "l/min", "critical": false }
+    ],
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-28",
+    "standard_refs": ["ISO_55001", "API_614"]
   }
 ]
