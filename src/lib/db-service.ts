@@ -1,6 +1,7 @@
 
+
 import type { Database as DbInstance } from '@tauri-apps/api/sql';
-import type { Component, LogEntry, LogEntryType, Parameter, Alarm, FunctionalNode } from '@/types/db';
+import type { Component, LogEntry, LogEntryType, Parameter, Alarm, FunctionalNode, Annotation } from '@/types/db';
 
 // Import JSON data which will be bundled by the build process
 import centralData from '@/assets/master-data/central.json';
@@ -122,6 +123,17 @@ CREATE TABLE IF NOT EXISTS functional_nodes (
     updated_at DATETIME NOT NULL,
     approved_by TEXT,
     approved_at DATETIME
+);
+
+CREATE TABLE IF NOT EXISTS annotations (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    functional_node_external_id TEXT NOT NULL,
+    text TEXT NOT NULL,
+    operator TEXT NOT NULL,
+    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+    x_pos REAL NOT NULL,
+    y_pos REAL NOT NULL,
+    FOREIGN KEY (functional_node_external_id) REFERENCES functional_nodes(external_id)
 );
 `;
 
@@ -458,5 +470,33 @@ export async function addComponentAndDocument(
         source: 'Opérateur 1',
         message: `Nouveau composant '${component.id}' ajouté via caméra.`,
         component_id: component.id,
+    });
+}
+
+export async function getAnnotationsForNode(externalId: string): Promise<Annotation[]> {
+    await initializeDatabase();
+    const db = await getDbInstance();
+    return await db.select('SELECT * FROM annotations WHERE functional_node_external_id = ? ORDER BY timestamp DESC', [externalId]);
+}
+
+export async function addAnnotation(annotation: {
+    functional_node_external_id: string;
+    text: string;
+    operator: string;
+    x_pos: number;
+    y_pos: number;
+}): Promise<void> {
+    const db = await getDbInstance();
+    const timestamp = new Date().toISOString().replace('T', ' ').slice(0, 19);
+
+    await db.execute(
+        'INSERT INTO annotations (functional_node_external_id, text, operator, timestamp, x_pos, y_pos) VALUES (?, ?, ?, ?, ?, ?)',
+        [annotation.functional_node_external_id, annotation.text, annotation.operator, timestamp, annotation.x_pos, annotation.y_pos]
+    );
+
+    await addLogEntry({
+        type: 'MANUAL',
+        source: annotation.operator,
+        message: `Annotation ajoutée sur le P&ID de ${annotation.functional_node_external_id}: "${annotation.text}"`
     });
 }

@@ -84,3 +84,13 @@ export interface FunctionalNode {
     approved_by: string | null;
     approved_at: string | null;
   }
+
+export interface Annotation {
+    id: number;
+    functional_node_external_id: string;
+    text: string;
+    operator: string;
+    timestamp: string;
+    x_pos: number; // Percentage
+    y_pos: number; // Percentage
+}
