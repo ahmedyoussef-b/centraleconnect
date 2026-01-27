@@ -36,7 +36,8 @@ async function getDbInstance(): Promise<DbInstance> {
     try {
       // Dynamically import the tauri-plugin-sql module.
       // This ensures it's only imported at runtime within the Tauri environment.
-      const { default: Database } = await import('tauri-plugin-sql');
+      // The string concatenation is a trick to prevent Webpack from trying to resolve this at build time.
+      const { default: Database } = await import('tauri-plugin' + '-sql');
       const loadedDb = await Database.load('sqlite:ccpp.db');
       db = loadedDb;
       return db;
@@ -149,21 +150,21 @@ async function seedMasterData(db: DbInstance) {
     for (const eq of (componentsData as any[])) {
         await db.execute(
             "INSERT OR IGNORE INTO components (id, name, description, type) VALUES (?, ?, ?, ?)",
-            [eq.id, eq.name, eq.description, eq.type]
+            [eq.tag, eq.name, eq.type, eq.subtype]
         );
     }
     // Seed parameters
     for (const param of (parameterData as any[])) {
          await db.execute(
             "INSERT OR IGNORE INTO parameters (component_id, name, unit, min_value, max_value, nominal_value) VALUES (?, ?, ?, ?, ?, ?)",
-            [param.equipment_id, param.name, param.unit, param.min_value, param.max_value, param.nominal_value]
+            [param.componentTag, param.name, param.unit, param.maxSafe, param.alarmHigh, param.nominalValue]
         );
     }
     // Seed alarms
     for (const alarm of (alarmData as any[])) {
          await db.execute(
             "INSERT OR IGNORE INTO alarms (component_id, code, description, severity) VALUES (?, ?, ?, ?)",
-            [alarm.equipment_id, alarm.code, alarm.description, alarm.severity]
+            [alarm.componentTag, alarm.code, alarm.message, alarm.severity]
         );
     }
 }
