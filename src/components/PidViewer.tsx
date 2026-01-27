@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -13,6 +14,7 @@ export default function PidViewer({ externalId }: PidViewerProps) {
     'B3.BA': '/assets/pids/B3/BACHE_ALIMENTAIRE.svg',
     'B3.PEX': '/assets/pids/B3/POMPES_EXTRACTION.svg',
     'B3.PE20': '/assets/pids/B3/B3PE20.svg',
+    'A0.CAA.HV183': '/assets/pids/A0/HV183.svg',
   };
 
   const src = pidMap[externalId] || null;

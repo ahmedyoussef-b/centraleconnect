@@ -1,0 +1,57 @@
+<svg width="1920" height="1080" viewBox="0 0 1920 1080" xmlns="http://www.w3.org/2000/svg" style="background-color: #ffffff; font-family: 'Inter', sans-serif;">
+  <title>P&amp;ID - Compresseur HV183</title>
+  <defs>
+    <style>
+      .pipe { fill: none; stroke: #4A4A4A; stroke-width: 8; }
+      .pipe-flow { fill: none; stroke: #4A4A4A; }
+      .equipment { fill: #EFEFEF; stroke: #1A1A1A; stroke-width: 4; }
+      .instrument-circle { fill: #ffffff; stroke: #1A1A1A; stroke-width: 3; }
+      .instrument-text { font-size: 32px; text-anchor: middle; dominant-baseline: middle; font-weight: 600; }
+      .label-text { font-size: 36px; text-anchor: middle; fill: #333333; }
+      .equipment-tag { font-size: 48px; font-weight: bold; text-anchor: middle; fill: #000000; }
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#4A4A4A" />
+    </marker>
+  </defs>
+
+  <!-- Calque des tuyauteries -->
+  <g id="pipes">
+    <!-- Tuyauterie d'aspiration -->
+    <path id="pipe-inlet" class="pipe" d="M 200,540 H 700" marker-end="url(#arrow)" />
+    <!-- Tuyauterie de refoulement -->
+    <path id="pipe-outlet" class="pipe" d="M 1220,540 H 1720" marker-end="url(#arrow)" />
+  </g>
+
+  <!-- Calque de l'équipement principal -->
+  <g id="equipment">
+    <circle id="compressor-body" class="equipment" cx="960" cy="540" r="260" />
+    <text id="equipment-tag-hv183" class="equipment-tag" x="960" y="540">HV-183</text>
+    <text class="label-text" x="960" y="450">Compresseur d'Air Service</text>
+  </g>
+
+  <!-- Calque des instruments -->
+  <g id="instruments">
+    <!-- Pression en sortie -->
+    <g id="instrument-pi-01">
+      <line class="pipe" x1="1350" y1="540" x2="1350" y2="400" />
+      <circle class="instrument-circle" cx="1350" cy="350" r="50" />
+      <text class="instrument-text" x="1350" y="350">PI</text>
+      <text class="instrument-text" x="1350" y="280">01</text>
+    </g>
+
+    <!-- Température en sortie -->
+    <g id="instrument-ti-01">
+      <line class="pipe" x1="1450" y1="540" x2="1450" y2="700" />
+      <circle class="instrument-circle" cx="1450" cy="750" r="50" />
+      <text class="instrument-text" x="1450" y="750">TI</text>
+      <text class="instrument-text" x="1450" y="820">01</text>
+    </g>
+  </g>
+
+  <!-- Calque des textes et labels -->
+  <g id="labels">
+    <text class="label-text" x="450" y="480">Aspiration Air Ambiant</text>
+    <text class="label-text" x="1500" y="480">Vers Réseau Air Service</text>
+  </g>
+</svg>
