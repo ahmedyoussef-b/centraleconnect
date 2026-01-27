@@ -1,9 +1,10 @@
+
 [
   {
     "id": "boiler-startup",
     "name": "Démarrage Chaudière",
     "description": "Procédure de préparation et de remplissage de la chaudière, basée sur le document de référence.",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "steps": [
       {
         "id": "s1",
@@ -102,17 +103,72 @@
         "title": "Vérifier la sécurité chaudière (FSE)",
         "type": "group",
         "steps": [
-            { "id": "s5a", "title": "TG associée synchronisée", "type": "check" },
-            { "id": "s5b", "title": "Au moins une pompe APH en service", "type": "check" },
-            { "id": "s5c", "title": "Au moins une pompe APB en service", "type": "check" },
-            { "id": "s5d", "title": "Une pompe CEX en service", "type": "check" },
-            { "id": "s5e", "title": "Une pompe FSR en service et ΔP correct", "type": "check" },
-            { "id": "s5f", "title": "Une pompe FLB en service et ΔP correct", "type": "check" },
-            { "id": "s5g", "title": "Niveau gonflement ballon HP détecté (-475 mm)", "type": "check" },
-            { "id": "s5h", "title": "Niveau gonflement ballon BP détecté (-580 mm)", "type": "check" },
-            { "id": "s5i", "title": "Absence d'eau dans pot condensat vapeur surchauffe HP", "type": "check" },
-            { "id": "s5j", "title": "Absence d'eau dans pot condensat vapeur surchauffe BP", "type": "check" }
+          { "id": "s5a", "title": "TG associée synchronisée", "type": "check" },
+          { "id": "s5b", "title": "Au moins une pompe APH en service", "type": "check" },
+          { "id": "s5c", "title": "Au moins une pompe APB en service", "type": "check" },
+          { "id": "s5d", "title": "Une pompe CEX en service", "type": "check" },
+          { "id": "s5e", "title": "Une pompe FSR en service et ΔP correct", "type": "check" },
+          { "id": "s5f", "title": "Une pompe FLB en service et ΔP correct", "type": "check" },
+          { "id": "s5g", "title": "Niveau gonflement ballon HP détecté (-475 mm)", "type": "check" },
+          { "id": "s5h", "title": "Niveau gonflement ballon BP détecté (-580 mm)", "type": "check" },
+          { "id": "s5i", "title": "Absence d'eau dans pot condensat vapeur surchauffe HP", "type": "check" },
+          { "id": "s5j", "title": "Absence d'eau dans pot condensat vapeur surchauffe BP", "type": "check" }
         ]
+      },
+      {
+        "id": "s6",
+        "title": "Vérifier conditions d'ouverture registre (Système TTA)",
+        "type": "group",
+        "steps": [
+          { "id": "s6a", "title": "La sécurité chaudière est armée (B1FSEUS005)", "type": "check" },
+          { "id": "s6b", "title": "La pompe hydraulique est sans-défaut et disponible", "type": "check" },
+          { "id": "s6c", "title": "Le niveau d'huile régulation registre est N-très bas", "type": "check" },
+          { "id": "s6d", "title": "La température d'huile régulation registre N-très haute", "type": "check" },
+          { "id": "s6e", "title": "La température de l'armoire locale registre N-haute", "type": "check" },
+          { "id": "s6f", "title": "Aucunes conditions de déclenchement", "type": "check" }
+        ]
+      },
+      {
+        "id": "s7",
+        "title": "Vérifier la disponibilité du contournement",
+        "type": "group",
+        "steps": [
+          { "id": "s7a", "title": "Chaudière Armé (FSE vérifié)", "type": "check" },
+          { "id": "s7b", "title": "Registre de chaudière non-fermé", "type": "check" },
+          { "id": "s7c", "title": "Absence de défaut sur l'unité hydraulique", "type": "check" },
+          { "id": "s7d", "title": "Armoire contournement en service (ON)", "type": "check" },
+          { "id": "s7e", "title": "Pression eau de désurchauffe correcte (> 7 bars)", "type": "check", "details": "Validation scada : P_cex > 7 bars" },
+          { "id": "s7f", "title": "Au moins un demi-condenseur est réfrigéré (vannes entrée et sortie ouvertes)", "type": "check" },
+          { "id": "s7g", "title": "Le vide condenseur est correct (< 300 mbar)", "type": "check", "details": "Validation scada : Pression < 300 mbar" },
+          { "id": "s7h", "title": "La température de vapeur surchauffé est haute (> 300°C)", "type": "check", "details": "Validation scada : B1ACOTE001 > 300°C" },
+          { "id": "s7i", "title": "Absence de conditions de déclenchement", "type": "check", "details": "Pression avant vanne détente PCV001 < 16 bars (PSHH01) ET Température en aval surchauffeur < 100°C (TSH101)" }
+        ]
+      },
+      {
+        "id": "s8",
+        "title": "Notes Opératoires sur le contournement",
+        "type": "group",
+        "steps": [
+            { "id": "s8a", "type": "instruction", "title": "Remarque sur vannes de désurchauffe", "details": "La 1ère vanne de désurchauffe s'ouvre dès l'ouverture du by-pass. La 2ème s'ouvre si la pression en aval de PCV001 est haute à 6.8 bars." },
+            { "id": "s8b", "type": "instruction", "title": "Conditions d'ouverture groupe CET", "details": "S'ouvre lorsque Pression SVA = 7 bars et T = 250°C. Déclenchement (ouverture vanne SVA) à P = 11 bars et T = 325°C." },
+            { "id": "s8c", "type": "instruction", "title": "Paramètres CET au démarrage", "details": "180°C et 1.2 bars." },
+            { "id": "s8d", "type": "instruction", "title": "Mise en service groupe CVI", "details": "À 1 bar: éjecteur de démarrage en marche. À 250 mbar: éjecteur d'entretien en service. À 150 mbar: arrêt éjecteur de démarrage." },
+            { "id": "s8e", "type": "instruction", "title": "Disponibilité By-pass", "details": "Disponible si P_vide < 300 mbar et T_B1ACOSUP > 300°C. S'ouvrent à 39 bars (HP) et 7 bars (BP)." }
+        ]
+      },
+      {
+        "id": "s9",
+        "title": "Vérifier conditions pour couplage chaudières",
+        "type": "group",
+        "steps": [
+          { "id": "s9a", "title": "Couplage HP (UV001/UV002)", "type": "check", "details": "Conditions maître: Ouverture registre. Conditions esclave: T ≥ 450°C (B2VVPTSH001 ou B1VVPTSH001) ET ΔP ≤ 2 bars." },
+          { "id": "s9b", "title": "Couplage BP (UV001/UV002)", "type": "check", "details": "Conditions maître: Ouverture registre. Conditions esclave: T ≥ 175°C (B2VVPTSH002 ou B1VVPTSH002) ET ΔP ≤ 0.5 bars." }
+        ]
+      },
+      {
+        "id": "s10",
+        "title": "Fin de disposition de chaudière après la confirmation de chimiste",
+        "type": "check"
       }
     ]
   }
