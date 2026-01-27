@@ -5,7 +5,7 @@ import { useParams, notFound } from 'next/navigation';
 import { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Check, ClipboardCheck, Info, ChevronsUpDown } from 'lucide-react';
-import { getProcedureById } from '@/lib/procedures-service';
+import { getProcedureById, getProcedures } from '@/lib/procedures-service';
 import type { Procedure, ProcedureStep } from '@/types/db';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -20,6 +20,14 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
 
+
+// This function tells Next.js which dynamic pages to pre-render at build time.
+export async function generateStaticParams() {
+    const procedures = getProcedures();
+    return procedures.map((proc) => ({
+      procedureId: proc.id,
+    }));
+}
 
 function StepRenderer({
   step,
