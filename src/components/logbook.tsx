@@ -103,7 +103,7 @@ export function Logbook() {
         const encoder = new TextEncoder();
         const data = encoder.encode(
           `${previousSignature}|${entryData.timestamp}|${entryData.type}|${entryData.source}|${entryData.message}|${
-            entryData.equipment_id ?? ''
+            entryData.component_id ?? ''
           }`
         );
         const hashBuffer = await crypto.subtle.digest('SHA-256', data);

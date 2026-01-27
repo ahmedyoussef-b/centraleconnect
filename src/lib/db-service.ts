@@ -421,6 +421,16 @@ export async function addComponentAndDocument(
 ): Promise<void> {
     const db = await getDbInstance();
     
+    // Check if component already exists
+    const existingComponent: { count: number }[] = await db.select(
+      "SELECT count(*) as count FROM components WHERE id = ?",
+      [component.id]
+    );
+
+    if (existingComponent[0].count > 0) {
+        throw new Error(`Le composant avec l'ID '${component.id}' existe déjà.`);
+    }
+
     await db.execute(
         'INSERT INTO components (id, name, description, type) VALUES (?, ?, ?, ?)',
         [component.id, component.name, component.description ?? '', component.type]
