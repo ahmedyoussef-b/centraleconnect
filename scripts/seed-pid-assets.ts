@@ -27,7 +27,7 @@ async function main() {
       { external_id: 'B3.PEX271', path: 'SYSTEM/B3/PEX271' },
       { external_id: 'B3.DES266', path: 'SYSTEM/B3/DES266' },
       { external_id: 'B3.GSE.SVBP3', path: 'SYSTEM/B3/GSE/SVBP3' },
-      // A0 - Lubrification & utilities (part06/07/08)
+      // A0 - Lubrification & utilities (part06/07/08/09)
       { external_id: 'A0.GGR.TV', path: 'SYSTEM/A0/GGR/TV' },
       { external_id: 'A0.GGR.CENT', path: 'SYSTEM/A0/GGR/CENT' },
       { external_id: 'A0.GGR.POMP1', path: 'SYSTEM/A0/GGR/POMP1' },
@@ -36,15 +36,14 @@ async function main() {
       { external_id: 'A0.CAA.RCP', path: 'SYSTEM/A0/CAA/RCP' },
       { external_id: 'A0.SKD.PUMP', path: 'SYSTEM/A0/SKD/PUMP' },
       { external_id: 'A0.SKD.TANK', path: 'SYSTEM/A0/SKD/TANK' },
+      { external_id: 'A0.FILT.221TF2', path: 'SYSTEM/A0/FILT/221TF2' },
+      { external_id: 'A0.FILT.GRILLES', path: 'SYSTEM/A0/FILT/GRILLES' },
       // B2 - Turbine gaz (part08/09)
       { external_id: 'B2.FILT.AIR', path: 'SYSTEM/B2/FILT/AIR' },
       { external_id: 'B2.PAD.HYD', path: 'SYSTEM/B2/PAD/HYD' },
       { external_id: 'B2.MIST.ELIM', path: 'SYSTEM/B2/MIST/ELIM' },
       { external_id: 'B2.PSO.HYD', path: 'SYSTEM/B2/PSO/HYD' },
       { external_id: 'B2.SKBD.VENT', path: 'SYSTEM/B2/SKBD/VENT' },
-      // A0 - Filtration (part09)
-      { external_id: 'A0.FILT.221TF2', path: 'SYSTEM/A0/FILT/221TF2' },
-      { external_id: 'A0.FILT.GRILLES', path: 'SYSTEM/A0/FILT/GRILLES' }
     ];
 
     console.log(`Préparation de l'injection de ${pidNodes.length} nœuds P&ID documentés...`);

@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1080" fill="none">
+  <g id="layer-background">
+    <rect width="1920" height="1080" fill="#F8F9FA"/>
+  </g>
+  <g id="layer-pipes" stroke="#495057" stroke-width="4">
+    <path d="M 400,500 H 600" />
+    <path d="M 950,500 H 1150" />
+  </g>
+  <g id="layer-equipment">
+    <rect x="600" y="450" width="350" height="100" rx="10" fill="#E9ECEF" stroke="#ADB5BD" stroke-width="2" />
+  </g>
+  <g id="layer-instruments">
+    <circle cx="980" cy="420" r="25" fill="#FFFFFF" stroke="#343A40" stroke-width="2" />
+    <text x="980" y="425" text-anchor="middle" font-size="16" fill="#343A40" font-family="Arial">PI</text>
+    <text x="980" y="440" text-anchor="middle" font-size="12" fill="#343A40" font-family="Arial">183</text>
+    <path d="M 870,450 V 425 H 955" stroke="#343A40" stroke-width="1.5" />
+  </g>
+  <g id="layer-labels" font-size="18" fill="#212529" font-family="Arial" text-anchor="middle">
+    <text x="775" y="580">Compresseur HV183</text>
+    <text x="350" y="505">AIR ENTRÉE</text>
+    <text x="1220" y="505">AIR SERVICE INSTRUMENT</text>
+  </g>
+</svg>
