@@ -36,3 +36,28 @@ export interface LogEntry {
     component_id: string | null;
     signature: string | null;
 }
+
+export type ProcedureStepType = 'check' | 'scada_check' | 'instruction' | 'group';
+
+export interface ProcedureStep {
+    id: string;
+    title: string;
+    type: ProcedureStepType;
+    details?: string;
+    steps?: ProcedureStep[];
+    validation?: {
+        componentId: string;
+        parameterKey: string;
+        condition: 'eq' | 'neq' | 'gt' | 'lt' | 'gte' | 'lte' | 'between';
+        value?: number | string;
+        values?: (number|string)[];
+    };
+}
+
+export interface Procedure {
+    id: string;
+    name: string;
+    description: string;
+    version: string;
+    steps: ProcedureStep[];
+}

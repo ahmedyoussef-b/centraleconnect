@@ -1,0 +1,119 @@
+[
+  {
+    "id": "boiler-startup",
+    "name": "Démarrage Chaudière",
+    "description": "Procédure de préparation et de remplissage de la chaudière, basée sur le document de référence.",
+    "version": "1.0.0",
+    "steps": [
+      {
+        "id": "s1",
+        "title": "Vérifier que la Turbine à Gaz est en service",
+        "type": "check",
+        "details": "La puissance de la TG associée doit être de préférence entre 70 et 80 MW."
+      },
+      {
+        "id": "s2",
+        "title": "Remplissage de la chaudière",
+        "type": "group",
+        "steps": [
+          {
+            "id": "s2a",
+            "title": "Remplir le réchauffeur avec le circuit SER et ouvrir l'évent HV701",
+            "type": "check"
+          },
+          {
+            "id": "s2b",
+            "title": "Après sortie d'eau, fermer la vanne de remplissage SER et les vannes d'évent",
+            "type": "check"
+          },
+          {
+            "id": "s2c",
+            "title": "Remplir l'économiseur HP et BP avec circuit SER, ouvrir évents HV701 et HV702",
+            "type": "check"
+          },
+          {
+            "id": "s2d",
+            "title": "Après sortie d'eau, fermer vanne remplissage SER et évents",
+            "type": "check"
+          },
+          {
+            "id": "s2e",
+            "title": "Mettre en service pompe APH et pompe APB",
+            "type": "check"
+          },
+          {
+            "id": "s2f",
+            "title": "Ouvrir l'entrée économiseur HP et BP (HV001)",
+            "type": "check"
+          },
+          {
+            "id": "s2g",
+            "title": "Ouvrir légèrement les vannes d'évent HV701 et HV702",
+            "type": "check"
+          },
+          {
+            "id": "s2h",
+            "title": "Fermer tous les évents après remplissage",
+            "type": "check"
+          },
+          {
+            "id": "s2i",
+            "title": "Ouvrir les vannes motorisées d'évent FSR UV008 et FLB UV008",
+            "type": "check"
+          },
+          {
+            "id": "s2j",
+            "title": "Ouvrir les vannes de purge de pot de condensat FSR UV010 et FLB UV010",
+            "type": "check",
+            "details": "Note: sur-débit pompe APH est de 225T/H, sur-débit pompe APB est de 110T/H."
+          },
+          {
+            "id": "s2k",
+            "title": "Ouvrir vannes UV050C et LCV050C (ligne de démarrage) pour remplissage ballon HP",
+            "type": "check"
+          },
+          {
+            "id": "s2l",
+            "title": "Remplir ballons HP et BP jusqu'aux niveaux de démarrage",
+            "type": "check",
+            "details": "Niveau cible HP: -475 mm. Niveau cible BP: -580 mm."
+          },
+          {
+            "id": "s2m",
+            "title": "Mettre en service une pompe FSR et une pompe FLB",
+            "type": "check"
+          }
+        ]
+      },
+      {
+        "id": "s3",
+        "title": "Vérifier conditions d'armement chaudière",
+        "type": "check",
+        "details": "Le registre doit être ouvert."
+      },
+      {
+        "id": "s4",
+        "title": "Vérifier conditions d'armement turbine à vapeur",
+        "type": "check",
+        "details": "Les vannes d'arrêt doivent être ouvertes."
+      },
+      {
+        "id": "s5",
+        "title": "Vérifier la sécurité chaudière (FSE)",
+        "type": "group",
+        "steps": [
+            { "id": "s5a", "title": "TG associée synchronisée", "type": "check" },
+            { "id": "s5b", "title": "Au moins une pompe APH en service", "type": "check" },
+            { "id": "s5c", "title": "Au moins une pompe APB en service", "type": "check" },
+            { "id": "s5d", "title": "Une pompe CEX en service", "type": "check" },
+            { "id": "s5e", "title": "Une pompe FSR en service et ΔP correct", "type": "check" },
+            { "id": "s5f", "title": "Une pompe FLB en service et ΔP correct", "type": "check" },
+            { "id": "s5g", "title": "Niveau gonflement ballon HP détecté (-475 mm)", "type": "check" },
+            { "id": "s5h", "title": "Niveau gonflement ballon BP détecté (-580 mm)", "type": "check" },
+            { "id": "s5i", "title": "Absence d'eau dans pot condensat vapeur surchauffe HP", "type": "check" },
+            { "id": "s5j", "title": "Absence d'eau dans pot condensat vapeur surchauffe BP", "type": "check" }
+        ]
+      }
+    ]
+  }
+]

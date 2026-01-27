@@ -1,21 +1,49 @@
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ClipboardCheck } from "lucide-react";
+'use client';
+
+import { getProcedures } from '@/lib/procedures-service';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { ClipboardCheck, ArrowRight } from "lucide-react";
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 
 export default function ProceduresPage() {
+    const procedures = getProcedures();
+
     return (
         <Card>
             <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                     <ClipboardCheck />
-                    Procédures
+                    Procédures Disponibles
                 </CardTitle>
+                <CardDescription>
+                    Sélectionnez une procédure pour commencer le guidage interactif.
+                </CardDescription>
             </CardHeader>
             <CardContent>
-                <div className="flex h-[200px] items-center justify-center rounded-lg border-2 border-dashed border-border p-4">
-                    <p className="text-center text-muted-foreground">
-                        La fonctionnalité de procédures guidées interactives sera implémentée prochainement.
-                    </p>
+                <div className="space-y-4">
+                    {procedures.length > 0 ? (
+                        procedures.map(proc => (
+                            <Card key={proc.id} className="flex items-center justify-between p-4">
+                                <div>
+                                    <h3 className="font-semibold">{proc.name}</h3>
+                                    <p className="text-sm text-muted-foreground">{proc.description}</p>
+                                </div>
+                                <Button asChild>
+                                    <Link href={`/procedures/${proc.id}`}>
+                                        Commencer <ArrowRight className="mr-2 h-4 w-4" />
+                                    </Link>
+                                </Button>
+                            </Card>
+                        ))
+                    ) : (
+                         <div className="flex h-[200px] items-center justify-center rounded-lg border-2 border-dashed border-border p-4">
+                            <p className="text-center text-muted-foreground">
+                                Aucune procédure n'est actuellement disponible.
+                            </p>
+                        </div>
+                    )}
                 </div>
             </CardContent>
         </Card>
