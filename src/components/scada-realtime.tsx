@@ -165,6 +165,13 @@ export function ScadaRealtime() {
                                 source: 'SCADA_MONITOR',
                                 message: message,
                                 component_id: thresholdInfo.component_id,
+                            }).catch(err => {
+                                console.error("Échec de l'enregistrement automatique de l'anomalie SCADA:", err);
+                                toast({
+                                    variant: 'destructive',
+                                    title: "Erreur d'enregistrement",
+                                    description: `L'anomalie pour ${thresholdInfo.name} n'a pas pu être enregistrée dans le journal.`
+                                });
                             });
                         });
                         loggedAnomalies.current.add(anomalyKey);
@@ -175,7 +182,7 @@ export function ScadaRealtime() {
               }
           }
       }
-  }, [tags, thresholds, isTauri]);
+  }, [tags, thresholds, isTauri, toast]);
 
   const ConnectionIcon = connectionState === 'connected' ? Wifi : WifiOff;
   const connectionColor =
