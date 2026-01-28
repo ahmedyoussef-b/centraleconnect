@@ -8,6 +8,16 @@ import type {
   Document
 } from '@/types/db';
 
+// Client-side data imports
+import equipmentComponentsData from '@/assets/master-data/components.json';
+import equipmentPidAssetsData from '@/assets/master-data/pid-assets.json';
+import equipmentB0Data from '@/assets/master-data/B0.json';
+import equipmentB1Data from '@/assets/master-data/B1.json';
+import equipmentB2Data from '@/assets/master-data/B2.json';
+import equipmentB3Data from '@/assets/master-data/B3.json';
+import allParameterData from '@/assets/master-data/parameters.json';
+
+
 const DB_NAME = 'ccpp.db';
 let isInitialized = false;
 
@@ -129,6 +139,93 @@ CREATE TABLE IF NOT EXISTS synoptic_items (
 COMMIT;
 `;
 
+// --- Client-side Data Simulation ---
+let clientSideEquipments: Equipment[] | null = null;
+let clientSideParameters: Parameter[] | null = null;
+
+function getClientSideData() {
+    if (clientSideEquipments && clientSideParameters) {
+        return { equipments: clientSideEquipments, parameters: clientSideParameters };
+    }
+
+    const allEquipmentsMap = new Map<string, any>();
+    const detailedData = [...equipmentB0Data, ...equipmentB1Data, ...equipmentB2Data, ...equipmentB3Data, ...equipmentPidAssetsData.nodes, ...equipmentComponentsData];
+
+    for (const item of detailedData as any[]) {
+        const id = item.external_id || item.tag;
+        if (!id) continue;
+        
+        const existing = allEquipmentsMap.get(id) || { externalId: id };
+        
+        const mergedItem = {
+            ...existing,
+            name: item.name || item.label_fr || existing.name || 'N/A',
+            description: item.description || existing.description,
+            type: item.type || existing.type,
+            subtype: item.subtype || existing.subtype,
+            systemCode: item.system || existing.systemCode,
+            subSystem: item.subsystem || existing.subSystem,
+            location: item.location || existing.location,
+            manufacturer: item.manufacturer || existing.manufacturer,
+            serialNumber: item.serialNumber || existing.serialNumber,
+            documentRef: item.document || existing.documentRef,
+            coordinates: JSON.stringify(item.coordinates) || existing.coordinates,
+            svgLayer: item.svg_layer || existing.svgLayer,
+            fireZone: item.fire_zone || existing.fireZone,
+            linkedParameters: JSON.stringify(item.linked_parameters) || existing.linkedParameters,
+            status: item.status || existing.status || 'UNKNOWN',
+            approvedBy: item.approved_by || item.approvedBy || existing.approvedBy,
+            approvedAt: item.approved_at || item.approval_date || existing.approvedAt ? new Date(item.approved_at || item.approval_date || existing.approvedAt).toISOString() : undefined,
+            parameters: item.parameters || existing.parameters,
+        };
+        allEquipmentsMap.set(id, mergedItem);
+    }
+
+    const finalEquipments: Equipment[] = [];
+    const finalParameters: Parameter[] = [];
+
+    for (const equip of Array.from(allEquipmentsMap.values())) {
+        const { parameters, ...equipData } = equip;
+        finalEquipments.push({ ...equipData, externalId: equip.externalId, version: 1, isImmutable: false });
+
+        if(equip.parameters && Array.isArray(equip.parameters)) {
+            for(const param of equip.parameters as any[]) {
+                if (param.name) {
+                    finalParameters.push({
+                      equipmentId: equip.externalId,
+                      name: param.name,
+                      unit: param.unit,
+                      nominalValue: typeof param.value === 'number' ? param.value : null,
+                      minSafe: typeof param.min === 'number' ? param.min : null,
+                      maxSafe: typeof param.max === 'number' ? param.max : null,
+                    });
+                }
+            }
+        }
+    }
+    
+    for (const param of allParameterData as any[]) {
+        finalParameters.push({
+            equipmentId: param.componentTag,
+            name: param.name,
+            unit: param.unit,
+            nominalValue: param.nominalValue,
+            minSafe: param.minSafe,
+            maxSafe: param.maxSafe,
+            alarmHigh: param.alarmHigh,
+            alarmLow: param.alarmLow,
+            standardRef: param.standardRef,
+        });
+    }
+    
+    clientSideEquipments = finalEquipments;
+    clientSideParameters = finalParameters;
+
+    return { equipments: clientSideEquipments, parameters: clientSideParameters };
+}
+// --- End Client-side Data Simulation ---
+
+
 async function createEntrySignature(
   entryData: { timestamp: string; type: string; source: string; message: string; equipmentId: string | null; },
   previousSignature: string
@@ -164,91 +261,106 @@ export async function initializeDatabase(): Promise<void> {
 }
 
 export async function getEquipments(): Promise<Equipment[]> {
-    if (typeof window === 'undefined' || !window.__TAURI__) return [];
-    await initializeDatabase();
-    const db = await invoke('plugin:sql|load', { db: DB_NAME });
-    const nodes: any[] = await invoke('plugin:sql|select', { db, query: 'SELECT * FROM equipments' });
-    return nodes.map(node => ({
-        ...node,
-        externalId: node.external_id,
-        systemCode: node.system_code,
-        subSystem: node.sub_system,
-        serialNumber: node.serial_number,
-        documentRef: node.document_ref,
-        svgLayer: node.svg_layer,
-        fireZone: node.fire_zone,
-        linkedParameters: JSON.parse(node.linked_parameters || '[]'),
-        isImmutable: !!node.is_immutable,
-        approvedBy: node.approved_by,
-        approvedAt: node.approved_at,
-        nominalData: JSON.parse(node.nominal_data || '{}'),
-        coordinates: JSON.parse(node.coordinates || '{}'),
-    }));
+    if (typeof window !== 'undefined' && window.__TAURI__) {
+        await initializeDatabase();
+        const db = await invoke('plugin:sql|load', { db: DB_NAME });
+        const nodes: any[] = await invoke('plugin:sql|select', { db, query: 'SELECT * FROM equipments' });
+        return nodes.map(node => ({
+            ...node,
+            externalId: node.external_id,
+            systemCode: node.system_code,
+            subSystem: node.sub_system,
+            serialNumber: node.serial_number,
+            tagNumber: node.tag_number,
+            documentRef: node.document_ref,
+            svgLayer: node.svg_layer,
+            fireZone: node.fire_zone,
+            linkedParameters: JSON.parse(node.linked_parameters || '[]'),
+            isImmutable: !!node.is_immutable,
+            approvedBy: node.approved_by,
+            approvedAt: node.approved_at,
+            nominalData: JSON.parse(node.nominal_data || '{}'),
+            coordinates: JSON.parse(node.coordinates || '{}'),
+        }));
+    }
+    return Promise.resolve(getClientSideData().equipments);
 }
 
 export async function getEquipmentById(id: string): Promise<Equipment | null> {
-  if (typeof window === 'undefined' || !window.__TAURI__) return null;
-  await initializeDatabase();
-  const db = await invoke('plugin:sql|load', { db: DB_NAME });
-  const result: any[] = await invoke('plugin:sql|select', { 
-    db, 
-    query: 'SELECT * FROM equipments WHERE external_id = $1 LIMIT 1',
-    values: [id]
-  });
-  if (result.length === 0) return null;
-  const node = result[0];
-   return {
-        ...node,
-        externalId: node.external_id,
-        systemCode: node.system_code,
-        subSystem: node.sub_system,
-        serialNumber: node.serial_number,
-        documentRef: node.document_ref,
-        svgLayer: node.svg_layer,
-        fireZone: node.fire_zone,
-        linkedParameters: JSON.parse(node.linked_parameters || '[]'),
-        isImmutable: !!node.is_immutable,
-        approvedBy: node.approved_by,
-        approvedAt: node.approved_at,
-        nominalData: JSON.parse(node.nominal_data || '{}'),
-        coordinates: JSON.parse(node.coordinates || '{}'),
-    };
+    if (typeof window !== 'undefined' && window.__TAURI__) {
+        await initializeDatabase();
+        const db = await invoke('plugin:sql|load', { db: DB_NAME });
+        const result: any[] = await invoke('plugin:sql|select', { 
+            db, 
+            query: 'SELECT * FROM equipments WHERE external_id = $1 LIMIT 1',
+            values: [id]
+        });
+        if (result.length === 0) return null;
+        const node = result[0];
+        return {
+            ...node,
+            externalId: node.external_id,
+            systemCode: node.system_code,
+            subSystem: node.sub_system,
+            serialNumber: node.serial_number,
+            documentRef: node.document_ref,
+            svgLayer: node.svg_layer,
+            fireZone: node.fire_zone,
+            linkedParameters: JSON.parse(node.linked_parameters || '[]'),
+            isImmutable: !!node.is_immutable,
+            approvedBy: node.approved_by,
+            approvedAt: node.approved_at,
+            nominalData: JSON.parse(node.nominal_data || '{}'),
+            coordinates: JSON.parse(node.coordinates || '{}'),
+        };
+    }
+    const equipments = getClientSideData().equipments;
+    return Promise.resolve(equipments.find(e => e.externalId === id) || null);
 }
 
 export async function getParametersForComponent(equipmentId: string): Promise<Parameter[]> {
-  if (typeof window === 'undefined' || !window.__TAURI__) return [];
-  await initializeDatabase();
-  const db = await invoke('plugin:sql|load', { db: DB_NAME });
-  return invoke('plugin:sql|select', { 
-    db, 
-    query: 'SELECT * FROM parameters WHERE equipment_id = $1 ORDER BY name',
-    values: [equipmentId]
-  });
+    if (typeof window !== 'undefined' && window.__TAURI__) {
+        await initializeDatabase();
+        const db = await invoke('plugin:sql|load', { db: DB_NAME });
+        return invoke('plugin:sql|select', { 
+            db, 
+            query: 'SELECT * FROM parameters WHERE equipment_id = $1 ORDER BY name',
+            values: [equipmentId]
+        });
+    }
+    const allParams = getClientSideData().parameters;
+    return Promise.resolve(allParams.filter(p => p.equipmentId === equipmentId));
 }
 
 export async function getParameters(): Promise<Parameter[]> {
-  if (typeof window === 'undefined' || !window.__TAURI__) return [];
-  await initializeDatabase();
-  const db = await invoke('plugin:sql|load', { db: DB_NAME });
-  return invoke('plugin:sql|select', { db, query: 'SELECT * FROM parameters' });
+  if (typeof window !== 'undefined' && window.__TAURI__) {
+    await initializeDatabase();
+    const db = await invoke('plugin:sql|load', { db: DB_NAME });
+    return invoke('plugin:sql|select', { db, query: 'SELECT * FROM parameters' });
+  }
+  return Promise.resolve(getClientSideData().parameters);
 }
 
 
 export async function getAssistantContextData(): Promise<any> {
-    if (typeof window === 'undefined' || !window.__TAURI__) return {};
-    await initializeDatabase();
-
-    const db = await invoke('plugin:sql|load', { db: DB_NAME });
-    const [equipments, parameters, alarms] = await Promise.all([
-        getEquipments(),
-        invoke('plugin:sql|select', { db, query: 'SELECT * FROM parameters' }),
-        invoke('plugin:sql|select', { db, query: 'SELECT * FROM alarms' }),
-    ]);
-    return { equipments, parameters, alarms };
+    if (typeof window !== 'undefined' && window.__TAURI__) {
+        await initializeDatabase();
+        const db = await invoke('plugin:sql|load', { db: DB_NAME });
+        const [equipments, parameters, alarms] = await Promise.all([
+            getEquipments(),
+            invoke('plugin:sql|select', { db, query: 'SELECT * FROM parameters' }),
+            invoke('plugin:sql|select', { db, query: 'SELECT * FROM alarms' }),
+        ]);
+        return { equipments, parameters, alarms };
+    }
+    // For web, we can provide a subset of data or mock it if needed
+    const { equipments, parameters } = getClientSideData();
+    const alarmsData = (await import('@/assets/master-data/alarms.json')).default;
+    return Promise.resolve({ equipments, parameters, alarms: alarmsData });
 }
 
 export async function getLogEntries(): Promise<LogEntry[]> {
-  if (typeof window === 'undefined' || !window.__TAURI__) return [];
+  if (typeof window === 'undefined' || !window.__TAURI__) return Promise.resolve([]);
   await initializeDatabase();
   const db = await invoke('plugin:sql|load', { db: DB_NAME });
   const entries: any[] = await invoke('plugin:sql|select', { db, query: 'SELECT * FROM log_entries ORDER BY timestamp DESC' });
@@ -256,7 +368,7 @@ export async function getLogEntries(): Promise<LogEntry[]> {
 }
 
 export async function getLogEntriesForNode(equipmentId: string): Promise<LogEntry[]> {
-  if (typeof window === 'undefined' || !window.__TAURI__) return [];
+  if (typeof window === 'undefined' || !window.__TAURI__) return Promise.resolve([]);
   await initializeDatabase();
   const db = await invoke('plugin:sql|load', { db: DB_NAME });
   const entries: any[] = await invoke('plugin:sql|select', { 
@@ -273,7 +385,10 @@ export async function addLogEntry(entry: {
   message: string;
   equipmentId?: string;
 }): Promise<void> {
-  if (typeof window === 'undefined' || !window.__TAURI__) return;
+  if (typeof window === 'undefined' || !window.__TAURI__) {
+    console.log('[WEB MODE] Log Entry (not saved):', entry);
+    return Promise.resolve();
+  }
   await initializeDatabase();
 
   const db = await invoke('plugin:sql|load', { db: DB_NAME });
@@ -300,7 +415,10 @@ export async function addComponentAndDocument(
   component: Pick<Equipment, 'externalId' | 'name' | 'type'>,
   document: { imageData: string; ocrText: string; description: string }
 ): Promise<void> {
-  if (typeof window === 'undefined' || !window.__TAURI__) return;
+  if (typeof window === 'undefined' || !window.__TAURI__) {
+      console.log('[WEB MODE] Add Component (not saved):', component);
+      return Promise.resolve();
+  }
   await initializeDatabase();
 
   const db = await invoke('plugin:sql|load', { db: DB_NAME });
@@ -331,7 +449,7 @@ export async function addComponentAndDocument(
 }
 
 export async function getAnnotationsForNode(externalId: string): Promise<Annotation[]> {
-    if (typeof window === 'undefined' || !window.__TAURI__) return [];
+    if (typeof window === 'undefined' || !window.__TAURI__) return Promise.resolve([]);
     await initializeDatabase();
 
     const db = await invoke('plugin:sql|load', { db: DB_NAME });
@@ -355,7 +473,10 @@ export async function addAnnotation(annotation: {
   xPos: number;
   yPos: number;
 }): Promise<void> {
-    if (typeof window === 'undefined' || !window.__TAURI__) return;
+    if (typeof window === 'undefined' || !window.__TAURI__) {
+        console.log('[WEB MODE] Add Annotation (not saved):', annotation);
+        return Promise.resolve();
+    }
     await initializeDatabase();
     const timestamp = new Date().toISOString().replace('T', ' ').slice(0, 19);
     
@@ -376,7 +497,7 @@ export async function addAnnotation(annotation: {
 }
 
 export async function getDocumentsForComponent(equipmentId: string): Promise<Document[]> {
-  if (typeof window === 'undefined' || !window.__TAURI__) return [];
+  if (typeof window === 'undefined' || !window.__TAURI__) return Promise.resolve([]);
   await initializeDatabase();
   const db = await invoke('plugin:sql|load', { db: DB_NAME });
   const docs: any[] = await invoke('plugin:sql|select', { 

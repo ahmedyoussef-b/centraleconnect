@@ -3,8 +3,8 @@
 import * as React from 'react';
 import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { getFunctionalNodes } from '@/lib/db-service';
-import type { FunctionalNode } from '@/types/db';
+import { getEquipments } from '@/lib/db-service';
+import type { Equipment } from '@/types/db';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -41,27 +41,22 @@ function Breadcrumb({ path, setPath }: { path: string[], setPath: (path: string[
 }
 
 export function SystemHierarchyBrowser() {
-    const [nodes, setNodes] = useState<FunctionalNode[]>([]);
+    const [nodes, setNodes] = useState<Equipment[]>([]);
     const [path, setPath] = useState<string[]>([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [isTauri, setIsTauri] = useState(false);
     const router = useRouter();
 
     useEffect(() => {
-        const tauriEnv = !!window.__TAURI__;
-        setIsTauri(tauriEnv);
-        if (tauriEnv) {
-            setLoading(true);
-            getFunctionalNodes()
-                .then(setNodes)
-                .catch(err => {
-                    console.error(err);
-                    setError("Impossible de charger les données des équipements.");
-                })
-                .finally(() => setLoading(false));
-        }
+        setLoading(true);
+        getEquipments()
+            .then(setNodes)
+            .catch(err => {
+                console.error(err);
+                setError("Impossible de charger les données des équipements.");
+            })
+            .finally(() => setLoading(false));
     }, []);
 
     const searchResults = useMemo(() => {
@@ -70,54 +65,53 @@ export function SystemHierarchyBrowser() {
         return nodes.filter(n =>
             n.name.toLowerCase().includes(lowerCaseQuery) ||
             (n.description && n.description.toLowerCase().includes(lowerCaseQuery)) ||
-            (n.tag && n.tag.toLowerCase().includes(lowerCaseQuery)) ||
-            n.system.toLowerCase().includes(lowerCaseQuery) ||
-            n.subsystem.toLowerCase().includes(lowerCaseQuery) ||
-            n.external_id.toLowerCase().includes(lowerCaseQuery)
+            (n.tagNumber && n.tagNumber.toLowerCase().includes(lowerCaseQuery)) ||
+            (n.systemCode && n.systemCode.toLowerCase().includes(lowerCaseQuery)) ||
+            (n.subSystem && n.subSystem.toLowerCase().includes(lowerCaseQuery)) ||
+            n.externalId.toLowerCase().includes(lowerCaseQuery)
         );
     }, [searchQuery, nodes]);
 
     const currentView = useMemo(() => {
         if (path.length === 0) { // System View
-            const systems = [...new Set(nodes.map(n => n.system))];
-            return systems.map(s => ({ id: s, name: s, type: 'system' as const }));
+            const systems = [...new Set(nodes.map(n => n.systemCode).filter(Boolean))];
+            return systems.map(s => ({ id: s!, name: s!, type: 'system' as const }));
         }
         if (path.length === 1) { // Subsystem View
             const [system] = path;
-            const systemNodes = nodes.filter(n => n.system === system);
-            const subsystems = [...new Set(systemNodes.map(n => n.subsystem.split('.')[0]))];
-            return subsystems.map(s => ({ id: s, name: s, type: 'subsystem' as const }));
+            const systemNodes = nodes.filter(n => n.systemCode === system);
+            const subsystems = [...new Set(systemNodes.map(n => n.subSystem?.split('.')[0]).filter(Boolean))];
+            return subsystems.map(s => ({ id: s!, name: s!, type: 'subsystem' as const }));
         }
         if (path.length === 2) { // Equipment View
             const [system, subsystem] = path;
             return nodes
-                .filter(n => n.system === system && n.subsystem.startsWith(subsystem))
-                .map(n => ({ id: n.external_id, name: n.name, type: 'equipment' as const, node: n }));
+                .filter(n => n.systemCode === system && n.subSystem?.startsWith(subsystem))
+                .map(n => ({ id: n.externalId, name: n.name, type: 'equipment' as const, node: n }));
         }
         return [];
     }, [path, nodes]);
 
-    const handleCardClick = (item: { id: string; type: 'system' | 'subsystem' | 'equipment'; node?: FunctionalNode }) => {
+    const handleCardClick = (item: { id: string; type: 'system' | 'subsystem' | 'equipment'; node?: Equipment }) => {
         if (item.type === 'equipment' && item.node) {
-            router.push(`/equipments/${encodeURIComponent(item.node.external_id)}`);
+            router.push(`/equipments/${encodeURIComponent(item.node.externalId)}`);
         } else {
             setPath([...path, item.id]);
         }
     };
-
-    if (!isTauri) {
-        return (
-          <div className="flex h-full items-center justify-center rounded-lg border-2 border-dashed border-border p-4">
-            <p className="text-center text-muted-foreground">
-              Le navigateur d'équipements n'est disponible que dans
-              l'application de bureau Tauri.
-            </p>
-          </div>
-        );
-    }
-
+    
     if (loading) {
-        return <Skeleton className="h-96 w-full" />;
+        return (
+            <Card>
+                <CardHeader>
+                    <Skeleton className="h-8 w-1/2"/>
+                    <Skeleton className="h-4 w-3/4"/>
+                </CardHeader>
+                <CardContent>
+                    <Skeleton className="h-96 w-full" />
+                </CardContent>
+            </Card>
+        );
     }
 
     if (error) {
@@ -170,16 +164,16 @@ export function SystemHierarchyBrowser() {
                              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                                 {searchResults.map(node => (
                                     <Card
-                                        key={node.external_id}
+                                        key={node.externalId}
                                         className="cursor-pointer hover:shadow-lg hover:border-primary transition-all"
-                                        onClick={() => router.push(`/equipments/${encodeURIComponent(node.external_id)}`)}
+                                        onClick={() => router.push(`/equipments/${encodeURIComponent(node.externalId)}`)}
                                     >
                                         <CardHeader>
                                             <CardTitle className="text-base flex items-center gap-2">
                                                 <Cog className="w-6 h-6 text-accent-foreground" />
                                                 {node.name}
                                             </CardTitle>
-                                            <CardDescription>{node.external_id}</CardDescription>
+                                            <CardDescription>{node.externalId}</CardDescription>
                                         </CardHeader>
                                         <CardContent>
                                             <p className="text-xs text-muted-foreground line-clamp-2">{node.description || 'Pas de description.'}</p>
