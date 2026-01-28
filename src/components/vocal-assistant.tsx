@@ -48,47 +48,6 @@ export function VocalAssistant() {
       sampleRate: 16000
   });
 
-  // Update input field with transcript from Vosk
-  useEffect(() => {
-    if (transcript.partial) {
-        setInput(transcript.partial);
-    }
-    if (transcript.final) {
-        handleSend(transcript.final);
-    }
-  }, [transcript]);
-
-  // Load master data on mount if in Tauri
-  useEffect(() => {
-    const tauriEnv = !!window.__TAURI__;
-    setIsTauri(tauriEnv);
-
-    async function loadData() {
-      if (tauriEnv) {
-        try {
-          const data = await getAssistantContextData();
-          setMasterDataContext(data);
-          console.log('Master data context loaded for assistant.');
-        } catch (e) {
-          console.error(e);
-          toast({
-            variant: 'destructive',
-            title: 'Erreur de base de données',
-            description: "Impossible de charger les données de référence pour l'assistant.",
-          });
-        }
-      }
-    }
-    loadData();
-  }, [toast]);
-
-  // Auto-scroll to bottom
-  useEffect(() => {
-    if (scrollAreaRef.current) {
-        scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
-    }
-  }, [messages]);
-
   const handleSend = useCallback(async (query: string) => {
     const trimmedInput = query.trim();
     if (!trimmedInput || isProcessing) return;
@@ -142,6 +101,47 @@ export function VocalAssistant() {
       setIsProcessing(false);
     }
   }, [isProcessing, isTtsEnabled, toast, masterDataContext, isTauri, showPid]);
+
+  // Update input field with transcript from Vosk
+  useEffect(() => {
+    if (transcript.partial) {
+        setInput(transcript.partial);
+    }
+    if (transcript.final) {
+        handleSend(transcript.final);
+    }
+  }, [transcript, handleSend]);
+
+  // Load master data on mount if in Tauri
+  useEffect(() => {
+    const tauriEnv = !!window.__TAURI__;
+    setIsTauri(tauriEnv);
+
+    async function loadData() {
+      if (tauriEnv) {
+        try {
+          const data = await getAssistantContextData();
+          setMasterDataContext(data);
+          console.log('Master data context loaded for assistant.');
+        } catch (e) {
+          console.error(e);
+          toast({
+            variant: 'destructive',
+            title: 'Erreur de base de données',
+            description: "Impossible de charger les données de référence pour l'assistant.",
+          });
+        }
+      }
+    }
+    loadData();
+  }, [toast]);
+
+  // Auto-scroll to bottom
+  useEffect(() => {
+    if (scrollAreaRef.current) {
+        scrollAreaRef.current.scrollTop = scrollAreaRef.current.scrollHeight;
+    }
+  }, [messages]);
   
   const handleSubmit = (e: React.FormEvent) => {
       e.preventDefault();
