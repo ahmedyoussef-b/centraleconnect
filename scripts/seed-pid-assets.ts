@@ -1,5 +1,4 @@
 
-#!/usr/bin/env tsx
 /**
  * Script d'injection batch des équipements P&ID dans la base SQLite
  * Via Prisma ORM → Mode immuable avec checksum SHA-256
@@ -147,5 +146,3 @@ main().catch((error) => {
   console.error('\n❌ [ERREUR FATALE]', error);
   process.exit(1);
 });
-
-    
