@@ -7,62 +7,32 @@ generator client {
 
 datasource db {
   provider = "sqlite"
-  url      = "file:./ccpp.db"
+  url      = "file:../ccpp.db"
 }
+
+// =========================================
+// Models
+// =========================================
 
 // Modèle pour les composants physiques principaux
 model Component {
-  tag            String       @id
-  name           String
-  type           String?
-  subtype        String?
-  manufacturer   String?
-  serialNumber   String?
-  location       String?
-  parameters     Parameter[]
-  alarms         Alarm[]
-  logEntries     LogEntry[]
-  documents      Document[]
+  tag          String      @id
+  name         String
+  type         String?
+  subtype      String?
+  manufacturer String?
+  serialNumber String?
+  location     String?
+  parameters   Parameter[]
+  documents    Document[]
+  logEntries   LogEntry[]
 
   @@map("components")
 }
 
-// Modèle pour les paramètres techniques des composants
-model Parameter {
-  id             Int       @id @default(autoincrement())
-  component_tag  String
-  key            String
-  name           String
-  unit           String?
-  nominal_value  Float?
-  min_safe       Float?
-  max_safe       Float?
-  alarm_high     Float?
-  alarm_low      Float?
-  standard_ref   String?
-  component      Component @relation(fields: [component_tag], references: [tag])
-
-  @@unique([component_tag, key])
-  @@map("parameters")
-}
-
-// Modèle pour les alarmes de référence
-model Alarm {
-  code            String    @id
-  component_tag   String
-  severity        String
-  description     String
-  parameter       String?
-  reset_procedure String?
-  standard_ref    String?
-  component       Component @relation(fields: [component_tag], references: [tag])
-
-  @@map("alarms")
-}
-
-// Modèle pour les nœuds fonctionnels issus des P&ID
+// Modèle pour les noeuds fonctionnels issus des P&ID
 model FunctionalNode {
-  external_id       String       @id
+  externalId        String         @id
   system            String
   subsystem         String
   document          String?
@@ -71,63 +41,169 @@ model FunctionalNode {
   name              String?
   description       String?
   location          String?
-  coordinates       String? // JSON string
-  linked_parameters String? // JSON string of parameter keys
-  svg_layer         String?
-  fire_zone         String?
+  coordinates       String? // JSON stored as string
+  linkedParameters  String? // JSON array stored as string
+  svgLayer          String?
+  fireZone          String?
   status            String?
-  checksum          String       @unique // SHA-256 checksum for data integrity
-  created_at        DateTime     @default(now())
-  updated_at        DateTime?    @updatedAt
-  approved_by       String?
-  approved_at       String?
+  checksum          String         @unique
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime?      @updatedAt
+  approvedBy        String?
+  approvedAt        DateTime?
   logEntries        LogEntry[]
   annotations       Annotation[]
+  alarmEvents       AlarmEvent[]
 
   @@map("functional_nodes")
 }
 
-// Modèle pour les entrées du journal de bord
-model LogEntry {
-  id                 Int      @id @default(autoincrement())
-  timestamp          DateTime @default(now())
-  type               String
-  source             String
-  message            String
-  component_tag      String?
-  functional_node_id String?
-  signature          String   @unique
+// Modèle pour les paramètres techniques des composants
+model Parameter {
+  id           Int      @id @default(autoincrement())
+  componentTag String
+  key          String
+  name         String
+  unit         String?
+  nominalValue Float?
+  minSafe      Float?
+  maxSafe      Float?
+  alarmHigh    Float?
+  alarmLow     Float?
+  standardRef  String?
+  component    Component @relation(fields: [componentTag], references: [tag])
 
-  component        Component?      @relation(fields: [component_tag], references: [tag])
-  functionalNode   FunctionalNode? @relation(fields: [functional_node_id], references: [external_id])
+  @@unique([componentTag, key])
+  @@map("parameters")
+}
+
+// Modèle pour le référentiel des alarmes
+model Alarm {
+  code            String       @id
+  componentTag    String
+  severity        AlarmSeverity
+  description     String
+  parameter       String?
+  resetProcedure  String?
+  standardRef     String?
+  events          AlarmEvent[]
+
+  @@map("alarms")
+}
+
+// Modèle pour les événements d'alarme (historique)
+model AlarmEvent {
+  id              Int      @id @default(autoincrement())
+  timestamp       DateTime @default(now())
+  alarmCode       String
+  functionalNodeId String?
+  message         String
+  acknowledged    Boolean  @default(false)
+  alarm           Alarm     @relation(fields: [alarmCode], references: [code])
+  functionalNode  FunctionalNode? @relation(fields: [functionalNodeId], references: [externalId])
+
+  @@map("alarm_events")
+}
+
+// Modèle pour le journal de bord
+model LogEntry {
+  id               Int          @id @default(autoincrement())
+  timestamp        DateTime
+  type             LogEntryType
+  source           String
+  message          String
+  signature        String       @unique
+  componentTag     String?
+  functionalNodeId String?
+  component        Component?   @relation(fields: [componentTag], references: [tag])
+  functionalNode   FunctionalNode? @relation(fields: [functionalNodeId], references: [externalId])
 
   @@map("log_entries")
 }
 
 // Modèle pour les annotations sur les P&ID
 model Annotation {
-  id                        Int          @id @default(autoincrement())
-  functional_node_external_id String
-  text                      String
-  operator                  String
-  timestamp                 DateTime     @default(now())
-  x_pos                     Float
-  y_pos                     Float
-  functionalNode            FunctionalNode @relation(fields: [functional_node_external_id], references: [external_id])
+  id                      Int      @id @default(autoincrement())
+  functionalNodeExternalId String
+  text                    String
+  operator                String
+  timestamp               DateTime
+  xPos                    Float
+  yPos                    Float
+  functionalNode          FunctionalNode @relation(fields: [functionalNodeExternalId], references: [externalId])
 
   @@map("annotations")
 }
 
-
-// Modèle pour les documents (images, etc.) liés aux composants
+// Modèle pour les documents (photos, etc.)
 model Document {
-  id            Int       @id @default(autoincrement())
-  component_tag String
-  imageData     String
-  ocrText       String?
-  description   String?
-  createdAt     DateTime  @default(now())
-  component     Component @relation(fields: [component_tag], references: [tag])
+  id          Int      @id @default(autoincrement())
+  componentTag String
+  imageData   String
+  ocrText     String?
+  description String?
+  createdAt   DateTime
+  component   Component @relation(fields: [componentTag], references: [tag])
 
   @@map("documents")
+}
+
+// Modèle pour les procédures
+model Procedure {
+  id          String         @id @default(cuid())
+  name        String
+  description String
+  version     String
+  steps       ProcedureStep[]
+
+  @@map("procedures")
+}
+
+// Modèle pour les étapes des procédures
+model ProcedureStep {
+  id          String   @id @default(cuid())
+  title       String
+  type        ProcedureStepType
+  details     String?
+  procedureId String
+  parentId    String?
+  procedure   Procedure @relation(fields: [procedureId], references: [id])
+  parent      ProcedureStep?  @relation("ProcedureStepHierarchy", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  children    ProcedureStep[] @relation("ProcedureStepHierarchy")
+
+  @@map("procedure_steps")
+}
+
+// Modèle pour les données SCADA historiques
+model ScadaData {
+  id        Int      @id @default(autoincrement())
+  timestamp DateTime
+  tag       String
+  value     Float
+
+  @@map("scada_data")
+}
+
+// =========================================
+// Enums
+// =========================================
+
+enum AlarmSeverity {
+  INFO
+  WARNING
+  CRITICAL
+  EMERGENCY
+}
+
+enum LogEntryType {
+  AUTO
+  MANUAL
+  DOCUMENT_ADDED
+}
+
+enum ProcedureStepType {
+  check
+  scada_check
+  instruction
+  group
 }
