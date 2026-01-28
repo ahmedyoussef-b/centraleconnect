@@ -1,10 +1,11 @@
+
 [
     {
       "code": "ALM-TG1-VIB-HI",
       "componentTag": "TG1",
-      "severity": "CRITICAL",
-      "message": "Vibration excessive sur palier N1 TG1",
-      "standardRef": "ISO 10814 §5.2"
+      "severity": "EMERGENCY",
+      "message": "Déclenchement par vibrations critiques",
+      "standardRef": "ISO 10816"
     },
     {
       "code": "ALM-TG1-EXHTEMP-HI",
@@ -33,5 +34,110 @@
       "severity": "WARNING",
       "message": "Émissions NOx au-dessus de la limite réglementaire",
       "standardRef": "EU 2010/75/EU Art. 31"
+    },
+    {
+      "code": "L30TXA",
+      "componentTag": "TG1",
+      "severity": "WARNING",
+      "message": "Alarme de surchauffe échappement (TTXM > Réf + Seuil)",
+      "standardRef": "SPEEDTRONIC MKIV"
+    },
+    {
+      "code": "L86TXT",
+      "componentTag": "TG1",
+      "severity": "EMERGENCY",
+      "message": "Déclenchement par surchauffe échappement",
+      "standardRef": "SPEEDTRONIC MKIV"
+    },
+    {
+      "code": "L30SPA",
+      "componentTag": "TG1",
+      "severity": "WARNING",
+      "message": "Alarme écart de température combustion (Spreads)",
+      "standardRef": "SPEEDTRONIC MKIV"
+    },
+    {
+      "code": "L30SPT",
+      "componentTag": "TG1",
+      "severity": "EMERGENCY",
+      "message": "Déclenchement par écart de température combustion excessif",
+      "standardRef": "SPEEDTRONIC MKIV"
+    },
+    {
+      "code": "L12H",
+      "componentTag": "TG1",
+      "severity": "EMERGENCY",
+      "message": "Déclenchement par survitesse électrique",
+      "standardRef": "SPEEDTRONIC MKIV"
+    },
+    {
+      "code": "BOS",
+      "componentTag": "TG1",
+      "severity": "EMERGENCY",
+      "message": "Déclenchement par survitesse mécanique (Réarmement manuel local)",
+      "standardRef": "Mécanique"
+    },
+    {
+      "code": "63QA-1",
+      "componentTag": "TG1",
+      "severity": "WARNING",
+      "message": "Basse pression d'huile de lubrification",
+      "standardRef": "API 614"
+    },
+    {
+      "code": "63QT-2A/B",
+      "componentTag": "TG1",
+      "severity": "EMERGENCY",
+      "message": "Déclenchement par très basse pression d'huile de lubrification",
+      "standardRef": "API 614"
+    },
+    {
+      "code": "63QQ-1",
+      "componentTag": "TG1",
+      "severity": "INFO",
+      "message": "Encrassement des filtres à huile (basculement nécessaire)",
+      "standardRef": "API 614"
+    },
+    {
+      "code": "VIB-HIGH-WARN",
+      "componentTag": "TG1",
+      "severity": "WARNING",
+      "message": "Niveau de vibrations élevé (seuil d'alarme)",
+      "standardRef": "ISO 10816"
+    },
+    {
+      "code": "L28FD",
+      "componentTag": "TG1",
+      "severity": "EMERGENCY",
+      "message": "Déclenchement par perte de flamme",
+      "standardRef": "SPEEDTRONIC MKIV / NFPA 85"
+    },
+    {
+      "code": "L60FFLH",
+      "componentTag": "TG1",
+      "severity": "EMERGENCY",
+      "message": "Déclenchement sur défaut débit combustible liquide au démarrage",
+      "standardRef": "SPEEDTRONIC MKIV"
+    },
+    {
+      "code": "L45HHAL",
+      "componentTag": "TG1",
+      "severity": "WARNING",
+      "message": "Alarme détection de gaz combustible (1er seuil)",
+      "standardRef": "NFPA 715"
+    },
+    {
+      "code": "L45HHTRP",
+      "componentTag": "TG1",
+      "severity": "EMERGENCY",
+      "message": "Déclenchement par détection de gaz combustible (2ème seuil)",
+      "standardRef": "NFPA 715"
+    },
+    {
+      "code": "45FA/FT/PT",
+      "componentTag": "TG1",
+      "severity": "EMERGENCY",
+      "message": "Déclenchement par détection incendie (et activation CO2)",
+      "standardRef": "NFPA 72"
     }
   ]
