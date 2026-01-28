@@ -1,17 +1,17 @@
+
 'use client';
 
 import { useEffect, useState } from 'react';
 import { notFound, useRouter } from 'next/navigation';
 import { ArrowLeft, Cog, Book, Bell, FileText, Database, BarChart2, Thermometer } from 'lucide-react';
-import Link from 'next/link';
 import Image from 'next/image';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
-import type { FunctionalNode, Parameter, LogEntry, Document } from '@/types/db';
-import type { Alarm } from '@/lib/alarms-service';
-import { getFunctionalNodeById, getParametersForComponent, getLogEntriesForNode, getDocumentsForComponent } from '@/lib/db-service';
+import type { Equipment, Parameter, LogEntry, Document } from '@/types/db';
 import { getAlarmsForComponent } from '@/lib/alarms-service';
+import { getEquipmentById, getParametersForComponent, getLogEntriesForNode, getDocumentsForComponent } from '@/lib/db-service';
+import type { Alarm } from '@/lib/alarms-service';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -20,6 +20,7 @@ import PidViewer from '@/components/PidViewer';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge, type BadgeProps } from '@/components/ui/badge';
+import { MaintenancePredictionWidget } from '@/components/maintenance-prediction-widget';
 
 function LoadingSkeleton() {
     return (
@@ -41,6 +42,7 @@ function LoadingSkeleton() {
                     </div>
                 </CardContent>
             </Card>
+            <Skeleton className="h-48 w-full" />
             <Skeleton className="h-96 w-full" />
         </div>
     );
@@ -56,7 +58,7 @@ const severityVariantMap: Record<Alarm['severity'], BadgeProps['variant']> = {
 export default function EquipmentDetailPage({ params }: { params: { id: string } }) {
     const router = useRouter();
     const equipmentId = decodeURIComponent(params.id);
-    const [node, setNode] = useState<FunctionalNode | null>(null);
+    const [node, setNode] = useState<Equipment | null>(null);
     const [parameters, setParameters] = useState<Parameter[]>([]);
     const [alarms, setAlarms] = useState<Alarm[]>([]);
     const [logEntries, setLogEntries] = useState<LogEntry[]>([]);
@@ -71,7 +73,7 @@ export default function EquipmentDetailPage({ params }: { params: { id: string }
             setLoading(true);
             setError(null);
             try {
-                const nodeData = await getFunctionalNodeById(equipmentId);
+                const nodeData = await getEquipmentById(equipmentId);
                 if (!nodeData) {
                     setError('Équipement non trouvé.');
                     return;
@@ -129,24 +131,25 @@ export default function EquipmentDetailPage({ params }: { params: { id: string }
                         <div className="md:col-span-2 space-y-4">
                            <h3 className="font-semibold text-lg flex items-center gap-2"><Database className="h-5 w-5"/> Informations Clés</h3>
                            <div className="grid grid-cols-2 gap-4 text-sm border p-4 rounded-md">
-                               <div><strong>ID Externe:</strong> <Badge variant="secondary" className="font-mono">{node.external_id}</Badge></div>
-                               <div><strong>Tag:</strong> <Badge variant="secondary" className="font-mono">{node.tag || 'N/A'}</Badge></div>
-                               <div><strong>Système:</strong> {node.system}</div>
-                               <div><strong>Sous-système:</strong> {node.subsystem}</div>
+                               <div><strong>ID Externe:</strong> <Badge variant="secondary" className="font-mono">{node.externalId}</Badge></div>
+                               <div><strong>Système:</strong> {node.systemCode}</div>
+                               <div><strong>Sous-système:</strong> {node.subSystem}</div>
                                <div className="col-span-2"><strong>Localisation:</strong> {node.location || 'Non spécifiée'}</div>
                            </div>
                         </div>
                         <div className="space-y-4">
                             <h3 className="font-semibold text-lg flex items-center gap-2"><BarChart2 className="h-5 w-5"/>État</h3>
                             <div className="border p-4 rounded-md space-y-2 text-sm">
-                                <div><strong>Statut:</strong> <Badge>{node.status}</Badge></div>
-                                <div><strong>Approuvé par:</strong> {node.approved_by || 'N/A'}</div>
-                                {node.approved_at && <div><strong>Approuvé le:</strong> {format(new Date(node.approved_at), 'dd/MM/yyyy', { locale: fr })}</div>}
+                                <div><strong>Statut:</strong> <Badge>{node.status || 'INCONNU'}</Badge></div>
+                                <div><strong>Approuvé par:</strong> {node.approvedBy || 'N/A'}</div>
+                                {node.approvedAt && <div><strong>Approuvé le:</strong> {format(new Date(node.approvedAt), 'dd/MM/yyyy', { locale: fr })}</div>}
                             </div>
                         </div>
                     </div>
                 </CardContent>
             </Card>
+
+            <MaintenancePredictionWidget equipmentId={equipmentId} />
 
             <Tabs defaultValue="pid" className="w-full">
                 <TabsList className="grid w-full grid-cols-5">
@@ -161,7 +164,7 @@ export default function EquipmentDetailPage({ params }: { params: { id: string }
                     <Card>
                         <CardHeader><CardTitle>Schéma P&ID Associé</CardTitle></CardHeader>
                         <CardContent>
-                            <PidViewer externalId={node.external_id} />
+                            <PidViewer externalId={node.externalId} />
                         </CardContent>
                     </Card>
                 </TabsContent>
@@ -174,7 +177,7 @@ export default function EquipmentDetailPage({ params }: { params: { id: string }
                                 <TableHeader><TableRow><TableHead>Paramètre</TableHead><TableHead>Valeur Nominale</TableHead><TableHead>Unité</TableHead><TableHead>Seuils (Sûr/Haut)</TableHead></TableRow></TableHeader>
                                 <TableBody>
                                     {parameters.length > 0 ? parameters.map(p => (
-                                        <TableRow key={p.id}><TableCell>{p.name}</TableCell><TableCell>{p.nominal_value ?? 'N/A'}</TableCell><TableCell>{p.unit}</TableCell><TableCell>{`Min: ${p.min_safe ?? 'N/A'}, Max: ${p.max_safe ?? 'N/A'}`}</TableCell></TableRow>
+                                        <TableRow key={p.id}><TableCell>{p.name}</TableCell><TableCell>{p.nominalValue ?? 'N/A'}</TableCell><TableCell>{p.unit}</TableCell><TableCell>{`Min: ${p.minSafe ?? 'N/A'}, Max: ${p.maxSafe ?? 'N/A'}`}</TableCell></TableRow>
                                     )) : <TableRow><TableCell colSpan={4} className="text-center">Aucun paramètre défini.</TableCell></TableRow>}
                                 </TableBody>
                             </Table>
@@ -217,7 +220,7 @@ export default function EquipmentDetailPage({ params }: { params: { id: string }
                 <TabsContent value="docs" className="mt-4">
                     <Card>
                         <CardHeader><CardTitle>Documents & Photos</CardTitle></CardHeader>
-                        <CardContent className="grid gap-4 md:grid-cols-2">
+                        <CardContent className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                              {documents.length > 0 ? documents.map(d => (
                                 <Card key={d.id}>
                                     <CardHeader><CardTitle className="text-base">{d.description}</CardTitle><CardDescription>Capturé le {format(new Date(d.createdAt), 'dd/MM/yyyy', { locale: fr })}</CardDescription></CardHeader>
