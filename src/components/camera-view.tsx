@@ -193,20 +193,30 @@ export function CameraView() {
   useEffect(() => {
     const initializeWorker = async () => {
       setViewState('processing');
-      const TesseractModule = await import('tesseract.js');
-      const worker = await TesseractModule.createWorker('fra', 1, {
-        logger: (m) => {
-          if (m.status === 'recognizing text') {
-            setProgress(m.progress * 100);
-          }
-        },
-      });
-      await worker.setParameters({
-        tessedit_char_whitelist:
-          '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz/-.,°m³/h barNOxDLNHRSGCTGV',
-      });
-      workerRef.current = worker;
-      setViewState('idle');
+      try {
+        const TesseractModule = await import('tesseract.js');
+        const worker = await TesseractModule.createWorker('fra', 1, {
+          logger: (m) => {
+            if (m.status === 'recognizing text') {
+              setProgress(m.progress * 100);
+            }
+          },
+        });
+        await worker.setParameters({
+          tessedit_char_whitelist:
+            '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz/-.,°m³/h barNOxDLNHRSGCTGV',
+        });
+        workerRef.current = worker;
+      } catch (error) {
+        console.error("Failed to initialize Tesseract worker:", error);
+        toast({
+          variant: 'destructive',
+          title: 'Erreur OCR',
+          description: "Le moteur de reconnaissance de texte n'a pas pu être chargé. L'analyse d'image sera indisponible.",
+        });
+      } finally {
+        setViewState('idle');
+      }
     };
     if (isTauri) {
       initializeWorker();
@@ -215,7 +225,7 @@ export function CameraView() {
       workerRef.current?.terminate();
       workerRef.current = null;
     };
-  }, [isTauri]);
+  }, [isTauri, toast]);
 
   const handleAnalyze = async () => {
     if (!videoRef.current) return;
