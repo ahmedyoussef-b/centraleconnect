@@ -1,773 +1,121 @@
-// ============================================
-// SCHEMA PRISMA - MASTER DATA SCADA/P&ID
-// Centrale Électrique à Cycle Combiné 2×1
-// Conforme : ISO 55001, IEC 61511, EU IED, ISA 18.2
-// Version : 3.0.0 - Architecture Immuabile
-// ============================================
+datasource db {
+  provider = "sqlite"
+  url      = "file:./ccpp.db"
+}
 
 generator client {
   provider = "prisma-client-js"
-  previewFeatures = ["fullTextSearch"]
 }
 
-datasource db {
-  provider = "sqlite"
-  url      = "file:./master-data.db"
-  relationMode = "prisma"
+model Component {
+  tag          String       @id
+  name         String
+  type         String
+  subtype      String?
+  manufacturer String?
+  serialNumber String?
+  location     String?
+  parameters   Parameter[]
+  alarms       Alarm[]
+  documents    Document[]
+  logEntries   LogEntry[]
+
+  @@map("components")
 }
-
-// ============================================
-// MODÈLE PRINCIPAL : NOEUD FONCTIONNEL SCADA
-// Correspond aux équipements physiques de la centrale
-// ============================================
-
-model FunctionalNode {
-  // Identifiants uniques
-  id                String    @id @default(cuid())
-  externalId        String    @unique @map("external_id")  // Format : A0.FIRE.DET.DF002
-  tagNumber         String?   @unique @map("tag_number")   // TAG ISA S5.1 (DF002, HV001A, T61)
-  
-  // Données descriptives
-  name              String
-  description       String?
-  type              NodeType
-  category          NodeCategory
-  
-  // Localisation hiérarchique SCADA
-  systemCode        String    @map("system_code")      // A0, B1, B2, B3
-  subSystem         String    @map("sub_system")       // FIRE, GAS, LUB, FUEL, COOL
-  area              String?                            // Zone physique (salle, niveau)
-  coordinates       Json?                              // { x: Float, y: Float, z: Float }
-  
-  // Données techniques nominales
-  manufacturer      String?
-  model             String?
-  serialNumber      String?   @map("serial_number")
-  installationDate  DateTime? @map("installation_date")
-  nominalData       Json?     @map("nominal_data")     // Données nominales (pression, débit, température)
-  
-  // Données P&ID spécifiques
-  document          String?                            // part10, part11, part12...
-  pidHotspot        Json?     @map("pid_hotspot")      // { x: Float, y: Float, layer: String, svgId: String }
-  pidSvgReference   String?   @map("pid_svg_reference") // "B2/lubrication-filtration.svg"
-  fireZone          String?   @map("fire_zone")        // ZONE41, ZONE_TG1, ZONE_TG2 (IEC 61511)
-  
-  // Relations hiérarchiques
-  parentId          String?
-  parent            FunctionalNode?   @relation("NodeHierarchy", fields: [parentId], references: [id])
-  children          FunctionalNode[]  @relation("NodeHierarchy")
-  
-  // Relations fonctionnelles
-  parameters        Parameter[]
-  alarms            Alarm[]
-  documents         Document[]
-  logEntries        LogEntry[]        @relation("NodeLogEntries")
-  procedures        ProcedureStep[]   @relation("NodeProcedures")
-  annotations       Annotation[]      @relation("NodeAnnotations")
-  regulatoryRefs    RegulatoryReference[]
-  
-  // Métadonnées de versioning et conformité
-  createdAt         DateTime  @default(now()) @map("created_at")
-  updatedAt         DateTime  @updatedAt @map("updated_at")
-  version           Int       @default(1)
-  
-  // Immuabilité et approbation
-  isImmutable       Boolean   @default(false) @map("is_immutable") // Bloque UPDATE après approbation
-  approvedBy        String?   @map("approved_by")  // ENG-SCADA-TEAM
-  approvedAt        DateTime? @map("approved_at")
-  checksum          String                             // SHA-256 checksum immuable
-  
-  // Index pour performances
-  @@index([systemCode, subSystem])
-  @@index([type])
-  @@index([externalId])
-  @@index([tagNumber])
-  @@fulltext([name, description])
-  
-  @@map("functional_nodes")
-}
-
-// ============================================
-// MODÈLE : PARAMÈTRE TECHNIQUE
-// Valeurs nominales et seuils opérationnels
-// ============================================
 
 model Parameter {
-  id                String    @id @default(cuid())
-  nodeId            String    @map("node_id")
-  name              String                              // Nom du paramètre (ex: GAS.PRESSURE, LUB.TEMP)
-  description       String?
-  unit              String                              // Unité (bar, °C, m³/h, kW, etc.)
-  dataType          DataType  @default(DOUBLE) @map("data_type")
-  
-  // Valeurs nominales et seuils
-  nominalValue      Float?    @map("nominal_value")    // Valeur nominale
-  minValue          Float?    @map("min_value")        // Minimum autorisé
-  maxValue          Float?    @map("max_value")        // Maximum autorisé
-  warningLow        Float?    @map("warning_low")      // Seuil warning bas
-  warningHigh       Float?    @map("warning_high")     // Seuil warning haut
-  alarmLow          Float?    @map("alarm_low")        // Seuil alarme bas
-  alarmHigh         Float?    @map("alarm_high")       // Seuil alarme haut
-  
-  // Métadonnées
-  source            String?   @default("MANUAL")       // SCADA, MANUAL, CALCULATED
-  isActive          Boolean   @default(true) @map("is_active")
-  createdAt         DateTime  @default(now()) @map("created_at")
-  updatedAt         DateTime  @updatedAt @map("updated_at")
-  
-  // Relations
-  node              FunctionalNode @relation(fields: [nodeId], references: [id], onDelete: Cascade)
-  
-  // Contraintes
-  @@index([nodeId])
-  @@index([name])
-  @@unique([nodeId, name])
-  
+  id            Int      @id @default(autoincrement())
+  component_tag String
+  key           String
+  name          String
+  unit          String?
+  nominal_value Float?
+  min_safe      Float?
+  max_safe      Float?
+  alarm_high    Float?
+  alarm_low     Float?
+  standard_ref  String?
+  component     Component @relation(fields: [component_tag], references: [tag])
+
+  @@unique([component_tag, key])
   @@map("parameters")
 }
 
-// ============================================
-// MODÈLE : ALARME INDUSTRIELLE
-// Conforme ISA 18.2 / IEC 62682
-// ============================================
-
 model Alarm {
-  id                String    @id @default(cuid())
-  nodeId            String    @map("node_id")
-  code              String    @unique                   // Format : SYS-XXX-YYY (ex: B2-LUB-001)
-  name              String
-  description       String?
-  
-  // Classification ISA 18.2
-  severity          AlarmSeverity
-  priority          Int       @default(1)               // 1=Highest, 5=Lowest
-  category          AlarmCategory
-  
-  // Conditions d'activation
-  condition         String                              // Condition logique (ex: "LUB.PRESSURE < 2.5")
-  delay             Int?      @default(0)               // Délai en secondes avant activation
-  autoAck           Boolean   @default(false) @map("auto_ack") // Acquittement automatique
-  
-  // Actions associées
-  procedureId       String?   @map("procedure_id")      // Procédure à suivre
-  shutdownRequired  Boolean   @default(false) @map("shutdown_required") // Arrêt requis
-  
-  // État
-  isActive          Boolean   @default(true) @map("is_active")
-  
-  // Métadonnées
-  createdAt         DateTime  @default(now()) @map("created_at")
-  updatedAt         DateTime  @updatedAt @map("updated_at")
-  
-  // Relations
-  node              FunctionalNode @relation(fields: [nodeId], references: [id], onDelete: Cascade)
-  procedure         Procedure?     @relation(fields: [procedureId], references: [id])
-  events            AlarmEvent[]
-  
-  // Index
-  @@index([nodeId])
-  @@index([severity])
-  @@index([category])
-  @@index([isActive])
-  
+  code            String    @id
+  component_tag   String
+  severity        String
+  description     String
+  parameter       String?
+  reset_procedure String?
+  standard_ref    String?
+  component       Component @relation(fields: [component_tag], references: [tag])
+
   @@map("alarms")
 }
 
-// ============================================
-// MODÈLE : ÉVÉNEMENT D'ALARME (HISTORIQUE)
-// Traçabilité complète du cycle de vie d'une alarme
-// ============================================
+model FunctionalNode {
+  external_id  String       @id
+  system       String
+  subsystem    String
+  document     String?
+  tag          String?
+  type         String
+  name         String
+  description  String?
+  location     String?
+  coordinates  Json
+  linked_parameters Json
+  svg_layer    String?
+  fire_zone    String?
+  status       String
+  checksum     String
+  created_at   DateTime     @default(now())
+  updated_at   DateTime     @updatedAt
+  approved_by  String?
+  approved_at  String?
+  annotations  Annotation[]
+  logEntries   LogEntry[]
 
-model AlarmEvent {
-  id                String    @id @default(cuid())
-  alarmId           String    @map("alarm_id")
-  
-  // Type d'événement
-  eventType         AlarmEventType @map("event_type")  // ACTIVATED, ACKNOWLEDGED, CLEARED, SUPPRESSED
-  timestamp         DateTime  @default(now())
-  
-  // Contexte opérationnel
-  operatorId        String?   @map("operator_id")       // Identifiant opérateur
-  operatorName      String?   @map("operator_name")     // Nom opérateur
-  comment           String?                             // Commentaire libre
-  scadaValue        Float?    @map("scada_value")       // Valeur SCADA au moment de l'événement
-  
-  // Métadonnées temporelles
-  acknowledgedAt    DateTime? @map("acknowledged_at")
-  clearedAt         DateTime? @map("cleared_at")
-  duration          Int?                                // Durée en secondes
-  
-  // Relations
-  alarm             Alarm     @relation(fields: [alarmId], references: [id], onDelete: Cascade)
-  
-  // Index
-  @@index([alarmId])
-  @@index([timestamp])
-  @@index([eventType])
-  @@index([operatorId])
-  
-  @@map("alarm_events")
+  @@map("functional_nodes")
 }
-
-// ============================================
-// MODÈLE : DOCUMENT TECHNIQUE
-// Documentation des équipements (manuel, P&ID, certificat)
-// ============================================
-
-model Document {
-  id                String    @id @default(cuid())
-  nodeId            String    @map("node_id")
-  title             String
-  description       String?
-  
-  // Fichier
-  fileName          String    @map("file_name")         // Nom fichier (ex: "pump-manual.pdf")
-  fileType          String    @map("file_type")         // pdf, dwg, jpg, png, svg, docx
-  fileSize          Int       @map("file_size")         // Taille en octets
-  filePath          String    @map("file_path")         // Chemin relatif (ex: "/documents/B2/LUB/")
-  checksum          String                              // SHA-256 pour intégrité
-  
-  // Métadonnées documentaires
-  documentType      DocumentType  @map("document_type")
-  revision          String    @default("A")             // Révision (A, B, C...)
-  issueDate         DateTime? @map("issue_date")        // Date d'émission
-  language          String    @default("fr")            // Langue (fr, en, ar)
-  
-  // Sécurité et conformité
-  confidential      Boolean   @default(false)
-  retentionYears    Int       @default(10) @map("retention_years") // Durée de rétention légale
-  
-  // Métadonnées système
-  uploadedBy        String?   @map("uploaded_by")       // Auteur upload
-  uploadedAt        DateTime  @default(now()) @map("uploaded_at")
-  version           Int       @default(1)
-  
-  // Relations
-  node              FunctionalNode @relation(fields: [nodeId], references: [id], onDelete: Cascade)
-  
-  // Index
-  @@index([nodeId])
-  @@index([documentType])
-  @@index([revision])
-  @@fulltext([title, description])
-  
-  @@map("documents")
-}
-
-// ============================================
-// MODÈLE : ENTRÉE JOURNAL DE BORD
-// Traçabilité ISO 55001 / Audit trail réglementaire
-// ============================================
 
 model LogEntry {
-  id                String    @id @default(cuid())
-  nodeId            String?   @map("node_id")           // Optionnel (évènement global)
-  
-  // Classification de l'événement
-  eventType         LogEventType  @map("event_type")
-  source            String        // SYSTEM, OPERATOR, SCADA, MAINTENANCE, EXTERNAL
-  severity          LogSeverity   @default(INFO)
-  
-  // Description
-  title             String                              // Titre court
-  details           String?                             // Description détaillée
-  rawData           Json?     @map("raw_data")          // Données brutes JSON (SCADA, capteurs)
-  
-  // Contexte opérationnel
-  operatorId        String?   @map("operator_id")       // Identifiant opérateur
-  operatorName      String?   @map("operator_name")     // Nom opérateur
-  shift             String?                             // Poste (A, B, C, D)
-  workOrderId       String?   @map("work_order_id")     // Ordre de travail associé
-  
-  // Métadonnées réglementaires
-  regulatoryTags    String[]  @map("regulatory_tags")   // ["ISO_55001", "IEC_61511", "EU_IED"]
-  environmental     Boolean   @default(false)           // Impact environnemental
-  safetyCritical    Boolean   @default(false) @map("safety_critical") // Sécurité critique
-  
-  // Horodatage et intégrité
-  timestamp         DateTime  @default(now())           // Horodatage local
-  serverTimestamp   DateTime? @map("server_timestamp")  // Horodatage serveur (synchro)
-  previousHash      String?   @map("previous_hash")     // Hash entrée précédente (blockchain)
-  integrityHash     String    @map("integrity_hash")    // SHA-256 de l'entrée complète
-  
-  // Relations
-  node              FunctionalNode? @relation(fields: [nodeId], references: [id], onDelete: SetNull)
-  
-  // Index critiques
-  @@index([nodeId])
-  @@index([eventType])
-  @@index([timestamp])
-  @@index([severity])
-  @@index([regulatoryTags])
-  @@index([operatorId])
-  
+  id                 Int      @id @default(autoincrement())
+  timestamp          DateTime @default(now())
+  type               String
+  source             String
+  message            String
+  signature          String   @unique
+  component_tag      String?
+  functional_node_id String?
+  Component          Component?     @relation(fields: [component_tag], references: [tag])
+  FunctionalNode     FunctionalNode? @relation(fields: [functional_node_id], references: [external_id])
+
   @@map("log_entries")
 }
 
-// ============================================
-// MODÈLE : ANNOTATION SUR P&ID
-// Annotations collaboratives sur les schémas P&ID
-// ============================================
-
 model Annotation {
-  id                String    @id @default(cuid())
-  nodeId            String    @map("node_id")
-  pidReference      String    @map("pid_reference")     // Référence P&ID (ex: "part12", "B2-LUB-001")
-  
-  // Contenu de l'annotation
-  content           String                              // Texte de l'annotation
-  annotationType    AnnotationType @default(TEXT) @map("annotation_type")
-  positionX         Float     @map("position_x")        // Coordonnée X sur le P&ID
-  positionY         Float     @map("position_y")        // Coordonnée Y sur le P&ID
-  
-  // Auteur et statut
-  authorId          String    @map("author_id")         // Identifiant auteur
-  authorName        String    @map("author_name")       // Nom auteur
-  status            AnnotationStatus @default(ACTIVE)
-  
-  // Métadonnées
-  createdAt         DateTime  @default(now()) @map("created_at")
-  updatedAt         DateTime  @updatedAt @map("updated_at")
-  expiresAt         DateTime? @map("expires_at")        // Date d'expiration (optionnelle)
-  
-  // Relations
-  node              FunctionalNode @relation(fields: [nodeId], references: [id], onDelete: Cascade)
-  
-  // Index
-  @@index([nodeId])
-  @@index([pidReference])
-  @@index([status])
-  @@index([createdAt])
-  @@index([authorId])
-  
+  id                          Int      @id @default(autoincrement())
+  functional_node_external_id String
+  text                        String
+  operator                    String
+  timestamp                   DateTime @default(now())
+  x_pos                       Float
+  y_pos                       Float
+  node                        FunctionalNode @relation(fields: [functional_node_external_id], references: [external_id])
+
   @@map("annotations")
 }
 
-// ============================================
-// MODÈLE : ÉTAPE DE PROCÉDURE
-// Procédures guidées conformes ISO 9001
-// ============================================
+model Document {
+  id           Int      @id @default(autoincrement())
+  component_tag String
+  imageData    String
+  ocrText      String?
+  description  String?
+  createdAt    DateTime @default(now())
+  component    Component @relation(fields: [component_tag], references: [tag])
 
-model ProcedureStep {
-  id                String    @id @default(cuid())
-  nodeId            String?   @map("node_id")           // Optionnel (procédure globale)
-  procedureId       String    @map("procedure_id")
-  
-  // Description de l'étape
-  stepNumber        Int       @map("step_number")       // Numéro d'étape (1, 2, 3...)
-  title             String                              // Titre court
-  description       String?
-  instructions      String                              // Instructions détaillées
-  
-  // Validation et vérification
-  validationType    ValidationType @map("validation_type")
-  expectedValue     String?   @map("expected_value")    // Valeur attendue (optionnelle)
-  tolerance         String?                             // Tolérance acceptée
-  
-  // Sécurité
-  safetyCheck       Boolean   @default(false) @map("safety_check")
-  safetyProcedure   String?   @map("safety_procedure")  // Procédure sécurité spécifique
-  lockoutRequired   Boolean   @default(false) @map("lockout_required") // Verrouillage requis
-  
-  // Métadonnées
-  estimatedTime     Int?      @map("estimated_time")    // Temps estimé en minutes
-  isCritical        Boolean   @default(false) @map("is_critical")
-  
-  // Relations
-  node              FunctionalNode? @relation(fields: [nodeId], references: [id], onDelete: SetNull)
-  
-  // Contraintes
-  @@index([nodeId])
-  @@index([procedureId])
-  @@index([stepNumber])
-  @@unique([procedureId, stepNumber])
-  
-  @@map("procedure_steps")
-}
-
-// ============================================
-// MODÈLE : PROCÉDURE COMPLÈTE
-// Procédures opérationnelles et de maintenance
-// ============================================
-
-model Procedure {
-  id                String    @id @default(cuid())
-  code              String    @unique                   // PROC-TG1-START-001
-  title             String
-  description       String?
-  
-  // Classification
-  procedureType     ProcedureType @map("procedure_type")
-  category          ProcedureCategory
-  revision          String    @default("A")             // Révision (A, B, C...)
-  
-  // Métadonnées
-  author            String?                             // Auteur de la procédure
-  approvalDate      DateTime? @map("approval_date")     // Date d'approbation
-  validityPeriod    Int       @default(12) @map("validity_period") // Période validité en mois
-  
-  // Sécurité
-  safetyLevel       SafetyLevel @default(STANDARD) @map("safety_level")
-  requiredTraining  String[]  @map("required_training") // Formations requises
-  
-  // Relations
-  steps             ProcedureStep[]
-  alarm             Alarm?      @relation(fields: [id], references: [procedureId])
-  
-  // Index
-  @@index([procedureType])
-  @@index([category])
-  @@index([revision])
-  @@index([safetyLevel])
-  @@fulltext([title, description])
-  
-  @@map("procedures")
-}
-
-// ============================================
-// MODÈLE : DONNÉES SCADA TEMPS RÉEL
-// Historique des valeurs SCADA avec qualité des données
-// ============================================
-
-model ScadaData {
-  id                String    @id @default(cuid())
-  nodeId            String    @map("node_id")
-  parameterName     String    @map("parameter_name")    // Nom du paramètre (ex: GAS.PRESSURE)
-  
-  // Valeur et qualité
-  value             Float                               // Valeur mesurée
-  quality           DataQuality @default(GOOD)          // Qualité de la donnée
-  timestamp         DateTime  @default(now())           // Horodatage
-  
-  // Métadonnées
-  source            String    @default("SCADA")         // SCADA, CALCULATED, MANUAL
-  unit              String?                             // Unité (redondant pour performance)
-  
-  // Relations
-  node              FunctionalNode @relation(fields: [nodeId], references: [id], onDelete: Cascade)
-  
-  // Index critiques pour performances
-  @@index([nodeId])
-  @@index([timestamp])
-  @@index([parameterName])
-  @@index([nodeId, parameterName])
-  @@index([nodeId, timestamp])
-  @@unique([nodeId, parameterName, timestamp])
-  
-  @@map("scada_data")
-}
-
-// ============================================
-// MODÈLE : MANIFEST MASTER DATA
-// Versioning global immuable de la base Master Data
-// ============================================
-
-model MasterDataManifest {
-  id              String   @id @default(cuid())
-  version         String   @unique                      // "1.0.0", "1.1.0", "2.0.0"
-  checksumSeed    String                                // SHA-256 global de tous les nodes
-  approvedBy      String                                // ENG-SCADA-TEAM
-  approvedAt      DateTime @default(now())
-  
-  // Références normatives
-  standardRefs    String[] @map("standard_refs")        // ["ISO_55001", "IEC_61511", "EU_IED"]
-  
-  // Statistiques
-  nodesCount      Int                                   // Nombre total de nodes
-  parametersCount Int       @default(0)                 // Nombre total de paramètres
-  alarmsCount     Int       @default(0)                 // Nombre total d'alarmes
-  documentsCount  Int       @default(0)                 // Nombre total de documents
-  
-  // Métadonnées
-  createdAt       DateTime @default(now())
-  description     String?                               // Description de la version
-  
-  @@map("master_data_manifest")
-}
-
-// ============================================
-// MODÈLE : RÉFÉRENCE RÉGLEMENTAIRE
-// Traçabilité normative structurée (ISO, IEC, EU)
-// ============================================
-
-model RegulatoryReference {
-  id              String   @id @default(cuid())
-  nodeId          String   @map("node_id")
-  
-  // Référence normative
-  standard        String                                // "ISO_55001", "IEC_61511", "EU_IED"
-  clause          String                                // "8.2.3", "11.4.2", "Annexe III"
-  requirement     String                                // Texte de l'exigence réglementaire
-  
-  // Conformité
-  complianceStatus ComplianceStatus @default(PENDING) @map("compliance_status")
-  complianceComment String?         @map("compliance_comment")
-  
-  // Métadonnées
-  verifiedBy      String?  @map("verified_by")         // Responsable vérification
-  verifiedAt      DateTime? @map("verified_at")        // Date vérification
-  
-  // Relations
-  node            FunctionalNode @relation(fields: [nodeId], references: [id], onDelete: Cascade)
-  
-  // Contraintes
-  @@unique([nodeId, standard, clause])
-  @@index([nodeId])
-  @@index([standard])
-  @@index([complianceStatus])
-  
-  @@map("regulatory_references")
-}
-
-// ============================================
-// MODÈLE : OPÉRATEUR / UTILISATEUR
-// Gestion des accès et permissions
-// ============================================
-
-model Operator {
-  id                String    @id @default(cuid())
-  employeeId        String    @unique @map("employee_id") // Matricule employé
-  username          String    @unique
-  email             String?   @unique
-  
-  // Informations personnelles
-  firstName         String    @map("first_name")
-  lastName          String    @map("last_name")
-  role              OperatorRole
-  department        String?                             // Département (OT, Maintenance, HSE)
-  
-  // Permissions et accréditations
-  permissions       Permission[]                        // Permissions accordées
-  certifications    String[]                            // Certifications (ex: ["TG1-OPERATOR", "LOCKOUT-TAGOUT"])
-  trainingCompleted Boolean   @default(false) @map("training_completed")
-  
-  // Métadonnées
-  hireDate          DateTime? @map("hire_date")
-  isActive          Boolean   @default(true) @map("is_active")
-  lastLogin         DateTime? @map("last_login")
-  createdAt         DateTime  @default(now()) @map("created_at")
-  
-  // Relations
-  logEntries        LogEntry[]  @relation("OperatorLogs")
-  alarmEvents       AlarmEvent[]
-  annotations       Annotation[]
-  
-  @@index([username])
-  @@index([role])
-  @@index([isActive])
-  
-  @@map("operators")
-}
-
-// ============================================
-// ENUMS - TYPES ET CATÉGORIES
-// ============================================
-
-// Types d'équipements
-enum NodeType {
-  TURBINE              // Turbine à gaz/vapeur
-  PUMP                 // Pompe
-  VALVE                // Vanne (motorisée, manuelle, sécurité)
-  COMPRESSOR           // Compresseur
-  HEAT_EXCHANGER       // Échangeur de chaleur
-  VESSEL               // Réservoir, vase, cuve
-  INSTRUMENT           // Instrument de mesure
-  SENSOR               // Capteur (pression, température, débit)
-  ACTUATOR             // Actionneur
-  CONTROL_PANEL        // Panneau de contrôle
-  ELECTRICAL           // Équipement électrique (transformateur, tableau)
-  SAFETY               // Équipement sécurité (CO2, détection incendie)
-  FILTER               // Filtre (huile, gaz, air)
-  SEPARATOR            // Séparateur (phases liquide/gaz)
-  BOILER               // Chaudière
-  PREHEATER            // Préchauffeur
-  OTHER                // Autre
-}
-
-// Catégories fonctionnelles
-enum NodeCategory {
-  MECHANICAL           // Mécanique
-  ELECTRICAL           // Électrique
-  INSTRUMENTATION      // Instrumentation
-  SAFETY               // Sécurité
-  CONTROL              // Contrôle/commande
-  AUXILIARY            // Auxiliaire
-  CIVIL                // Génie civil
-}
-
-// Types de données
-enum DataType {
-  INTEGER              // Entier
-  DOUBLE               // Réel (double précision)
-  BOOLEAN              // Booléen
-  STRING               // Chaîne de caractères
-  ENUM                 // Énumération
-  TIMESTAMP            // Horodatage
-}
-
-// Sévérité des alarmes (ISA 18.2)
-enum AlarmSeverity {
-  EMERGENCY            // Urgence - Arrêt immédiat requis
-  CRITICAL             // Critique - Action immédiate
-  HIGH                 // Haute - Action rapide
-  MEDIUM               // Moyenne - Action programmée
-  LOW                  // Basse - Information
-  INFO                 // Information seulement
-}
-
-// Catégories d'alarmes
-enum AlarmCategory {
-  SAFETY               // Sécurité des personnes/installation
-  ENVIRONMENTAL        // Impact environnemental
-  PROCESS              // Procédé/process
-  EQUIPMENT            // Équipement
-  ELECTRICAL           // Électrique
-  INSTRUMENTATION      // Instrumentation
-  COMMUNICATION        // Communication
-  OTHER                // Autre
-}
-
-// Types d'événements d'alarme
-enum AlarmEventType {
-  ACTIVATED            // Alarme activée
-  ACKNOWLEDGED         // Alarme acquittée
-  CLEARED              // Alarme revenue à la normale
-  SUPPRESSED           // Alarme supprimée (maintenance)
-  RESET                // Alarme réinitialisée
-}
-
-// Types de documents
-enum DocumentType {
-  MANUAL               // Manuel technique
-  DRAWING              // Schéma, plan, P&ID
-  CERTIFICATE          // Certificat (conformité, calibration)
-  PROCEDURE            // Procédure opératoire
-  REPORT               // Rapport (inspection, audit)
-  SPECIFICATION        // Spécification technique
-  CALCULATION          // Calcul technique
-  PHOTO                // Photographie
-  VIDEO                // Vidéo
-  OTHER                // Autre
-}
-
-// Types d'événements du journal
-enum LogEventType {
-  OPERATION            // Opération normale
-  MAINTENANCE          // Maintenance (préventive/corrective)
-  ALARM                // Événement alarme
-  PROCEDURE            // Exécution procédure
-  MANUAL_ENTRY         // Saisie manuelle opérateur
-  SYSTEM               // Événement système
-  SECURITY             // Événement sécurité
-  ENVIRONMENTAL        // Événement environnemental
-  SAFETY               // Événement sécurité (HSE)
-  AUDIT                // Audit/conformité
-}
-
-// Sévérité du journal
-enum LogSeverity {
-  DEBUG                // Debug (développement)
-  INFO                 // Information
-  NOTICE               // Notification
-  WARNING              // Avertissement
-  ERROR                // Erreur
-  CRITICAL             // Critique
-  ALERT                // Alerte
-  EMERGENCY            // Urgence
-}
-
-// Types d'annotations P&ID
-enum AnnotationType {
-  TEXT                 // Texte informatif
-  WARNING              // Avertissement
-  QUESTION             // Question/commentaire
-  ACTION               // Action requise
-  INFO                 // Information générale
-  DANGER               // Danger/sécurité
-}
-
-// Statut des annotations
-enum AnnotationStatus {
-  ACTIVE               // Active
-  RESOLVED             // Résolue
-  ARCHIVED             // Archivée
-  EXPIRED              // Expirée
-}
-
-// Types de validation procédure
-enum ValidationType {
-  MANUAL               // Validation manuelle opérateur
-  SCADA_CHECK          // Vérification SCADA (valeur paramètre)
-  TIMER                // Validation par temporisation
-  FORMULA              // Validation par formule/calcul
-  DOCUMENT             // Validation par document/photo
-}
-
-// Types de procédures
-enum ProcedureType {
-  STARTUP              // Démarrage
-  SHUTDOWN             // Arrêt
-  NORMAL_OPERATION     // Opération normale
-  EMERGENCY            // Procédure d'urgence
-  MAINTENANCE          // Maintenance
-  TEST                 // Test/essai
-  ISOLATION            // Isolement
-  LOCKOUT              // Verrouillage (LOTO)
-}
-
-// Catégories de procédures
-enum ProcedureCategory {
-  COLD_START           // Démarrage à froid
-  HOT_START            // Démarrage à chaud
-  LOAD_CHANGE          // Changement de charge
-  TRIP_RECOVERY        // Récupération après déclenchement
-  PREVENTIVE_MAINT     // Maintenance préventive
-  CORRECTIVE_MAINT     // Maintenance corrective
-}
-
-// Niveaux de sécurité procédures
-enum SafetyLevel {
-  STANDARD             // Standard
-  RISK                 // Risque identifié
-  HIGH_RISK            // Haut risque
-  CRITICAL             // Critique (permis de travail requis)
-}
-
-// Qualité des données SCADA
-enum DataQuality {
-  GOOD                 // Donnée valide
-  BAD                  // Donnée invalide
-  UNCERTAIN            // Donnée incertaine
-  SUBSTITUTED          // Donnée substituée (calculée/estimée)
-}
-
-// Statut de conformité réglementaire
-enum ComplianceStatus {
-  PENDING              // En attente de vérification
-  COMPLIANT            // Conforme
-  NON_COMPLIANT        // Non conforme
-  WAIVED               // Dérivé (waiver accordé)
-}
-
-// Rôles des opérateurs
-enum OperatorRole {
-  ADMIN                // Administrateur système
-  SUPERVISOR           // Superviseur OT
-  OPERATOR             // Opérateur de conduite
-  MAINTENANCE          // Technicien maintenance
-  HSE                  // Santé Sécurité Environnement
-  ENGINEER             // Ingénieur système
-  VIEWER               // Lecteur (accès lecture seule)
-}
-
-// Permissions système
-enum Permission {
-  VIEW_SCADA           // Vue SCADA temps réel
-  ACKNOWLEDGE_ALARM    // Acquitter alarmes
-  MODIFY_PARAMETER     // Modifier paramètres
-  EXECUTE_PROCEDURE    // Exécuter procédures
-  CREATE_ANNOTATION    // Créer annotations P&ID
-  MANAGE_DOCUMENT      // Gérer documentation
-  EXPORT_REPORT        // Exporter rapports
-  ADMIN_CONFIG         // Configuration administrative
+  @@map("documents")
 }

@@ -7,13 +7,7 @@ import type {
   Alarm, 
   FunctionalNode, 
   Annotation,
-  AlarmEvent,
-  Document,
-  Procedure,
-  ProcedureStep,
-  ScadaData,
-  RegulatoryReference,
-  Operator
+  Document
 } from '@/types/db';
 
 // Import JSON data which will be bundled by the build process
@@ -52,7 +46,8 @@ CREATE TABLE IF NOT EXISTS parameters (
     alarm_high REAL,
     alarm_low REAL,
     standard_ref TEXT,
-    FOREIGN KEY (component_tag) REFERENCES components(tag)
+    FOREIGN KEY (component_tag) REFERENCES components(tag),
+    UNIQUE(component_tag, key)
 );
 
 CREATE TABLE IF NOT EXISTS alarms (
@@ -63,17 +58,6 @@ CREATE TABLE IF NOT EXISTS alarms (
     parameter TEXT,
     reset_procedure TEXT,
     standard_ref TEXT,
-    FOREIGN KEY (component_tag) REFERENCES components(tag)
-);
-
-CREATE TABLE IF NOT EXISTS log_entries (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    timestamp TEXT NOT NULL,
-    type TEXT NOT NULL,
-    source TEXT NOT NULL,
-    message TEXT NOT NULL,
-    component_tag TEXT,
-    signature TEXT UNIQUE,
     FOREIGN KEY (component_tag) REFERENCES components(tag)
 );
 
@@ -97,6 +81,19 @@ CREATE TABLE IF NOT EXISTS functional_nodes (
     updated_at TEXT NOT NULL,
     approved_by TEXT,
     approved_at TEXT
+);
+
+CREATE TABLE IF NOT EXISTS log_entries (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    timestamp TEXT NOT NULL,
+    type TEXT NOT NULL,
+    source TEXT NOT NULL,
+    message TEXT NOT NULL,
+    component_tag TEXT,
+    functional_node_id TEXT,
+    signature TEXT UNIQUE,
+    FOREIGN KEY (component_tag) REFERENCES components(tag),
+    FOREIGN KEY (functional_node_id) REFERENCES functional_nodes(external_id)
 );
 
 CREATE TABLE IF NOT EXISTS annotations (
@@ -131,6 +128,7 @@ async function createEntrySignature(
     source: string;
     message: string;
     component_tag: string | null;
+    functional_node_id: string | null;
   },
   previousSignature: string
 ): Promise<string> {
@@ -138,7 +136,7 @@ async function createEntrySignature(
   const data = encoder.encode(
     `${previousSignature}|${entryData.timestamp}|${entryData.type}|${entryData.source}|${entryData.message}|${
       entryData.component_tag ?? ''
-    }`
+    }|${entryData.functional_node_id ?? ''}`
   );
   const hashBuffer = await crypto.subtle.digest('SHA-256', data);
   const hashArray = Array.from(new Uint8Array(hashBuffer));
@@ -384,6 +382,7 @@ export async function addLogEntry(entry: {
   source: string;
   message: string;
   component_tag?: string;
+  functional_node_id?: string;
 }): Promise<void> {
   if (typeof window === 'undefined' || !window.__TAURI__) return;
 
@@ -400,6 +399,7 @@ export async function addLogEntry(entry: {
     source: entry.source,
     message: entry.message,
     component_tag: entry.component_tag || null,
+    functional_node_id: entry.functional_node_id || null,
     timestamp: timestamp
   };
 
@@ -407,8 +407,8 @@ export async function addLogEntry(entry: {
 
   await invoke('plugin:sql|execute', {
     db: DB_NAME,
-    query: 'INSERT INTO log_entries (timestamp, type, source, message, component_tag, signature) VALUES ($1, $2, $3, $4, $5, $6)',
-    values: [timestamp, entry.type, entry.source, entry.message, entry.component_tag || null, signature],
+    query: 'INSERT INTO log_entries (timestamp, type, source, message, component_tag, functional_node_id, signature) VALUES ($1, $2, $3, $4, $5, $6, $7)',
+    values: [timestamp, entry.type, entry.source, entry.message, entry.component_tag || null, entry.functional_node_id || null, signature],
   });
 }
 
@@ -474,6 +474,7 @@ export async function addAnnotation(annotation: {
       type: 'MANUAL',
       source: annotation.operator,
       message: `Annotation ajoutée sur le P&ID de ${annotation.functional_node_external_id}: "${annotation.text}"`,
+      functional_node_id: annotation.functional_node_external_id,
     });
 }
 
