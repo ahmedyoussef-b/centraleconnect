@@ -94,7 +94,7 @@ async function main() {
 
   for (const equip of Array.from(allEquipments.values())) {
     if(equip.parameters && Array.isArray(equip.parameters)) {
-      for(const param of equip.parameters) {
+      for(const param of equip.parameters as any[]) {
         const paramKey = `${equip.externalId}::${param.name}`;
         if (allParams.has(paramKey)) continue;
 
@@ -103,9 +103,9 @@ async function main() {
               equipmentId: equip.externalId,
               name: param.name,
               unit: param.unit,
-              nominalValue: param.value,
-              minSafe: param.min,
-              maxSafe: param.max,
+              nominalValue: typeof param.value === 'number' ? param.value : null,
+              minSafe: typeof param.min === 'number' ? param.min : null,
+              maxSafe: typeof param.max === 'number' ? param.max : null,
             }
         });
         allParams.add(paramKey);
