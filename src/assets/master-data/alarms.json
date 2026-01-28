@@ -1,20 +1,6 @@
 
 [
     {
-      "code": "ALM-TG1-VIB-HI",
-      "componentTag": "TG1",
-      "severity": "EMERGENCY",
-      "message": "Déclenchement par vibrations critiques",
-      "standardRef": "ISO 10816"
-    },
-    {
-      "code": "ALM-TG1-EXHTEMP-HI",
-      "componentTag": "TG1",
-      "severity": "WARNING",
-      "message": "Température échappement TG1 élevée",
-      "standardRef": "IEC 60034-1 Annex C"
-    },
-    {
       "code": "ALM-HRSG1-PRESS-HI",
       "componentTag": "HRSG1",
       "severity": "EMERGENCY",
@@ -40,69 +26,107 @@
       "componentTag": "TG1",
       "severity": "WARNING",
       "message": "Alarme de surchauffe échappement (TTXM > Réf + Seuil)",
-      "standardRef": "SPEEDTRONIC MKIV"
+      "standardRef": "SPEEDTRONIC MKIV",
+      "parameter": "S'active lorsque la température moyenne (TTXM) dépasse la référence (TTRXB) + le seuil TTKOT3 (environ 11°C / 20°F sous le seuil de déclenchement).",
+      "reset_procedure": "Automatique si la température repasse sous le seuil."
     },
     {
       "code": "L86TXT",
       "componentTag": "TG1",
       "severity": "EMERGENCY",
       "message": "Déclenchement par surchauffe échappement",
-      "standardRef": "SPEEDTRONIC MKIV"
+      "standardRef": "SPEEDTRONIC MKIV",
+      "parameter": "TTXM > référence + seuil TTKOT2 ou atteinte du seuil isothermique TTKOT1.",
+      "reset_procedure": "Nécessite l'actionnement du signal de réarmement principal L86MR1 après retour à des conditions normales."
     },
     {
       "code": "L30SPA",
       "componentTag": "TG1",
       "severity": "WARNING",
       "message": "Alarme écart de température combustion (Spreads)",
-      "standardRef": "SPEEDTRONIC MKIV"
+      "standardRef": "SPEEDTRONIC MKIV",
+      "parameter": "Écart réel > limite admissible calculée (TTXSPL) pendant 3 secondes.",
+      "reset_procedure": "Manuel via l'écran de contrôle (accusé réception et Reset)."
     },
     {
       "code": "L30SPT",
       "componentTag": "TG1",
       "severity": "EMERGENCY",
       "message": "Déclenchement par écart de température combustion excessif",
-      "standardRef": "SPEEDTRONIC MKIV"
+      "standardRef": "SPEEDTRONIC MKIV",
+      "parameter": "Écart excessif avec thermocouples froids adjacents, ou écart important persistant plus de 5 minutes.",
+      "reset_procedure": "Manuel via l'écran de contrôle (accusé réception et Reset)."
     },
     {
       "code": "L12H",
       "componentTag": "TG1",
       "severity": "EMERGENCY",
       "message": "Déclenchement par survitesse électrique",
-      "standardRef": "SPEEDTRONIC MKIV"
+      "standardRef": "SPEEDTRONIC MKIV",
+      "parameter": "Vitesse turbine (TNH) > point de consigne de sécurité (TNKOS).",
+      "reset_procedure": "Signal de réarmement principal L86MR."
     },
     {
       "code": "BOS",
       "componentTag": "TG1",
       "severity": "EMERGENCY",
       "message": "Déclenchement par survitesse mécanique (Réarmement manuel local)",
-      "standardRef": "Mécanique"
+      "standardRef": "Mécanique",
+      "parameter": "Déplacement du doigt de survitesse par force centrifuge (seuil fixe non réglable, supérieur à l'électrique).",
+      "reset_procedure": "MANUEL UNIQUEMENT en tirant physiquement la poignée de réarmement sur le réducteur des auxiliaires."
     },
     {
       "code": "63QA-1",
       "componentTag": "TG1",
       "severity": "WARNING",
       "message": "Basse pression d'huile de lubrification",
-      "standardRef": "API 614"
+      "standardRef": "API 614",
+      "parameter": "Chute de pression sous les seuils de régulation du collecteur principal.",
+      "reset_procedure": "Acquittement de l'alarme à l'écran après rétablissement de la pression. Démarrage automatique de la pompe auxiliaire (88QA) puis de secours (88QE)."
     },
     {
       "code": "63QT-2A/B",
       "componentTag": "TG1",
       "severity": "EMERGENCY",
       "message": "Déclenchement par très basse pression d'huile de lubrification",
-      "standardRef": "API 614"
+      "standardRef": "API 614",
+      "parameter": "Pression insuffisante détectée par une logique 2 sur 3.",
+      "reset_procedure": "Réarmement principal après analyse de la cause."
     },
     {
       "code": "63QQ-1",
       "componentTag": "TG1",
       "severity": "INFO",
       "message": "Encrassement des filtres à huile (basculement nécessaire)",
-      "standardRef": "API 614"
+      "standardRef": "API 614",
+      "parameter": "Pression différentielle d'environ 1,5 bar (21 psi).",
+      "reset_procedure": "Aucun réarmement nécessaire, l'alarme disparaît après basculement et normalisation de la pression différentielle."
     },
     {
-      "code": "VIB-HIGH-WARN",
+      "code": "VIB-START-INHIBIT",
       "componentTag": "TG1",
-      "severity": "WARNING",
-      "message": "Niveau de vibrations élevé (seuil d'alarme)",
+      "severity": "INFO",
+      "message": "Inhibition de démarrage (défaut capteurs vibrations)",
+      "parameter": "≥ 3 capteurs turbine ou ≥ 2 capteurs réducteur/alternateur défectueux.",
+      "reset_procedure": "Disparaît lorsque les capteurs sont de nouveau fonctionnels.",
+      "standardRef": "ISO 10816"
+    },
+    {
+        "code": "VIB-HIGH-WARN",
+        "componentTag": "TG1",
+        "severity": "WARNING",
+        "message": "Niveau de vibrations élevé (seuil d'alarme)",
+        "parameter": "Le niveau de vibration a dépassé le premier seuil d'alerte.",
+        "reset_procedure": "Automatique si le niveau de vibration revient à la normale.",
+        "standardRef": "ISO 10816"
+    },
+    {
+      "code": "VIB-HIGH-TRIP",
+      "componentTag": "TG1",
+      "severity": "EMERGENCY",
+      "message": "Déclenchement par vibrations critiques",
+      "parameter": "Niveau de vibration critique atteint ou tous les capteurs d'un groupe sont invalides.",
+      "reset_procedure": "Manuel ou automatique (L86AMR) ou via le réarmement principal (L86MRI) selon la configuration.",
       "standardRef": "ISO 10816"
     },
     {
@@ -110,34 +134,44 @@
       "componentTag": "TG1",
       "severity": "EMERGENCY",
       "message": "Déclenchement par perte de flamme",
-      "standardRef": "SPEEDTRONIC MKIV / NFPA 85"
+      "standardRef": "SPEEDTRONIC MKIV / NFPA 85",
+      "parameter": "Moins de 2 capteurs UV sur 4 détectent une flamme.",
+      "reset_procedure": "Réarmement principal après purge et analyse de la cause."
     },
     {
       "code": "L60FFLH",
       "componentTag": "TG1",
       "severity": "EMERGENCY",
       "message": "Déclenchement sur défaut débit combustible liquide au démarrage",
-      "standardRef": "SPEEDTRONIC MKIV"
+      "standardRef": "SPEEDTRONIC MKIV",
+      "parameter": "Débit injecté > valeur prédéfinie pendant plus de 2 secondes.",
+      "reset_procedure": "Nécessite un réarmement manuel."
     },
     {
       "code": "L45HHAL",
       "componentTag": "TG1",
       "severity": "WARNING",
       "message": "Alarme détection de gaz combustible (1er seuil)",
-      "standardRef": "NFPA 715"
+      "standardRef": "NFPA 715",
+      "parameter": "Premier seuil de détection de gaz atteint.",
+      "reset_procedure": "Automatique si la concentration de gaz diminue."
     },
     {
       "code": "L45HHTRP",
       "componentTag": "TG1",
       "severity": "EMERGENCY",
       "message": "Déclenchement par détection de gaz combustible (2ème seuil)",
-      "standardRef": "NFPA 715"
+      "standardRef": "NFPA 715",
+      "parameter": "Deuxième seuil de détection de gaz atteint.",
+      "reset_procedure": "Réarmement principal après ventilation et analyse de la cause."
     },
     {
       "code": "45FA/FT/PT",
       "componentTag": "TG1",
       "severity": "EMERGENCY",
       "message": "Déclenchement par détection incendie (et activation CO2)",
-      "standardRef": "NFPA 72"
+      "standardRef": "NFPA 72",
+      "parameter": "Confirmation par 2 détecteurs dans une même zone.",
+      "reset_procedure": "Les clapets CO2 doivent être rouverts manuellement avant tout nouveau démarrage (confirmé par fins de course)."
     }
   ]
