@@ -15,103 +15,103 @@ datasource db {
 // --------------------------------------
 
 model Equipment {
-  externalId        String      @id
-  name              String
-  description       String?
-  parentId          String?
-  type              String?
-  subtype           String?
-  systemCode        String?     @map("system_code")
-  subSystem         String?     @map("sub_system")
-  location          String?
-  manufacturer      String?
-  serialNumber      String?     @map("serial_number")
-  documentRef       String?     @map("document_ref")
-  coordinates       String? // JSON
-  svgLayer          String?     @map("svg_layer")
-  fireZone          String?     @map("fire_zone")
-  linkedParameters  String?     @map("linked_parameters") // JSON
-  status            String?
-  version           Int         @default(1)
-  isImmutable       Boolean     @default(false) @map("is_immutable")
-  approvedBy        String?     @map("approved_by")
-  approvedAt        DateTime?   @map("approved_at")
-  checksum          String?     @unique
-  nominalData       String?     @map("nominal_data") // JSON
+  externalId       String    @id
+  name             String
+  description      String?
+  parentId         String?
+  type             String?
+  subtype          String?
+  systemCode       String?   @map("system_code")
+  subSystem        String?   @map("sub_system")
+  location         String?
+  manufacturer     String?
+  serialNumber     String?   @map("serial_number")
+  documentRef      String?   @map("document_ref")
+  coordinates      String? // JSON
+  svgLayer         String?   @map("svg_layer")
+  fireZone         String?   @map("fire_zone")
+  linkedParameters String?   @map("linked_parameters") // JSON
+  status           String?
+  version          Int       @default(1)
+  isImmutable      Boolean   @default(false) @map("is_immutable")
+  approvedBy       String?   @map("approved_by")
+  approvedAt       DateTime? @map("approved_at")
+  checksum         String?   @unique
+  nominalData      String?   @map("nominal_data") // JSON
 
-  parameters        Parameter[]
-  alarms            Alarm[]
-  scadaData         ScadaData[]
-  logEntries        LogEntry[]
-  annotations       Annotation[]
-  documents         Document[]
+  parameters  Parameter[]
+  alarms      Alarm[]
+  scadaData   ScadaData[]
+  logEntries  LogEntry[]
+  annotations Annotation[]
+  documents   Document[]
 
   @@map("equipments")
 }
 
 model Parameter {
-  id            Int       @id @default(autoincrement())
-  name          String
-  unit          String?
-  nominalValue  Float?    @map("nominal_value")
-  minSafe       Float?    @map("min_safe")
-  maxSafe       Float?    @map("max_safe")
-  alarmHigh     Float?    @map("alarm_high")
-  alarmLow      Float?    @map("alarm_low")
-  standardRef   String?   @map("standard_ref")
+  id           Int     @id @default(autoincrement())
+  name         String
+  unit         String?
+  nominalValue Float?  @map("nominal_value")
+  minSafe      Float?  @map("min_safe")
+  maxSafe      Float?  @map("max_safe")
+  alarmHigh    Float?  @map("alarm_high")
+  alarmLow     Float?  @map("alarm_low")
+  standardRef  String? @map("standard_ref")
 
-  equipmentId   String
-  equipment     Equipment @relation(fields: [equipmentId], references: [externalId])
+  equipmentId String
+  equipment   Equipment @relation(fields: [equipmentId], references: [externalId])
 
   @@map("parameters")
 }
 
 model Alarm {
-  code            String    @id
-  severity        Severity
-  description     String
-  parameter       String?
-  resetProcedure  String?   @map("reset_procedure")
-  standardRef     String?   @map("standard_ref")
+  code           String   @id
+  severity       Severity
+  description    String
+  parameter      String?
+  resetProcedure String?  @map("reset_procedure")
+  standardRef    String?  @map("standard_ref")
 
-  equipmentId     String
-  equipment       Equipment @relation(fields: [equipmentId], references: [externalId])
+  equipmentId String
+  equipment   Equipment @relation(fields: [equipmentId], references: [externalId])
 
-  alarmEvents     AlarmEvent[]
+  alarmEvents AlarmEvent[]
 
   @@map("alarms")
 }
 
 model LogEntry {
-  id            Int       @id @default(autoincrement())
-  timestamp     DateTime
-  type          LogType
-  source        String
-  message       String
-  signature     String    @unique
+  id        Int      @id @default(autoincrement())
+  timestamp DateTime
+  type      LogType
+  source    String
+  message   String
+  signature String   @unique
 
-  equipmentId   String?
-  equipment     Equipment? @relation(fields: [equipmentId], references: [externalId])
+  equipmentId String?
+  equipment   Equipment? @relation(fields: [equipmentId], references: [externalId])
 
   @@map("log_entries")
 }
 
 model AlarmEvent {
-  id          Int      @id @default(autoincrement())
-  timestamp   DateTime
-  isActive    Boolean
-  details     String?
+  id        Int      @id @default(autoincrement())
+  timestamp DateTime
+  isActive  Boolean
+  details   String?
 
-  alarmCode   String
-  alarm       Alarm    @relation(fields: [alarmCode], references: [code])
+  alarmCode String
+  alarm     Alarm  @relation(fields: [alarmCode], references: [code])
 
   @@map("alarm_events")
 }
 
 model ScadaData {
-  id          Int       @id @default(autoincrement())
-  timestamp   DateTime
-  value       Float
+  id        Int      @id @default(autoincrement())
+  timestamp DateTime
+  value     Float
 
   equipmentId String
   equipment   Equipment @relation(fields: [equipmentId], references: [externalId])
@@ -120,12 +120,12 @@ model ScadaData {
 }
 
 model Annotation {
-  id          Int       @id @default(autoincrement())
-  timestamp   DateTime
-  text        String
-  operator    String
-  xPos        Float     @map("x_pos")
-  yPos        Float     @map("y_pos")
+  id        Int      @id @default(autoincrement())
+  timestamp DateTime
+  text      String
+  operator  String
+  xPos      Float    @map("x_pos")
+  yPos      Float    @map("y_pos")
 
   equipmentId String
   equipment   Equipment @relation(fields: [equipmentId], references: [externalId])
@@ -142,26 +142,26 @@ model Document {
 
   equipmentId String
   equipment   Equipment @relation(fields: [equipmentId], references: [externalId])
-  
+
   @@map("documents")
 }
 
 model SynopticItem {
-    externalId    String      @id
-    name          String?
-    type          String?
-    parentId      String?     @map("parent_id")
-    groupPath     String?     @map("group_path")
-    elementId     String?     @map("element_id")
-    level         Int?
-    approvedBy    String?     @map("approved_by")
-    approvalDate  String?     @map("approval_date")
+  externalId   String  @id
+  name         String?
+  type         String?
+  parentId     String? @map("parent_id")
+  groupPath    String? @map("group_path")
+  elementId    String? @map("element_id")
+  level        Int?
+  approvedBy   String? @map("approved_by")
+  approvalDate String? @map("approval_date")
 
-    @@map("synoptic_items")
+  @@map("synoptic_items")
 }
 
 model Procedure {
-  id          String   @id
+  id          String  @id
   name        String
   description String?
   version     String?
@@ -169,7 +169,6 @@ model Procedure {
 
   @@map("procedures")
 }
-
 
 // --------------------------------------
 // ---        ENUMERATIONS            ---
