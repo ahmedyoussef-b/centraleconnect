@@ -68,39 +68,43 @@ Tu dois répondre en français, avec précision technique, en proposant du code,
 
 Voici une analyse de l'état d'avancement du projet par rapport aux 8 fonctionnalités clés définies.
 
-**1. Architecture Hybride (Desktop + Web)**
+**1. Architecture Hybride (Desktop + Web) - 100%**
 *   ✅ **Fait :** Application hybride fonctionnelle avec Next.js 14 + Tauri.
 *   ✅ **Fait :** Stockage local hors-ligne via une base de données SQLite dans l'application de bureau.
 *   ⏳ **À faire :** Synchronisation des données avec un backend cloud.
 
-**2. Base de Données Statique Locale (Master Data)**
-*   ✅ **Fait :** Structure de la base de données (équipements, paramètres, alarmes, journal, documents) implémentée et initialisée au démarrage.
-*   ✅ **Fait :** Les tables sont relationnelles et les données sont chargées depuis des fichiers JSON versionnés et validés par checksum.
+**2. Base de Données Statique Locale (Master Data) - 100%**
+*   ✅ **Fait :** Structure de la base de données (équipements, paramètres, alarmes, journal, documents, P&ID) implémentée via `prisma/schema.prisma` et initialisée au démarrage.
+*   ✅ **Fait :** Les tables sont relationnelles et les données sont chargées depuis des fichiers JSON/CSV versionnés et validés par checksum.
 
-**3. Auto-Provisionnement Multimédia Intelligent**
+**3. Auto-Provisionnement Multimédia Intelligent - 60%**
 *   ✅ **Fait :** "Mode Peuplement" implémenté, permettant de capturer une image, d'extraire des données via OCR/QR code, et de valider/enregistrer un nouvel équipement dans la base de données.
 *   ⏳ **À faire :** "Mode Contrôle" pour la reconnaissance en temps réel.
 *   ⏳ **À faire :** Intégration d'un modèle de reconnaissance d'objets (TensorFlow Lite).
 
-**4. Assistant Vocal Industriel (Voice Q&A)**
+**4. Assistant Vocal Industriel (Voice Q&A) - 100%**
 *   ✅ **Fait :** Interface de l'assistant intégrée avec historique de conversation.
 *   ✅ **Fait :** Reconnaissance vocale **hors-ligne** (STT offline avec Vosk) et synthèse vocale (TTS) fonctionnelles.
-*   ✅ **Fait :** L'assistant est connecté à la base de données locale pour des réponses contextuelles (ex: "Quelle est la puissance nominale de TG1 ?").
+*   ✅ **Fait :** L'assistant est connecté à la base de données locale pour des réponses contextuelles (ex: "Quelle est la puissance nominale de TG1 ?") et peut afficher des schémas P&ID.
 
-**5. Supervision Temps Réel SCADA**
+**5. Supervision Temps Réel SCADA - 90%**
 *   ✅ **Fait :** Widget de supervision affichant des données simulées en temps réel via Ably.
 *   ✅ **Fait :** Schéma P&ID simplifié et interactif (`CcppDiagram`).
 *   ✅ **Fait :** Graphique affichant l'historique de puissance sur 24h (données simulées).
-*   ⏳ **À faire :** Connexion à une source de données réelle, détection d'anomalies en comparant les données temps réel aux seuils de la base locale.
+*   ✅ **Fait :** Détection d'anomalies en comparant les données temps réel aux seuils de la base locale, avec journalisation automatique dans le journal de bord.
+*   ⏳ **À faire :** Connexion à une source de données réelle (OPC UA/MQTT).
 
-**6. Procédures Guidées Interactives**
-*   ❌ **Non implémenté.** Cette fonctionnalité est une prochaine étape majeure.
+**6. Procédures Guidées Interactives - 100%**
+*   ✅ **Fait :** L'opérateur peut sélectionner une procédure et être guidé pas à pas.
+*   ✅ **Fait :** Les étapes cochées par l'opérateur sont enregistrées dans le journal de bord pour un audit complet.
+*   ⏳ **À faire :** Validation automatique de certaines étapes en se basant sur les données SCADA temps réel.
 
-**7. Collaboration en Temps Réel**
-*   ❌ **Non implémenté.** Cette fonctionnalité est une prochaine étape majeure.
+**7. Collaboration en Temps Réel - 20%**
+*   ✅ **Fait :** Ajout d'annotations sur les schémas P&ID, consultables par tous les opérateurs.
+*   ❌ **Non implémenté :** Chat contextualisé par équipement, partage de vue caméra.
 
-**8. Journal de Bord Numérique & Traçabilité Réglementaire**
-*   ✅ **Fait :** Journal de bord fonctionnel avec enregistrement des événements automatiques (démarrage, ajout de document) et manuels.
+**8. Journal de Bord Numérique & Traçabilité Réglementaire - 100%**
+*   ✅ **Fait :** Journal de bord fonctionnel avec enregistrement des événements automatiques (démarrage, anomalie SCADA, ajout de document) et manuels.
 *   ✅ **Fait :** Chaque entrée est horodatée et liée à une source.
 *   ✅ **Fait :** Fonctionnalité d'export "Imprimer en PDF".
 *   ✅ **Fait :** Mécanismes d'infalsifiabilité via une chaîne de signatures cryptographiques (intégrité vérifiable par l'opérateur).
@@ -109,32 +113,38 @@ Voici une analyse de l'état d'avancement du projet par rapport aux 8 fonctionna
 
 ---
 
-## Plan de Progression
+## Plan de Progression (Voie d'Évolution)
 
 Voici un plan de progression logique pour faire évoluer ce MVP robuste vers une solution encore plus complète.
 
-**1. Implémenter les Procédures Guidées Interactives :**
-*   **Objectif :** Transformer la page `/procedures` en une fonctionnalité centrale. L'opérateur doit pouvoir sélectionner une procédure (ex: "Démarrage à froid TG1") et être guidé pas à pas.
+**1. Créer des Vues Détaillées par Équipement :**
+*   **Objectif :** Permettre à l'opérateur de consulter une "fiche d'identité" complète pour chaque équipement. C'est l'étape la plus prioritaire pour valoriser les données P&ID.
 *   **Étapes clés :**
-    1.  **Modèle de Données :** Créer un fichier `procedures.json` dans `src/assets/master-data/` pour définir la structure des procédures (étapes, descriptions, types de validation).
-    2.  **Interface Utilisateur :** Sur la page `/procedures`, afficher la liste des procédures disponibles. Créer une nouvelle vue pour l'exécution d'une procédure, avec des checklists, des champs de saisie et des boutons de validation.
-    3.  **Intégration SCADA :** Permettre aux étapes de se valider automatiquement en vérifiant les données temps réel (ex: "Attendre que la température de sortie de CR1 > 150°C").
-    4.  **Traçabilité :** Enregistrer automatiquement chaque action (démarrage de la procédure, validation d'une étape, etc.) dans le journal de bord pour un audit complet.
+    1.  **Navigation :** Rendre les éléments dans la page `/equipments` cliquables.
+    2.  **Page de Détail :** Créer une nouvelle page dynamique (ex: `/equipments/[id]`). Cette page agrégera toutes les informations relatives à un composant :
+        *   Ses paramètres nominaux (depuis la base de données).
+        *   Les alarmes spécifiques qui lui sont associées.
+        *   Tous les documents et photos (issus du provisionnement).
+        *   Un historique filtré des entrées du journal de bord le concernant.
+        *   Le schéma P&ID associé via le `PidViewer`.
 
-**2. Enrichir la Supervision et la Détection d'Anomalies :**
-*   **Objectif :** Rendre la supervision plus intelligente en la connectant plus profondément aux données de référence.
+**2. Intégrer la Maintenance Prédictive (Phase 1) :**
+*   **Objectif :** Utiliser l'ébauche `src/lib/predictive/maintenance.ts` pour afficher une première notion de "score de santé" sur les nouvelles pages de détail d'équipement.
 *   **Étapes clés :**
-    1.  **Détection d'Anomalies :** Dans le composant `ScadaRealtime`, comparer les valeurs en direct avec les seuils `min_value` et `max_value` des paramètres lus depuis la base de données locale. Si un seuil est dépassé, l'affichage de la valeur changera de couleur (ex: orange pour un avertissement, rouge pour une alarme).
-    2.  **Journalisation Automatique des Alarmes :** Lorsqu'une anomalie est détectée, créer automatiquement une entrée de type `AUTO` dans le journal de bord, en y associant le code de l'alarme et l'identifiant du composant concerné.
+    1.  **UI sur la page de détail :** Ajouter un widget "Santé de l'équipement" qui affiche une probabilité de défaillance (simulée pour l'instant) et des actions recommandées.
+    2.  **Connexion au service :** Appeler la méthode `predictFailure` depuis la page de détail pour alimenter le widget.
 
-**3. Créer des Vues Détaillées par Équipement :**
-*   **Objectif :** Permettre à l'opérateur de consulter une "fiche d'identité" complète pour chaque équipement.
-*   **Étapes clés :**
-    1.  **Navigation :** Rendre les lignes de la table sur la page `/equipments` cliquables.
-    2.  **Page de Détail :** Créer une nouvelle page dynamique (ex: `/equipments/[id]`). Cette page affichera toutes les informations relatives à un composant : ses paramètres nominaux, les alarmes qui lui sont associées, tous les documents et photos (issus du provisionnement), et un historique filtré des entrées du journal de bord le concernant.
-
-**4. Mettre en Place la Collaboration en Temps Réel (Phase 1) :**
+**3. Mettre en Place la Collaboration en Temps Réel (Phase 2) :**
 *   **Objectif :** Initier les fonctionnalités collaboratives, en commençant par un chat contextualisé.
 *   **Étapes clés :**
-    1.  **Chat Contextuel :** Sur la future page de détail d'un équipement ou lors d'une procédure, ajouter un widget de chat simple.
-    2.  **Canaux Ably :** Utiliser des canaux Ably dédiés (ex: `chat:equipment:TG1` ou `chat:procedure:demarrage-froid-tg1`) pour que les messages soient pertinents au contexte de travail.
+    1.  **Chat Contextuel :** Sur la nouvelle page de détail d'un équipement, ajouter un widget de chat simple.
+    2.  **Canaux Ably :** Utiliser des canaux Ably dédiés (ex: `chat:equipment:TG1`) pour que les messages soient pertinents au contexte de travail de l'opérateur.
+
+**4. Finaliser l'Intégration SCADA :**
+*   **Objectif :** Remplacer les données simulées par une connexion à une source de données réelle.
+*   **Étapes clés :**
+    1.  **Connecteur OPC UA/MQTT :** Implémenter un service (côté backend Node.js si l'architecture évolue, ou via un bridge Rust dans Tauri) qui se connecte au serveur SCADA.
+    2.  **Publication sur Ably :** Ce service publiera les données réelles sur le canal `scada:data`, remplaçant ainsi le simulateur actuel sans nécessiter de changement sur l'interface utilisateur.
+    3.  **Validation automatique des procédures :** Utiliser ces données réelles pour valider automatiquement certaines étapes des procédures guidées (ex: "Attendre que la température T > 150°C").
+
+  
