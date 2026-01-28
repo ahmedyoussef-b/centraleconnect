@@ -1,148 +1,137 @@
-
 /**
- * Script d'injection batch des équipements P&ID dans la base SQLite
- * Via Prisma ORM → Mode immuable avec checksum SHA-256
- * Conformité ISO 55001 / IEC 61511 / EU IED
+ * Script d'injection complet des données de référence (Master Data) dans la base de données.
+ * A utiliser pour un environnement de développement Node.js.
+ * 
+ * Exécution : `npm run db:seed`
+ * 
+ * Ce script va :
+ * 1. Supprimer toutes les données des tables concernées pour garantir un état propre.
+ * 2. Injecter les composants depuis `components.json`.
+ * 3. Injecter les paramètres depuis `parameters.json`.
+ * 4. Injecter les alarmes depuis `alarms.json`.
+ * 5. Injecter les noeuds fonctionnels P&ID depuis `pid-assets.json` avec un checksum.
  */
 
 import { PrismaClient } from '@prisma/client';
 import { createHash } from 'crypto';
-import { readFileSync, writeFileSync } from 'fs';
+import { readFileSync } from 'fs';
 import path from 'path';
 
 const prisma = new PrismaClient();
 
-interface PidNode {
-  external_id: string;
-  system: string;
-  subsystem: string;
-  document: string;
-  tag: string | null;
-  type: string;
-  name: string;
-  description: string;
-  location: string;
-  coordinates: {
-    x: number;
-    y: number;
-    page: string;
-  };
-  linked_parameters: string[];
-  svg_layer: string;
-  fire_zone: string | null;
-  status: string;
+// Helper function to read JSON master data
+function readMasterData(filename: string): any {
+    const filePath = path.join(__dirname, '../src/assets/master-data/', filename);
+    const rawData = readFileSync(filePath, 'utf-8');
+    return JSON.parse(rawData);
 }
 
-interface PidAssets {
-  version: string;
-  generated_at: string;
-  approved_by: string | null;
-  approved_at: string | null;
-  standard_references: Record<string, string>;
-  checksum_seed: string | null;
-  nodes: PidNode[];
-}
 
 async function main() {
-  console.log('🚀 [PID ASSETS SEED] Démarrage injection Master Data P&ID...\n');
+  console.log('🚀 [SEED] Démarrage de l\'injection des données de référence (Master Data)...');
 
-  // Lecture du fichier pid-assets.json
-  const filePath = path.join(__dirname, '../src/assets/master-data/pid-assets.json');
-  const rawData = readFileSync(filePath, 'utf-8');
-  const pidAssets: PidAssets = JSON.parse(rawData);
+  // Charger toutes les données
+  const componentsData = readMasterData('components.json');
+  const parameterData = readMasterData('parameters.json');
+  const alarmData = readMasterData('alarms.json');
+  const pidAssetsData = readMasterData('pid-assets.json');
 
-  // Génération checksum global
-  const checksumSeed = createHash('sha256').update(rawData).digest('hex');
-  console.log(`✅ Checksum seed calculé : ${checksumSeed.substring(0, 16)}...`);
+  // 1. Nettoyage des tables
+  console.log('🗑️  Nettoyage des tables existantes (ordre respectant les contraintes)...');
+  await prisma.annotation.deleteMany({});
+  await prisma.logEntry.deleteMany({});
+  await prisma.document.deleteMany({});
+  await prisma.alarm.deleteMany({});
+  await prisma.parameter.deleteMany({});
+  await prisma.component.deleteMany({});
+  await prisma.functionalNode.deleteMany({});
+  console.log('✅ Tables nettoyées.');
 
+  // 2. Injection des composants
+  console.log('🌱 Injection des Composants...');
+  await prisma.component.createMany({
+    data: componentsData.map((c: any) => ({
+        tag: c.tag,
+        name: c.name,
+        type: c.type,
+        subtype: c.subtype,
+        manufacturer: c.manufacturer,
+        serialNumber: c.serialNumber,
+        location: c.location,
+    })),
+  });
+  console.log(`   ✅ ${componentsData.length} composants injectés.`);
+  
+  // 3. Injection des paramètres
+  console.log('🌱 Injection des Paramètres...');
+  await prisma.parameter.createMany({
+    data: parameterData.map((p: any) => ({
+        component_tag: p.componentTag,
+        key: p.key,
+        name: p.name,
+        unit: p.unit,
+        nominal_value: p.nominalValue,
+        min_safe: p.minSafe,
+        max_safe: p.maxSafe,
+        alarm_high: p.alarmHigh,
+        alarm_low: p.alarmLow,
+        standard_ref: p.standardRef,
+    })),
+  });
+  console.log(`   ✅ ${parameterData.length} paramètres injectés.`);
+
+  // 4. Injection des alarmes
+  console.log('🌱 Injection des Alarmes...');
+  await prisma.alarm.createMany({
+    data: alarmData.map((a: any) => ({
+        code: a.code,
+        component_tag: a.componentTag,
+        severity: a.severity,
+        description: a.message,
+        parameter: a.parameter,
+        reset_procedure: a.reset_procedure,
+        standard_ref: a.standardRef,
+    })),
+  });
+  console.log(`   ✅ ${alarmData.length} alarmes injectées.`);
+
+
+  // 5. Injection des noeuds fonctionnels P&ID
+  console.log('🌱 Injection des Nœuds Fonctionnels (P&ID)...');
+  const nodesArray = Array.isArray(pidAssetsData.nodes) ? pidAssetsData.nodes : [];
   let successCount = 0;
-  let errorCount = 0;
-  const errors: string[] = [];
-
-  // Injection des nœuds
-  for (const node of pidAssets.nodes) {
-    try {
-      // Génération checksum individuel
-      const nodeChecksum = createHash('sha256')
-        .update(JSON.stringify(node))
-        .digest('hex');
-
-      // Upsert dans la base
-      await prisma.functionalNode.upsert({
-        where: { external_id: node.external_id },
-        update: {
-          system: node.system,
-          subsystem: node.subsystem,
-          document: node.document,
-          tag: node.tag,
-          type: node.type,
-          name: node.name,
-          description: node.description,
-          location: node.location,
-          coordinates: node.coordinates,
-          linked_parameters: node.linked_parameters,
-          svg_layer: node.svg_layer,
-          fire_zone: node.fire_zone,
-          status: node.status,
-          checksum: nodeChecksum,
-          updated_at: new Date(),
-        },
-        create: {
-          external_id: node.external_id,
-          system: node.system,
-          subsystem: node.subsystem,
-          document: node.document,
-          tag: node.tag,
-          type: node.type,
-          name: node.name,
-          description: node.description,
-          location: node.location,
-          coordinates: node.coordinates,
-          linked_parameters: node.linked_parameters,
-          svg_layer: node.svg_layer,
-          fire_zone: node.fire_zone,
-          status: node.status,
-          checksum: nodeChecksum,
-          created_at: new Date(),
-          updated_at: new Date(),
-        },
-      });
-
-      successCount++;
-      if (successCount % 10 === 0) {
-        console.log(`   ✅ ${successCount}/${pidAssets.nodes.length} nœuds injectés...`);
-      }
-    } catch (error) {
-      errorCount++;
-      errors.push(`❌ ${node.external_id}: ${(error as Error).message}`);
-    }
-  }
-
-  // Mise à jour checksum seed global
-  pidAssets.checksum_seed = checksumSeed;
-  pidAssets.approved_at = new Date().toISOString();
   
-  writeFileSync(filePath, JSON.stringify(pidAssets, null, 2), 'utf-8');
+  for (const node of nodesArray) {
+    const nodeToHash = {
+        external_id: node.external_id, system: node.system, subsystem: node.subsystem,
+        document: node.document, tag: node.tag, type: node.type, name: node.name,
+        description: node.description, location: node.location, coordinates: node.coordinates,
+        linked_parameters: node.linked_parameters, svg_layer: node.svg_layer,
+        fire_zone: node.fire_zone, status: node.status,
+    };
+    const checksum = createHash('sha256').update(JSON.stringify(nodeToHash)).digest('hex');
 
-  // Résumé
-  console.log('\n📊 [RÉSUMÉ INJECTION]');
-  console.log(`   ✅ Nœuds injectés : ${successCount}`);
-  console.log(`   ❌ Erreurs : ${errorCount}`);
-  console.log(`   🔐 Checksum seed : ${checksumSeed}`);
-  console.log(`   📁 Fichier mis à jour : ${filePath}`);
-
-  if (errors.length > 0) {
-    console.log('\n⚠️  [ERREURS DÉTAILLÉES]');
-    errors.forEach(err => console.log(`   ${err}`));
+    await prisma.functionalNode.create({
+      data: {
+          ...nodeToHash,
+          coordinates: JSON.stringify(node.coordinates),
+          linked_parameters: JSON.stringify(node.linked_parameters),
+          checksum: checksum,
+      },
+    });
+    successCount++;
   }
+  console.log(`   ✅ ${successCount} nœuds fonctionnels injectés.`);
 
-  console.log('\n✅ [PID ASSETS SEED] Injection terminée avec succès !');
-  
-  await prisma.$disconnect();
+
+  console.log('\n🎉 [SEED] Injection terminée avec succès !');
 }
 
-// Gestion erreurs
-main().catch((error) => {
-  console.error('\n❌ [ERREUR FATALE]', error);
-  process.exit(1);
-});
+main()
+  .catch((e) => {
+    console.error('❌ [ERREUR FATALE LORS DU SEEDING]', e);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });
