@@ -8,6 +8,7 @@ import { Badge, type BadgeProps } from '@/components/ui/badge';
 import { BellRing, Wind, Cog, Zap, Factory } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import React from 'react';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
 type AlarmWithRef = Alarm & { standardRef: string };
 
@@ -102,23 +103,29 @@ export default function AlarmsPage() {
                 </CardHeader>
             </Card>
 
-            <div className="space-y-4">
+            <Accordion type="multiple" defaultValue={categories.map(c => c.name)} className="space-y-4">
                 {categories.map(category => (
-                    <Card key={category.name}>
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-3">
-                                <category.icon className="h-6 w-6 text-primary"/>
-                                {category.name}
-                                <Badge variant="secondary">{category.alarms.length}</Badge>
-                            </CardTitle>
-                            <CardDescription>{category.description}</CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                            <AlarmTable alarms={category.alarms} />
-                        </CardContent>
-                    </Card>
+                     <Card key={category.name}>
+                        <AccordionItem value={category.name} className="border-b-0">
+                                <AccordionTrigger className="p-6 hover:no-underline">
+                                    <div className="text-left flex-1">
+                                        <CardTitle className="flex items-center gap-3">
+                                            <category.icon className="h-6 w-6 text-primary"/>
+                                            {category.name}
+                                            <Badge variant="secondary">{category.alarms.length}</Badge>
+                                        </CardTitle>
+                                        <CardDescription className="mt-1.5">{category.description}</CardDescription>
+                                    </div>
+                                </AccordionTrigger>
+                            <AccordionContent>
+                                <CardContent className="pt-0">
+                                    <AlarmTable alarms={category.alarms} />
+                                </CardContent>
+                            </AccordionContent>
+                        </AccordionItem>
+                     </Card>
                 ))}
-            </div>
+            </Accordion>
         </div>
     );
 }
