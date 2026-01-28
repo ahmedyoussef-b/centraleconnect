@@ -6,7 +6,8 @@ import type {
   Parameter, 
   Alarm, 
   FunctionalNode, 
-  Annotation
+  Annotation,
+  Document
 } from '@/types/db';
 
 // Import JSON data which will be bundled by the build process
@@ -342,6 +343,17 @@ export async function getParameters(): Promise<Parameter[]> {
   return invoke('plugin:sql|select', { db, query: 'SELECT * FROM parameters ORDER BY component_tag, name' });
 }
 
+export async function getParametersForComponent(tag: string): Promise<Parameter[]> {
+  await initializeDatabase();
+  if (typeof window === 'undefined' || !window.__TAURI__) return [];
+  const db = await invoke('plugin:sql|load', { db: DB_NAME });
+  return invoke('plugin:sql|select', { 
+    db, 
+    query: 'SELECT * FROM parameters WHERE component_tag = $1 ORDER BY name',
+    values: [tag]
+  });
+}
+
 export async function getComponentsWithParameters(): Promise<Component[]> {
     await initializeDatabase();
     if (typeof window === 'undefined' || !window.__TAURI__) return [];
@@ -373,6 +385,23 @@ export async function getFunctionalNodes(): Promise<FunctionalNode[]> {
     }));
 }
 
+export async function getFunctionalNodeById(id: string): Promise<FunctionalNode | null> {
+  await initializeDatabase();
+  if (typeof window === 'undefined' || !window.__TAURI__) return null;
+  const db = await invoke('plugin:sql|load', { db: DB_NAME });
+  const result: any[] = await invoke('plugin:sql|select', { 
+    db, 
+    query: 'SELECT * FROM functional_nodes WHERE external_id = $1 LIMIT 1',
+    values: [id]
+  });
+  if (result.length === 0) return null;
+  const node = result[0];
+  return {
+    ...node,
+    coordinates: JSON.parse(node.coordinates || '{}'),
+    linked_parameters: JSON.parse(node.linked_parameters || '[]'),
+  };
+}
 
 export async function getAssistantContextData(): Promise<any> {
     await initializeDatabase();
@@ -395,6 +424,16 @@ export async function getLogEntries(): Promise<LogEntry[]> {
   return invoke('plugin:sql|select', { db, query: 'SELECT * FROM log_entries ORDER BY timestamp DESC' });
 }
 
+export async function getLogEntriesForNode(nodeId: string): Promise<LogEntry[]> {
+  await initializeDatabase();
+  if (typeof window === 'undefined' || !window.__TAURI__) return [];
+  const db = await invoke('plugin:sql|load', { db: DB_NAME });
+  return invoke('plugin:sql|select', { 
+    db, 
+    query: 'SELECT * FROM log_entries WHERE functional_node_id = $1 OR component_tag = $1 ORDER BY timestamp DESC',
+    values: [nodeId]
+  });
+}
 
 export async function addLogEntry(entry: {
   type: LogEntryType;
@@ -501,6 +540,18 @@ export async function addAnnotation(annotation: {
       message: `Annotation ajoutée sur le P&ID de ${annotation.functional_node_external_id}: "${annotation.text}"`,
       functional_node_id: annotation.functional_node_external_id,
     });
+}
+
+
+export async function getDocumentsForComponent(tag: string): Promise<Document[]> {
+  await initializeDatabase();
+  if (typeof window === 'undefined' || !window.__TAURI__) return [];
+  const db = await invoke('plugin:sql|load', { db: DB_NAME });
+  return invoke('plugin:sql|select', { 
+    db, 
+    query: 'SELECT * FROM documents WHERE component_tag = $1 ORDER BY createdAt DESC',
+    values: [tag]
+  });
 }
 
 // Ensure database is initialized on load

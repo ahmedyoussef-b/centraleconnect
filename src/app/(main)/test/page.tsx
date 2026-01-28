@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Link as LinkIcon } from 'lucide-react';
 import type { FunctionalNode } from '@/types/db';
 
@@ -29,6 +30,7 @@ export default function TestPage() {
     const [highlightParameters, setHighlightParameters] = useState<string[]>([]);
     const [scadaData, setScadaData] = useState<Record<string, number>>({});
     const { toast } = useToast();
+    const router = useRouter();
 
     // Simulate real-time data updates
     useEffect(() => {
@@ -60,8 +62,9 @@ export default function TestPage() {
             title: "Navigation P&ID → Détails",
             description: `Clic sur ${node.name || 'un composant'}. ID: ${node.external_id}. Navigation vers la page de détails de l'équipement...`,
         });
-        // In a real implementation, you would navigate:
-        // router.push(`/equipments/${node.external_id}`);
+        if (node.external_id) {
+            router.push(`/equipments/${encodeURIComponent(node.external_id)}`);
+        }
     };
 
     return (

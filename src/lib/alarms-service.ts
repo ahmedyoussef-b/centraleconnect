@@ -1,11 +1,11 @@
 import alarmsData from '@/assets/master-data/alarms.json';
-import type { Alarm } from '@/types/db';
+import type { Alarm as DbAlarm } from '@/types/db';
 
-type AlarmWithRef = Alarm & { 
+export type Alarm = DbAlarm & { 
     standardRef?: string;
 };
 
-export function getAlarms(): AlarmWithRef[] {
+export function getAlarms(): Alarm[] {
   // The JSON data has a slightly different structure than the Alarm type.
   // We map the fields here to match the type definition.
   return (alarmsData as any[]).map(alarm => ({
@@ -17,4 +17,8 @@ export function getAlarms(): AlarmWithRef[] {
     parameter: alarm.parameter,
     reset_procedure: alarm.reset_procedure,
   }));
+}
+
+export function getAlarmsForComponent(componentTag: string): Alarm[] {
+  return getAlarms().filter(a => a.component_id === componentTag);
 }

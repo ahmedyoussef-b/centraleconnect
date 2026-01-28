@@ -89,7 +89,16 @@ export default function MainLayout({
 }) {
   const pathname = usePathname();
   const userAvatar = PlaceHolderImages.find((p) => p.id === 'user-avatar');
-  const title = pageTitles[pathname] ?? 'CCPP Monitor';
+  
+  let title: string;
+  if (pathname.startsWith('/equipments/')) {
+    title = 'Détail Équipement';
+  } else if (pathname.startsWith('/procedures/')) {
+    title = 'Exécution Procédure';
+  } else {
+    title = pageTitles[pathname] ?? 'CCPP Monitor';
+  }
+
 
   return (
     <PidViewerProvider>
@@ -143,7 +152,7 @@ export default function MainLayout({
                   </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                  <SidebarMenuButton asChild tooltip="Équipements" isActive={pathname === '/equipments'}>
+                  <SidebarMenuButton asChild tooltip="Équipements" isActive={pathname.startsWith('/equipments')}>
                       <Link href="/equipments">
                           <Database />
                           Équipements

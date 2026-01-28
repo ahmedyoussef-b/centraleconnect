@@ -2,13 +2,13 @@
 
 import * as React from 'react';
 import { useEffect, useState, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
 import { getFunctionalNodes } from '@/lib/db-service';
 import type { FunctionalNode } from '@/types/db';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Folder, Cog, Database, ChevronRight, Home, Search, X } from 'lucide-react';
-import { usePidViewer } from '@/contexts/pid-viewer-context';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { cn } from '@/lib/utils';
@@ -47,7 +47,7 @@ export function SystemHierarchyBrowser() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [isTauri, setIsTauri] = useState(false);
-    const { showPid } = usePidViewer();
+    const router = useRouter();
 
     useEffect(() => {
         const tauriEnv = !!window.__TAURI__;
@@ -99,7 +99,7 @@ export function SystemHierarchyBrowser() {
 
     const handleCardClick = (item: { id: string; type: 'system' | 'subsystem' | 'equipment'; node?: FunctionalNode }) => {
         if (item.type === 'equipment' && item.node) {
-            showPid(item.node.external_id);
+            router.push(`/equipments/${encodeURIComponent(item.node.external_id)}`);
         } else {
             setPath([...path, item.id]);
         }
@@ -172,7 +172,7 @@ export function SystemHierarchyBrowser() {
                                     <Card
                                         key={node.external_id}
                                         className="cursor-pointer hover:shadow-lg hover:border-primary transition-all"
-                                        onClick={() => showPid(node.external_id)}
+                                        onClick={() => router.push(`/equipments/${encodeURIComponent(node.external_id)}`)}
                                     >
                                         <CardHeader>
                                             <CardTitle className="text-base flex items-center gap-2">
