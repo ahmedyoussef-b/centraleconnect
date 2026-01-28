@@ -1,31 +1,25 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
 
 datasource db {
   provider = "sqlite"
   url      = "file:./ccpp.db"
 }
 
-generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["driverAdapters"]
-}
-
 model Component {
-  id          String     @id
+  id          String   @id
   name        String
   description String?
   type        String
   parameters  Parameter[]
-  alarms      Alarm[]
-  log_entries LogEntry[]
   documents   Document[]
-
-  @@map("components")
+  logEntries  LogEntry[]  @relation("ComponentToLogEntry")
 }
 
 model Parameter {
-  id            Int       @id @default(autoincrement())
+  id            Int      @id @default(autoincrement())
   component_id  String
   name          String
   unit          String?
@@ -33,31 +27,27 @@ model Parameter {
   max_value     Float?
   nominal_value Float?
   component     Component @relation(fields: [component_id], references: [id])
-
-  @@map("parameters")
 }
 
 model Alarm {
-  id           Int     @id @default(autoincrement())
+  id           Int      @id @default(autoincrement())
   component_id String
   code         String
   description  String?
   severity     String // 'INFO', 'WARNING', 'CRITICAL', 'EMERGENCY'
-  component    Component @relation(fields: [component_id], references: [id])
 
   @@unique([component_id, code])
-  @@map("alarms")
 }
 
 model LogEntry {
-  id           Int        @id @default(autoincrement())
-  timestamp    DateTime   @default(now())
+  id           Int      @id @default(autoincrement())
+  timestamp    DateTime @default(now())
   type         String // 'AUTO', 'MANUAL', 'DOCUMENT_ADDED'
   source       String
   message      String
   component_id String?
   signature    String?
-  component    Component? @relation(fields: [component_id], references: [id])
+  component    Component? @relation("ComponentToLogEntry", fields: [component_id], references: [id])
 
   @@map("log_entries")
 }
@@ -71,45 +61,41 @@ model Document {
   ocr_text     String?
   created_at   DateTime @default(now())
   component    Component @relation(fields: [component_id], references: [id], onDelete: Cascade)
-
-  @@map("documents")
 }
 
 model FunctionalNode {
-  id                Int      @id @default(autoincrement())
-  external_id       String   @unique
-  system            String
-  subsystem         String
-  document          String?
-  tag               String?
-  type              String
-  name              String
-  description       String?
-  location          String?
-  coordinates       String? // JSON stored as string
-  linked_parameters String? // JSON stored as string
-  svg_layer         String?
-  fire_zone         String?
-  status            String
-  checksum          String
-  created_at        DateTime
-  updated_at        DateTime
-  approved_by       String?
-  approved_at       DateTime?
-  annotations       Annotation[]
+    id                  Int       @id @default(autoincrement())
+    external_id         String    @unique
+    system              String
+    subsystem           String
+    document            String?
+    tag                 String?
+    type                String
+    name                String
+    description         String?
+    location            String?
+    coordinates         String?   // JSON stored as string
+    linked_parameters   String?   // JSON stored as string
+    svg_layer           String?
+    fire_zone           String?
+    status              String
+    checksum            String
+    created_at          DateTime
+    updated_at          DateTime
+    approved_by         String?
+    approved_at         DateTime?
+    annotations         Annotation[]
 
-  @@map("functional_nodes")
+    @@map("functional_nodes")
 }
 
 model Annotation {
-  id                          Int      @id @default(autoincrement())
-  functional_node_external_id String
-  text                        String
-  operator                    String
-  timestamp                   DateTime @default(now())
-  x_pos                       Float
-  y_pos                       Float
-  functional_node             FunctionalNode @relation(fields: [functional_node_external_id], references: [external_id])
-
-  @@map("annotations")
+    id                          Int      @id @default(autoincrement())
+    functional_node_external_id String
+    text                        String
+    operator                    String
+    timestamp                   DateTime @default(now())
+    x_pos                       Float
+    y_pos                       Float
+    functional_node             FunctionalNode @relation(fields: [functional_node_external_id], references: [external_id])
 }
