@@ -1,48 +1,64 @@
-
 export type LogEntryType = 'AUTO' | 'MANUAL' | 'DOCUMENT_ADDED';
 
-export interface Component {
-    tag: string;
+export interface Equipment {
+    externalId: string;
     name: string;
-    type: string;
+    description?: string;
+    parentId?: string;
+    type?: string;
     subtype?: string;
+    systemCode?: string;
+    subSystem?: string;
+    location?: string;
     manufacturer?: string;
     serialNumber?: string;
-    location?: string;
+    tagNumber?: string;
+    documentRef?: string;
+    coordinates?: any; // JSON
+    svgLayer?: string;
+    fireZone?: string;
+    linkedParameters?: any; // JSON
+    status?: string;
+    version: number;
+    isImmutable: boolean;
+    approvedBy?: string;
+    approvedAt?: string; // ISO Date String
+    checksum?: string;
+    nominalData?: any; // JSON
 }
 
 export interface Parameter {
     id?: number;
-    component_tag: string;
-    key: string;
+    equipmentId: string;
     name: string;
-    unit: string;
-    nominal_value: number | null;
-    min_safe: number | null;
-    max_safe: number | null;
-    alarm_high: number | null;
-    alarm_low: number | null;
-    standard_ref: string | null;
+    unit?: string;
+    dataType?: 'TEXT' | 'NUMERIC' | 'BOOLEAN';
+    nominalValue?: number | null;
+    minSafe?: number | null;
+    maxSafe?: number | null;
+    warningHigh?: number | null;
+    alarmHigh?: number | null;
+    alarmLow?: number | null;
+    standardRef?: string;
 }
 
 export interface Alarm {
     code: string;
-    component_tag: string;
+    equipmentId: string;
     severity: 'INFO' | 'WARNING' | 'CRITICAL' | 'EMERGENCY';
     description: string;
     parameter?: string;
-    reset_procedure?: string;
-    standard_ref?: string;
+    resetProcedure?: string;
+    standardRef?: string;
 }
 
 export interface LogEntry {
     id: number;
-    timestamp: string;
+    timestamp: string; // ISO Date String
     type: LogEntryType;
     source: string;
     message: string;
-    component_tag: string | null;
-    functional_node_id: string | null;
+    equipmentId: string | null;
     signature: string | null;
 }
 
@@ -71,43 +87,33 @@ export interface Procedure {
     steps: ProcedureStep[];
 }
 
-export interface FunctionalNode {
-    external_id: string;
-    system: string;
-    subsystem: string;
-    document: string | null;
-    tag: string | null;
-    type: string;
-    name: string;
-    description: string | null;
-    location: string | null;
-    coordinates: any;
-    linked_parameters: any;
-    svg_layer: string | null;
-    fire_zone: string | null;
-    status: string;
-    checksum: string;
-    created_at: string;
-    updated_at: string;
-    approved_by: string | null;
-    approved_at: string | null;
-  }
-
 export interface Annotation {
     id: number;
-    functional_node_external_id: string;
+    equipmentId: string;
     text: string;
     operator: string;
-    timestamp: string;
-    x_pos: number; // Percentage
-    y_pos: number; // Percentage
+    timestamp: string; // ISO Date String
+    xPos: number; // Percentage
+    yPos: number; // Percentage
 }
 
 export interface Document {
     id: number;
-    component_tag: string;
-    imageData: string;
+    equipmentId: string;
+    imageData: string; // Base64 or data URL
     ocrText: string;
     description: string;
-    createdAt: string;
+    createdAt: string; // ISO Date String
+}
+
+export interface SynopticItem {
+    externalId: string;
+    name: string;
+    type: string;
+    parentId?: string;
+    groupPath: string;
+    elementId: string;
+    level: number;
+    approvedBy?: string;
+    approvalDate?: string;
 }

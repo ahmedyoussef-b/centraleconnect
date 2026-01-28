@@ -1,192 +1,164 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "sqlite"
-  url      = "file:../ccpp.db"
+  url      = env("DATABASE_URL")
 }
 
-// =========================================
-// Models
-// =========================================
-
-// Modèle pour les composants physiques principaux
-model Component {
-  tag          String      @id
-  name         String
-  type         String?
-  subtype      String?
-  manufacturer String?
-  serialNumber String?
-  location     String?
-  parameters   Parameter[]
-  documents    Document[]
-  logEntries   LogEntry[]
-
-  @@map("components")
-}
-
-// Modèle pour les noeuds fonctionnels issus des P&ID
-model FunctionalNode {
-  externalId        String         @id
-  system            String
-  subsystem         String
-  document          String?
-  tag               String?
-  type              String?
-  name              String?
+model Equipment {
+  externalId        String        @id
+  name              String
   description       String?
+  parentId          String?
+  parent            Equipment?    @relation("EquipmentHierarchy", fields: [parentId], references: [externalId], onDelete: NoAction, onUpdate: NoAction)
+  children          Equipment[]   @relation("EquipmentHierarchy")
+  type              String?
+  subtype           String?
+  systemCode        String?
+  subSystem         String?
   location          String?
-  coordinates       String? // JSON stored as string
-  linkedParameters  String? // JSON array stored as string
+  manufacturer      String?
+  serialNumber      String?
+  tagNumber         String?       @unique
+  documentRef       String?
+  coordinates       String?
   svgLayer          String?
   fireZone          String?
+  linkedParameters  String?
   status            String?
-  checksum          String         @unique
-  createdAt         DateTime       @default(now())
-  updatedAt         DateTime?      @updatedAt
+  version           Int           @default(1)
+  isImmutable       Boolean       @default(false)
   approvedBy        String?
   approvedAt        DateTime?
+  checksum          String?       @unique
+  nominalData       String?
+  parameters        Parameter[]
+  alarms            Alarm[]
   logEntries        LogEntry[]
+  documents         Document[]
   annotations       Annotation[]
-  alarmEvents       AlarmEvent[]
+  scadaData         ScadaData[]
 
-  @@map("functional_nodes")
+  @@map("equipments")
 }
 
-// Modèle pour les paramètres techniques des composants
 model Parameter {
   id           Int      @id @default(autoincrement())
-  componentTag String
-  key          String
+  equipmentId  String
   name         String
   unit         String?
+  dataType     String   @default("TEXT")
   nominalValue Float?
   minSafe      Float?
   maxSafe      Float?
+  warningHigh  Float?
   alarmHigh    Float?
   alarmLow     Float?
   standardRef  String?
-  component    Component @relation(fields: [componentTag], references: [tag])
+  equipment    Equipment @relation(fields: [equipmentId], references: [externalId])
 
-  @@unique([componentTag, key])
+  @@unique([equipmentId, name])
   @@map("parameters")
 }
 
-// Modèle pour le référentiel des alarmes
 model Alarm {
-  code            String       @id
-  componentTag    String
-  severity        AlarmSeverity
-  description     String
-  parameter       String?
-  resetProcedure  String?
-  standardRef     String?
-  events          AlarmEvent[]
+  code           String        @id
+  equipmentId    String
+  severity       AlarmSeverity
+  description    String
+  parameter      String?
+  resetProcedure String?
+  standardRef    String?
+  equipment      Equipment     @relation(fields: [equipmentId], references: [externalId])
+  events         AlarmEvent[]
 
   @@map("alarms")
 }
 
-// Modèle pour les événements d'alarme (historique)
-model AlarmEvent {
-  id              Int      @id @default(autoincrement())
-  timestamp       DateTime @default(now())
-  alarmCode       String
-  functionalNodeId String?
-  message         String
-  acknowledged    Boolean  @default(false)
-  alarm           Alarm     @relation(fields: [alarmCode], references: [code])
-  functionalNode  FunctionalNode? @relation(fields: [functionalNodeId], references: [externalId])
-
-  @@map("alarm_events")
-}
-
-// Modèle pour le journal de bord
 model LogEntry {
-  id               Int          @id @default(autoincrement())
-  timestamp        DateTime
-  type             LogEntryType
-  source           String
-  message          String
-  signature        String       @unique
-  componentTag     String?
-  functionalNodeId String?
-  component        Component?   @relation(fields: [componentTag], references: [tag])
-  functionalNode   FunctionalNode? @relation(fields: [functionalNodeId], references: [externalId])
+  id          Int       @id @default(autoincrement())
+  timestamp   DateTime
+  type        LogType
+  source      String
+  message     String
+  signature   String    @unique
+  equipmentId String?
+  equipment   Equipment? @relation(fields: [equipmentId], references: [externalId])
 
   @@map("log_entries")
 }
 
-// Modèle pour les annotations sur les P&ID
 model Annotation {
-  id                      Int      @id @default(autoincrement())
-  functionalNodeExternalId String
-  text                    String
-  operator                String
-  timestamp               DateTime
-  xPos                    Float
-  yPos                    Float
-  functionalNode          FunctionalNode @relation(fields: [functionalNodeExternalId], references: [externalId])
+  id          Int      @id @default(autoincrement())
+  equipmentId String
+  text        String
+  operator    String
+  timestamp   DateTime
+  xPos        Float
+  yPos        Float
+  equipment   Equipment @relation(fields: [equipmentId], references: [externalId])
 
   @@map("annotations")
 }
 
-// Modèle pour les documents (photos, etc.)
 model Document {
   id          Int      @id @default(autoincrement())
-  componentTag String
+  equipmentId String
   imageData   String
   ocrText     String?
   description String?
   createdAt   DateTime
-  component   Component @relation(fields: [componentTag], references: [tag])
+  equipment   Equipment @relation(fields: [equipmentId], references: [externalId])
 
   @@map("documents")
 }
 
-// Modèle pour les procédures
 model Procedure {
-  id          String         @id @default(cuid())
+  id          String @id
   name        String
   description String
   version     String
-  steps       ProcedureStep[]
+  steps       Json
 
   @@map("procedures")
 }
 
-// Modèle pour les étapes des procédures
-model ProcedureStep {
-  id          String   @id @default(cuid())
-  title       String
-  type        ProcedureStepType
-  details     String?
-  procedureId String
-  parentId    String?
-  procedure   Procedure @relation(fields: [procedureId], references: [id])
-  parent      ProcedureStep?  @relation("ProcedureStepHierarchy", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  children    ProcedureStep[] @relation("ProcedureStepHierarchy")
-
-  @@map("procedure_steps")
-}
-
-// Modèle pour les données SCADA historiques
 model ScadaData {
-  id        Int      @id @default(autoincrement())
-  timestamp DateTime
-  tag       String
-  value     Float
+  id          Int      @id @default(autoincrement())
+  timestamp   DateTime
+  equipmentId String
+  value       Float
+  equipment   Equipment @relation(fields: [equipmentId], references: [externalId])
 
   @@map("scada_data")
 }
 
-// =========================================
-// Enums
-// =========================================
+model AlarmEvent {
+  id        Int      @id @default(autoincrement())
+  alarmCode String
+  timestamp DateTime @default(now())
+  isActive  Boolean
+  details   String?
+  alarm     Alarm    @relation(fields: [alarmCode], references: [code])
+
+  @@map("alarm_events")
+}
+
+model SynopticItem {
+  externalId   String  @id
+  name         String?
+  type         String?
+  parentId     String?
+  groupPath    String?
+  elementId    String?
+  level        Int?
+  approvedBy   String?
+  approvalDate String?
+
+  @@map("synoptic_items")
+}
 
 enum AlarmSeverity {
   INFO
@@ -195,15 +167,8 @@ enum AlarmSeverity {
   EMERGENCY
 }
 
-enum LogEntryType {
+enum LogType {
   AUTO
   MANUAL
   DOCUMENT_ADDED
-}
-
-enum ProcedureStepType {
-  check
-  scada_check
-  instruction
-  group
 }
