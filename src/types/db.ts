@@ -24,7 +24,7 @@ export interface Alarm {
     component_id: string;
     code: string;
     description: string;
-    severity: 'INFO' | 'WARNING' | 'CRITICAL';
+    severity: 'INFO' | 'WARNING' | 'CRITICAL' | 'EMERGENCY';
 }
 
 export interface LogEntry {
