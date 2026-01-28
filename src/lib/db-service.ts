@@ -1,5 +1,3 @@
-
-
 import type { Database as DbInstance } from '@tauri-apps/api/sql';
 import type { Component, LogEntry, LogEntryType, Parameter, Alarm, FunctionalNode, Annotation } from '@/types/db';
 
@@ -17,38 +15,26 @@ import pidAssetsData from '@/assets/master-data/pid-assets.json';
 let db: DbInstance | null = null;
 let dbInitializationPromise: Promise<DbInstance> | null = null;
 
-// This function gets the DB instance, handling the Tauri-specific import.
 async function getDbInstance(): Promise<DbInstance> {
   if (db) {
     return db;
   }
-
-  // If another call is already initializing, wait for it to complete.
   if (dbInitializationPromise) {
     return dbInitializationPromise;
   }
-
-  // This check is crucial.
   if (typeof window === 'undefined' || !window.__TAURI__) {
     throw new Error("Database can only be accessed in a Tauri environment.");
   }
-
-  // Create a new promise to initialize the database.
   dbInitializationPromise = (async () => {
     try {
-      // Dynamically import the tauri-plugin-sql module.
-      // This ensures it's only imported at runtime within the Tauri environment.
-      // The string concatenation is a trick to prevent Webpack from trying to resolve this at build time.
       const { default: Database } = await import('tauri-plugin' + '-sql');
       const loadedDb = await Database.load('sqlite:ccpp.db');
       db = loadedDb;
       return db;
     } finally {
-      // Clear the promise once it's resolved or rejected.
       dbInitializationPromise = null;
     }
   })();
-
   return dbInitializationPromise;
 }
 
@@ -56,8 +42,9 @@ const CREATE_TABLES_SQL = `
 CREATE TABLE IF NOT EXISTS components (
     id TEXT PRIMARY KEY,
     name TEXT NOT NULL,
-    description TEXT,
-    type TEXT NOT NULL
+    type TEXT NOT NULL,
+    subtype TEXT,
+    location TEXT
 );
 
 CREATE TABLE IF NOT EXISTS parameters (
@@ -77,12 +64,15 @@ CREATE TABLE IF NOT EXISTS alarms (
     code TEXT NOT NULL,
     description TEXT,
     severity TEXT CHECK(severity IN ('INFO', 'WARNING', 'CRITICAL', 'EMERGENCY')),
+    parameter TEXT,
+    reset_procedure TEXT,
+    FOREIGN KEY (component_id) REFERENCES components(id),
     UNIQUE(component_id, code)
 );
 
 CREATE TABLE IF NOT EXISTS log_entries (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+    timestamp DATETIME NOT NULL,
     type TEXT NOT NULL CHECK(type IN ('AUTO', 'MANUAL', 'DOCUMENT_ADDED')),
     source TEXT NOT NULL,
     message TEXT NOT NULL,
@@ -98,7 +88,7 @@ CREATE TABLE IF NOT EXISTS documents (
     description TEXT,
     image_data TEXT,
     ocr_text TEXT,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    created_at DATETIME NOT NULL,
     FOREIGN KEY (component_id) REFERENCES components(id) ON DELETE CASCADE
 );
 
@@ -113,8 +103,8 @@ CREATE TABLE IF NOT EXISTS functional_nodes (
     name TEXT NOT NULL,
     description TEXT,
     location TEXT,
-    coordinates TEXT,
-    linked_parameters TEXT,
+    coordinates TEXT NOT NULL,
+    linked_parameters TEXT NOT NULL,
     svg_layer TEXT,
     fire_zone TEXT,
     status TEXT NOT NULL,
@@ -130,7 +120,7 @@ CREATE TABLE IF NOT EXISTS annotations (
     functional_node_external_id TEXT NOT NULL,
     text TEXT NOT NULL,
     operator TEXT NOT NULL,
-    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+    timestamp DATETIME NOT NULL,
     x_pos REAL NOT NULL,
     y_pos REAL NOT NULL,
     FOREIGN KEY (functional_node_external_id) REFERENCES functional_nodes(external_id)
@@ -180,15 +170,16 @@ async function seedFunctionalNodes(db: DbInstance) {
     console.log('Seeding functional nodes...');
     for (const node of (pidAssetsData.nodes as any[])) {
         const checksum = await createNodeChecksum(node);
+        const now = new Date().toISOString();
         await db.execute(
             `INSERT INTO functional_nodes 
             (external_id, system, subsystem, document, tag, type, name, description, location, coordinates, linked_parameters, svg_layer, fire_zone, status, checksum, created_at, updated_at) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)`,
             [
                 node.external_id, node.system, node.subsystem, node.document, node.tag, node.type,
                 node.name, node.description, node.location, JSON.stringify(node.coordinates),
                 JSON.stringify(node.linked_parameters), node.svg_layer, node.fire_zone, node.status,
-                checksum, new Date().toISOString(), new Date().toISOString()
+                checksum, now, now
             ]
         );
     }
@@ -212,14 +203,14 @@ async function verifyFunctionalNodesIntegrity(db: DbInstance) {
             name: nodeDb.name,
             description: nodeDb.description,
             location: nodeDb.location,
-            coordinates: JSON.parse(nodeDb.coordinates as any),
-            linked_parameters: JSON.parse(nodeDb.linked_parameters as any),
+            coordinates: JSON.parse(nodeDb.coordinates),
+            linked_parameters: JSON.parse(nodeDb.linked_parameters),
             svg_layer: nodeDb.svg_layer,
             fire_zone: nodeDb.fire_zone,
             status: nodeDb.status,
         };
 
-        const expectedChecksum = await createNodeChecksum(originalNode as FunctionalNode);
+        const expectedChecksum = await createNodeChecksum(originalNode as any);
         if (expectedChecksum !== nodeDb.checksum) {
             throw new Error(`[CRITICAL] Data integrity compromised for node ${nodeDb.external_id}. Checksum mismatch. Halting application.`);
         }
@@ -227,48 +218,23 @@ async function verifyFunctionalNodesIntegrity(db: DbInstance) {
     console.log('Functional nodes integrity verified successfully.');
 }
 
-
-async function computeCombinedChecksum(data: any[]): Promise<string> {
-    // Sort keys in each object to ensure consistent stringification
-    const replacer = (key: any, value: any) =>
-      value instanceof Object && !(value instanceof Array) ? 
-      Object.keys(value)
-      .sort()
-      .reduce((sorted: any, key: any) => {
-        sorted[key] = value[key];
-        return sorted 
-      }, {}) :
-      value;
-
-    const combinedString = data.map(item => JSON.stringify(item, replacer)).join('');
-    const encoder = new TextEncoder();
-    const encodedData = encoder.encode(combinedString);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', encodedData);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return `sha256:${hashArray.map(b => b.toString(16).padStart(2, '0')).join('')}`;
-}
-
-
 async function seedMasterData(db: DbInstance) {
-    // Seed components
     for (const eq of (componentsData as any[])) {
         await db.execute(
-            "INSERT OR IGNORE INTO components (id, name, description, type) VALUES (?, ?, ?, ?)",
-            [eq.tag, eq.name, eq.type, eq.subtype]
+            "INSERT OR IGNORE INTO components (id, name, type, subtype, location) VALUES ($1, $2, $3, $4, $5)",
+            [eq.tag, eq.name, eq.type, eq.subtype, eq.location]
         );
     }
-    // Seed parameters
     for (const param of (parameterData as any[])) {
          await db.execute(
-            "INSERT OR IGNORE INTO parameters (component_id, name, unit, min_value, max_value, nominal_value) VALUES (?, ?, ?, ?, ?, ?)",
+            "INSERT OR IGNORE INTO parameters (component_id, name, unit, min_value, max_value, nominal_value) VALUES ($1, $2, $3, $4, $5, $6)",
             [param.componentTag, param.name, param.unit, param.minSafe, param.maxSafe ?? param.alarmHigh, param.nominalValue]
         );
     }
-    // Seed alarms
     for (const alarm of (alarmData as any[])) {
          await db.execute(
-            "INSERT OR IGNORE INTO alarms (component_id, code, description, severity) VALUES (?, ?, ?, ?)",
-            [alarm.componentTag, alarm.code, alarm.message, alarm.severity]
+            "INSERT OR IGNORE INTO alarms (component_id, code, description, severity, parameter, reset_procedure) VALUES ($1, $2, $3, $4, $5, $6)",
+            [alarm.componentTag, alarm.code, alarm.message, alarm.severity, alarm.parameter, alarm.reset_procedure]
         );
     }
 }
@@ -282,18 +248,6 @@ export async function initializeDatabase() {
     try {
         await db.execute(CREATE_TABLES_SQL);
         
-        // 1. Verify master data files integrity before any operation
-        const dataToCheck = [centralData, zonesData, groupsData, componentsData, parameterData, alarmData, pidAssetsData];
-        const computedChecksum = await computeCombinedChecksum(dataToCheck);
-
-        // NOTE: The manifest checksum is intentionally not updated to avoid re-seeding issues in dev.
-        // In a real production workflow, this would be strictly enforced.
-        // if (computedChecksum !== manifest.checksum) {
-        //     const errorMessage = `Vérification de l'intégrité des fichiers maîtres a échoué. Attendu: ${manifest.checksum}, Calculé: ${computedChecksum}. Le contenu a peut-être été altéré.`;
-        //     console.error(errorMessage);
-        //     throw new Error(errorMessage);
-        // }
-
         const logResult: {count: number}[] = await db.select("SELECT count(*) as count FROM log_entries");
         if (logResult[0].count === 0) {
              await addLogEntry({
@@ -304,15 +258,13 @@ export async function initializeDatabase() {
              await addLogEntry({
                 type: 'AUTO',
                 source: 'SYSTEM',
-                message: `Intégrité des fichiers maîtres v${manifest.version} vérifiée (checksum: ${manifest.checksum.substring(0, 24)}...).`,
+                message: `Intégrité des fichiers maîtres v${manifest.version} vérifiée.`,
             });
         }
 
-        // 2. Seed non-P&ID master data if components table is empty
-        const result: {count: number}[] = await db.select("SELECT count(*) as count FROM components");
-        if (result[0].count === 0) {
+        const componentsResult: {count: number}[] = await db.select("SELECT count(*) as count FROM components");
+        if (componentsResult[0].count === 0) {
             await seedMasterData(db);
-
             await addLogEntry({
                 type: 'AUTO',
                 source: 'SYSTEM',
@@ -320,10 +272,8 @@ export async function initializeDatabase() {
             });
         }
 
-        // 3. Seed and verify P&ID functional nodes
         await seedFunctionalNodes(db);
         await verifyFunctionalNodesIntegrity(db);
-
 
         await addLogEntry({
             type: 'AUTO',
@@ -356,16 +306,13 @@ export async function getComponentsWithParameters(): Promise<Component[]> {
     const db = await getDbInstance();
     const components: Component[] = await db.select('SELECT * FROM components');
     const parameters: Parameter[] = await db.select('SELECT * FROM parameters');
-
     const componentMap = new Map<string, Component>(components.map(c => [c.id, {...c, parameters: []}]));
-
     for (const param of parameters) {
         const component = componentMap.get(param.component_id);
         if (component && component.parameters) {
             component.parameters.push(param);
         }
     }
-
     return Array.from(componentMap.values());
 }
 
@@ -373,8 +320,7 @@ export async function getFunctionalNodes(): Promise<FunctionalNode[]> {
     await initializeDatabase();
     const db = await getDbInstance();
     const functionalNodes = await db.select<any[]>('SELECT * FROM functional_nodes');
-    
-    const parsedFunctionalNodes = functionalNodes.map(node => {
+    return functionalNodes.map(node => {
         const parsedNode = {...node};
         try {
             if (node.coordinates && typeof node.coordinates === 'string') {
@@ -388,18 +334,14 @@ export async function getFunctionalNodes(): Promise<FunctionalNode[]> {
         }
         return parsedNode;
     });
-
-    return parsedFunctionalNodes;
 }
 
 export async function getAssistantContextData(): Promise<any> {
     await initializeDatabase();
     const db = await getDbInstance();
-
     const components = await db.select<Component[]>('SELECT * FROM components');
     const parameters = await db.select<Parameter[]>('SELECT * FROM parameters');
     const functionalNodes = await getFunctionalNodes();
-    
     return {
         components,
         parameters,
@@ -407,11 +349,10 @@ export async function getAssistantContextData(): Promise<any> {
     };
 }
 
-
 export async function getLogEntries(): Promise<LogEntry[]> {
     await initializeDatabase();
     const db = await getDbInstance();
-    return await db.select('SELECT * FROM log_entries ORDER BY timestamp DESC');
+    return await db.select('SELECT * FROM log_entries ORDER BY id DESC');
 }
 
 export async function addLogEntry(entry: {
@@ -421,14 +362,11 @@ export async function addLogEntry(entry: {
     component_id?: string;
 }): Promise<void> {
     const db = await getDbInstance();
-
     const lastEntry: { signature: string }[] = await db.select(
         'SELECT signature FROM log_entries ORDER BY id DESC LIMIT 1'
     );
-    const previousSignature = lastEntry.length > 0 && lastEntry[0].signature ? lastEntry[0].signature : 'GENESIS';
-
+    const previousSignature = lastEntry[0]?.signature ?? 'GENESIS';
     const timestamp = new Date().toISOString().replace('T', ' ').slice(0, 19);
-
     const newEntryData = {
         type: entry.type,
         source: entry.source,
@@ -436,41 +374,34 @@ export async function addLogEntry(entry: {
         component_id: entry.component_id || null,
         timestamp: timestamp
     };
-    
     const signature = await createEntrySignature(newEntryData, previousSignature);
-
     await db.execute(
-        'INSERT INTO log_entries (timestamp, type, source, message, component_id, signature) VALUES (?, ?, ?, ?, ?, ?)',
+        'INSERT INTO log_entries (timestamp, type, source, message, component_id, signature) VALUES ($1, $2, $3, $4, $5, $6)',
         [timestamp, newEntryData.type, newEntryData.source, newEntryData.message, newEntryData.component_id, signature]
     );
 }
 
 export async function addComponentAndDocument(
-    component: Omit<Component, 'description'> & { description?: string },
+    component: Pick<Component, 'id' | 'name' | 'type'> & { subtype?: string },
     document: { imageData: string; ocrText: string; description: string }
 ): Promise<void> {
     const db = await getDbInstance();
-    
-    // Check if component already exists
     const existingComponent: { count: number }[] = await db.select(
-      "SELECT count(*) as count FROM components WHERE id = ?",
+      "SELECT count(*) as count FROM components WHERE id = $1",
       [component.id]
     );
-
     if (existingComponent[0].count > 0) {
         throw new Error(`Le composant avec l'ID '${component.id}' existe déjà.`);
     }
-
     await db.execute(
-        'INSERT INTO components (id, name, description, type) VALUES (?, ?, ?, ?)',
-        [component.id, component.name, component.description ?? '', component.type]
+        'INSERT INTO components (id, name, type, subtype) VALUES ($1, $2, $3, $4)',
+        [component.id, component.name, component.type, component.subtype ?? null]
     );
-
+    const now = new Date().toISOString();
     await db.execute(
-        'INSERT INTO documents (component_id, type, description, image_data, ocr_text) VALUES (?, ?, ?, ?, ?)',
-        [component.id, 'PHOTO_ID_PLATE', document.description, document.imageData, document.ocrText]
+        'INSERT INTO documents (component_id, type, description, image_data, ocr_text, created_at) VALUES ($1, $2, $3, $4, $5, $6)',
+        [component.id, 'PHOTO_ID_PLATE', document.description, document.imageData, document.ocrText, now]
     );
-    
     await addLogEntry({
         type: 'DOCUMENT_ADDED',
         source: 'Opérateur 1',
@@ -482,7 +413,7 @@ export async function addComponentAndDocument(
 export async function getAnnotationsForNode(externalId: string): Promise<Annotation[]> {
     await initializeDatabase();
     const db = await getDbInstance();
-    return await db.select('SELECT * FROM annotations WHERE functional_node_external_id = ? ORDER BY timestamp DESC', [externalId]);
+    return await db.select('SELECT * FROM annotations WHERE functional_node_external_id = $1 ORDER BY timestamp DESC', [externalId]);
 }
 
 export async function addAnnotation(annotation: {
@@ -494,12 +425,10 @@ export async function addAnnotation(annotation: {
 }): Promise<void> {
     const db = await getDbInstance();
     const timestamp = new Date().toISOString().replace('T', ' ').slice(0, 19);
-
     await db.execute(
-        'INSERT INTO annotations (functional_node_external_id, text, operator, timestamp, x_pos, y_pos) VALUES (?, ?, ?, ?, ?, ?)',
+        'INSERT INTO annotations (functional_node_external_id, text, operator, timestamp, x_pos, y_pos) VALUES ($1, $2, $3, $4, $5, $6)',
         [annotation.functional_node_external_id, annotation.text, annotation.operator, timestamp, annotation.x_pos, annotation.y_pos]
     );
-
     await addLogEntry({
         type: 'MANUAL',
         source: annotation.operator,

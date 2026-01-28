@@ -1,4 +1,3 @@
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -9,44 +8,52 @@ datasource db {
 }
 
 model Component {
-  id          String   @id
-  name        String
-  description String?
-  type        String
-  parameters  Parameter[]
-  documents   Document[]
-  logEntries  LogEntry[]  @relation("ComponentToLogEntry")
+  id       String @id // This corresponds to the 'tag' field from JSON
+  name     String
+  type     String
+  subtype  String?
+  location String?
+
+  parameters Parameter[]
+  alarms     Alarm[]
+  docs       Document[]
+  logEntries LogEntry[] @relation("ComponentToLogEntry")
 }
 
 model Parameter {
-  id            Int      @id @default(autoincrement())
+  id            Int     @id @default(autoincrement())
   component_id  String
   name          String
   unit          String?
   min_value     Float?
   max_value     Float?
   nominal_value Float?
-  component     Component @relation(fields: [component_id], references: [id])
+
+  component Component @relation(fields: [component_id], references: [id])
 }
 
 model Alarm {
-  id           Int      @id @default(autoincrement())
+  id              Int     @id @default(autoincrement())
+  code            String
+  description     String?
+  severity        String
+  parameter       String?
+  reset_procedure String?
+
   component_id String
-  code         String
-  description  String?
-  severity     String // 'INFO', 'WARNING', 'CRITICAL', 'EMERGENCY'
+  component    Component @relation(fields: [component_id], references: [id])
 
   @@unique([component_id, code])
 }
 
 model LogEntry {
   id           Int      @id @default(autoincrement())
-  timestamp    DateTime @default(now())
-  type         String // 'AUTO', 'MANUAL', 'DOCUMENT_ADDED'
+  timestamp    DateTime
+  type         String
   source       String
   message      String
-  component_id String?
   signature    String?
+  component_id String?
   component    Component? @relation("ComponentToLogEntry", fields: [component_id], references: [id])
 
   @@map("log_entries")
@@ -54,48 +61,51 @@ model LogEntry {
 
 model Document {
   id           Int      @id @default(autoincrement())
-  component_id String
-  type         String // 'PHOTO_ID_PLATE', 'MANUAL_PAGE', 'P&ID_SNIPPET'
+  type         String
   description  String?
   image_data   String?
   ocr_text     String?
-  created_at   DateTime @default(now())
-  component    Component @relation(fields: [component_id], references: [id], onDelete: Cascade)
+  created_at   DateTime
+
+  component_id String
+  component    Component @relation(fields: [component_id], references: [id])
 }
 
 model FunctionalNode {
-    id                  Int       @id @default(autoincrement())
-    external_id         String    @unique
-    system              String
-    subsystem           String
-    document            String?
-    tag                 String?
-    type                String
-    name                String
-    description         String?
-    location            String?
-    coordinates         String?   // JSON stored as string
-    linked_parameters   String?   // JSON stored as string
-    svg_layer           String?
-    fire_zone           String?
-    status              String
-    checksum            String
-    created_at          DateTime
-    updated_at          DateTime
-    approved_by         String?
-    approved_at         DateTime?
-    annotations         Annotation[]
+  id                Int      @id @default(autoincrement())
+  external_id       String   @unique
+  system            String
+  subsystem         String
+  document          String?
+  tag               String?
+  type              String
+  name              String
+  description       String?
+  location          String?
+  coordinates       String // JSON stored as string
+  linked_parameters String // JSON stored as string
+  svg_layer         String?
+  fire_zone         String?
+  status            String
+  checksum          String
+  created_at        DateTime
+  updated_at        DateTime
+  approved_by       String?
+  approved_at       DateTime?
+  annotations       Annotation[]
 
-    @@map("functional_nodes")
+  @@map("functional_nodes")
 }
 
 model Annotation {
-    id                          Int      @id @default(autoincrement())
-    functional_node_external_id String
-    text                        String
-    operator                    String
-    timestamp                   DateTime @default(now())
-    x_pos                       Float
-    y_pos                       Float
-    functional_node             FunctionalNode @relation(fields: [functional_node_external_id], references: [external_id])
+  id                          Int      @id @default(autoincrement())
+  text                        String
+  operator                    String
+  timestamp                   DateTime
+  x_pos                       Float
+  y_pos                       Float
+  functional_node_external_id String
+  functional_node             FunctionalNode @relation(fields: [functional_node_external_id], references: [external_id])
+
+  @@map("annotations")
 }
