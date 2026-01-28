@@ -1,103 +1,133 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "sqlite"
-  url      = env("DATABASE_URL")
+  url      = "file:./dev.db"
 }
 
+// --------------------------------------
+// ---          CORE MODELS           ---
+// --------------------------------------
+
 model Equipment {
-  externalId        String        @id
+  externalId        String      @id
   name              String
   description       String?
   parentId          String?
-  parent            Equipment?    @relation("EquipmentHierarchy", fields: [parentId], references: [externalId], onDelete: NoAction, onUpdate: NoAction)
-  children          Equipment[]   @relation("EquipmentHierarchy")
   type              String?
   subtype           String?
-  systemCode        String?
-  subSystem         String?
+  systemCode        String?     @map("system_code")
+  subSystem         String?     @map("sub_system")
   location          String?
   manufacturer      String?
-  serialNumber      String?
-  tagNumber         String?       @unique
-  documentRef       String?
-  coordinates       String?
-  svgLayer          String?
-  fireZone          String?
-  linkedParameters  String?
+  serialNumber      String?     @map("serial_number")
+  documentRef       String?     @map("document_ref")
+  coordinates       String? // JSON
+  svgLayer          String?     @map("svg_layer")
+  fireZone          String?     @map("fire_zone")
+  linkedParameters  String?     @map("linked_parameters") // JSON
   status            String?
-  version           Int           @default(1)
-  isImmutable       Boolean       @default(false)
-  approvedBy        String?
-  approvedAt        DateTime?
-  checksum          String?       @unique
-  nominalData       String?
+  version           Int         @default(1)
+  isImmutable       Boolean     @default(false) @map("is_immutable")
+  approvedBy        String?     @map("approved_by")
+  approvedAt        DateTime?   @map("approved_at")
+  checksum          String?     @unique
+  nominalData       String?     @map("nominal_data") // JSON
+
   parameters        Parameter[]
   alarms            Alarm[]
-  logEntries        LogEntry[]
-  documents         Document[]
-  annotations       Annotation[]
   scadaData         ScadaData[]
+  logEntries        LogEntry[]
+  annotations       Annotation[]
+  documents         Document[]
 
   @@map("equipments")
 }
 
 model Parameter {
-  id           Int      @id @default(autoincrement())
-  equipmentId  String
-  name         String
-  unit         String?
-  dataType     String   @default("TEXT")
-  nominalValue Float?
-  minSafe      Float?
-  maxSafe      Float?
-  warningHigh  Float?
-  alarmHigh    Float?
-  alarmLow     Float?
-  standardRef  String?
-  equipment    Equipment @relation(fields: [equipmentId], references: [externalId])
+  id            Int       @id @default(autoincrement())
+  name          String
+  unit          String?
+  nominalValue  Float?    @map("nominal_value")
+  minSafe       Float?    @map("min_safe")
+  maxSafe       Float?    @map("max_safe")
+  alarmHigh     Float?    @map("alarm_high")
+  alarmLow      Float?    @map("alarm_low")
+  standardRef   String?   @map("standard_ref")
 
-  @@unique([equipmentId, name])
+  equipmentId   String
+  equipment     Equipment @relation(fields: [equipmentId], references: [externalId])
+
   @@map("parameters")
 }
 
 model Alarm {
-  code           String        @id
-  equipmentId    String
-  severity       AlarmSeverity
-  description    String
-  parameter      String?
-  resetProcedure String?
-  standardRef    String?
-  equipment      Equipment     @relation(fields: [equipmentId], references: [externalId])
-  events         AlarmEvent[]
+  code            String    @id
+  severity        Severity
+  description     String
+  parameter       String?
+  resetProcedure  String?   @map("reset_procedure")
+  standardRef     String?   @map("standard_ref")
+
+  equipmentId     String
+  equipment       Equipment @relation(fields: [equipmentId], references: [externalId])
+
+  alarmEvents     AlarmEvent[]
 
   @@map("alarms")
 }
 
 model LogEntry {
-  id          Int       @id @default(autoincrement())
-  timestamp   DateTime
-  type        LogType
-  source      String
-  message     String
-  signature   String    @unique
-  equipmentId String?
-  equipment   Equipment? @relation(fields: [equipmentId], references: [externalId])
+  id            Int       @id @default(autoincrement())
+  timestamp     DateTime
+  type          LogType
+  source        String
+  message       String
+  signature     String    @unique
+
+  equipmentId   String?
+  equipment     Equipment? @relation(fields: [equipmentId], references: [externalId])
 
   @@map("log_entries")
 }
 
-model Annotation {
+model AlarmEvent {
   id          Int      @id @default(autoincrement())
+  timestamp   DateTime
+  isActive    Boolean
+  details     String?
+
+  alarmCode   String
+  alarm       Alarm    @relation(fields: [alarmCode], references: [code])
+
+  @@map("alarm_events")
+}
+
+model ScadaData {
+  id          Int       @id @default(autoincrement())
+  timestamp   DateTime
+  value       Float
+
   equipmentId String
+  equipment   Equipment @relation(fields: [equipmentId], references: [externalId])
+
+  @@map("scada_data")
+}
+
+model Annotation {
+  id          Int       @id @default(autoincrement())
+  timestamp   DateTime
   text        String
   operator    String
-  timestamp   DateTime
-  xPos        Float
-  yPos        Float
+  xPos        Float     @map("x_pos")
+  yPos        Float     @map("y_pos")
+
+  equipmentId String
   equipment   Equipment @relation(fields: [equipmentId], references: [externalId])
 
   @@map("annotations")
@@ -105,62 +135,47 @@ model Annotation {
 
 model Document {
   id          Int      @id @default(autoincrement())
-  equipmentId String
-  imageData   String
-  ocrText     String?
+  imageData   String   @map("image_data")
+  ocrText     String?  @map("ocr_text")
   description String?
-  createdAt   DateTime
-  equipment   Equipment @relation(fields: [equipmentId], references: [externalId])
+  createdAt   DateTime @map("created_at")
 
+  equipmentId String
+  equipment   Equipment @relation(fields: [equipmentId], references: [externalId])
+  
   @@map("documents")
 }
 
+model SynopticItem {
+    externalId    String      @id
+    name          String?
+    type          String?
+    parentId      String?     @map("parent_id")
+    groupPath     String?     @map("group_path")
+    elementId     String?     @map("element_id")
+    level         Int?
+    approvedBy    String?     @map("approved_by")
+    approvalDate  String?     @map("approval_date")
+
+    @@map("synoptic_items")
+}
+
 model Procedure {
-  id          String @id
+  id          String   @id
   name        String
-  description String
-  version     String
-  steps       Json
+  description String?
+  version     String?
+  steps       String // JSON
 
   @@map("procedures")
 }
 
-model ScadaData {
-  id          Int      @id @default(autoincrement())
-  timestamp   DateTime
-  equipmentId String
-  value       Float
-  equipment   Equipment @relation(fields: [equipmentId], references: [externalId])
 
-  @@map("scada_data")
-}
+// --------------------------------------
+// ---        ENUMERATIONS            ---
+// --------------------------------------
 
-model AlarmEvent {
-  id        Int      @id @default(autoincrement())
-  alarmCode String
-  timestamp DateTime @default(now())
-  isActive  Boolean
-  details   String?
-  alarm     Alarm    @relation(fields: [alarmCode], references: [code])
-
-  @@map("alarm_events")
-}
-
-model SynopticItem {
-  externalId   String  @id
-  name         String?
-  type         String?
-  parentId     String?
-  groupPath    String?
-  elementId    String?
-  level        Int?
-  approvedBy   String?
-  approvalDate String?
-
-  @@map("synoptic_items")
-}
-
-enum AlarmSeverity {
+enum Severity {
   INFO
   WARNING
   CRITICAL
