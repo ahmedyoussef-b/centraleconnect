@@ -63,8 +63,8 @@
       "severity": "EMERGENCY",
       "message": "Déclenchement par survitesse électrique",
       "standardRef": "SPEEDTRONIC MKIV",
-      "parameter": "Vitesse turbine (TNH) > point de consigne de sécurité (TNKOS).",
-      "reset_procedure": "Signal de réarmement principal L86MR."
+      "parameter": "Utilise 3 capteurs (77NH-1/2/3) pour mesurer la vitesse (TNH). Se déclenche si TNH dépasse le point de consigne TNKOS, coupant l'alimentation combustible (FSR à zéro).",
+      "reset_procedure": "S'effectue via le signal de réarmement principal L86MR sur le panneau de commande une fois que la vitesse est revenue à la normale."
     },
     {
       "code": "BOS",
@@ -72,8 +72,8 @@
       "severity": "EMERGENCY",
       "message": "Déclenchement par survitesse mécanique (Réarmement manuel local)",
       "standardRef": "Mécanique",
-      "parameter": "Déplacement du doigt de survitesse par force centrifuge (seuil fixe non réglable, supérieur à l'électrique).",
-      "reset_procedure": "MANUEL UNIQUEMENT en tirant physiquement la poignée de réarmement sur le réducteur des auxiliaires."
+      "parameter": "Une masselotte (doigt de survitesse) se déplace par force centrifuge si la vitesse dépasse le seuil mécanique. L'action purge l'huile de sécurité (OLT), provoquant la fermeture des vannes de combustible.",
+      "reset_procedure": "Réarmement OBLIGATOIREMENT MANUEL en tirant la poignée sur le réducteur des auxiliaires. Un fin de course (12HA) confirme le réarmement et est un permissif de démarrage."
     },
     {
       "code": "63QA-1",
