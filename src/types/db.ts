@@ -2,31 +2,37 @@
 export type LogEntryType = 'AUTO' | 'MANUAL' | 'DOCUMENT_ADDED';
 
 export interface Component {
-    id: string;
+    tag: string;
     name: string;
-    description: string;
     type: string;
-    parameters?: Parameter[];
+    subtype?: string;
+    manufacturer?: string;
+    serialNumber?: string;
+    location?: string;
 }
 
 export interface Parameter {
     id?: number;
-    component_id: string;
+    component_tag: string;
+    key: string;
     name: string;
     unit: string;
-    min_value: number | null;
-    max_value: number | null;
     nominal_value: number | null;
+    min_safe: number | null;
+    max_safe: number | null;
+    alarm_high: number | null;
+    alarm_low: number | null;
+    standard_ref: string | null;
 }
 
 export interface Alarm {
-    id?: number;
-    component_id: string;
     code: string;
-    description: string;
+    component_tag: string;
     severity: 'INFO' | 'WARNING' | 'CRITICAL' | 'EMERGENCY';
+    description: string;
     parameter?: string;
     reset_procedure?: string;
+    standard_ref?: string;
 }
 
 export interface LogEntry {
@@ -35,7 +41,7 @@ export interface LogEntry {
     type: LogEntryType;
     source: string;
     message: string;
-    component_id: string | null;
+    component_tag: string | null;
     signature: string | null;
 }
 
@@ -65,7 +71,6 @@ export interface Procedure {
 }
 
 export interface FunctionalNode {
-    id: number;
     external_id: string;
     system: string;
     subsystem: string;
@@ -95,4 +100,68 @@ export interface Annotation {
     timestamp: string;
     x_pos: number; // Percentage
     y_pos: number; // Percentage
+}
+
+export interface Document {
+    id: number;
+    component_tag: string;
+    imageData: string;
+    ocrText: string;
+    description: string;
+    createdAt: string;
+}
+
+export interface ScadaData {
+    id: string;
+    node_id: string;
+    parameter_name: string;
+    value: number;
+    quality: string;
+    timestamp: string;
+    source: string;
+    unit: string | null;
+}
+  
+export interface RegulatoryReference {
+    id: string;
+    node_id: string;
+    standard: string;
+    clause: string;
+    requirement: string;
+    compliance_status: string;
+    compliance_comment: string | null;
+    verified_by: string | null;
+    verified_at: string | null;
+}
+  
+export interface Operator {
+    id: string;
+    employee_id: string;
+    username: string;
+    email: string | null;
+    first_name: string;
+    last_name: string;
+    role: string;
+    department: string | null;
+    permissions: string;
+    certifications: string;
+    training_completed: boolean;
+    hire_date: string | null;
+    is_active: boolean;
+    last_login: string | null;
+    created_at: string;
+}
+
+export interface AlarmEvent {
+    id: string;
+    alarm_id: string;
+    event_type: string;
+    timestamp: string;
+    operator_id: string | null;
+    operator_name: string | null;
+    comment: string | null;
+    scada_value: number | null;
+    acknowledged_at: string | null;
+    cleared_at: string | null;
+    duration: number | null;
 }
