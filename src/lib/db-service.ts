@@ -6,8 +6,7 @@ import type {
   Parameter, 
   Alarm, 
   FunctionalNode, 
-  Annotation,
-  Document
+  Annotation
 } from '@/types/db';
 
 // Import JSON data which will be bundled by the build process
@@ -17,17 +16,19 @@ import alarmData from '@/assets/master-data/alarms.json';
 import manifest from '@/assets/master-data/manifest.json';
 import pidAssetsData from '@/assets/master-data/pid-assets.json';
 
-const DB_NAME = 'sqlite:ccpp.db';
+const DB_NAME = 'ccpp.db';
 let isInitialized = false;
 
 /**
  * Schema SQL complet - Toutes les tables nécessaires
  */
 const CREATE_TABLES_SQL = `
+BEGIN;
+
 CREATE TABLE IF NOT EXISTS components (
-    tag TEXT PRIMARY KEY,
+    tag TEXT PRIMARY KEY NOT NULL,
     name TEXT NOT NULL,
-    type TEXT NOT NULL,
+    type TEXT,
     subtype TEXT,
     manufacturer TEXT,
     serialNumber TEXT,
@@ -51,7 +52,7 @@ CREATE TABLE IF NOT EXISTS parameters (
 );
 
 CREATE TABLE IF NOT EXISTS alarms (
-    code TEXT PRIMARY KEY,
+    code TEXT PRIMARY KEY NOT NULL,
     component_tag TEXT NOT NULL,
     severity TEXT CHECK(severity IN ('INFO', 'WARNING', 'CRITICAL', 'EMERGENCY')) NOT NULL,
     description TEXT NOT NULL,
@@ -62,13 +63,13 @@ CREATE TABLE IF NOT EXISTS alarms (
 );
 
 CREATE TABLE IF NOT EXISTS functional_nodes (
-    external_id TEXT PRIMARY KEY,
+    external_id TEXT PRIMARY KEY NOT NULL,
     system TEXT NOT NULL,
     subsystem TEXT NOT NULL,
     document TEXT,
     tag TEXT,
-    type TEXT NOT NULL,
-    name TEXT NOT NULL,
+    type TEXT,
+    name TEXT,
     description TEXT,
     location TEXT,
     coordinates TEXT,
@@ -76,9 +77,9 @@ CREATE TABLE IF NOT EXISTS functional_nodes (
     svg_layer TEXT,
     fire_zone TEXT,
     status TEXT,
-    checksum TEXT NOT NULL,
+    checksum TEXT UNIQUE NOT NULL,
     created_at TEXT NOT NULL,
-    updated_at TEXT NOT NULL,
+    updated_at TEXT,
     approved_by TEXT,
     approved_at TEXT
 );
@@ -86,25 +87,25 @@ CREATE TABLE IF NOT EXISTS functional_nodes (
 CREATE TABLE IF NOT EXISTS log_entries (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     timestamp TEXT NOT NULL,
-    type TEXT NOT NULL,
+    type TEXT CHECK(type IN ('AUTO', 'MANUAL', 'DOCUMENT_ADDED')) NOT NULL,
     source TEXT NOT NULL,
     message TEXT NOT NULL,
     component_tag TEXT,
     functional_node_id TEXT,
-    signature TEXT UNIQUE,
+    signature TEXT UNIQUE NOT NULL,
     FOREIGN KEY (component_tag) REFERENCES components(tag),
     FOREIGN KEY (functional_node_id) REFERENCES functional_nodes(external_id)
 );
 
 CREATE TABLE IF NOT EXISTS annotations (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  functional_node_external_id TEXT NOT NULL,
-  text TEXT NOT NULL,
-  operator TEXT NOT NULL,
-  timestamp TEXT NOT NULL,
-  x_pos REAL NOT NULL,
-  y_pos REAL NOT NULL,
-  FOREIGN KEY (functional_node_external_id) REFERENCES functional_nodes(external_id)
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    functional_node_external_id TEXT NOT NULL,
+    text TEXT NOT NULL,
+    operator TEXT NOT NULL,
+    timestamp TEXT NOT NULL,
+    x_pos REAL NOT NULL,
+    y_pos REAL NOT NULL,
+    FOREIGN KEY (functional_node_external_id) REFERENCES functional_nodes(external_id)
 );
 
 CREATE TABLE IF NOT EXISTS documents (
@@ -116,6 +117,8 @@ CREATE TABLE IF NOT EXISTS documents (
     createdAt TEXT NOT NULL,
     FOREIGN KEY (component_tag) REFERENCES components(tag)
 );
+
+COMMIT;
 `;
 
 /**
@@ -148,7 +151,15 @@ async function createEntrySignature(
  * Création de checksum SHA-256 pour un nœud fonctionnel
  */
 async function createNodeChecksum(node: any): Promise<string> {
-  const nodeString = JSON.stringify(node);
+  // Sort keys to ensure consistent JSON stringification
+  const sortedNode = Object.keys(node).sort().reduce(
+    (obj: any, key: any) => { 
+      obj[key] = node[key]; 
+      return obj;
+    }, 
+    {}
+  );
+  const nodeString = JSON.stringify(sortedNode);
   const encoder = new TextEncoder();
   const data = encoder.encode(nodeString);
   const hashBuffer = await crypto.subtle.digest('SHA-256', data);
@@ -160,7 +171,9 @@ async function createNodeChecksum(node: any): Promise<string> {
  * Vérification de l'intégrité des nœuds fonctionnels
  */
 async function verifyFunctionalNodesIntegrity(): Promise<void> {
-  const nodesFromDb: any[] = await invoke('plugin:sql|select', { db: DB_NAME, query: 'SELECT * FROM functional_nodes' });
+  const db = await invoke('plugin:sql|load', { db: DB_NAME });
+  const nodesFromDb: any[] = await invoke('plugin:sql|select', { db, query: 'SELECT * FROM functional_nodes' });
+
   if (nodesFromDb.length === 0) {
     console.log('No functional nodes to verify.');
     return;
@@ -198,8 +211,8 @@ async function verifyFunctionalNodesIntegrity(): Promise<void> {
 /**
  * Injection des données Master Data
  */
-async function seedMasterData(): Promise<void> {
-  const componentsResult: { count: number }[] = await invoke('plugin:sql|select', { db: DB_NAME, query: 'SELECT count(*) as count FROM components' });
+async function seedMasterData(db: any): Promise<void> {
+  const componentsResult: { count: number }[] = await invoke('plugin:sql|select', { db, query: 'SELECT count(*) as count FROM components' });
   if (componentsResult[0].count > 0) {
     console.log('Master data (components) already seeded.');
     return;
@@ -209,7 +222,7 @@ async function seedMasterData(): Promise<void> {
 
   for (const eq of componentsData as any[]) {
     await invoke('plugin:sql|execute', {
-      db: DB_NAME,
+      db,
       query: 'INSERT INTO components (tag, name, type, subtype, manufacturer, serialNumber, location) VALUES ($1, $2, $3, $4, $5, $6, $7)',
       values: [eq.tag, eq.name, eq.type, eq.subtype, eq.manufacturer, eq.serialNumber, eq.location]
     });
@@ -217,7 +230,7 @@ async function seedMasterData(): Promise<void> {
 
   for (const param of parameterData as any[]) {
     await invoke('plugin:sql|execute', {
-      db: DB_NAME,
+      db,
       query: 'INSERT INTO parameters (component_tag, key, name, unit, nominal_value, min_safe, max_safe, alarm_high, alarm_low, standard_ref) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)',
       values: [param.componentTag, param.key, param.name, param.unit, param.nominalValue, param.minSafe, param.maxSafe, param.alarmHigh, param.alarmLow, param.standardRef]
     });
@@ -225,7 +238,7 @@ async function seedMasterData(): Promise<void> {
   
   for (const alarm of alarmData as any[]) {
     await invoke('plugin:sql|execute', {
-      db: DB_NAME,
+      db,
       query: 'INSERT INTO alarms (code, component_tag, severity, description, parameter, reset_procedure, standard_ref) VALUES ($1, $2, $3, $4, $5, $6, $7)',
       values: [alarm.code, alarm.componentTag, alarm.severity, alarm.message, alarm.parameter, alarm.reset_procedure, alarm.standardRef]
     });
@@ -234,8 +247,8 @@ async function seedMasterData(): Promise<void> {
   console.log('✅ Master data seeded.');
 }
 
-async function seedFunctionalNodes(): Promise<void> {
-    const result: { count: number }[] = await invoke('plugin:sql|select', { db: DB_NAME, query: "SELECT count(*) as count FROM functional_nodes" });
+async function seedFunctionalNodes(db: any): Promise<void> {
+    const result: { count: number }[] = await invoke('plugin:sql|select', { db, query: "SELECT count(*) as count FROM functional_nodes" });
     if (result[0].count > 0) {
       console.log('✅ Functional nodes already seeded.');
       return;
@@ -264,7 +277,7 @@ async function seedFunctionalNodes(): Promise<void> {
         const checksum = await createNodeChecksum(nodeToHash);
         const now = new Date().toISOString();
         await invoke('plugin:sql|execute', {
-            db: DB_NAME,
+            db,
             query: `INSERT INTO functional_nodes (external_id, system, subsystem, document, tag, type, name, description, location, coordinates, linked_parameters, svg_layer, fire_zone, status, checksum, created_at, updated_at, approved_by, approved_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19)`,
             values: [
                 node.external_id, node.system, node.subsystem, node.document, node.tag, node.type, node.name, node.description, node.location, JSON.stringify(node.coordinates), JSON.stringify(node.linked_parameters), node.svg_layer, node.fire_zone, node.status, checksum, now, now, pidAssetsData.approved_by, pidAssetsData.approved_at
@@ -283,10 +296,11 @@ export async function initializeDatabase(): Promise<void> {
   }
 
   console.log('🚀 Initializing database...');
-  await invoke('plugin:sql|execute', { db: DB_NAME, query: CREATE_TABLES_SQL });
+  const db = await invoke('plugin:sql|load', { db: DB_NAME });
+  await invoke('plugin:sql|execute', { db, query: CREATE_TABLES_SQL });
   console.log('✅ Tables created.');
 
-  const logResult: { count: number }[] = await invoke('plugin:sql|select', { db: DB_NAME, query: 'SELECT count(*) as count FROM log_entries' });
+  const logResult: { count: number }[] = await invoke('plugin:sql|select', { db, query: 'SELECT count(*) as count FROM log_entries' });
   if (logResult[0].count === 0) {
     await addLogEntry({
       type: 'AUTO',
@@ -300,8 +314,8 @@ export async function initializeDatabase(): Promise<void> {
     });
   }
 
-  await seedMasterData();
-  await seedFunctionalNodes();
+  await seedMasterData(db);
+  await seedFunctionalNodes(db);
   await verifyFunctionalNodesIntegrity();
   
   await addLogEntry({
@@ -317,21 +331,24 @@ export async function initializeDatabase(): Promise<void> {
 export async function getComponents(): Promise<Component[]> {
   await initializeDatabase();
   if (typeof window === 'undefined' || !window.__TAURI__) return [];
-  return invoke('plugin:sql|select', { db: DB_NAME, query: 'SELECT * FROM components ORDER BY name' });
+  const db = await invoke('plugin:sql|load', { db: DB_NAME });
+  return invoke('plugin:sql|select', { db, query: 'SELECT * FROM components ORDER BY name' });
 }
 
 export async function getParameters(): Promise<Parameter[]> {
   await initializeDatabase();
   if (typeof window === 'undefined' || !window.__TAURI__) return [];
-  return invoke('plugin:sql|select', { db: DB_NAME, query: 'SELECT * FROM parameters ORDER BY component_tag, name' });
+  const db = await invoke('plugin:sql|load', { db: DB_NAME });
+  return invoke('plugin:sql|select', { db, query: 'SELECT * FROM parameters ORDER BY component_tag, name' });
 }
 
 export async function getComponentsWithParameters(): Promise<Component[]> {
     await initializeDatabase();
     if (typeof window === 'undefined' || !window.__TAURI__) return [];
 
-    const components: any[] = await invoke('plugin:sql|select', { db: DB_NAME, query: 'SELECT * FROM components' });
-    const parameters: Parameter[] = await invoke('plugin:sql|select', { db: DB_NAME, query: 'SELECT * FROM parameters' });
+    const db = await invoke('plugin:sql|load', { db: DB_NAME });
+    const components: any[] = await invoke('plugin:sql|select', { db, query: 'SELECT * FROM components' });
+    const parameters: Parameter[] = await invoke('plugin:sql|select', { db, query: 'SELECT * FROM parameters' });
 
     const componentMap = new Map(components.map(c => [c.tag, { ...c, parameters: [] }]));
 
@@ -347,7 +364,8 @@ export async function getFunctionalNodes(): Promise<FunctionalNode[]> {
     await initializeDatabase();
     if (typeof window === 'undefined' || !window.__TAURI__) return [];
 
-    const nodes: any[] = await invoke('plugin:sql|select', { db: DB_NAME, query: 'SELECT * FROM functional_nodes' });
+    const db = await invoke('plugin:sql|load', { db: DB_NAME });
+    const nodes: any[] = await invoke('plugin:sql|select', { db, query: 'SELECT * FROM functional_nodes' });
     return nodes.map(node => ({
         ...node,
         coordinates: JSON.parse(node.coordinates || '{}'),
@@ -361,9 +379,9 @@ export async function getAssistantContextData(): Promise<any> {
     if (typeof window === 'undefined' || !window.__TAURI__) return {};
 
     const [components, parameters, alarms, functionalNodes] = await Promise.all([
-        invoke('plugin:sql|select', { db: DB_NAME, query: 'SELECT * FROM components' }),
-        invoke('plugin:sql|select', { db: DB_NAME, query: 'SELECT * FROM parameters' }),
-        invoke('plugin:sql|select', { db: DB_NAME, query: 'SELECT * FROM alarms' }),
+        getComponents(),
+        getParameters(),
+        invoke('plugin:sql|load', { db: DB_NAME }).then(db => invoke('plugin:sql|select', { db, query: 'SELECT * FROM alarms' })),
         getFunctionalNodes(),
     ]);
     return { components, parameters, alarms, functional_nodes: functionalNodes };
@@ -373,7 +391,8 @@ export async function getAssistantContextData(): Promise<any> {
 export async function getLogEntries(): Promise<LogEntry[]> {
   await initializeDatabase();
   if (typeof window === 'undefined' || !window.__TAURI__) return [];
-  return invoke('plugin:sql|select', { db: DB_NAME, query: 'SELECT * FROM log_entries ORDER BY timestamp DESC' });
+  const db = await invoke('plugin:sql|load', { db: DB_NAME });
+  return invoke('plugin:sql|select', { db, query: 'SELECT * FROM log_entries ORDER BY timestamp DESC' });
 }
 
 
@@ -386,8 +405,9 @@ export async function addLogEntry(entry: {
 }): Promise<void> {
   if (typeof window === 'undefined' || !window.__TAURI__) return;
 
+  const db = await invoke('plugin:sql|load', { db: DB_NAME });
   const lastEntry: { signature: string }[] = await invoke('plugin:sql|select', {
-    db: DB_NAME,
+    db,
     query: 'SELECT signature FROM log_entries ORDER BY timestamp DESC LIMIT 1'
   });
   
@@ -406,7 +426,7 @@ export async function addLogEntry(entry: {
   const signature = await createEntrySignature(newEntryData, previousSignature);
 
   await invoke('plugin:sql|execute', {
-    db: DB_NAME,
+    db,
     query: 'INSERT INTO log_entries (timestamp, type, source, message, component_tag, functional_node_id, signature) VALUES ($1, $2, $3, $4, $5, $6, $7)',
     values: [timestamp, entry.type, entry.source, entry.message, entry.component_tag || null, entry.functional_node_id || null, signature],
   });
@@ -418,19 +438,21 @@ export async function addComponentAndDocument(
 ): Promise<void> {
   if (typeof window === 'undefined' || !window.__TAURI__) return;
 
-  const existing: any[] = await invoke('plugin:sql|select', { db: DB_NAME, query: 'SELECT 1 FROM components WHERE tag = $1', values: [component.tag]});
+  const db = await invoke('plugin:sql|load', { db: DB_NAME });
+
+  const existing: any[] = await invoke('plugin:sql|select', { db, query: 'SELECT 1 FROM components WHERE tag = $1', values: [component.tag]});
   if (existing.length > 0) {
       throw new Error(`Le composant avec le tag '${component.tag}' existe déjà.`);
   }
 
   await invoke('plugin:sql|execute', {
-    db: DB_NAME,
+    db,
     query: 'INSERT INTO components (tag, name, type) VALUES ($1, $2, $3)',
     values: [component.tag, component.name, component.type]
   });
 
   await invoke('plugin:sql|execute', {
-    db: DB_NAME,
+    db,
     query: 'INSERT INTO documents (component_tag, imageData, ocrText, description, createdAt) VALUES ($1, $2, $3, $4, $5)',
     values: [component.tag, document.imageData, document.ocrText, document.description, new Date().toISOString()]
   });
@@ -447,8 +469,9 @@ export async function getAnnotationsForNode(externalId: string): Promise<Annotat
     await initializeDatabase();
     if (typeof window === 'undefined' || !window.__TAURI__) return [];
 
+    const db = await invoke('plugin:sql|load', { db: DB_NAME });
     return invoke('plugin:sql|select', { 
-        db: DB_NAME, 
+        db, 
         query: 'SELECT * FROM annotations WHERE functional_node_external_id = $1 ORDER BY timestamp DESC',
         values: [externalId]
     });
@@ -463,9 +486,11 @@ export async function addAnnotation(annotation: {
 }): Promise<void> {
     if (typeof window === 'undefined' || !window.__TAURI__) return;
     const timestamp = new Date().toISOString().replace('T', ' ').slice(0, 19);
+    
+    const db = await invoke('plugin:sql|load', { db: DB_NAME });
 
     await invoke('plugin:sql|execute', {
-        db: DB_NAME,
+        db,
         query: 'INSERT INTO annotations (functional_node_external_id, text, operator, timestamp, x_pos, y_pos) VALUES ($1, $2, $3, $4, $5, $6)',
         values: [annotation.functional_node_external_id, annotation.text, annotation.operator, timestamp, annotation.x_pos, annotation.y_pos]
     });

@@ -1,7 +1,5 @@
-// ============================================
-// SCHEMA PRISMA CORRIGÉ - CENTRALE CCPP 2×1
-// Version : 2.2.0 - Compatible SQLite
-// ============================================
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
   provider = "prisma-client-js"
@@ -12,478 +10,124 @@ datasource db {
   url      = "file:./ccpp.db"
 }
 
-// ============================================
-// MODÈLE PRINCIPAL : NOEUD FONCTIONNEL
-// ============================================
-
-model FunctionalNode {
-  // Identifiants
-  id         String @id @default(cuid())
-  externalId String @unique
-
-  // Données descriptives
-  name        String
-  description String?
-  type        NodeType
-  category    NodeCategory
-
-  // Localisation
-  systemCode String
-  subSystem  String
-  area       String?
-
-  // Données techniques
-  manufacturer     String?
-  model            String?
-  serialNumber     String?
-  installationDate DateTime?
-  nominalData      Json?
-
-  // Relations hiérarchiques
-  parentId String?
-  parent   FunctionalNode?  @relation("NodeHierarchy", fields: [parentId], references: [id])
-  children FunctionalNode[] @relation("NodeHierarchy")
-
-  // Relations fonctionnelles
+// Modèle pour les composants physiques principaux
+model Component {
+  tag            String       @id
+  name           String
+  type           String?
+  subtype        String?
+  manufacturer   String?
+  serialNumber   String?
+  location       String?
   parameters     Parameter[]
   alarms         Alarm[]
-  documents      Document[]
   logEntries     LogEntry[]
-  annotations    Annotation[]
-  procedureSteps ProcedureStep[]
-  scadaData      ScadaData[]
-
-  // Métadonnées
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("functional_nodes")
-}
-
-// ============================================
-// MODÈLE : PARAMÈTRE TECHNIQUE
-// ============================================
-
-model Parameter {
-  id          String   @id @default(cuid())
-  nodeId      String
-  name        String
-  description String?
-  unit        String
-  dataType    DataType @default(DOUBLE)
-
-  // Valeurs
-  nominalValue Float?
-  minValue     Float?
-  maxValue     Float?
-  warningLow   Float?
-  warningHigh  Float?
-  alarmLow     Float?
-  alarmHigh    Float?
-
-  // Métadonnées
-  source    String?  @default("MANUAL")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Relations
-  node FunctionalNode @relation(fields: [nodeId], references: [id], onDelete: Cascade)
-
-  @@unique([nodeId, name])
-  @@map("parameters")
-}
-
-// ============================================
-// MODÈLE : ALARME
-// ============================================
-
-model Alarm {
-  id               String        @id @default(cuid())
-  nodeId           String
-  code             String        @unique
-  name             String
-  description      String?
-  severity         AlarmSeverity
-  priority         Int           @default(1)
-  category         AlarmCategory
-  condition        String
-  delay            Int?          @default(0)
-  autoAck          Boolean       @default(false)
-  procedureId      String?
-  shutdownRequired Boolean       @default(false)
-  isActive         Boolean       @default(true)
-  createdAt        DateTime      @default(now())
-  updatedAt        DateTime      @updatedAt
-
-  // Relations
-  node        FunctionalNode @relation(fields: [nodeId], references: [id], onDelete: Cascade)
-  procedure   Procedure?     @relation(fields: [procedureId], references: [id])
-  alarmEvents AlarmEvent[]
-
-  @@map("alarms")
-}
-
-// ============================================
-// MODÈLE : ÉVÉNEMENT D'ALARME
-// ============================================
-
-model AlarmEvent {
-  id             String         @id @default(cuid())
-  alarmId        String
-  eventType      AlarmEventType
-  timestamp      DateTime       @default(now())
-  operatorId     String?
-  comment        String?
-  scadaValue     Float?
-  acknowledgedAt DateTime?
-  clearedAt      DateTime?
-  duration       Int?
-
-  // Relations
-  alarm Alarm @relation(fields: [alarmId], references: [id], onDelete: Cascade)
-
-  @@map("alarm_events")
-}
-
-// ============================================
-// MODÈLE : DOCUMENT
-// ============================================
-
-model Document {
-  id             String       @id @default(cuid())
-  nodeId         String
-  title          String
-  description    String?
-  fileName       String
-  fileType       String
-  fileSize       Int
-  filePath       String
-  checksum       String
-  documentType   DocumentType
-  revision       String       @default("A")
-  issueDate      DateTime?
-  language       String       @default("fr")
-  confidential   Boolean      @default(false)
-  retentionYears Int          @default(10)
-  uploadedBy     String?
-  uploadedAt     DateTime     @default(now())
-  version        Int          @default(1)
-
-  // Relations
-  node FunctionalNode @relation(fields: [nodeId], references: [id], onDelete: Cascade)
-
-  @@map("documents")
-}
-
-// ============================================
-// MODÈLE : ENTRÉE JOURNAL
-// ============================================
-
-model LogEntry {
-  id              String       @id @default(cuid())
-  nodeId          String?
-  eventType       LogEventType
-  source          String
-  severity        LogSeverity  @default(INFO)
-  title           String
-  details         String?
-  rawData         Json?
-  operatorId      String?
-  shift           String?
-  workOrderId     String?
-  regulatoryTags  String // Chaîne séparée par des virgules au lieu de String[]
-  environmental   Boolean      @default(false)
-  safetyCritical  Boolean      @default(false)
-  timestamp       DateTime     @default(now())
-  serverTimestamp DateTime?
-  previousHash    String?
-  integrityHash   String
-
-  // Relations
-  node FunctionalNode? @relation(fields: [nodeId], references: [id], onDelete: SetNull)
-
-  @@map("log_entries")
-}
-
-// ============================================
-// MODÈLE : ANNOTATION
-// ============================================
-
-model Annotation {
-  id             String           @id @default(cuid())
-  nodeId         String
-  pidReference   String
-  content        String
-  annotationType AnnotationType   @default(TEXT)
-  positionX      Float
-  positionY      Float
-  authorId       String
-  authorName     String
-  status         AnnotationStatus @default(ACTIVE)
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
-  expiresAt      DateTime?
-
-  // Relations
-  node FunctionalNode @relation(fields: [nodeId], references: [id], onDelete: Cascade)
-
-  @@map("annotations")
-}
-
-// ============================================
-// MODÈLE : PROCÉDURE
-// ============================================
-
-model Procedure {
-  id               String            @id @default(cuid())
-  code             String            @unique
-  title            String
-  description      String?
-  procedureType    ProcedureType
-  category         ProcedureCategory
-  revision         String            @default("A")
-  author           String?
-  approvalDate     DateTime?
-  validityPeriod   Int               @default(12)
-  safetyLevel      SafetyLevel       @default(STANDARD)
-  requiredTraining String // Chaîne séparée par des virgules au lieu de String[]
-
-  // Relations
-  steps  ProcedureStep[]
-  alarms Alarm[]
-
-  @@map("procedures")
-}
-
-// ============================================
-// MODÈLE : ÉTAPE DE PROCÉDURE
-// ============================================
-
-model ProcedureStep {
-  id              String         @id @default(cuid())
-  nodeId          String?
-  procedureId     String
-  stepNumber      Int
-  title           String
-  description     String?
-  instructions    String
-  validationType  ValidationType
-  expectedValue   String?
-  tolerance       String?
-  safetyCheck     Boolean        @default(false)
-  safetyProcedure String?
-  lockoutRequired Boolean        @default(false)
-  estimatedTime   Int?
-  isCritical      Boolean        @default(false)
-
-  // Relations
-  node      FunctionalNode? @relation(fields: [nodeId], references: [id], onDelete: SetNull)
-  procedure Procedure       @relation(fields: [procedureId], references: [id], onDelete: Cascade)
-
-  @@unique([procedureId, stepNumber])
-  @@map("procedure_steps")
-}
-
-// ============================================
-// MODÈLE : DONNÉES SCADA
-// ============================================
-
-model ScadaData {
-  id            String      @id @default(cuid())
-  nodeId        String
-  parameterName String
-  value         Float
-  quality       DataQuality @default(GOOD)
-  timestamp     DateTime    @default(now())
-  source        String      @default("SCADA")
-  unit          String?
-
-  // Relations
-  node FunctionalNode @relation(fields: [nodeId], references: [id], onDelete: Cascade)
-
-  @@unique([nodeId, parameterName, timestamp])
-  @@map("scada_data")
-}
-
-// ============================================
-// MODÈLE : COMPOSANT (hérité)
-// ============================================
-
-model Component {
-  id               String    @id @default(cuid())
-  externalId       String    @unique
-  name             String
-  type             String
-  description      String?
-  manufacturer     String?
-  model            String?
-  serialNumber     String?
-  installationDate DateTime?
-  status           String    @default("OPERATIONAL")
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
+  documents      Document[]
 
   @@map("components")
 }
 
-// ============================================
-// ENUMS
-// ============================================
+// Modèle pour les paramètres techniques des composants
+model Parameter {
+  id             Int       @id @default(autoincrement())
+  component_tag  String
+  key            String
+  name           String
+  unit           String?
+  nominal_value  Float?
+  min_safe       Float?
+  max_safe       Float?
+  alarm_high     Float?
+  alarm_low      Float?
+  standard_ref   String?
+  component      Component @relation(fields: [component_tag], references: [tag])
 
-enum NodeType {
-  TURBINE
-  PUMP
-  VALVE
-  COMPRESSOR
-  HEAT_EXCHANGER
-  VESSEL
-  INSTRUMENT
-  SENSOR
-  ACTUATOR
-  CONTROL_PANEL
-  ELECTRICAL
-  SAFETY
-  OTHER
+  @@unique([component_tag, key])
+  @@map("parameters")
 }
 
-enum NodeCategory {
-  MECHANICAL
-  ELECTRICAL
-  INSTRUMENTATION
-  SAFETY
-  CONTROL
-  AUXILIARY
-  CIVIL
+// Modèle pour les alarmes de référence
+model Alarm {
+  code            String    @id
+  component_tag   String
+  severity        String
+  description     String
+  parameter       String?
+  reset_procedure String?
+  standard_ref    String?
+  component       Component @relation(fields: [component_tag], references: [tag])
+
+  @@map("alarms")
 }
 
-enum DataType {
-  INTEGER
-  DOUBLE
-  BOOLEAN
-  STRING
-  ENUM
-  TIMESTAMP
+// Modèle pour les nœuds fonctionnels issus des P&ID
+model FunctionalNode {
+  external_id       String       @id
+  system            String
+  subsystem         String
+  document          String?
+  tag               String?
+  type              String?
+  name              String?
+  description       String?
+  location          String?
+  coordinates       String? // JSON string
+  linked_parameters String? // JSON string of parameter keys
+  svg_layer         String?
+  fire_zone         String?
+  status            String?
+  checksum          String       @unique // SHA-256 checksum for data integrity
+  created_at        DateTime     @default(now())
+  updated_at        DateTime?    @updatedAt
+  approved_by       String?
+  approved_at       String?
+  logEntries        LogEntry[]
+  annotations       Annotation[]
+
+  @@map("functional_nodes")
 }
 
-enum AlarmSeverity {
-  EMERGENCY
-  CRITICAL
-  HIGH
-  MEDIUM
-  LOW
-  INFO
+// Modèle pour les entrées du journal de bord
+model LogEntry {
+  id                 Int      @id @default(autoincrement())
+  timestamp          DateTime @default(now())
+  type               String
+  source             String
+  message            String
+  component_tag      String?
+  functional_node_id String?
+  signature          String   @unique
+
+  component        Component?      @relation(fields: [component_tag], references: [tag])
+  functionalNode   FunctionalNode? @relation(fields: [functional_node_id], references: [external_id])
+
+  @@map("log_entries")
 }
 
-enum AlarmCategory {
-  SAFETY
-  ENVIRONMENTAL
-  PROCESS
-  EQUIPMENT
-  ELECTRICAL
-  INSTRUMENTATION
-  COMMUNICATION
-  OTHER
+// Modèle pour les annotations sur les P&ID
+model Annotation {
+  id                        Int          @id @default(autoincrement())
+  functional_node_external_id String
+  text                      String
+  operator                  String
+  timestamp                 DateTime     @default(now())
+  x_pos                     Float
+  y_pos                     Float
+  functionalNode            FunctionalNode @relation(fields: [functional_node_external_id], references: [external_id])
+
+  @@map("annotations")
 }
 
-enum AlarmEventType {
-  ACTIVATED
-  ACKNOWLEDGED
-  CLEARED
-  SUPPRESSED
-  RESET
-}
 
-enum DocumentType {
-  MANUAL
-  DRAWING
-  CERTIFICATE
-  PROCEDURE
-  REPORT
-  SPECIFICATION
-  CALCULATION
-  PHOTO
-  VIDEO
-  OTHER
-}
+// Modèle pour les documents (images, etc.) liés aux composants
+model Document {
+  id            Int       @id @default(autoincrement())
+  component_tag String
+  imageData     String
+  ocrText       String?
+  description   String?
+  createdAt     DateTime  @default(now())
+  component     Component @relation(fields: [component_tag], references: [tag])
 
-enum LogEventType {
-  OPERATION
-  MAINTENANCE
-  ALARM
-  PROCEDURE
-  MANUAL_ENTRY
-  SYSTEM
-  SECURITY
-  ENVIRONMENTAL
-  SAFETY
-  AUDIT
-}
-
-enum LogSeverity {
-  DEBUG
-  INFO
-  NOTICE
-  WARNING
-  ERROR
-  CRITICAL
-  ALERT
-  EMERGENCY
-}
-
-enum AnnotationType {
-  TEXT
-  WARNING
-  QUESTION
-  ACTION
-  INFO
-  DANGER
-}
-
-enum AnnotationStatus {
-  ACTIVE
-  RESOLVED
-  ARCHIVED
-  EXPIRED
-}
-
-enum ProcedureType {
-  STARTUP
-  SHUTDOWN
-  NORMAL_OPERATION
-  EMERGENCY
-  MAINTENANCE
-  TEST
-  ISOLATION
-  LOCKOUT
-}
-
-enum ProcedureCategory {
-  COLD_START
-  HOT_START
-  LOAD_CHANGE
-  TRIP_RECOVERY
-  PREVENTIVE_MAINT
-  CORRECTIVE_MAINT
-}
-
-enum ValidationType {
-  MANUAL
-  SCADA_CHECK
-  TIMER
-  FORMULA
-  DOCUMENT
-}
-
-enum SafetyLevel {
-  STANDARD
-  RISK
-  HIGH_RISK
-  CRITICAL
-}
-
-enum DataQuality {
-  GOOD
-  BAD
-  UNCERTAIN
-  SUBSTITUTED
+  @@map("documents")
 }

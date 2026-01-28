@@ -42,6 +42,7 @@ export interface LogEntry {
     source: string;
     message: string;
     component_tag: string | null;
+    functional_node_id: string | null;
     signature: string | null;
 }
 
@@ -109,59 +110,4 @@ export interface Document {
     ocrText: string;
     description: string;
     createdAt: string;
-}
-
-export interface ScadaData {
-    id: string;
-    node_id: string;
-    parameter_name: string;
-    value: number;
-    quality: string;
-    timestamp: string;
-    source: string;
-    unit: string | null;
-}
-  
-export interface RegulatoryReference {
-    id: string;
-    node_id: string;
-    standard: string;
-    clause: string;
-    requirement: string;
-    compliance_status: string;
-    compliance_comment: string | null;
-    verified_by: string | null;
-    verified_at: string | null;
-}
-  
-export interface Operator {
-    id: string;
-    employee_id: string;
-    username: string;
-    email: string | null;
-    first_name: string;
-    last_name: string;
-    role: string;
-    department: string | null;
-    permissions: string;
-    certifications: string;
-    training_completed: boolean;
-    hire_date: string | null;
-    is_active: boolean;
-    last_login: string | null;
-    created_at: string;
-}
-
-export interface AlarmEvent {
-    id: string;
-    alarm_id: string;
-    event_type: string;
-    timestamp: string;
-    operator_id: string | null;
-    operator_name: string | null;
-    comment: string | null;
-    scada_value: number | null;
-    acknowledged_at: string | null;
-    cleared_at: string | null;
-    duration: number | null;
 }
