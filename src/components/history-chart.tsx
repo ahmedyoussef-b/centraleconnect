@@ -1,6 +1,7 @@
 
 'use client';
 
+import { useEffect, useState } from 'react';
 import { TrendingUp } from 'lucide-react';
 import { CartesianGrid, Line, LineChart, XAxis, YAxis, Tooltip, Legend } from 'recharts';
 
@@ -19,6 +20,7 @@ import {
   type ChartConfig,
 } from '@/components/ui/chart';
 import { fr } from 'date-fns/locale';
+import { Skeleton } from './ui/skeleton';
 
 // Generate mock data for the last 24 hours
 const generateChartData = () => {
@@ -40,8 +42,6 @@ const generateChartData = () => {
   return data;
 };
 
-const chartData = generateChartData();
-
 const chartConfig = {
   TG1: {
     label: 'Puissance TG1',
@@ -62,6 +62,26 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 export function HistoryChart() {
+  const [chartData, setChartData] = useState<any[]>([]);
+
+  useEffect(() => {
+    setChartData(generateChartData());
+  }, []);
+
+  if (chartData.length === 0) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Historique de Puissance (24h)</CardTitle>
+          <CardDescription>Évolution des puissances actives (MW)</CardDescription>
+        </CardHeader>
+        <CardContent>
+            <Skeleton className="h-[300px]" />
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card>
       <CardHeader>
