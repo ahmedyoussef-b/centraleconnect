@@ -25,6 +25,8 @@ export interface Alarm {
     code: string;
     description: string;
     severity: 'INFO' | 'WARNING' | 'CRITICAL' | 'EMERGENCY';
+    parameter?: string;
+    reset_procedure?: string;
 }
 
 export interface LogEntry {

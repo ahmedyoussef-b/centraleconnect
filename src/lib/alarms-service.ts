@@ -1,7 +1,9 @@
 import alarmsData from '@/assets/master-data/alarms.json';
 import type { Alarm } from '@/types/db';
 
-type AlarmWithRef = Alarm & { standardRef: string };
+type AlarmWithRef = Alarm & { 
+    standardRef?: string;
+};
 
 export function getAlarms(): AlarmWithRef[] {
   // The JSON data has a slightly different structure than the Alarm type.
@@ -12,5 +14,7 @@ export function getAlarms(): AlarmWithRef[] {
     severity: alarm.severity,
     description: alarm.message,
     standardRef: alarm.standardRef,
+    parameter: alarm.parameter,
+    reset_procedure: alarm.reset_procedure,
   }));
 }

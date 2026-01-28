@@ -3,14 +3,14 @@
 import { getAlarms } from '@/lib/alarms-service';
 import type { Alarm } from '@/types/db';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge, type BadgeProps } from '@/components/ui/badge';
-import { BellRing, Wind, Cog, Zap, Factory } from 'lucide-react';
+import { BellRing, Wind, Cog, Zap, Factory, ChevronDown, AlertTriangle, Shield } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import React from 'react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
-type AlarmWithRef = Alarm & { standardRef: string };
+type AlarmWithRef = Alarm & { standardRef?: string };
 
 const severityVariantMap: Record<Alarm['severity'], BadgeProps['variant']> = {
   EMERGENCY: 'destructive',
@@ -19,7 +19,7 @@ const severityVariantMap: Record<Alarm['severity'], BadgeProps['variant']> = {
   INFO: 'secondary',
 };
 
-function AlarmTable({ alarms }: { alarms: AlarmWithRef[] }) {
+function AlarmList({ alarms }: { alarms: AlarmWithRef[] }) {
     if (alarms.length === 0) {
         return (
             <div className="flex h-[100px] items-center justify-center rounded-lg border-2 border-dashed border-border">
@@ -28,39 +28,62 @@ function AlarmTable({ alarms }: { alarms: AlarmWithRef[] }) {
         );
     }
     return (
-        <div className="rounded-md border">
-            <Table>
-                <TableHeader>
-                    <TableRow>
-                        <TableHead className="w-[120px]">Sévérité</TableHead>
-                        <TableHead className="w-[200px]">Code Alarme</TableHead>
-                        <TableHead className="w-[150px]">Composant</TableHead>
-                        <TableHead>Description</TableHead>
-                        <TableHead className="w-[150px]">Réf. Norme</TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {alarms.map((alarm, index) => (
-                        <TableRow key={`${alarm.code}-${index}`}>
-                            <TableCell>
-                                <Badge 
+        <div className="space-y-2">
+            {alarms.map((alarm, index) => (
+                <Collapsible key={`${alarm.code}-${index}`} className="rounded-lg border group">
+                    <CollapsibleTrigger className="flex w-full items-center justify-between p-3 text-left hover:bg-muted/50 rounded-t-lg">
+                        <div className="grid flex-1 grid-cols-4 items-center gap-4">
+                            <div className="flex items-center gap-2 font-semibold">
+                                <Badge
                                     variant={severityVariantMap[alarm.severity] ?? 'default'}
                                     className={cn(
+                                        'text-xs',
                                         alarm.severity === 'WARNING' && 'bg-yellow-500 text-slate-900 hover:bg-yellow-500/90 border-transparent',
                                         alarm.severity === 'EMERGENCY' && 'animate-pulse'
                                     )}
                                 >
                                     {alarm.severity}
                                 </Badge>
-                            </TableCell>
-                            <TableCell className="font-mono text-xs">{alarm.code}</TableCell>
-                            <TableCell className="font-medium">{alarm.component_id}</TableCell>
-                            <TableCell>{alarm.description}</TableCell>
-                            <TableCell className="text-xs text-muted-foreground">{alarm.standardRef}</TableCell>
-                        </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
+                            </div>
+                            <div className="font-mono text-xs">{alarm.code}</div>
+                            <div>{alarm.description}</div>
+                            <div className="text-xs text-muted-foreground">{alarm.component_id}</div>
+                        </div>
+                        <ChevronDown className="ml-4 h-4 w-4 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-180" />
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                        <div className="border-t p-4 space-y-4 text-sm bg-muted/30 rounded-b-lg">
+                            {alarm.parameter && (
+                                <div className="flex items-start gap-3">
+                                    <AlertTriangle className="h-5 w-5 text-yellow-500 mt-0.5 flex-shrink-0" />
+                                    <div>
+                                        <h4 className="font-semibold">Paramètre de déclenchement</h4>
+                                        <p className="text-muted-foreground">{alarm.parameter}</p>
+                                    </div>
+                                </div>
+                            )}
+                             {alarm.reset_procedure && (
+                                <div className="flex items-start gap-3">
+                                    <Shield className="h-5 w-5 text-blue-500 mt-0.5 flex-shrink-0" />
+                                    <div>
+                                        <h4 className="font-semibold">Procédure de Réarmement</h4>
+                                        <p className="text-muted-foreground">{alarm.reset_procedure}</p>
+                                    </div>
+                                </div>
+                            )}
+                             {alarm.standardRef && (
+                                <div className="flex items-start gap-3">
+                                    <Cog className="h-5 w-5 text-muted-foreground mt-0.5 flex-shrink-0" />
+                                    <div>
+                                        <h4 className="font-semibold">Référence Norme</h4>
+                                        <p className="text-muted-foreground">{alarm.standardRef}</p>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </CollapsibleContent>
+                </Collapsible>
+            ))}
         </div>
     );
 }
@@ -119,7 +142,13 @@ export default function AlarmsPage() {
                                 </AccordionTrigger>
                             <AccordionContent>
                                 <CardContent className="pt-0">
-                                    <AlarmTable alarms={category.alarms} />
+                                    <div className="grid grid-cols-4 items-center gap-4 px-3 py-2 text-xs font-semibold text-muted-foreground border-b mb-2">
+                                        <span>Sévérité</span>
+                                        <span>Code Alarme</span>
+                                        <span>Description</span>
+                                        <span>Composant</span>
+                                    </div>
+                                    <AlarmList alarms={category.alarms} />
                                 </CardContent>
                             </AccordionContent>
                         </AccordionItem>
