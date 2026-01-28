@@ -1,0 +1,1508 @@
+[
+    {
+      "external_id": "B3.CEX",
+      "path": "B3/CEX",
+      "level": 3,
+      "type": "EQUIPMENT",
+      "subtype": "CONDENSER",
+      "parent_id": "B3",
+      "label_fr": "Condenseur turbine vapeur",
+      "label_en": "Steam turbine condenser",
+      "tags": ["CEX", "CONDENSER", "B3"],
+      "parameters": [
+        { "name": "temp_cooling_water_in", "unit": "°C", "value": 47.0, "critical": true, "max": 50 },
+        { "name": "temp_cooling_water_out", "unit": "°C", "value": 50.0, "critical": true, "max": 55 },
+        { "name": "pressure_vacuum", "unit": "mBAR", "value": 9.9, "critical": true, "min": 5.0, "max": 15.0 },
+        { "name": "flow_cooling_water", "unit": "T/H", "value": 441, "critical": true, "min": 400, "max": 500 }
+      ],
+      "approved_by": "ENG-SCADA-TEAM",
+      "approval_date": "2026-01-29",
+      "standard_refs": ["IEC 61511", "ASME VIII", "ISO 55001"]
+    },
+    {
+      "external_id": "B3.BACHE.ALIM",
+      "path": "B3/BACHE/ALIM",
+      "level": 3,
+      "type": "EQUIPMENT",
+      "subtype": "TANK",
+      "parent_id": "B3",
+      "label_fr": "Bâche alimentaire eau déminéralisée",
+      "label_en": "Deionized water supply tank",
+      "tags": ["BACHE_ALIM", "EAU_DEM", "B3"],
+      "parameters": [
+        { "name": "temp", "unit": "°C", "value": 47.2, "critical": true, "max": 50 },
+        { "name": "conductivity", "unit": "µS/cm", "value": 0.12, "critical": true, "max": 0.2 },
+        { "name": "pressure", "unit": "mBAR", "value": 96.4, "critical": true, "min": 80, "max": 120 },
+        { "name": "niveau", "unit": "%", "critical": true, "min": 30, "max": 90 }
+      ],
+      "approved_by": "ENG-SCADA-TEAM",
+      "approval_date": "2026-01-29",
+      "standard_refs": ["IEC 61511", "ASME Section XI", "ISO 55001"]
+    },
+    {
+      "external_id": "B3.DEGAZEUR",
+      "path": "B3/DEGAZEUR",
+      "level": 3,
+      "type": "EQUIPMENT",
+      "subtype": "DEAERATOR",
+      "parent_id": "B3",
+      "label_fr": "Dégazeur thermique",
+      "label_en": "Thermal deaerator",
+      "tags": ["DEGAZEUR", "O2_REMOVAL", "B3"],
+      "parameters": [
+        { "name": "temp", "unit": "°C", "critical": true, "min": 104, "max": 108 },
+        { "name": "pressure", "unit": "BAR", "critical": true, "value": 0.12 },
+        { "name": "oxygene_dissous", "unit": "ppb", "critical": true, "max": 7 },
+        { "name": "debit_entrante", "unit": "T/H", "critical": true, "min": 400, "max": 450 }
+      ],
+      "approved_by": "ENG-SCADA-TEAM",
+      "approval_date": "2026-01-29",
+      "standard_refs": ["ASME PTC 12", "IEC 61511"]
+    },
+    {
+      "external_id": "B3.LCV001",
+      "path": "B3/LCV/001",
+      "level": 3,
+      "type": "EQUIPMENT",
+      "subtype": "CONTROL_VALVE",
+      "parent_id": "B3",
+      "label_fr": "Vanne de régulation LCV001",
+      "label_en": "Control valve LCV001",
+      "tags": ["LCV001", "B3"],
+      "parameters": [
+        { "name": "position", "unit": "%", "value": 23, "critical": true },
+        { "name": "press_diff", "unit": "BAR", "critical": false }
+      ],
+      "approved_by": "ENG-SCADA-TEAM",
+      "approval_date": "2026-01-29",
+      "standard_refs": ["IEC 61511", "ISA-75.01"]
+    },
+    {
+      "external_id": "B3.LCV002",
+      "path": "B3/LCV/002",
+      "level": 3,
+      "type": "EQUIPMENT",
+      "subtype": "CONTROL_VALVE",
+      "parent_id": "B3",
+      "label_fr": "Vanne de régulation LCV002",
+      "label_en": "Control valve LCV002",
+      "tags": ["LCV002", "B3"],
+      "parameters": [
+        { "name": "position", "unit": "%", "value": 0, "critical": true }
+      ],
+      "approved_by": "ENG-SCADA-TEAM",
+      "approval_date": "2026-01-29",
+      "standard_refs": ["IEC 61511", "ISA-75.01"]
+    },
+    {
+      "external_id": "B3.UV001",
+      "path": "B3/UV/001",
+      "level": 3,
+      "type": "EQUIPMENT",
+      "subtype": "VALVE",
+      "parent_id": "B3",
+      "label_fr": "Vanne motorisée UV001",
+      "label_en": "Motorized valve UV001",
+      "tags": ["UV001", "B3"],
+      "parameters": [
+        { "name": "position", "unit": "%", "value": 100, "critical": false },
+        { "name": "press_upstream", "unit": "BAR", "value": 9.9, "critical": true, "max": 12 }
+      ],
+      "approved_by": "ENG-SCADA-TEAM",
+      "approval_date": "2026-01-29",
+      "standard_refs": ["IEC 61511", "ISO 5208"]
+    },
+    {
+      "external_id": "B3.LV001",
+      "path": "B3/LV/001",
+      "level": 3,
+      "type": "EQUIPMENT",
+      "subtype": "LINEAR_VALVE",
+      "parent_id": "B3",
+      "label_fr": "Vanne linéaire LV001",
+      "label_en": "Linear valve LV001",
+      "tags": ["LV001", "B3"],
+      "parameters": [
+        { "name": "position", "unit": "%", "value": 100, "critical": false }
+      ],
+      "approved_by": "ENG-SCADA-TEAM",
+      "approval_date": "2026-01-29",
+      "standard_refs": ["IEC 61511", "ISA-75.01"]
+    },
+    {
+      "external_id": "B3.CR1",
+      "path": "B3/CR1",
+      "level": 3,
+      "type": "LOCATION",
+      "subtype": "COOLING_CIRCUIT",
+      "parent_id": "B3",
+      "label_fr": "Circuit de refroidissement CR1",
+      "label_en": "Cooling circuit CR1",
+      "tags": ["CR1", "B3"],
+      "parameters": [
+        { "name": "temp", "unit": "°C", "value": 97, "critical": true, "max": 100 }
+      ],
+      "approved_by": "ENG-SCADA-TEAM",
+      "approval_date": "2026-01-29",
+      "standard_refs": ["ISO 55001"]
+    },
+    {
+      "external_id": "B3.CR2",
+      "path": "B3/CR2",
+      "level": 3,
+      "type": "LOCATION",
+      "subtype": "COOLING_CIRCUIT",
+      "parent_id": "B3",
+      "label_fr": "Circuit de refroidissement CR2",
+      "label_en": "Cooling circuit CR2",
+      "tags": ["CR2", "B3"],
+      "parameters": [
+        { "name": "temp", "unit": "°C", "value": 81, "critical": true, "max": 85 }
+      ],
+      "approved_by": "ENG-SCADA-TEAM",
+      "approval_date": "2026-01-29",
+      "standard_refs": ["ISO 55001"]
+    },
+    {
+      "external_id": "B3.APH",
+      "path": "B3/APH",
+      "level": 3,
+      "type": "EQUIPMENT",
+      "subtype": "HEATER",
+      "parent_id": "B3",
+      "label_fr": "Échangeur haute pression (APH)",
+      "label_en": "High-pressure heater (APH)",
+      "tags": ["APH", "B3"],
+      "parameters": [
+        { "name": "pressure", "unit": "BAR", "value": 100, "critical": true, "max": 105 },
+        { "name": "temp_in", "unit": "°C", "value": 47, "critical": false },
+        { "name": "temp_out", "unit": "°C", "value": 100, "critical": true, "max": 105 }
+      ],
+      "approved_by": "ENG-SCADA-TEAM",
+      "approval_date": "2026-01-29",
+      "standard_refs": ["ASME VIII", "IEC 61511"]
+    },
+    {
+      "external_id": "B3.APB",
+      "path": "B3/APB",
+      "level": 3,
+      "type": "EQUIPMENT",
+      "subtype": "HEATER",
+      "parent_id": "B3",
+      "label_fr": "Échangeur basse pression (APB)",
+      "label_en": "Low-pressure heater (APB)",
+      "tags": ["APB", "B3"],
+      "parameters": [
+        { "name": "pressure", "unit": "BAR", "value": 16.1, "critical": true, "max": 17.0 },
+        { "name": "temp_in", "unit": "°C", "value": 47, "critical": false },
+        { "name": "temp_out", "unit": "°C", "value": 80, "critical": true, "max": 85 }
+      ],
+      "approved_by": "ENG-SCADA-TEAM",
+      "approval_date": "2026-01-29",
+      "standard_refs": ["ASME VIII", "IEC 61511"]
+    },
+    {
+      "external_id": "B3.FBP",
+      "path": "B3/FBP",
+      "level": 3,
+      "type": "EQUIPMENT",
+      "subtype": "FEED_PUMP",
+      "parent_id": "B3",
+      "label_fr": "Pompe d’alimentation FB",
+      "label_en": "Feedwater pump FB",
+      "tags": ["FBP", "B3"],
+      "parameters": [
+        { "name": "debit", "unit": "T/H", "value": 441, "critical": true, "min": 400, "max": 480 },
+        { "name": "pression_sortie", "unit": "BAR", "critical": true, "min": 100, "max": 105 }
+      ],
+      "approved_by": "ENG-SCADA-TEAM",
+      "approval_date": "2026-01-29",
+      "standard_refs": ["ISO 13709", "API 610"]
+    },
+    {
+      "external_id": "B3.TANK.DEMIN",
+      "path": "B3/TANK/DEMIN",
+      "level": 3,
+      "type": "EQUIPMENT",
+      "subtype": "TANK",
+      "parent_id": "B3",
+      "label_fr": "Réservoir stockage eau déminéralisée",
+      "label_en": "Deionized water storage tank",
+      "tags": ["TANK_DEMIN", "B3"],
+      "parameters": [
+        { "name": "niveau", "unit": "MM", "value": 6981, "critical": true, "min": 2000, "max": 7500 },
+        { "name": "volume_estime", "unit": "m³", "critical": false, "value": 120 },
+        { "name": "conductivity", "unit": "µS/cm", "critical": true, "max": 0.2 }
+      ],
+      "approved_by": "ENG-SCADA-TEAM",
+      "approval_date": "2026-01-29",
+      "standard_refs": ["ASME Section XII", "IEC 61511", "ISO 55001"]
+    },
+    {
+      "external_id": "B3.CAP.201",
+      "path": "B3/CAP/201",
+      "level": 3,
+      "type": "EQUIPMENT",
+      "subtype": "TANK",
+      "parent_id": "B3",
+      "label_fr": "Réservoir CAP 201",
+      "label_en": "Capacitor tank 201",
+      "tags": ["CAP_201", "B3"],
+      "parameters": [
+        { "name": "niveau", "unit": "MM", "value": 2619, "critical": true, "min": 1000, "max": 3000 }
+      ],
+      "approved_by": "ENG-SCADA-TEAM",
+      "approval_date": "2026-01-29",
+      "standard_refs": ["ISO 55001"]
+    },
+    {
+      "external_id": "B3.CAP.101",
+      "path": "B3/CAP/101",
+      "level": 3,
+      "type": "EQUIPMENT",
+      "subtype": "TANK",
+      "parent_id": "B3",
+      "label_fr": "Réservoir CAP 101",
+      "label_en": "Capacitor tank 101",
+      "tags": ["CAP_101", "B3"],
+      "parameters": [
+        { "name": "niveau", "unit": "MM", "value": 2525, "critical": true, "min": 1000, "max": 3000 }
+      ],
+      "approved_by": "ENG-SCADA-TEAM",
+      "approval_date": "2026-01-29",
+      "standard_refs": ["ISO 55001"]
+    },
+    {
+      "external_id": "B3.SR.1001",
+      "path": "B3/SR/1001",
+      "level": 3,
+      "type": "EQUIPMENT",
+      "subtype": "TANK",
+      "parent_id": "B3",
+      "label_fr": "Réservoir SR 1001",
+      "label_en": "Service reservoir 1001",
+      "tags": ["SR_1001", "B3"],
+      "parameters": [
+        { "name": "niveau", "unit": "MM", "value": 1598, "critical": true, "min": 800, "max": 2000 }
+      ],
+      "approved_by": "ENG-SCADA-TEAM",
+      "approval_date": "2026-01-29",
+      "standard_refs": ["ISO 55001"]
+    },
+    {
+      "external_id": "B3.VASE.EXPANSION.TG1",
+      "path": "B3/VASE/EXPANSION/TG1",
+      "level": 3,
+      "type": "EQUIPMENT",
+      "subtype": "EXPANSION_TANK",
+      "parent_id": "B3",
+      "label_fr": "Vase d’expansion HRSG TG1",
+      "label_en": "Expansion tank HRSG TG1",
+      "tags": ["VAS_EXP_TG1", "HRSG", "B1"],
+      "parameters": [
+        { "name": "niveau", "unit": "MM", "critical": true, "min": 500, "max": 2000 },
+        { "name": "pression", "unit": "BAR", "critical": true, "max": 2.0 }
+      ],
+      "approved_by": "ENG-SCADA-TEAM",
+      "approval_date": "2026-01-29",
+      "standard_refs": ["ASME VIII", "IEC 61511"]
+    },
+    {
+      "external_id": "B3.VASE.EXPANSION.TG2",
+      "path": "B3/VASE/EXPANSION/TG2",
+      "level": 3,
+      "type": "EQUIPMENT",
+      "subtype": "EXPANSION_TANK",
+      "parent_id": "B3",
+      "label_fr": "Vase d’expansion HRSG TG2",
+      "label_en": "Expansion tank HRSG TG2",
+      "tags": ["VAS_EXP_TG2", "HRSG", "B2"],
+      "parameters": [
+        { "name": "niveau", "unit": "MM", "critical": true, "min": 500, "max": 2000 },
+        { "name": "pression", "unit": "BAR", "critical": true, "max": 2.0 }
+      ],
+      "approved_by": "ENG-SCADA-TEAM",
+      "approval_date": "2026-01-29",
+      "standard_refs": ["ASME VIII", "IEC 61511"]
+    },
+    {
+      "external_id": "B3.HV101",
+      "path": "B3/HV/101",
+      "level": 3,
+      "type": "EQUIPMENT",
+      "subtype": "VALVE",
+      "parent_id": "B3",
+      "label_fr": "Vanne manuelle HV101",
+      "label_en": "Hand valve HV101",
+      "tags": ["HV101", "B3"],
+      "parameters": [
+        { "name": "etat", "unit": "-", "value": "FERME", "critical": false }
+      ],
+      "approved_by": "ENG-SCADA-TEAM",
+      "approval_date": "2026-01-29",
+      "standard_refs": ["ISO 5208"]
+    },
+    {
+      "external_id": "B3.HV201",
+      "path": "B3/HV/201",
+      "level": 3,
+      "type": "EQUIPMENT",
+      "subtype": "VALVE",
+      "parent_id": "B3",
+      "label_fr": "Vanne manuelle HV201",
+      "label_en": "Hand valve HV201",
+      "tags": ["HV201", "B3"],
+      "parameters": [
+        { "name": "etat", "unit": "-", "value": "OUVERT", "critical": false }
+      ],
+      "approved_by": "ENG-SCADA-TEAM",
+      "approval_date": "2026-01-29",
+      "standard_refs": ["ISO 5208"]
+    },
+    {
+      "external_id": "B3.LCV001",
+      "path": "B3/LCV/001",
+      "level": 3,
+      "type": "EQUIPMENT",
+      "subtype": "CONTROL_VALVE",
+      "parent_id": "B3",
+      "label_fr": "Vanne de régulation LCV001",
+      "label_en": "Control valve LCV001",
+      "tags": ["LCV001", "B3"],
+      "parameters": [
+        { "name": "position", "unit": "%", "value": 23, "critical": true },
+        { "name": "press_diff", "unit": "BAR", "critical": false }
+      ],
+      "approved_by": "ENG-SCADA-TEAM",
+      "approval_date": "2026-01-29",
+      "standard_refs": ["IEC 61511", "ISA-75.01"]
+    },
+    {
+      "external_id": "B3.LCV002",
+      "path": "B3/LCV/002",
+      "level": 3,
+      "type": "EQUIPMENT",
+      "subtype": "CONTROL_VALVE",
+      "parent_id": "B3",
+      "label_fr": "Vanne de régulation LCV002",
+      "label_en": "Control valve LCV002",
+      "tags": ["LCV002", "B3"],
+      "parameters": [
+        { "name": "position", "unit": "%", "value": 0, "critical": true }
+      ],
+      "approved_by": "ENG-SCADA-TEAM",
+      "approval_date": "2026-01-29",
+      "standard_refs": ["IEC 61511", "ISA-75.01"]
+    },
+        {
+          "external_id": "B3.CEX.CONDENSER",
+          "path": "B3/CEX/CONDENSER",
+          "level": 3,
+          "type": "EQUIPMENT",
+          "subtype": "CONDENSER",
+          "parent_id": "B3.CEX",
+          "label_fr": "Condenseur des buees (échangeur eau/refroidissement)",
+          "label_en": "Mist condenser (water cooling exchanger)",
+          "tags": ["CEX", "CONDENSER", "B3"],
+          "parameters": [
+            { "name": "temp_in", "unit": "°C", "value": 102, "critical": true, "max": 105 },
+            { "name": "temp_out", "unit": "°C", "value": 80, "critical": true, "min": 75 },
+            { "name": "temp_medium", "unit": "°C", "value": 100, "critical": false }
+          ],
+          "approved_by": "ENG-SCADA-TEAM",
+          "approval_date": "2026-01-29",
+          "standard_refs": ["ASME VIII", "IEC 61511"]
+        },
+        {
+          "external_id": "B3.DESURCH.HPBP",
+          "path": "B3/DESURCH/HPBP",
+          "level": 3,
+          "type": "EQUIPMENT",
+          "subtype": "HEATER",
+          "parent_id": "B3",
+          "label_fr": "Désurchauffe des contournements HP/BP",
+          "label_en": "Desuperheating of HP/BP bypass circuits",
+          "tags": ["DESURCH", "HP_BP", "B3"],
+          "parameters": [
+            { "name": "temp", "unit": "°C", "value": 50.0, "critical": true, "max": 55 },
+            { "name": "pressure", "unit": "BAR", "value": 12.4, "critical": true, "max": 13.0 }
+          ],
+          "approved_by": "ENG-SCADA-TEAM",
+          "approval_date": "2026-01-29",
+          "standard_refs": ["ISO 55001", "ASME VIII"]
+        },
+        {
+          "external_id": "B3.DISCHARGE.CAP",
+          "path": "B3/DISCHARGE/CAP",
+          "level": 3,
+          "type": "EQUIPMENT",
+          "subtype": "DISCHARGE_LINE",
+          "parent_id": "B3",
+          "label_fr": "Décharge vers baches tampons CAP",
+          "label_en": "Discharge to CAP buffer tanks",
+          "tags": ["DISCHARGE", "CAP", "B3"],
+          "parameters": [
+            { "name": "flow", "unit": "T/H", "value": 439, "critical": true, "min": 400, "max": 480 },
+            { "name": "pressure", "unit": "BAR", "value": 9.9, "critical": true, "max": 10.5 },
+            { "name": "temp", "unit": "°C", "value": 50.0, "critical": true, "max": 55 }
+          ],
+          "approved_by": "ENG-SCADA-TEAM",
+          "approval_date": "2026-01-29",
+          "standard_refs": ["ISO 55001"]
+        },
+        {
+          "external_id": "B3.COND.EJECT.VAC",
+          "path": "B3/COND/EJECT/VAC",
+          "level": 3,
+          "type": "EQUIPMENT",
+          "subtype": "VACUUM_EJECTOR",
+          "parent_id": "B3",
+          "label_fr": "Éjecteur vide entretien condenseur",
+          "label_en": "Vacuum ejector for condenser maintenance",
+          "tags": ["EJECTOR", "VAC", "B3"],
+          "parameters": [
+            { "name": "pressure_vacuum", "unit": "mBAR", "critical": true, "max": 100 },
+            { "name": "debit_vapeur", "unit": "kg/h", "critical": false }
+          ],
+          "approved_by": "ENG-SCADA-TEAM",
+          "approval_date": "2026-01-29",
+          "standard_refs": ["IEC 61511", "ASME PTC 12"]
+        },
+        {
+          "external_id": "B3.LV003",
+          "path": "B3/LV/003",
+          "level": 3,
+          "type": "EQUIPMENT",
+          "subtype": "LINEAR_VALVE",
+          "parent_id": "B3",
+          "label_fr": "Vanne linéaire LV003",
+          "label_en": "Linear valve LV003",
+          "tags": ["LV003", "B3"],
+          "parameters": [
+            { "name": "position", "unit": "%", "value": 1, "critical": true }
+          ],
+          "approved_by": "ENG-SCADA-TEAM",
+          "approval_date": "2026-01-29",
+          "standard_refs": ["ISA-75.01"]
+        },
+        {
+          "external_id": "B3.FCV001",
+          "path": "B3/FCV/001",
+          "level": 3,
+          "type": "EQUIPMENT",
+          "subtype": "FLOW_CONTROL_VALVE",
+          "parent_id": "B3",
+          "label_fr": "Vanne de régulation débit FCV001",
+          "label_en": "Flow control valve FCV001",
+          "tags": ["FCV001", "B3"],
+          "parameters": [
+            { "name": "position", "unit": "%", "value": 32, "critical": true },
+            { "name": "flow", "unit": "T/H", "critical": false }
+          ],
+          "approved_by": "ENG-SCADA-TEAM",
+          "approval_date": "2026-01-29",
+          "standard_refs": ["IEC 61511", "ISA-75.01"]
+        },
+        {
+          "external_id": "B3.UV101",
+          "path": "B3/UV/101",
+          "level": 3,
+          "type": "EQUIPMENT",
+          "subtype": "VALVE",
+          "parent_id": "B3",
+          "label_fr": "Vanne motorisée UV101",
+          "label_en": "Motorized valve UV101",
+          "tags": ["UV101", "B3"],
+          "parameters": [
+            { "name": "position", "unit": "%", "value": 100, "critical": false },
+            { "name": "temp_upstream", "unit": "°C", "value": 46.6, "critical": false }
+          ],
+          "approved_by": "ENG-SCADA-TEAM",
+          "approval_date": "2026-01-29",
+          "standard_refs": ["ISO 5208"]
+        },
+        {
+          "external_id": "B3.UV201",
+          "path": "B3/UV/201",
+          "level": 3,
+          "type": "EQUIPMENT",
+          "subtype": "VALVE",
+          "parent_id": "B3",
+          "label_fr": "Vanne motorisée UV201",
+          "label_en": "Motorized valve UV201",
+          "tags": ["UV201", "B3"],
+          "parameters": [
+            { "name": "position", "unit": "%", "value": 100, "critical": false },
+            { "name": "temp_upstream", "unit": "°C", "value": 47.2, "critical": false }
+          ],
+          "approved_by": "ENG-SCADA-TEAM",
+          "approval_date": "2026-01-29",
+          "standard_refs": ["ISO 5208"]
+        },
+        {
+          "external_id": "B3.HV101",
+          "path": "B3/HV/101",
+          "level": 3,
+          "type": "EQUIPMENT",
+          "subtype": "VALVE",
+          "parent_id": "B3",
+          "label_fr": "Vanne manuelle HV101",
+          "label_en": "Hand valve HV101",
+          "tags": ["HV101", "B3"],
+          "parameters": [
+            { "name": "etat", "unit": "-", "value": "OUVERT", "critical": false }
+          ],
+          "approved_by": "ENG-SCADA-TEAM",
+          "approval_date": "2026-01-29",
+          "standard_refs": ["ISO 5208"]
+        },
+        {
+          "external_id": "B3.HV201",
+          "path": "B3/HV/201",
+          "level": 3,
+          "type": "EQUIPMENT",
+          "subtype": "VALVE",
+          "parent_id": "B3",
+          "label_fr": "Vanne manuelle HV201",
+          "label_en": "Hand valve HV201",
+          "tags": ["HV201", "B3"],
+          "parameters": [
+            { "name": "etat", "unit": "-", "value": "FERME", "critical": false }
+          ],
+          "approved_by": "ENG-SCADA-TEAM",
+          "approval_date": "2026-01-29",
+          "standard_refs": ["ISO 5208"]
+        },
+        {
+          "external_id": "B3.PUMP.101",
+          "path": "B3/PUMP/101",
+          "level": 3,
+          "type": "EQUIPMENT",
+          "subtype": "PUMP",
+          "parent_id": "B3",
+          "label_fr": "Pompe 101PO",
+          "label_en": "Pump 101PO",
+          "tags": ["101PO", "B3"],
+          "parameters": [
+            { "name": "status", "unit": "-", "value": "RUN", "critical": true },
+            { "name": "flow", "unit": "T/H", "critical": false }
+          ],
+          "approved_by": "ENG-SCADA-TEAM",
+          "approval_date": "2026-01-29",
+          "standard_refs": ["ISO 13709"]
+        },
+        {
+          "external_id": "B3.PUMP.201",
+          "path": "B3/PUMP/201",
+          "level": 3,
+          "type": "EQUIPMENT",
+          "subtype": "PUMP",
+          "parent_id": "B3",
+          "label_fr": "Pompe 201PO",
+          "label_en": "Pump 201PO",
+          "tags": ["201PO", "B3"],
+          "parameters": [
+            { "name": "status", "unit": "-", "value": "RUN", "critical": true },
+            { "name": "flow", "unit": "T/H", "critical": false }
+          ],
+          "approved_by": "ENG-SCADA-TEAM",
+          "approval_date": "2026-01-29",
+          "standard_refs": ["ISO 13709"]
+        },
+          {
+            "external_id": "B3.VAPEUR.BP",
+            "path": "B3/VAPEUR/BP",
+            "level": 3,
+            "type": "EQUIPMENT",
+            "subtype": "STEAM_LINE",
+            "parent_id": "B3",
+            "label_fr": "Ligne vapeur basse pression TV",
+            "label_en": "Low-pressure steam line TV",
+            "tags": ["VAPEUR_BP", "B3"],
+            "parameters": [
+              { "name": "pressure", "unit": "BAR", "value": 5.0, "critical": true, "max": 6.0 },
+              { "name": "temp", "unit": "°C", "value": 270, "critical": true, "max": 275 },
+              { "name": "flow", "unit": "T/H", "value": 422, "critical": true, "min": 400, "max": 450 }
+            ],
+            "approved_by": "ENG-SCADA-TEAM",
+            "approval_date": "2026-01-29",
+            "standard_refs": ["ASME VIII", "IEC 61511"]
+          },
+          {
+            "external_id": "B3.CEX.HEATER",
+            "path": "B3/CEX/HEATER",
+            "level": 3,
+            "type": "EQUIPMENT",
+            "subtype": "HEATER",
+            "parent_id": "B3.CEX",
+            "label_fr": "Échangeur CEX (chauffage eau alimentaire)",
+            "label_en": "CEX heater (feedwater preheating)",
+            "tags": ["CEX", "HEATER", "B3"],
+            "parameters": [
+              { "name": "temp_in", "unit": "°C", "value": 106, "critical": true, "max": 110 },
+              { "name": "pressure", "unit": "BAR", "value": 1.20, "critical": true, "max": 1.3 },
+              { "name": "level", "unit": "MM", "value": 2531, "critical": true, "min": 2000, "max": 2800 }
+            ],
+            "approved_by": "ENG-SCADA-TEAM",
+            "approval_date": "2026-01-29",
+            "standard_refs": ["ASME VIII", "ISO 55001"]
+          },
+          {
+            "external_id": "B3.PCV001",
+            "path": "B3/PCV/001",
+            "level": 3,
+            "type": "EQUIPMENT",
+            "subtype": "PRESSURE_CONTROL_VALVE",
+            "parent_id": "B3",
+            "label_fr": "Vanne de régulation pression PCV001",
+            "label_en": "Pressure control valve PCV001",
+            "tags": ["PCV001", "B3"],
+            "parameters": [
+              { "name": "position", "unit": "%", "value": 30, "critical": true },
+              { "name": "press_upstream", "unit": "BAR", "critical": false }
+            ],
+            "approved_by": "ENG-SCADA-TEAM",
+            "approval_date": "2026-01-29",
+            "standard_refs": ["IEC 61511", "ISA-75.01"]
+          },
+          {
+            "external_id": "B3.PCV002",
+            "path": "B3/PCV/002",
+            "level": 3,
+            "type": "EQUIPMENT",
+            "subtype": "PRESSURE_CONTROL_VALVE",
+            "parent_id": "B3",
+            "label_fr": "Vanne de régulation pression PCV002",
+            "label_en": "Pressure control valve PCV002",
+            "tags": ["PCV002", "B3"],
+            "parameters": [
+              { "name": "position", "unit": "%", "value": 0, "critical": true }
+            ],
+            "approved_by": "ENG-SCADA-TEAM",
+            "approval_date": "2026-01-29",
+            "standard_refs": ["IEC 61511", "ISA-75.01"]
+          },
+          {
+            "external_id": "B3.HV101",
+            "path": "B3/HV/101",
+            "level": 3,
+            "type": "EQUIPMENT",
+            "subtype": "VALVE",
+            "parent_id": "B3",
+            "label_fr": "Vanne manuelle HV101",
+            "label_en": "Hand valve HV101",
+            "tags": ["HV101", "B3"],
+            "parameters": [
+              { "name": "etat", "unit": "-", "value": "OUVERT", "critical": false }
+            ],
+            "approved_by": "ENG-SCADA-TEAM",
+            "approval_date": "2026-01-29",
+            "standard_refs": ["ISO 5208"]
+          },
+          {
+            "external_id": "B3.HV201",
+            "path": "B3/HV/201",
+            "level": 3,
+            "type": "EQUIPMENT",
+            "subtype": "VALVE",
+            "parent_id": "B3",
+            "label_fr": "Vanne manuelle HV201",
+            "label_en": "Hand valve HV201",
+            "tags": ["HV201", "B3"],
+            "parameters": [
+              { "name": "etat", "unit": "-", "value": "FERME", "critical": false }
+            ],
+            "approved_by": "ENG-SCADA-TEAM",
+            "approval_date": "2026-01-29",
+            "standard_refs": ["ISO 5208"]
+          },
+          {
+            "external_id": "B3.HV301",
+            "path": "B3/HV/301",
+            "level": 3,
+            "type": "EQUIPMENT",
+            "subtype": "VALVE",
+            "parent_id": "B3",
+            "label_fr": "Vanne manuelle HV301",
+            "label_en": "Hand valve HV301",
+            "tags": ["HV301", "B3"],
+            "parameters": [
+              { "name": "etat", "unit": "-", "value": "OUVERT", "critical": false }
+            ],
+            "approved_by": "ENG-SCADA-TEAM",
+            "approval_date": "2026-01-29",
+            "standard_refs": ["ISO 5208"]
+          },
+          {
+            "external_id": "B3.BALLOON.PURGES.CR1",
+            "path": "B3/BALLOON/PURGES/CR1",
+            "level": 3,
+            "type": "EQUIPMENT",
+            "subtype": "TANK",
+            "parent_id": "B3",
+            "label_fr": "Ballon purges circuit CR1",
+            "label_en": "Purge tank CR1 circuit",
+            "tags": ["PURGES", "CR1", "B3"],
+            "parameters": [
+              { "name": "niveau", "unit": "MM", "critical": true, "min": 500, "max": 2000 }
+            ],
+            "approved_by": "ENG-SCADA-TEAM",
+            "approval_date": "2026-01-29",
+            "standard_refs": ["ASME VIII", "ISO 55001"]
+          },
+          {
+            "external_id": "B3.UV101",
+            "path": "B3/UV/101",
+            "level": 3,
+            "type": "EQUIPMENT",
+            "subtype": "VALVE",
+            "parent_id": "B3",
+            "label_fr": "Vanne motorisée UV101",
+            "label_en": "Motorized valve UV101",
+            "tags": ["UV101", "B3"],
+            "parameters": [
+              { "name": "position", "unit": "%", "value": 100, "critical": false },
+              { "name": "temp_upstream", "unit": "°C", "value": 97, "critical": false }
+            ],
+            "approved_by": "ENG-SCADA-TEAM",
+            "approval_date": "2026-01-29",
+            "standard_refs": ["ISO 5208"]
+          },
+          {
+            "external_id": "B3.UV201",
+            "path": "B3/UV/201",
+            "level": 3,
+            "type": "EQUIPMENT",
+            "subtype": "VALVE",
+            "parent_id": "B3",
+            "label_fr": "Vanne motorisée UV201",
+            "label_en": "Motorized valve UV201",
+            "tags": ["UV201", "B3"],
+            "parameters": [
+              { "name": "position", "unit": "%", "value": 100, "critical": false },
+              { "name": "temp_upstream", "unit": "°C", "value": 270, "critical": false }
+            ],
+            "approved_by": "ENG-SCADA-TEAM",
+            "approval_date": "2026-01-29",
+            "standard_refs": ["ISO 5208"]
+          },
+          {
+            "external_id": "B3.UV301",
+            "path": "B3/UV/301",
+            "level": 3,
+            "type": "EQUIPMENT",
+            "subtype": "VALVE",
+            "parent_id": "B3",
+            "label_fr": "Vanne motorisée UV301",
+            "label_en": "Motorized valve UV301",
+            "tags": ["UV301", "B3"],
+            "parameters": [
+              { "name": "position", "unit": "%", "value": 100, "critical": false }
+            ],
+            "approved_by": "ENG-SCADA-TEAM",
+            "approval_date": "2026-01-29",
+            "standard_refs": ["ISO 5208"]
+          },
+          {
+            "external_id": "B3.CR1",
+            "path": "B3/CR1",
+            "level": 3,
+            "type": "LOCATION",
+            "subtype": "COOLING_CIRCUIT",
+            "parent_id": "B3",
+            "label_fr": "Circuit de refroidissement CR1",
+            "label_en": "Cooling circuit CR1",
+            "tags": ["CR1", "B3"],
+            "parameters": [
+              { "name": "pressure", "unit": "BAR", "value": 100, "critical": true, "max": 105 },
+              { "name": "flow", "unit": "T/H", "value": 174, "critical": true, "min": 150, "max": 200 }
+            ],
+            "approved_by": "ENG-SCADA-TEAM",
+            "approval_date": "2026-01-29",
+            "standard_refs": ["ISO 55001"]
+          },
+          {
+            "external_id": "B3.CR2",
+            "path": "B3/CR2",
+            "level": 3,
+            "type": "LOCATION",
+            "subtype": "COOLING_CIRCUIT",
+            "parent_id": "B3",
+            "label_fr": "Circuit de refroidissement CR2",
+            "label_en": "Cooling circuit CR2",
+            "tags": ["CR2", "B3"],
+            "parameters": [
+              { "name": "pressure", "unit": "BAR", "value": 16.1, "critical": true, "max": 17.0 },
+              { "name": "flow", "unit": "T/H", "value": 74, "critical": true, "min": 50, "max": 100 }
+            ],
+            "approved_by": "ENG-SCADA-TEAM",
+            "approval_date": "2026-01-29",
+            "standard_refs": ["ISO 55001"]
+          },
+        
+  {
+    "external_id": "B3.CEX.VACUUM",
+    "path": "B3/CEX/VACUUM",
+    "level": 3,
+    "type": "EQUIPMENT",
+    "subtype": "CONDENSER_VACUUM",
+    "parent_id": "B3.CEX",
+    "label_fr": "Condenseur — zone vide et appoint",
+    "label_en": "Condenser vacuum & make-up system",
+    "tags": ["CEX", "VACUUM", "B3"],
+    "parameters": [
+      { "name": "temp", "unit": "°C", "value": 270, "critical": true, "max": 275 },
+      { "name": "pressure", "unit": "BAR", "value": 8.1, "critical": true, "max": 8.5 },
+      { "name": "conductivity", "unit": "µS/cm", "value": 0.12, "critical": true, "max": 0.2 }
+    ],
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-29",
+    "standard_refs": ["ASME VIII", "IEC 61511"]
+  },
+  {
+    "external_id": "B3.TANK.101CS",
+    "path": "B3/TANK/101CS",
+    "level": 3,
+    "type": "EQUIPMENT",
+    "subtype": "TANK",
+    "parent_id": "B3",
+    "label_fr": "Réservoir 101CS — appoint condenseur",
+    "label_en": "Tank 101CS — condenser make-up",
+    "tags": ["101CS", "B3"],
+    "parameters": [
+      { "name": "niveau", "unit": "MM", "value": 2619, "critical": true, "min": 2000, "max": 3000 },
+      { "name": "temp", "unit": "°C", "value": 47, "critical": false }
+    ],
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-29",
+    "standard_refs": ["ASME VIII", "ISO 55001"]
+  },
+  {
+    "external_id": "B3.TANK.201CS",
+    "path": "B3/TANK/201CS",
+    "level": 3,
+    "type": "EQUIPMENT",
+    "subtype": "TANK",
+    "parent_id": "B3",
+    "label_fr": "Réservoir 201CS — appoint condenseur",
+    "label_en": "Tank 201CS — condenser make-up",
+    "tags": ["201CS", "B3"],
+    "parameters": [
+      { "name": "niveau", "unit": "MM", "value": 2533, "critical": true, "min": 2000, "max": 3000 },
+      { "name": "temp", "unit": "°C", "value": 47, "critical": false }
+    ],
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-29",
+    "standard_refs": ["ASME VIII", "ISO 55001"]
+  },
+  {
+    "external_id": "B3.TANK.102CS",
+    "path": "B3/TANK/102CS",
+    "level": 3,
+    "type": "EQUIPMENT",
+    "subtype": "TANK",
+    "parent_id": "B3",
+    "label_fr": "Réservoir 102CS — vidange condenseur",
+    "label_en": "Tank 102CS — condenser drain",
+    "tags": ["102CS", "B3"],
+    "parameters": [
+      { "name": "niveau", "unit": "MM", "value": 603, "critical": true, "min": 200, "max": 1000 },
+      { "name": "temp", "unit": "°C", "value": 47, "critical": false }
+    ],
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-29",
+    "standard_refs": ["ASME VIII", "ISO 55001"]
+  },
+  {
+    "external_id": "B3.TANK.202CS",
+    "path": "B3/TANK/202CS",
+    "level": 3,
+    "type": "EQUIPMENT",
+    "subtype": "TANK",
+    "parent_id": "B3",
+    "label_fr": "Réservoir 202CS — vidange condenseur",
+    "label_en": "Tank 202CS — condenser drain",
+    "tags": ["202CS", "B3"],
+    "parameters": [
+      { "name": "niveau", "unit": "MM", "critical": true, "min": 200, "max": 1000 },
+      { "name": "temp", "unit": "°C", "critical": false }
+    ],
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-29",
+    "standard_refs": ["ASME VIII", "ISO 55001"]
+  },
+  {
+    "external_id": "B3.LV001",
+    "path": "B3/LV/001",
+    "level": 3,
+    "type": "EQUIPMENT",
+    "subtype": "LINEAR_VALVE",
+    "parent_id": "B3",
+    "label_fr": "Vanne linéaire LV001",
+    "label_en": "Linear valve LV001",
+    "tags": ["LV001", "B3"],
+    "parameters": [
+      { "name": "position", "unit": "%", "value": 0, "critical": true }
+    ],
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-29",
+    "standard_refs": ["ISA-75.01"]
+  },
+  {
+    "external_id": "B3.UV001",
+    "path": "B3/UV/001",
+    "level": 3,
+    "type": "EQUIPMENT",
+    "subtype": "VALVE",
+    "parent_id": "B3",
+    "label_fr": "Vanne motorisée UV001",
+    "label_en": "Motorized valve UV001",
+    "tags": ["UV001", "B3"],
+    "parameters": [
+      { "name": "position", "unit": "%", "value": 100, "critical": false },
+      { "name": "temp_upstream", "unit": "°C", "value": 47, "critical": false }
+    ],
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-29",
+    "standard_refs": ["ISO 5208"]
+  },
+  {
+    "external_id": "B3.UV002",
+    "path": "B3/UV/002",
+    "level": 3,
+    "type": "EQUIPMENT",
+    "subtype": "VALVE",
+    "parent_id": "B3",
+    "label_fr": "Vanne motorisée UV002",
+    "label_en": "Motorized valve UV002",
+    "tags": ["UV002", "B3"],
+    "parameters": [
+      { "name": "position", "unit": "%", "value": 100, "critical": false }
+    ],
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-29",
+    "standard_refs": ["ISO 5208"]
+  },
+  {
+    "external_id": "B3.UV003",
+    "path": "3/UV/003",
+    "level": 3,
+    "type": "EQUIPMENT",
+    "subtype": "VALVE",
+    "parent_id": "B3",
+    "label_fr": "Vanne motorisée UV003",
+    "label_en": "Motorized valve UV003",
+    "tags": ["UV003", "B3"],
+    "parameters": [
+      { "name": "position", "unit": "%", "value": 100, "critical": false }
+    ],
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-29",
+    "standard_refs": ["ISO 5208"]
+  },
+  {
+    "external_id": "B3.UV004",
+    "path": "B3/UV/004",
+    "level": 3,
+    "type": "EQUIPMENT",
+    "subtype": "VALVE",
+    "parent_id": "B3",
+    "label_fr": "Vanne motorisée UV004",
+    "label_en": "Motorized valve UV004",
+    "tags": ["UV004", "B3"],
+    "parameters": [
+      { "name": "position", "unit": "%", "value": 100, "critical": false }
+    ],
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-29",
+    "standard_refs": ["ISO 5208"]
+  },
+  {
+    "external_id": "B3.UV005",
+    "path": "B3/UV/005",
+    "level": 3,
+    "type": "EQUIPMENT",
+    "subtype": "VALVE",
+    "parent_id": "B3",
+    "label_fr": "Vanne motorisée UV005",
+    "label_en": "Motorized valve UV005",
+    "tags": ["UV005", "B3"],
+    "parameters": [
+      { "name": "position", "unit": "%", "value": 100, "critical": false }
+    ],
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-29",
+    "standard_refs": ["ISO 5208"]
+  },
+  {
+    "external_id": "B3.UV006",
+    "path": "B3/UV/006",
+    "level": 3,
+    "type": "EQUIPMENT",
+    "subtype": "VALVE",
+    "parent_id": "B3",
+    "label_fr": "Vanne motorisée UV006",
+    "label_en": "Motorized valve UV006",
+    "tags": ["UV006", "B3"],
+    "parameters": [
+      { "name": "position", "unit": "%", "value": 100, "critical": false }
+    ],
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-29",
+    "standard_refs": ["ISO 5208"]
+  },
+  {
+    "external_id": "B3.LCV001",
+    "path": "B3/LCV/001",
+    "level": 3,
+    "type": "EQUIPMENT",
+    "subtype": "CONTROL_VALVE",
+    "parent_id": "B3",
+    "label_fr": "Vanne de régulation LCV001",
+    "label_en": "Control valve LCV001",
+    "tags": ["LCV001", "B3"],
+    "parameters": [
+      { "name": "position", "unit": "%", "value": 21, "critical": true },
+      { "name": "press_diff", "unit": "BAR", "critical": false }
+    ],
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-29",
+    "standard_refs": ["IEC 61511", "ISA-75.01"]
+  },
+  {
+    "external_id": "B3.LCV002",
+    "path": "B3/LCV/002",
+    "level": 3,
+    "type": "EQUIPMENT",
+    "subtype": "CONTROL_VALVE",
+    "parent_id": "B3",
+    "label_fr": "Vanne de régulation LCV002",
+    "label_en": "Control valve LCV002",
+    "tags": ["LCV002", "B3"],
+    "parameters": [
+      { "name": "position", "unit": "%", "value": 0, "critical": true }
+    ],
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-29",
+    "standard_refs": ["IEC 61511", "ISA-75.01"]
+  },
+  {
+    "external_id": "B3.SER",
+    "path": "B3/SER",
+    "level": 3,
+    "type": "EQUIPMENT",
+    "subtype": "SYSTEM",
+    "parent_id": "B3",
+    "label_fr": "Système de vidange et appoint condenseur",
+    "label_en": "Condenser drain & make-up system",
+    "tags": ["SER", "B3"],
+    "parameters": [
+      { "name": "status", "unit": "-", "value": "ACTIVE", "critical": true },
+      { "name": "flow_makeup", "unit": "T/H", "critical": false }
+    ],
+    "approved_by": "ENG-SCADA-TEAM",
+    "approval_date": "2026-01-29",
+    "standard_refs": ["IEC 61511", "ISO 55001"]
+  },
+    {
+      "external_id": "B3.CEX.VACUUM",
+      "path": "B3/CEX/VACUUM",
+      "level": 3,
+      "type": "EQUIPMENT",
+      "subtype": "CONDENSER_VACUUM",
+      "parent_id": "B3.CEX",
+      "label_fr": "Condenseur — zone vide et appoint",
+      "label_en": "Condenser vacuum & make-up system",
+      "tags": ["CEX", "VACUUM", "B3"],
+      "parameters": [
+        { "name": "temp", "unit": "°C", "value": 270, "critical": true, "max": 275 },
+        { "name": "pressure", "unit": "BAR", "value": 8.1, "critical": true, "max": 8.5 },
+        { "name": "conductivity", "unit": "µS/cm", "value": 0.12, "critical": true, "max": 0.2 }
+      ],
+      "approved_by": "ENG-SCADA-TEAM",
+      "approval_date": "2026-01-29",
+      "standard_refs": ["ASME VIII", "IEC 61511"]
+    },
+    {
+      "external_id": "B3.TANK.101CS",
+      "path": "B3/TANK/101CS",
+      "level": 3,
+      "type": "EQUIPMENT",
+      "subtype": "TANK",
+      "parent_id": "B3",
+      "label_fr": "Réservoir 101CS — appoint condenseur",
+      "label_en": "Tank 101CS — condenser make-up",
+      "tags": ["101CS", "B3"],
+      "parameters": [
+        { "name": "niveau", "unit": "MM", "value": 2619, "critical": true, "min": 2000, "max": 3000 },
+        { "name": "temp", "unit": "°C", "value": 47, "critical": false }
+      ],
+      "approved_by": "ENG-SCADA-TEAM",
+      "approval_date": "2026-01-29",
+      "standard_refs": ["ASME VIII", "ISO 55001"]
+    },
+    {
+      "external_id": "B3.TANK.201CS",
+      "path": "B3/TANK/201CS",
+      "level": 3,
+      "type": "EQUIPMENT",
+      "subtype": "TANK",
+      "parent_id": "B3",
+      "label_fr": "Réservoir 201CS — appoint condenseur",
+      "label_en": "Tank 201CS — condenser make-up",
+      "tags": ["201CS", "B3"],
+      "parameters": [
+        { "name": "niveau", "unit": "MM", "value": 2533, "critical": true, "min": 2000, "max": 3000 },
+        { "name": "temp", "unit": "°C", "value": 47, "critical": false }
+      ],
+      "approved_by": "ENG-SCADA-TEAM",
+      "approval_date": "2026-01-29",
+      "standard_refs": ["ASME VIII", "ISO 55001"]
+    },
+    {
+      "external_id": "B3.TANK.102CS",
+      "path": "B3/TANK/102CS",
+      "level": 3,
+      "type": "EQUIPMENT",
+      "subtype": "TANK",
+      "parent_id": "B3",
+      "label_fr": "Réservoir 102CS — vidange condenseur",
+      "label_en": "Tank 102CS — condenser drain",
+      "tags": ["102CS", "B3"],
+      "parameters": [
+        { "name": "niveau", "unit": "MM", "value": 603, "critical": true, "min": 200, "max": 1000 },
+        { "name": "temp", "unit": "°C", "value": 47, "critical": false }
+      ],
+      "approved_by": "ENG-SCADA-TEAM",
+      "approval_date": "2026-01-29",
+      "standard_refs": ["ASME VIII", "ISO 55001"]
+    },
+    {
+      "external_id": "B3.TANK.202CS",
+      "path": "B3/TANK/202CS",
+      "level": 3,
+      "type": "EQUIPMENT",
+      "subtype": "TANK",
+      "parent_id": "B3",
+      "label_fr": "Réservoir 202CS — vidange condenseur",
+      "label_en": "Tank 202CS — condenser drain",
+      "tags": ["202CS", "B3"],
+      "parameters": [
+        { "name": "niveau", "unit": "MM", "critical": true, "min": 200, "max": 1000 },
+        { "name": "temp", "unit": "°C", "critical": false }
+      ],
+      "approved_by": "ENG-SCADA-TEAM",
+      "approval_date": "2026-01-29",
+      "standard_refs": ["ASME VIII", "ISO 55001"]
+    },
+    {
+      "external_id": "B3.LV001",
+      "path": "B3/LV/001",
+      "level": 3,
+      "type": "EQUIPMENT",
+      "subtype": "LINEAR_VALVE",
+      "parent_id": "B3",
+      "label_fr": "Vanne linéaire LV001",
+      "label_en": "Linear valve LV001",
+      "tags": ["LV001", "B3"],
+      "parameters": [
+        { "name": "position", "unit": "%", "value": 0, "critical": true }
+      ],
+      "approved_by": "ENG-SCADA-TEAM",
+      "approval_date": "2026-01-29",
+      "standard_refs": ["ISA-75.01"]
+    },
+    {
+      "external_id": "B3.UV001",
+      "path": "B3/UV/001",
+      "level": 3,
+      "type": "EQUIPMENT",
+      "subtype": "VALVE",
+      "parent_id": "B3",
+      "label_fr": "Vanne motorisée UV001",
+      "label_en": "Motorized valve UV001",
+      "tags": ["UV001", "B3"],
+      "parameters": [
+        { "name": "position", "unit": "%", "value": 100, "critical": false },
+        { "name": "temp_upstream", "unit": "°C", "value": 47, "critical": false }
+      ],
+      "approved_by": "ENG-SCADA-TEAM",
+      "approval_date": "2026-01-29",
+      "standard_refs": ["ISO 5208"]
+    },
+    {
+      "external_id": "B3.UV002",
+      "path": "B3/UV/002",
+      "level": 3,
+      "type": "EQUIPMENT",
+      "subtype": "VALVE",
+      "parent_id": "B3",
+      "label_fr": "Vanne motorisée UV002",
+      "label_en": "Motorized valve UV002",
+      "tags": ["UV002", "B3"],
+      "parameters": [
+        { "name": "position", "unit": "%", "value": 100, "critical": false }
+      ],
+      "approved_by": "ENG-SCADA-TEAM",
+      "approval_date": "2026-01-29",
+      "standard_refs": ["ISO 5208"]
+    },
+    {
+      "external_id": "B3.UV003",
+      "path": "3/UV/003",
+      "level": 3,
+      "type": "EQUIPMENT",
+      "subtype": "VALVE",
+      "parent_id": "B3",
+      "label_fr": "Vanne motorisée UV003",
+      "label_en": "Motorized valve UV003",
+      "tags": ["UV003", "B3"],
+      "parameters": [
+        { "name": "position", "unit": "%", "value": 100, "critical": false }
+      ],
+      "approved_by": "ENG-SCADA-TEAM",
+      "approval_date": "2026-01-29",
+      "standard_refs": ["ISO 5208"]
+    },
+    {
+      "external_id": "B3.UV004",
+      "path": "B3/UV/004",
+      "level": 3,
+      "type": "EQUIPMENT",
+      "subtype": "VALVE",
+      "parent_id": "B3",
+      "label_fr": "Vanne motorisée UV004",
+      "label_en": "Motorized valve UV004",
+      "tags": ["UV004", "B3"],
+      "parameters": [
+        { "name": "position", "unit": "%", "value": 100, "critical": false }
+      ],
+      "approved_by": "ENG-SCADA-TEAM",
+      "approval_date": "2026-01-29",
+      "standard_refs": ["ISO 5208"]
+    },
+    {
+      "external_id": "B3.UV005",
+      "path": "B3/UV/005",
+      "level": 3,
+      "type": "EQUIPMENT",
+      "subtype": "VALVE",
+      "parent_id": "B3",
+      "label_fr": "Vanne motorisée UV005",
+      "label_en": "Motorized valve UV005",
+      "tags": ["UV005", "B3"],
+      "parameters": [
+        { "name": "position", "unit": "%", "value": 100, "critical": false }
+      ],
+      "approved_by": "ENG-SCADA-TEAM",
+      "approval_date": "2026-01-29",
+      "standard_refs": ["ISO 5208"]
+    },
+    {
+      "external_id": "B3.UV006",
+      "path": "B3/UV/006",
+      "level": 3,
+      "type": "EQUIPMENT",
+      "subtype": "VALVE",
+      "parent_id": "B3",
+      "label_fr": "Vanne motorisée UV006",
+      "label_en": "Motorized valve UV006",
+      "tags": ["UV006", "B3"],
+      "parameters": [
+        { "name": "position", "unit": "%", "value": 100, "critical": false }
+      ],
+      "approved_by": "ENG-SCADA-TEAM",
+      "approval_date": "2026-01-29",
+      "standard_refs": ["ISO 5208"]
+    },
+    {
+      "external_id": "B3.LCV001",
+      "path": "B3/LCV/001",
+      "level": 3,
+      "type": "EQUIPMENT",
+      "subtype": "CONTROL_VALVE",
+      "parent_id": "B3",
+      "label_fr": "Vanne de régulation LCV001",
+      "label_en": "Control valve LCV001",
+      "tags": ["LCV001", "B3"],
+      "parameters": [
+        { "name": "position", "unit": "%", "value": 21, "critical": true },
+        { "name": "press_diff", "unit": "BAR", "critical": false }
+      ],
+      "approved_by": "ENG-SCADA-TEAM",
+      "approval_date": "2026-01-29",
+      "standard_refs": ["IEC 61511", "ISA-75.01"]
+    },
+    {
+      "external_id": "B3.LCV002",
+      "path": "B3/LCV/002",
+      "level": 3,
+      "type": "EQUIPMENT",
+      "subtype": "CONTROL_VALVE",
+      "parent_id": "B3",
+      "label_fr": "Vanne de régulation LCV002",
+      "label_en": "Control valve LCV002",
+      "tags": ["LCV002", "B3"],
+      "parameters": [
+        { "name": "position", "unit": "%", "value": 0, "critical": true }
+      ],
+      "approved_by": "ENG-SCADA-TEAM",
+      "approval_date": "2026-01-29",
+      "standard_refs": ["IEC 61511", "ISA-75.01"]
+    },
+    {
+      "external_id": "B3.SER",
+      "path": "B3/SER",
+      "level": 3,
+      "type": "EQUIPMENT",
+      "subtype": "SYSTEM",
+      "parent_id": "B3",
+      "label_fr": "Système de vidange et appoint condenseur",
+      "label_en": "Condenser drain & make-up system",
+      "tags": ["SER", "B3"],
+      "parameters": [
+        { "name": "status", "unit": "-", "value": "ACTIVE", "critical": true },
+        { "name": "flow_makeup", "unit": "T/H", "critical": false }
+      ],
+      "approved_by": "ENG-SCADA-TEAM",
+      "approval_date": "2026-01-29",
+      "standard_refs": ["IEC 61511", "ISO 55001"]
+    },
+      {
+        "external_id": "B3.TANK.001BA",
+        "path": "B3/TANK/001BA",
+        "level": 3,
+        "type": "EQUIPMENT",
+        "subtype": "TANK",
+        "parent_id": "B3",
+        "label_fr": "Réservoir 001BA — eau de refroidissement",
+        "label_en": "Tank 001BA — cooling water",
+        "tags": ["001BA", "TANK", "B3"],
+        "parameters": [
+          {
+            "name": "niveau",
+            "unit": "MM",
+            "value": 1598,
+            "critical": true,
+            "min": 1000,
+            "max": 2000
+          }
+        ],
+        "approved_by": "ENG-SCADA-TEAM",
+        "approval_date": "2026-01-29",
+        "standard_refs": ["ASME VIII", "IEC 61511"]
+      },
+      {
+        "external_id": "B3.PPES.HP.BP.CR1",
+        "path": "B3/PPES/HP_BP/CR1",
+        "level": 3,
+        "type": "EQUIPMENT",
+        "subtype": "CIRCULATION_PUMP",
+        "parent_id": "B3",
+        "label_fr": "Pompe de recirculation HP/BP CR1",
+        "label_en": "HP/BP recirculation pump CR1",
+        "tags": ["PPES", "HP_BP", "CR1", "B3"],
+        "parameters": [
+          {
+            "name": "status",
+            "unit": "-",
+            "value": "RUN",
+            "critical": true
+          }
+        ],
+        "approved_by": "ENG-SCADA-TEAM",
+        "approval_date": "2026-01-29",
+        "standard_refs": ["ISO 13709", "IEC 61511"]
+      },
+      {
+        "external_id": "B3.PPES.PRECHAUFFEUR.CR12",
+        "path": "B3/PPES/PRECHAUFFEUR/CR12",
+        "level": 3,
+        "type": "EQUIPMENT",
+        "subtype": "CIRCULATION_PUMP",
+        "parent_id": "B3",
+        "label_fr": "Pompe de recirculation préchauffeur CR1/2",
+        "label_en": "Preheater recirculation pump CR1/2",
+        "tags": ["PPES", "PRECHAUFFEUR", "CR12", "B3"],
+        "parameters": [
+          {
+            "name": "status",
+            "unit": "-",
+            "value": "RUN",
+            "critical": true
+          }
+        ],
+        "approved_by": "ENG-SCADA-TEAM",
+        "approval_date": "2026-01-29",
+        "standard_refs": ["ISO 13709", "IEC 61511"]
+      },
+      {
+        "external_id": "B3.PPES.HP.BP.CR2",
+        "path": "B3/PPES/HP_BP/CR2",
+        "level": 3,
+        "type": "EQUIPMENT",
+        "subtype": "CIRCULATION_PUMP",
+        "parent_id": "B3",
+        "label_fr": "Pompe de recirculation HP/BP CR2",
+        "label_en": "HP/BP recirculation pump CR2",
+        "tags": ["PPES", "HP_BP", "CR2", "B3"],
+        "parameters": [
+          {
+            "name": "status",
+            "unit": "-",
+            "value": "RUN",
+            "critical": true
+          }
+        ],
+        "approved_by": "ENG-SCADA-TEAM",
+        "approval_date": "2026-01-29",
+        "standard_refs": ["ISO 13709", "IEC 61511"]
+      },
+      {
+        "external_id": "B3.FV001",
+        "path": "B3/FV/001",
+        "level": 3,
+        "type": "EQUIPMENT",
+        "subtype": "FLOAT_VALVE",
+        "parent_id": "B3",
+        "label_fr": "Vanne à flotteur FV001",
+        "label_en": "Float valve FV001",
+        "tags": ["FV001", "B3"],
+        "parameters": [
+          {
+            "name": "position",
+            "unit": "%",
+            "value": 100,
+            "critical": false
+          }
+        ],
+        "approved_by": "ENG-SCADA-TEAM",
+        "approval_date": "2026-01-29",
+        "standard_refs": ["ISO 5208"]
+      },
+      {
+        "external_id": "B3.SXS",
+        "path": "B3/SXS",
+        "level": 3,
+        "type": "EQUIPMENT",
+        "subtype": "SAFETY_EXHAUST_SYSTEM",
+        "parent_id": "B3",
+        "label_fr": "Système de sécurité SXS",
+        "label_en": "Safety exhaust system SXS",
+        "tags": ["SXS", "B3"],
+        "parameters": [
+          {
+            "name": "status",
+            "unit": "-",
+            "value": "OK",
+            "critical": true
+          }
+        ],
+        "approved_by": "ENG-SCADA-TEAM",
+        "approval_date": "2026-01-29",
+        "standard_refs": ["IEC 61511"]
+      }
+    ]
+ 
+
+    
