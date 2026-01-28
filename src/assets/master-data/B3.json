@@ -1501,8 +1501,1818 @@
         "approved_by": "ENG-SCADA-TEAM",
         "approval_date": "2026-01-29",
         "standard_refs": ["IEC 61511"]
-      }
-    ]
+      },
+        {
+          "external_id": "B3.RECHAUFFEUR.CONDENSATS.1",
+          "path": "B3/RECHAUFFEUR/CONDENSATS/1",
+          "level": 3,
+          "type": "EQUIPMENT",
+          "subtype": "HEATER",
+          "parent_id": "B3",
+          "label_fr": "Réchauffeur de condensats — Chaudière 1",
+          "label_en": "Condensate heater — Boiler 1",
+          "tags": ["RECHAUFFEUR", "CONDENSATS", "CR1", "B3"],
+          "parameters": [
+            {
+              "name": "temp_in",
+              "unit": "°C",
+              "value": 79,
+              "critical": true,
+              "min": 75,
+              "max": 85
+            },
+            {
+              "name": "temp_out",
+              "unit": "°C",
+              "value": 102,
+              "critical": true,
+              "max": 105
+            },
+            {
+              "name": "debit",
+              "unit": "T/H",
+              "value": 120,
+              "critical": true,
+              "min": 100,
+              "max": 150
+            }
+          ],
+          "approved_by": "ENG-SCADA-TEAM",
+          "approval_date": "2026-01-29",
+          "standard_refs": ["ASME VIII", "IEC 61511"]
+        },
+        {
+          "external_id": "B3.RECHAUFFEUR.CONDENSATS.2",
+          "path": "B3/RECHAUFFEUR/CONDENSATS/2",
+          "level": 3,
+          "type": "EQUIPMENT",
+          "subtype": "HEATER",
+          "parent_id": "B3",
+          "label_fr": "Réchauffeur de condensats — Chaudière 2",
+          "label_en": "Condensate heater — Boiler 2",
+          "tags": ["RECHAUFFEUR", "CONDENSATS", "CR2", "B3"],
+          "parameters": [
+            {
+              "name": "temp_in",
+              "unit": "°C",
+              "value": 97,
+              "critical": true,
+              "min": 90,
+              "max": 100
+            },
+            {
+              "name": "temp_out",
+              "unit": "°C",
+              "value": 100,
+              "critical": true,
+              "max": 105
+            },
+            {
+              "name": "debit",
+              "unit": "T/H",
+              "value": 182,
+              "critical": true,
+              "min": 150,
+              "max": 200
+            }
+          ],
+          "approved_by": "ENG-SCADA-TEAM",
+          "approval_date": "2026-01-29",
+          "standard_refs": ["ASME VIII", "IEC 61511"]
+        },
+        {
+          "external_id": "B3.TCV050",
+          "path": "B3/TCV/050",
+          "level": 3,
+          "type": "EQUIPMENT",
+          "subtype": "TEMP_CONTROL_VALVE",
+          "parent_id": "B3.RECHAUFFEUR.CONDENSATS.1",
+          "label_fr": "Vanne de régulation température TCV050",
+          "label_en": "Temperature control valve TCV050",
+          "tags": ["TCV050", "CONDENSATS", "CR1", "B3"],
+          "parameters": [
+            {
+              "name": "position",
+              "unit": "%",
+              "value": 17.69,
+              "critical": true
+            },
+            {
+              "name": "temp_upstream",
+              "unit": "°C",
+              "value": 79,
+              "critical": false
+            }
+          ],
+          "approved_by": "ENG-SCADA-TEAM",
+          "approval_date": "2026-01-29",
+          "standard_refs": ["IEC 61511", "ISA-75.01"]
+        },
+        {
+          "external_id": "B3.TCV052",
+          "path": "B3/TCV/052",
+          "level": 3,
+          "type": "EQUIPMENT",
+          "subtype": "TEMP_CONTROL_VALVE",
+          "parent_id": "B3.RECHAUFFEUR.CONDENSATS.2",
+          "label_fr": "Vanne de régulation température TCV052",
+          "label_en": "Temperature control valve TCV052",
+          "tags": ["TCV052", "CONDENSATS", "CR2", "B3"],
+          "parameters": [
+            {
+              "name": "position",
+              "unit": "%",
+              "value": 99.75,
+              "critical": true
+            },
+            {
+              "name": "temp_upstream",
+              "unit": "°C",
+              "value": 97,
+              "critical": false
+            }
+          ],
+          "approved_by": "ENG-SCADA-TEAM",
+          "approval_date": "2026-01-29",
+          "standard_refs": ["IEC 61511", "ISA-75.01"]
+        },
+        {
+          "external_id": "B3.UV001.CR1",
+          "path": "B3/UV/001/CR1",
+          "level": 3,
+          "type": "EQUIPMENT",
+          "subtype": "VALVE",
+          "parent_id": "B3.RECHAUFFEUR.CONDENSATS.1",
+          "label_fr": "Vanne motorisée UV001 — Circuit CR1",
+          "label_en": "Motorized valve UV001 — CR1 circuit",
+          "tags": ["UV001", "CR1", "B3"],
+          "parameters": [
+            {
+              "name": "position",
+              "unit": "%",
+              "value": 100,
+              "critical": false
+            }
+          ],
+          "approved_by": "ENG-SCADA-TEAM",
+          "approval_date": "2026-01-29",
+          "standard_refs": ["ISO 5208"]
+        },
+        {
+          "external_id": "B3.UV002.CR2",
+          "path": "B3/UV/002/CR2",
+          "level": 3,
+          "type": "EQUIPMENT",
+          "subtype": "VALVE",
+          "parent_id": "B3.RECHAUFFEUR.CONDENSATS.2",
+          "label_fr": "Vanne motorisée UV002 — Circuit CR2",
+          "label_en": "Motorized valve UV002 — CR2 circuit",
+          "tags": ["UV002", "CR2", "B3"],
+          "parameters": [
+            {
+              "name": "position",
+              "unit": "%",
+              "value": 100,
+              "critical": false
+            }
+          ],
+          "approved_by": "ENG-SCADA-TEAM",
+          "approval_date": "2026-01-29",
+          "standard_refs": ["ISO 5208"]
+        },
+          {
+            "external_id": "B3.TURBINE",
+            "path": "B3/TURBINE",
+            "level": 3,
+            "type": "EQUIPMENT",
+            "subtype": "STEAM_TURBINE",
+            "parent_id": "B3",
+            "label_fr": "Turbine à vapeur — ensemble complet",
+            "label_en": "Steam turbine — full assembly",
+            "tags": ["TURBINE", "TV", "B3"],
+            "parameters": [
+              {
+                "name": "speed",
+                "unit": "RPM",
+                "value": 3000,
+                "critical": true,
+                "min": 2950,
+                "max": 3050
+              },
+              {
+                "name": "vibration_x",
+                "unit": "mm/s",
+                "value": 4.2,
+                "critical": true,
+                "max": 12.0
+              },
+              {
+                "name": "vibration_y",
+                "unit": "mm/s",
+                "value": 3.8,
+                "critical": true,
+                "max": 12.0
+              }
+            ],
+            "approved_by": "ENG-SCADA-TEAM",
+            "approval_date": "2026-01-29",
+            "standard_refs": ["IEC 60034", "API 670", "IEC 61511"]
+          },
+          {
+            "external_id": "B3.ALTERNATEUR",
+            "path": "B3/ALTERNATEUR",
+            "level": 3,
+            "type": "EQUIPMENT",
+            "subtype": "GENERATOR",
+            "parent_id": "B3.TURBINE",
+            "label_fr": "Alternateur — turbine vapeur",
+            "label_en": "Generator — steam turbine",
+            "tags": ["ALTERNATEUR", "TV", "B3"],
+            "parameters": [
+              {
+                "name": "voltage",
+                "unit": "kV",
+                "value": 15.75,
+                "critical": true,
+                "min": 15.0,
+                "max": 16.5
+              },
+              {
+                "name": "current",
+                "unit": "kA",
+                "value": 12.5,
+                "critical": true,
+                "max": 13.0
+              },
+              {
+                "name": "freq",
+                "unit": "Hz",
+                "value": 50.0,
+                "critical": true,
+                "tolerance": 0.1
+              }
+            ],
+            "approved_by": "ENG-SCADA-TEAM",
+            "approval_date": "2026-01-29",
+            "standard_refs": ["IEC 60034", "IEEE 446"]
+          },
+          {
+            "external_id": "B3.GGR",
+            "path": "B3/GGR",
+            "level": 3,
+            "type": "EQUIPMENT",
+            "subtype": "GEARBOX",
+            "parent_id": "B3.TURBINE",
+            "label_fr": "Réducteur de vitesse GGR",
+            "label_en": "Gearbox GGR",
+            "tags": ["GGR", "TV", "B3"],
+            "parameters": [
+              {
+                "name": "temp_oil",
+                "unit": "°C",
+                "value": 49.7,
+                "critical": true,
+                "max": 55
+              },
+              {
+                "name": "pressure_oil",
+                "unit": "BAR",
+                "value": 4.0,
+                "critical": true,
+                "min": 3.5,
+                "max": 4.5
+              },
+              {
+                "name": "vibration",
+                "unit": "mm/s",
+                "value": 5.1,
+                "critical": true,
+                "max": 10.0
+              }
+            ],
+            "approved_by": "ENG-SCADA-TEAM",
+            "approval_date": "2026-01-29",
+            "standard_refs": ["ISO 10438", "IEC 61511"]
+          },
+          {
+            "external_id": "B3.SVA",
+            "path": "B3/SVA",
+            "level": 3,
+            "type": "EQUIPMENT",
+            "subtype": "STEAM_VALVE_ASSEMBLY",
+            "parent_id": "B3.TURBINE",
+            "label_fr": "Assemblage vanne vapeur (SVA)",
+            "label_en": "Steam valve assembly (SVA)",
+            "tags": ["SVA", "TV", "B3"],
+            "parameters": [
+              {
+                "name": "position_main",
+                "unit": "%",
+                "value": 100,
+                "critical": true
+              },
+              {
+                "name": "temp_upstream",
+                "unit": "°C",
+                "value": 502.2,
+                "critical": true,
+                "max": 505
+              }
+            ],
+            "approved_by": "ENG-SCADA-TEAM",
+            "approval_date": "2026-01-29",
+            "standard_refs": ["ASME B16.34", "IEC 61511"]
+          },
+          {
+            "external_id": "B3.SECURITES.TV",
+            "path": "B3/SECURITES/TV",
+            "level": 3,
+            "type": "SYSTEM",
+            "subtype": "SAFETY_SYSTEM",
+            "parent_id": "B3",
+            "label_fr": "Sécurités TV — désarmement",
+            "label_en": "TV safety system — trip",
+            "tags": ["SECURITES", "TV", "B3"],
+            "parameters": [
+              {
+                "name": "status",
+                "unit": "-",
+                "value": "ARMED",
+                "critical": true
+              },
+              {
+                "name": "trip_speed_high",
+                "unit": "RPM",
+                "value": 3150,
+                "critical": true
+              },
+              {
+                "name": "trip_vibration",
+                "unit": "mm/s",
+                "value": 12.0,
+                "critical": true
+              },
+              {
+                "name": "trip_bearing_temp",
+                "unit": "°C",
+                "value": 95.0,
+                "critical": true
+              }
+            ],
+            "approved_by": "ENG-SCADA-TEAM",
+            "approval_date": "2026-01-29",
+            "standard_refs": ["IEC 61511", "API 670"]
+          },
+          {
+            "external_id": "B3.HUILE.REGULATION",
+            "path": "B3/HUILE/REGULATION",
+            "level": 3,
+            "type": "SYSTEM",
+            "subtype": "OIL_SYSTEM",
+            "parent_id": "B3",
+            "label_fr": "Huile de régulation — 011PO / 012PO",
+            "label_en": "Regulation oil system — 011PO / 012PO",
+            "tags": ["HUILE", "REGULATION", "TV", "B3"],
+            "parameters": [
+              {
+                "name": "pressure",
+                "unit": "BAR",
+                "value": 12.0,
+                "critical": true,
+                "min": 10.0,
+                "max": 14.0
+              },
+              {
+                "name": "temp",
+                "unit": "°C",
+                "value": 46.6,
+                "critical": true,
+                "max": 50
+              },
+              {
+                "name": "flow_011PO",
+                "unit": "L/min",
+                "value": 85,
+                "critical": false
+              },
+              {
+                "name": "flow_012PO",
+                "unit": "L/min",
+                "value": 78,
+                "critical": false
+              }
+            ],
+            "approved_by": "ENG-SCADA-TEAM",
+            "approval_date": "2026-01-29",
+            "standard_refs": ["ISO 10438", "IEC 61511"]
+          },
+          {
+            "external_id": "B3.SOULEVEMENT",
+            "path": "B3/SOULEVEMENT",
+            "level": 3,
+            "type": "SYSTEM",
+            "subtype": "LIFTING_SYSTEM",
+            "parent_id": "B3",
+            "label_fr": "Soulèvement — PO 004/005/006/007/008/009",
+            "label_en": "Lifting system — PO 004 to 009",
+            "tags": ["SOULEVEMENT", "TV", "B3"],
+            "parameters": [
+              {
+                "name": "status_004PO",
+                "unit": "-",
+                "value": "OK",
+                "critical": false
+              },
+              {
+                "name": "status_005PO",
+                "unit": "-",
+                "value": "OK",
+                "critical": false
+              },
+              {
+                "name": "status_006PO",
+                "unit": "-",
+                "value": "OK",
+                "critical": false
+              },
+              {
+                "name": "status_007PO",
+                "unit": "-",
+                "value": "OK",
+                "critical": false
+              },
+              {
+                "name": "status_008PO",
+                "unit": "-",
+                "value": "OK",
+                "critical": false
+              },
+              {
+                "name": "status_009PO",
+                "unit": "-",
+                "value": "OK",
+                "critical": false
+              }
+            ],
+            "approved_by": "ENG-SCADA-TEAM",
+            "approval_date": "2026-01-29",
+            "standard_refs": ["ISO 4306", "IEC 61511"]
+          },
+          {
+            "external_id": "B3.GRAISSAGE",
+            "path": "B3/GRAISSAGE",
+            "level": 3,
+            "type": "SYSTEM",
+            "subtype": "LUBRICATION_SYSTEM",
+            "parent_id": "B3",
+            "label_fr": "Système de graissage — 001PO/AC, 002PO/AC, 003PO/DC",
+            "label_en": "Lubrication system — 001PO/AC, 002PO/AC, 003PO/DC",
+            "tags": ["GRAISSAGE", "TV", "B3"],
+            "parameters": [
+              {
+                "name": "pressure_oil",
+                "unit": "BAR",
+                "value": 4.0,
+                "critical": true,
+                "min": 3.5,
+                "max": 4.5
+              },
+              {
+                "name": "flow",
+                "unit": "L/min",
+                "value": 120,
+                "critical": true
+              },
+              {
+                "name": "temp",
+                "unit": "°C",
+                "value": 46.6,
+                "critical": true,
+                "max": 50
+              }
+            ],
+            "approved_by": "ENG-SCADA-TEAM",
+            "approval_date": "2026-01-29",
+            "standard_refs": ["ISO 10438", "IEC 61511"]
+          },
+          {
+            "external_id": "B3.CAISSE.A.HUILE",
+            "path": "B3/CAISSE/A/HUILE",
+            "level": 3,
+            "type": "EQUIPMENT",
+            "subtype": "OIL_RESERVOIR",
+            "parent_id": "B3",
+            "label_fr": "Caisse à huile 001BA",
+            "label_en": "Oil reservoir 001BA",
+            "tags": ["CAISSE_HUILE", "TV", "B3"],
+            "parameters": [
+              {
+                "name": "niveau",
+                "unit": "%",
+                "value": 77.5,
+                "critical": true,
+                "min": 60,
+                "max": 85
+              },
+              {
+                "name": "temp_oil",
+                "unit": "°C",
+                "value": 46.6,
+                "critical": true,
+                "max": 50
+              },
+              {
+                "name": "pressure",
+                "unit": "mBAR",
+                "value": 96.4,
+                "critical": false
+              }
+            ],
+            "approved_by": "ENG-SCADA-TEAM",
+            "approval_date": "2026-01-29",
+            "standard_refs": ["ISO 10438", "IEC 61511"]
+          },
+          {
+            "external_id": "B3.SURCHAUFFEUR.HP1",
+            "path": "B3/SURCHAUFFEUR/HP1",
+            "level": 3,
+            "type": "EQUIPMENT",
+            "subtype": "SUPERHEATER",
+            "parent_id": "B3",
+            "label_fr": "Surchauffeur HP1 — TV",
+            "label_en": "Superheater HP1 — TV",
+            "tags": ["SURCHAUFFEUR", "HP1", "TV", "B3"],
+            "parameters": [
+              {
+                "name": "temp_out",
+                "unit": "°C",
+                "value": 507.4,
+                "critical": true,
+                "max": 510
+              },
+              {
+                "name": "pression",
+                "unit": "BAR",
+                "value": 67.9,
+                "critical": true,
+                "max": 68.5
+              }
+            ],
+            "approved_by": "ENG-SCADA-TEAM",
+            "approval_date": "2026-01-29",
+            "standard_refs": ["ASME VIII", "IEC 61511"]
+          },
+          {
+            "external_id": "B3.SURCHAUFFEUR.HP2",
+            "path": "B3/SURCHAUFFEUR/HP2",
+            "level": 3,
+            "type": "EQUIPMENT",
+            "subtype": "SUPERHEATER",
+            "parent_id": "B3",
+            "label_fr": "Surchauffeur HP2 — TV",
+            "label_en": "Superheater HP2 — TV",
+            "tags": ["SURCHAUFFEUR", "HP2", "TV", "B3"],
+            "parameters": [
+              {
+                "name": "temp_out",
+                "unit": "°C",
+                "value": 511.1,
+                "critical": true,
+                "max": 515
+              },
+              {
+                "name": "pression",
+                "unit": "BAR",
+                "value": 68.1,
+                "critical": true,
+                "max": 68.5
+              }
+            ],
+            "approved_by": "ENG-SCADA-TEAM",
+            "approval_date": "2026-01-29",
+            "standard_refs": ["ASME VIII", "IEC 61511"]
+          },
+          {
+            "external_id": "B3.SURCHAUFFEUR.BP1",
+            "path": "B3/SURCHAUFFEUR/BP1",
+            "level": 3,
+            "type": "EQUIPMENT",
+            "subtype": "SUPERHEATER",
+            "parent_id": "B3",
+            "label_fr": "Surchauffeur BP1 — TV",
+            "label_en": "Superheater BP1 — TV",
+            "tags": ["SURCHAUFFEUR", "BP1", "TV", "B3"],
+            "parameters": [
+              {
+                "name": "temp_out",
+                "unit": "°C",
+                "value": 219.7,
+                "critical": true,
+                "max": 225
+              },
+              {
+                "name": "pression",
+                "unit": "BAR",
+                "value": 5.0,
+                "critical": true,
+                "max": 5.2
+              }
+            ],
+            "approved_by": "ENG-SCADA-TEAM",
+            "approval_date": "2026-01-29",
+            "standard_refs": ["ASME VIII", "IEC 61511"]
+          },
+          {
+            "external_id": "B3.SURCHAUFFEUR.BP2",
+            "path": "B3/SURCHAUFFEUR/BP2",
+            "level": 3,
+            "type": "EQUIPMENT",
+            "subtype": "SUPERHEATER",
+            "parent_id": "B3",
+            "label_fr": "Surchauffeur BP2 — TV",
+            "label_en": "Superheater BP2 — TV",
+            "tags": ["SURCHAUFFEUR", "BP2", "TV", "B3"],
+            "parameters": [
+              {
+                "name": "temp_out",
+                "unit": "°C",
+                "value": 213.9,
+                "critical": true,
+                "max": 215
+              },
+              {
+                "name": "pression",
+                "unit": "BAR",
+                "value": 5.0,
+                "critical": true,
+                "max": 5.2
+              }
+            ],
+            "approved_by": "ENG-SCADA-TEAM",
+            "approval_date": "2026-01-29",
+            "standard_refs": ["ASME VIII", "IEC 61511"]
+          },
+            {
+              "external_id": "B3.BALLOON.PURGES.TV",
+              "path": "B3/BALLOON/PURGES/TV",
+              "level": 3,
+              "type": "EQUIPMENT",
+              "subtype": "TANK",
+              "parent_id": "B3",
+              "label_fr": "Ballon des purges propres — TV",
+              "label_en": "Purge tank — TV",
+              "tags": ["BALLOON", "PURGES", "TV", "B3"],
+              "parameters": [
+                {
+                  "name": "niveau",
+                  "unit": "MM",
+                  "critical": true,
+                  "min": 500,
+                  "max": 2000
+                },
+                {
+                  "name": "pression",
+                  "unit": "BAR",
+                  "value": 1.0,
+                  "critical": true,
+                  "max": 1.5
+                }
+              ],
+              "approved_by": "ENG-SCADA-TEAM",
+              "approval_date": "2026-01-29",
+              "standard_refs": ["ASME VIII", "IEC 61511"]
+            },
+            {
+              "external_id": "B3.TV001",
+              "path": "B3/TV/001",
+              "level": 3,
+              "type": "EQUIPMENT",
+              "subtype": "VALVE",
+              "parent_id": "B3.BALLOON.PURGES.TV",
+              "label_fr": "Vanne TV001 — purge principale",
+              "label_en": "Valve TV001 — main purge",
+              "tags": ["TV001", "PURGE", "B3"],
+              "parameters": [
+                {
+                  "name": "position",
+                  "unit": "%",
+                  "value": 100,
+                  "critical": false
+                }
+              ],
+              "approved_by": "ENG-SCADA-TEAM",
+              "approval_date": "2026-01-29",
+              "standard_refs": ["ISO 5208"]
+            },
+            {
+              "external_id": "B3.TV006",
+              "path": "B3/TV/006",
+              "level": 3,
+              "type": "EQUIPMENT",
+              "subtype": "VALVE",
+              "parent_id": "B3.BALLOON.PURGES.TV",
+              "label_fr": "Vanne TV006 — purge secondaire",
+              "label_en": "Valve TV006 — secondary purge",
+              "tags": ["TV006", "PURGE", "B3"],
+              "parameters": [
+                {
+                  "name": "position",
+                  "unit": "%",
+                  "value": 0,
+                  "critical": false
+                }
+              ],
+              "approved_by": "ENG-SCADA-TEAM",
+              "approval_date": "2026-01-29",
+              "standard_refs": ["ISO 5208"]
+            },
+            {
+              "external_id": "B3.UV101",
+              "path": "B3/UV/101",
+              "level": 3,
+              "type": "EQUIPMENT",
+              "subtype": "VALVE",
+              "parent_id": "B3",
+              "label_fr": "Vanne motorisée UV101 — purge TV",
+              "label_en": "Motorized valve UV101 — TV purge",
+              "tags": ["UV101", "PURGE", "TV", "B3"],
+              "parameters": [
+                {
+                  "name": "position",
+                  "unit": "%",
+                  "value": 100,
+                  "critical": false
+                }
+              ],
+              "approved_by": "ENG-SCADA-TEAM",
+              "approval_date": "2026-01-29",
+              "standard_refs": ["ISO 5208"]
+            },
+            {
+              "external_id": "B3.UV102",
+              "path": "B3/UV/102",
+              "level": 3,
+              "type": "EQUIPMENT",
+              "subtype": "VALVE",
+              "parent_id": "B3",
+              "label_fr": "Vanne motorisée UV102 — purge TV",
+              "label_en": "Motorized valve UV102 — TV purge",
+              "tags": ["UV102", "PURGE", "TV", "B3"],
+              "parameters": [
+                {
+                  "name": "position",
+                  "unit": "%",
+                  "value": 100,
+                  "critical": false
+                }
+              ],
+              "approved_by": "ENG-SCADA-TEAM",
+              "approval_date": "2026-01-29",
+              "standard_refs": ["ISO 5208"]
+            },
+            {
+              "external_id": "B3.UV103",
+              "path": "B3/UV/103",
+              "level": 3,
+              "type": "EQUIPMENT",
+              "subtype": "VALVE",
+              "parent_id": "B3",
+              "label_fr": "Vanne motorisée UV103 — purge TV",
+              "label_en": "Motorized valve UV103 — TV purge",
+              "tags": ["UV103", "PURGE", "TV", "B3"],
+              "parameters": [
+                {
+                  "name": "position",
+                  "unit": "%",
+                  "value": 100,
+                  "critical": false
+                }
+              ],
+              "approved_by": "ENG-SCADA-TEAM",
+              "approval_date": "2026-01-29",
+              "standard_refs": ["ISO 5208"]
+            },
+            {
+              "external_id": "B3.UV104",
+              "path": "B3/UV/104",
+              "level": 3,
+              "type": "EQUIPMENT",
+              "subtype": "VALVE",
+              "parent_id": "B3",
+              "label_fr": "Vanne motorisée UV104 — purge TV",
+              "label_en": "Motorized valve UV104 — TV purge",
+              "tags": ["UV104", "PURGE", "TV", "B3"],
+              "parameters": [
+                {
+                  "name": "position",
+                  "unit": "%",
+                  "value": 100,
+                  "critical": false
+                }
+              ],
+              "approved_by": "ENG-SCADA-TEAM",
+              "approval_date": "2026-01-29",
+              "standard_refs": ["ISO 5208"]
+            },
+            {
+              "external_id": "B3.UV105",
+              "path": "B3/UV/105",
+              "level": 3,
+              "type": "EQUIPMENT",
+              "subtype": "VALVE",
+              "parent_id": "B3",
+              "label_fr": "Vanne motorisée UV105 — purge TV",
+              "label_en": "Motorized valve UV105 — TV purge",
+              "tags": ["UV105", "PURGE", "TV", "B3"],
+              "parameters": [
+                {
+                  "name": "position",
+                  "unit": "%",
+                  "value": 100,
+                  "critical": false
+                }
+              ],
+              "approved_by": "ENG-SCADA-TEAM",
+              "approval_date": "2026-01-29",
+              "standard_refs": ["ISO 5208"]
+            },
+            {
+              "external_id": "B3.UV106",
+              "path": "B3/UV/106",
+              "level": 3,
+              "type": "EQUIPMENT",
+              "subtype": "VALVE",
+              "parent_id": "B3",
+              "label_fr": "Vanne motorisée UV106 — purge TV",
+              "label_en": "Motorized valve UV106 — TV purge",
+              "tags": ["UV106", "PURGE", "TV", "B3"],
+              "parameters": [
+                {
+                  "name": "position",
+                  "unit": "%",
+                  "value": 100,
+                  "critical": false
+                }
+              ],
+              "approved_by": "ENG-SCADA-TEAM",
+              "approval_date": "2026-01-29",
+              "standard_refs": ["ISO 5208"]
+            },
+            {
+              "external_id": "B3.UV107",
+              "path": "B3/UV/107",
+              "level": 3,
+              "type": "EQUIPMENT",
+              "subtype": "VALVE",
+              "parent_id": "B3",
+              "label_fr": "Vanne motorisée UV107 — purge TV",
+              "label_en": "Motorized valve UV107 — TV purge",
+              "tags": ["UV107", "PURGE", "TV", "B3"],
+              "parameters": [
+                {
+                  "name": "position",
+                  "unit": "%",
+                  "value": 100,
+                  "critical": false
+                }
+              ],
+              "approved_by": "ENG-SCADA-TEAM",
+              "approval_date": "2026-01-29",
+              "standard_refs": ["ISO 5208"]
+            },
+            {
+              "external_id": "B3.UV108",
+              "path": "B3/UV/108",
+              "level": 3,
+              "type": "EQUIPMENT",
+              "subtype": "VALVE",
+              "parent_id": "B3",
+              "label_fr": "Vanne motorisée UV108 — purge TV",
+              "label_en": "Motorized valve UV108 — TV purge",
+              "tags": ["UV108", "PURGE", "TV", "B3"],
+              "parameters": [
+                {
+                  "name": "position",
+                  "unit": "%",
+                  "value": 100,
+                  "critical": false
+                }
+              ],
+              "approved_by": "ENG-SCADA-TEAM",
+              "approval_date": "2026-01-29",
+              "standard_refs": ["ISO 5208"]
+            },
+            {
+              "external_id": "B3.UV109",
+              "path": "B3/UV/109",
+              "level": 3,
+              "type": "EQUIPMENT",
+              "subtype": "VALVE",
+              "parent_id": "B3",
+              "label_fr": "Vanne motorisée UV109 — purge TV",
+              "label_en": "Motorized valve UV109 — TV purge",
+              "tags": ["UV109", "PURGE", "TV", "B3"],
+              "parameters": [
+                {
+                  "name": "position",
+                  "unit": "%",
+                  "value": 100,
+                  "critical": false
+                }
+              ],
+              "approved_by": "ENG-SCADA-TEAM",
+              "approval_date": "2026-01-29",
+              "standard_refs": ["ISO 5208"]
+            },
+            {
+              "external_id": "B3.PURGE.CET.PCV001",
+              "path": "B3/PURGE/CET/PCV001",
+              "level": 3,
+              "type": "EQUIPMENT",
+              "subtype": "PRESSURE_CONTROL_VALVE",
+              "parent_id": "B3",
+              "label_fr": "Vanne de régulation PCV001 — purge CET",
+              "label_en": "Pressure control valve PCV001 — CET purge",
+              "tags": ["PCV001", "PURGE", "CET", "B3"],
+              "parameters": [
+                {
+                  "name": "position",
+                  "unit": "%",
+                  "value": 100,
+                  "critical": true
+                },
+                {
+                  "name": "press_upstream",
+                  "unit": "BAR",
+                  "value": 1.0,
+                  "critical": true,
+                  "max": 1.5
+                }
+              ],
+              "approved_by": "ENG-SCADA-TEAM",
+              "approval_date": "2026-01-29",
+              "standard_refs": ["IEC 61511", "ISA-75.01"]
+            },
+            {
+              "external_id": "B3.PURGE.CET.PCV002",
+              "path": "B3/PURGE/CET/PCV002",
+              "level": 3,
+              "type": "EQUIPMENT",
+              "subtype": "PRESSURE_CONTROL_VALVE",
+              "parent_id": "B3",
+              "label_fr": "Vanne de régulation PCV002 — purge CET",
+              "label_en": "Pressure control valve PCV002 — CET purge",
+              "tags": ["PCV002", "PURGE", "CET", "B3"],
+              "parameters": [
+                {
+                  "name": "position",
+                  "unit": "%",
+                  "value": 0,
+                  "critical": true
+                }
+              ],
+              "approved_by": "ENG-SCADA-TEAM",
+              "approval_date": "2026-01-29",
+              "standard_refs": ["IEC 61511", "ISA-75.01"]
+            },
+            {
+              "external_id": "B3.SXS",
+              "path": "B3/SXS",
+              "level": 3,
+              "type": "EQUIPMENT",
+              "subtype": "SAFETY_EXHAUST_SYSTEM",
+              "parent_id": "B3",
+              "label_fr": "Système de sécurité SXS — purges TV",
+              "label_en": "Safety exhaust system SXS — TV purges",
+              "tags": ["SXS", "PURGE", "TV", "B3"],
+              "parameters": [
+                {
+                  "name": "status",
+                  "unit": "-",
+                  "value": "OK",
+                  "critical": true
+                }
+              ],
+              "approved_by": "ENG-SCADA-TEAM",
+              "approval_date": "2026-01-29",
+              "standard_refs": ["IEC 61511"]
+            },
+              {
+                "external_id": "B3.ACCU.OIL.003BA",
+                "path": "B3/ACCUMULATOR/OIL/003BA",
+                "level": 3,
+                "type": "EQUIPMENT",
+                "subtype": "ACCUMULATOR",
+                "parent_id": "B3",
+                "label_fr": "Accumulateur huile 003-BA",
+                "label_en": "Oil accumulator 003-BA",
+                "tags": ["ACCUMULATOR", "HUILE", "TV", "B3"],
+                "parameters": [
+                  {
+                    "name": "pressure",
+                    "unit": "BAR",
+                    "value": 105.1,
+                    "critical": true,
+                    "min": 100,
+                    "max": 110
+                  },
+                  {
+                    "name": "temp",
+                    "unit": "°C",
+                    "value": 47.2,
+                    "critical": true,
+                    "max": 50
+                  }
+                ],
+                "approved_by": "ENG-SCADA-TEAM",
+                "approval_date": "2026-01-29",
+                "standard_refs": ["ISO 10438", "IEC 61511"]
+              },
+              {
+                "external_id": "B3.FILTRE.DOUBLE.004005",
+                "path": "B3/FILTRE/DOUBLE/004_005",
+                "level": 3,
+                "type": "EQUIPMENT",
+                "subtype": "FILTER",
+                "parent_id": "B3",
+                "label_fr": "Filtre double 004/005FI",
+                "label_en": "Double filter 004/005FI",
+                "tags": ["FILTRE", "DOUBLE", "HUILE", "B3"],
+                "parameters": [
+                  {
+                    "name": "delta_p",
+                    "unit": "BAR",
+                    "critical": true,
+                    "max": 0.5
+                  },
+                  {
+                    "name": "status",
+                    "unit": "-",
+                    "value": "OK",
+                    "critical": false
+                  }
+                ],
+                "approved_by": "ENG-SCADA-TEAM",
+                "approval_date": "2026-01-29",
+                "standard_refs": ["ISO 10438", "IEC 61511"]
+              },
+              {
+                "external_id": "B3.FILTRE.TRAITEMENT.006007008",
+                "path": "B3/FILTRE/TRAITEMENT/006_007_008",
+                "level": 3,
+                "type": "EQUIPMENT",
+                "subtype": "FILTER",
+                "parent_id": "B3",
+                "label_fr": "Filtre de traitement 006/007/008FI",
+                "label_en": "Treatment filter 006/007/008FI",
+                "tags": ["FILTRE", "TRAITEMENT", "HUILE", "B3"],
+                "parameters": [
+                  {
+                    "name": "delta_p",
+                    "unit": "BAR",
+                    "critical": true,
+                    "max": 0.5
+                  },
+                  {
+                    "name": "status",
+                    "unit": "-",
+                    "value": "OK",
+                    "critical": false
+                  }
+                ],
+                "approved_by": "ENG-SCADA-TEAM",
+                "approval_date": "2026-01-29",
+                "standard_refs": ["ISO 10438", "IEC 61511"]
+              },
+              {
+                "external_id": "B3.BLOC.REGUL.HP1",
+                "path": "B3/BLOC/REGUL/HP1",
+                "level": 3,
+                "type": "EQUIPMENT",
+                "subtype": "REGULATION_BLOCK",
+                "parent_id": "B3",
+                "label_fr": "Bloc de régulation HP1",
+                "label_en": "Regulation block HP1",
+                "tags": ["BLOC_REGUL", "HP1", "HUILE", "B3"],
+                "parameters": [
+                  {
+                    "name": "pressure_out",
+                    "unit": "BAR",
+                    "value": 104.9,
+                    "critical": true,
+                    "min": 100,
+                    "max": 110
+                  },
+                  {
+                    "name": "flow",
+                    "unit": "L/min",
+                    "critical": true,
+                    "min": 80,
+                    "max": 120
+                  }
+                ],
+                "approved_by": "ENG-SCADA-TEAM",
+                "approval_date": "2026-01-29",
+                "standard_refs": ["ISO 10438", "IEC 61511"]
+              },
+              {
+                "external_id": "B3.BLOC.REGUL.HP2",
+                "path": "B3/BLOC/REGUL/HP2",
+                "level": 3,
+                "type": "EQUIPMENT",
+                "subtype": "REGULATION_BLOCK",
+                "parent_id": "B3",
+                "label_fr": "Bloc de régulation HP2",
+                "label_en": "Regulation block HP2",
+                "tags": ["BLOC_REGUL", "HP2", "HUILE", "B3"],
+                "parameters": [
+                  {
+                    "name": "pressure_out",
+                    "unit": "BAR",
+                    "value": 105.1,
+                    "critical": true,
+                    "min": 100,
+                    "max": 110
+                  }
+                ],
+                "approved_by": "ENG-SCADA-TEAM",
+                "approval_date": "2026-01-29",
+                "standard_refs": ["ISO 10438", "IEC 61511"]
+              },
+              {
+                "external_id": "B3.BLOC.REGUL.BP",
+                "path": "B3/BLOC/REGUL/BP",
+                "level": 3,
+                "type": "EQUIPMENT",
+                "subtype": "REGULATION_BLOCK",
+                "parent_id": "B3",
+                "label_fr": "Bloc de régulation BP",
+                "label_en": "Regulation block BP",
+                "tags": ["BLOC_REGUL", "BP", "HUILE", "B3"],
+                "parameters": [
+                  {
+                    "name": "pressure_out",
+                    "unit": "BAR",
+                    "value": 105.2,
+                    "critical": true,
+                    "min": 100,
+                    "max": 110
+                  }
+                ],
+                "approved_by": "ENG-SCADA-TEAM",
+                "approval_date": "2026-01-29",
+                "standard_refs": ["ISO 10438", "IEC 61511"]
+              },
+              {
+                "external_id": "B3.BLOC.SECUR.HP1",
+                "path": "B3/BLOC/SECUR/HP1",
+                "level": 3,
+                "type": "EQUIPMENT",
+                "subtype": "SAFETY_BLOCK",
+                "parent_id": "B3",
+                "label_fr": "Bloc de sécurité HP1",
+                "label_en": "Safety block HP1",
+                "tags": ["BLOC_SECUR", "HP1", "HUILE", "B3"],
+                "parameters": [
+                  {
+                    "name": "status",
+                    "unit": "-",
+                    "value": "ARMED",
+                    "critical": true
+                  },
+                  {
+                    "name": "trip_pressure_high",
+                    "unit": "BAR",
+                    "value": 115.0,
+                    "critical": true
+                  }
+                ],
+                "approved_by": "ENG-SCADA-TEAM",
+                "approval_date": "2026-01-29",
+                "standard_refs": ["IEC 61511", "API 670"]
+              },
+              {
+                "external_id": "B3.BLOC.SECUR.HP2",
+                "path": "B3/BLOC/SECUR/HP2",
+                "level": 3,
+                "type": "EQUIPMENT",
+                "subtype": "SAFETY_BLOCK",
+                "parent_id": "B3",
+                "label_fr": "Bloc de sécurité HP2",
+                "label_en": "Safety block HP2",
+                "tags": ["BLOC_SECUR", "HP2", "HUILE", "B3"],
+                "parameters": [
+                  {
+                    "name": "status",
+                    "unit": "-",
+                    "value": "ARMED",
+                    "critical": true
+                  }
+                ],
+                "approved_by": "ENG-SCADA-TEAM",
+                "approval_date": "2026-01-29",
+                "standard_refs": ["IEC 61511", "API 670"]
+              },
+              {
+                "external_id": "B3.BLOC.SECUR.BP",
+                "path": "B3/BLOC/SECUR/BP",
+                "level": 3,
+                "type": "EQUIPMENT",
+                "subtype": "SAFETY_BLOCK",
+                "parent_id": "B3",
+                "label_fr": "Bloc de sécurité BP",
+                "label_en": "Safety block BP",
+                "tags": ["BLOC_SECUR", "BP", "HUILE", "B3"],
+                "parameters": [
+                  {
+                    "name": "status",
+                    "unit": "-",
+                    "value": "ARMED",
+                    "critical": true
+                  }
+                ],
+                "approved_by": "ENG-SCADA-TEAM",
+                "approval_date": "2026-01-29",
+                "standard_refs": ["IEC 61511", "API 670"]
+              },
+              {
+                "external_id": "B3.TCV007",
+                "path": "B3/TCV/007",
+                "level": 3,
+                "type": "EQUIPMENT",
+                "subtype": "TEMP_CONTROL_VALVE",
+                "parent_id": "B3",
+                "label_fr": "Vanne de régulation température TCV007",
+                "label_en": "Temperature control valve TCV007",
+                "tags": ["TCV007", "HUILE", "TV", "B3"],
+                "parameters": [
+                  {
+                    "name": "position",
+                    "unit": "%",
+                    "value": 100,
+                    "critical": true
+                  },
+                  {
+                    "name": "temp_upstream",
+                    "unit": "°C",
+                    "value": 20.5,
+                    "critical": true,
+                    "max": 25
+                  }
+                ],
+                "approved_by": "ENG-SCADA-TEAM",
+                "approval_date": "2026-01-29",
+                "standard_refs": ["ISA-75.01", "IEC 61511"]
+              },
+              {
+                "external_id": "B3.SR.HP1",
+                "path": "B3/SR/HP1",
+                "level": 3,
+                "type": "EQUIPMENT",
+                "subtype": "SAFETY_RELIEF_VALVE",
+                "parent_id": "B3.BLOC.REGUL.HP1",
+                "label_fr": "Soupape de sécurité SR HP1 — huile",
+                "label_en": "Safety relief valve SR HP1 — oil",
+                "tags": ["SR_HP1", "PSV", "HUILE", "B3"],
+                "parameters": [
+                  {
+                    "name": "set_pressure",
+                    "unit": "BAR",
+                    "value": 106.3,
+                    "critical": true,
+                    "max": 107.0
+                  },
+                  {
+                    "name": "status",
+                    "unit": "-",
+                    "value": "CLOSED",
+                    "critical": true
+                  }
+                ],
+                "approved_by": "ENG-SCADA-TEAM",
+                "approval_date": "2026-01-29",
+                "standard_refs": ["ASME Section VIII", "IEC 61511"]
+              },
+              {
+                "external_id": "B3.SR.HP2",
+                "path": "B3/SR/HP2",
+                "level": 3,
+                "type": "EQUIPMENT",
+                "subtype": "SAFETY_RELIEF_VALVE",
+                "parent_id": "B3.BLOC.REGUL.HP2",
+                "label_fr": "Soupape de sécurité SR HP2 — huile",
+                "label_en": "Safety relief valve SR HP2 — oil",
+                "tags": ["SR_HP2", "PSV", "HUILE", "B3"],
+                "parameters": [
+                  {
+                    "name": "set_pressure",
+                    "unit": "BAR",
+                    "value": 106.3,
+                    "critical": true,
+                    "max": 107.0
+                  }
+                ],
+                "approved_by": "ENG-SCADA-TEAM",
+                "approval_date": "2026-01-29",
+                "standard_refs": ["ASME Section VIII", "IEC 61511"]
+              },
+              {
+                "external_id": "B3.SR.BP",
+                "path": "B3/SR/BP",
+                "level": 3,
+                "type": "EQUIPMENT",
+                "subtype": "SAFETY_RELIEF_VALVE",
+                "parent_id": "B3.BLOC.REGUL.BP",
+                "label_fr": "Soupape de sécurité SR BP — huile",
+                "label_en": "Safety relief valve SR BP — oil",
+                "tags": ["SR_BP", "PSV", "HUILE", "B3"],
+                "parameters": [
+                  {
+                    "name": "set_pressure",
+                    "unit": "BAR",
+                    "value": 106.3,
+                    "critical": true,
+                    "max": 107.0
+                  }
+                ],
+                "approved_by": "ENG-SCADA-TEAM",
+                "approval_date": "2026-01-29",
+                "standard_refs": ["ASME Section VIII", "IEC 61511"]
+              },
+              {
+                "external_id": "B3.CAISSE.A.HUILE.002BA",
+                "path": "B3/CAISSE/A/HUILE/002BA",
+                "level": 3,
+                "type": "EQUIPMENT",
+                "subtype": "OIL_RESERVOIR",
+                "parent_id": "B3",
+                "label_fr": "Caisse à huile 002BA",
+                "label_en": "Oil reservoir 002BA",
+                "tags": ["CAISSE_HUILE", "002BA", "TV", "B3"],
+                "parameters": [
+                  {
+                    "name": "niveau",
+                    "unit": "%",
+                    "value": 77.5,
+                    "critical": true,
+                    "min": 60,
+                    "max": 85
+                  },
+                  {
+                    "name": "temp",
+                    "unit": "°C",
+                    "value": 20.5,
+                    "critical": true,
+                    "max": 25
+                  },
+                  {
+                    "name": "pressure",
+                    "unit": "BAR",
+                    "value": 0.1,
+                    "critical": true,
+                    "max": 0.2
+                  }
+                ],
+                "approved_by": "ENG-SCADA-TEAM",
+                "approval_date": "2026-01-29",
+                "standard_refs": ["ISO 10438", "IEC 61511"]
+              },
+                {
+                  "external_id": "B3.MOTOR.OIL.008MO",
+                  "path": "B3/MOTOR/OIL/008MO",
+                  "level": 3,
+                  "type": "EQUIPMENT",
+                  "subtype": "OIL_PUMP_MOTOR",
+                  "parent_id": "B3",
+                  "label_fr": "Moteur huile 008MO",
+                  "label_en": "Oil pump motor 008MO",
+                  "tags": ["008MO", "HUILE", "TV", "B3"],
+                  "parameters": [
+                    {
+                      "name": "status",
+                      "unit": "-",
+                      "value": "RUN",
+                      "critical": true
+                    },
+                    {
+                      "name": "temp_bearing",
+                      "unit": "°C",
+                      "critical": true,
+                      "max": 90
+                    }
+                  ],
+                  "approved_by": "ENG-SCADA-TEAM",
+                  "approval_date": "2026-01-29",
+                  "standard_refs": ["IEC 60034", "ISO 10438"]
+                },
+                {
+                  "external_id": "B3.TCV006",
+                  "path": "B3/TCV/006",
+                  "level": 3,
+                  "type": "EQUIPMENT",
+                  "subtype": "TEMP_CONTROL_VALVE",
+                  "parent_id": "B3",
+                  "label_fr": "Vanne de régulation température TCV006",
+                  "label_en": "Temperature control valve TCV006",
+                  "tags": ["TCV006", "HUILE", "TV", "B3"],
+                  "parameters": [
+                    {
+                      "name": "position",
+                      "unit": "%",
+                      "value": 100,
+                      "critical": true
+                    },
+                    {
+                      "name": "temp_upstream",
+                      "unit": "°C",
+                      "value": 63,
+                      "critical": true,
+                      "max": 65
+                    }
+                  ],
+                  "approved_by": "ENG-SCADA-TEAM",
+                  "approval_date": "2026-01-29",
+                  "standard_refs": ["ISA-75.01", "IEC 61511"]
+                },
+                {
+                  "external_id": "B3.VANNE.ZV.001",
+                  "path": "B3/VANNE/ZV/001",
+                  "level": 3,
+                  "type": "EQUIPMENT",
+                  "subtype": "DRAIN_VALVE",
+                  "parent_id": "B3",
+                  "label_fr": "Vanne de vidange 001ZV",
+                  "label_en": "Drain valve 001ZV",
+                  "tags": ["001ZV", "DRAIN", "HUILE", "B3"],
+                  "parameters": [
+                    {
+                      "name": "position",
+                      "unit": "%",
+                      "value": 0,
+                      "critical": false
+                    }
+                  ],
+                  "approved_by": "ENG-SCADA-TEAM",
+                  "approval_date": "2026-01-29",
+                  "standard_refs": ["ISO 5208"]
+                },
+                {
+                  "external_id": "B3.PUMP.SOULEV.004PO",
+                  "path": "B3/PUMP/SOULEV/004PO",
+                  "level": 3,
+                  "type": "EQUIPMENT",
+                  "subtype": "LIFT_PUMP",
+                  "parent_id": "B3",
+                  "label_fr": "Pompe de soulèvement 004PO",
+                  "label_en": "Lifting pump 004PO",
+                  "tags": ["004PO", "SOULEVEMENT", "TV", "B3"],
+                  "parameters": [
+                    {
+                      "name": "status",
+                      "unit": "-",
+                      "value": "STOP",
+                      "critical": false
+                    },
+                    {
+                      "name": "pressure",
+                      "unit": "BAR",
+                      "critical": true,
+                      "max": 5.0
+                    }
+                  ],
+                  "approved_by": "ENG-SCADA-TEAM",
+                  "approval_date": "2026-01-29",
+                  "standard_refs": ["ISO 13709", "IEC 61511"]
+                },
+                {
+                  "external_id": "B3.PUMP.SOULEV.005PO",
+                  "path": "B3/PUMP/SOULEV/005PO",
+                  "level": 3,
+                  "type": "EQUIPMENT",
+                  "subtype": "LIFT_PUMP",
+                  "parent_id": "B3",
+                  "label_fr": "Pompe de soulèvement 005PO",
+                  "label_en": "Lifting pump 005PO",
+                  "tags": ["005PO", "SOULEVEMENT", "TV", "B3"],
+                  "parameters": [
+                    {
+                      "name": "status",
+                      "unit": "-",
+                      "value": "STOP",
+                      "critical": false
+                    }
+                  ],
+                  "approved_by": "ENG-SCADA-TEAM",
+                  "approval_date": "2026-01-29",
+                  "standard_refs": ["ISO 13709", "IEC 61511"]
+                },
+                {
+                  "external_id": "B3.PUMP.SOULEV.006PO",
+                  "path": "B3/PUMP/SOULEV/006PO",
+                  "level": 3,
+                  "type": "EQUIPMENT",
+                  "subtype": "LIFT_PUMP",
+                  "parent_id": "B3",
+                  "label_fr": "Pompe de soulèvement 006PO",
+                  "label_en": "Lifting pump 006PO",
+                  "tags": ["006PO", "SOULEVEMENT", "TV", "B3"],
+                  "parameters": [
+                    {
+                      "name": "status",
+                      "unit": "-",
+                      "value": "RUN",
+                      "critical": true
+                    }
+                  ],
+                  "approved_by": "ENG-SCADA-TEAM",
+                  "approval_date": "2026-01-29",
+                  "standard_refs": ["ISO 13709", "IEC 61511"]
+                },
+                {
+                  "external_id": "B3.PUMP.SOULEV.007PO",
+                  "path": "B3/PUMP/SOULEV/007PO",
+                  "level": 3,
+                  "type": "EQUIPMENT",
+                  "subtype": "LIFT_PUMP",
+                  "parent_id": "B3",
+                  "label_fr": "Pompe de soulèvement 007PO",
+                  "label_en": "Lifting pump 007PO",
+                  "tags": ["007PO", "SOULEVEMENT", "TV", "B3"],
+                  "parameters": [
+                    {
+                      "name": "status",
+                      "unit": "-",
+                      "value": "STOP",
+                      "critical": false
+                    }
+                  ],
+                  "approved_by": "ENG-SCADA-TEAM",
+                  "approval_date": "2026-01-29",
+                  "standard_refs": ["ISO 13709", "IEC 61511"]
+                },
+                {
+                  "external_id": "B3.PUMP.SOULEV.008PO",
+                  "path": "B3/PUMP/SOULEV/008PO",
+                  "level": 3,
+                  "type": "EQUIPMENT",
+                  "subtype": "LIFT_PUMP",
+                  "parent_id": "B3",
+                  "label_fr": "Pompe de soulèvement 008PO",
+                  "label_en": "Lifting pump 008PO",
+                  "tags": ["008PO", "SOULEVEMENT", "TV", "B3"],
+                  "parameters": [
+                    {
+                      "name": "status",
+                      "unit": "-",
+                      "value": "RUN",
+                      "critical": true
+                    }
+                  ],
+                  "approved_by": "ENG-SCADA-TEAM",
+                  "approval_date": "2026-01-29",
+                  "standard_refs": ["ISO 13709", "IEC 61511"]
+                },
+                {
+                  "external_id": "B3.PUMP.SOULEV.009PO",
+                  "path": "B3/PUMP/SOULEV/009PO",
+                  "level": 3,
+                  "type": "EQUIPMENT",
+                  "subtype": "LIFT_PUMP",
+                  "parent_id": "B3",
+                  "label_fr": "Pompe de soulèvement 009PO",
+                  "label_en": "Lifting pump 009PO",
+                  "tags": ["009PO", "SOULEVEMENT", "TV", "B3"],
+                  "parameters": [
+                    {
+                      "name": "status",
+                      "unit": "-",
+                      "value": "STOP",
+                      "critical": false
+                    }
+                  ],
+                  "approved_by": "ENG-SCADA-TEAM",
+                  "approval_date": "2026-01-29",
+                  "standard_refs": ["ISO 13709", "IEC 61511"]
+                },
+                {
+                  "external_id": "B3.CAISSE.A.HUILE.001BA",
+                  "path": "B3/CAISSE/A/HUILE/001BA",
+                  "level": 3,
+                  "type": "EQUIPMENT",
+                  "subtype": "OIL_RESERVOIR",
+                  "parent_id": "B3",
+                  "label_fr": "Caisse à huile 001BA",
+                  "label_en": "Oil reservoir 001BA",
+                  "tags": ["CAISSE_HUILE", "001BA", "TV", "B3"],
+                  "parameters": [
+                    {
+                      "name": "niveau",
+                      "unit": "%",
+                      "value": 77.5,
+                      "critical": true,
+                      "min": 60,
+                      "max": 85
+                    },
+                    {
+                      "name": "temp",
+                      "unit": "°C",
+                      "value": 63,
+                      "critical": true,
+                      "max": 65
+                    },
+                    {
+                      "name": "pressure",
+                      "unit": "BAR",
+                      "value": 1.8,
+                      "critical": true,
+                      "max": 2.0
+                    }
+                  ],
+                  "approved_by": "ENG-SCADA-TEAM",
+                  "approval_date": "2026-01-29",
+                  "standard_refs": ["ISO 10438", "IEC 61511"]
+                },
+                {
+                  "external_id": "B3.FILTRE.HUILE.001FI",
+                  "path": "B3/FILTRE/HUILE/001FI",
+                  "level": 3,
+                  "type": "EQUIPMENT",
+                  "subtype": "FILTER",
+                  "parent_id": "B3",
+                  "label_fr": "Filtre huile 001FI",
+                  "label_en": "Oil filter 001FI",
+                  "tags": ["FILTRE", "HUILE", "TV", "B3"],
+                  "parameters": [
+                    {
+                      "name": "delta_p",
+                      "unit": "BAR",
+                      "critical": true,
+                      "max": 0.5
+                    },
+                    {
+                      "name": "status",
+                      "unit": "-",
+                      "value": "OK",
+                      "critical": false
+                    }
+                  ],
+                  "approved_by": "ENG-SCADA-TEAM",
+                  "approval_date": "2026-01-29",
+                  "standard_refs": ["ISO 10438", "IEC 61511"]
+                },
+                {
+                  "external_id": "B3.BLOC.REGUL.HUILE",
+                  "path": "B3/BLOC/REGUL/HUILE",
+                  "level": 3,
+                  "type": "EQUIPMENT",
+                  "subtype": "REGULATION_BLOCK",
+                  "parent_id": "B3",
+                  "label_fr": "Bloc de régulation huile",
+                  "label_en": "Oil regulation block",
+                  "tags": ["BLOC_REGUL", "HUILE", "TV", "B3"],
+                  "parameters": [
+                    {
+                      "name": "pressure_out",
+                      "unit": "BAR",
+                      "value": 18.0,
+                      "critical": true,
+                      "min": 17.0,
+                      "max": 19.0
+                    },
+                    {
+                      "name": "flow",
+                      "unit": "L/min",
+                      "critical": true,
+                      "min": 80,
+                      "max": 120
+                    }
+                  ],
+                  "approved_by": "ENG-SCADA-TEAM",
+                  "approval_date": "2026-01-29",
+                  "standard_refs": ["ISO 10438", "IEC 61511"]
+                },
+                {
+                  "external_id": "B3.SR.HUILE",
+                  "path": "B3/SR/HUILE",
+                  "level": 3,
+                  "type": "EQUIPMENT",
+                  "subtype": "SAFETY_RELIEF_VALVE",
+                  "parent_id": "B3.BLOC.REGUL.HUILE",
+                  "label_fr": "Soupape de sécurité huile",
+                  "label_en": "Oil safety relief valve",
+                  "tags": ["SR_HUILE", "PSV", "TV", "B3"],
+                  "parameters": [
+                    {
+                      "name": "set_pressure",
+                      "unit": "BAR",
+                      "value": 20.0,
+                      "critical": true,
+                      "max": 20.5
+                    },
+                    {
+                      "name": "status",
+                      "unit": "-",
+                      "value": "CLOSED",
+                      "critical": true
+                    }
+                  ],
+                  "approved_by": "ENG-SCADA-TEAM",
+                  "approval_date": "2026-01-29",
+                  "standard_refs": ["ASME Section VIII", "IEC 61511"]
+                },
+                {
+                  "id": "B3.TV",
+                  "name": "Turbine Vapeur",
+                  "type": "turbine",
+                  "path": ["B3", "TV"],
+                  "level": 2,
+                  "tags": ["TV", "STEAM", "POWER"],
+                  "parameters": [
+                    {
+                      "id": "B3.TV.HP.INLET.TEMP",
+                      "name": "Température vapeur HP entrée",
+                      "value": 505.6,
+                      "unit": "°C",
+                      "external_id": "B3TV41.HP_INLET_TEMP",
+                      "source": "HMI_20220818_REGULATION"
+                    },
+                    {
+                      "id": "B3.TV.HP.INLET.PRESS",
+                      "name": "Pression vapeur HP entrée",
+                      "value": 67.3,
+                      "unit": "bar",
+                      "external_id": "B3TV41.HP_INLET_PRESS",
+                      "source": "HMI_20220818_REGULATION"
+                    },
+                    {
+                      "id": "B3.TV.SPEED.REF",
+                      "name": "Consigne vitesse",
+                      "value": 3000.0,
+                      "unit": "tr/mn",
+                      "external_id": "B3TV41.SPEED_REF",
+                      "source": "HMI_20220818_REGULATION"
+                    },
+                    {
+                      "id": "B3.TV.LOAD.HP.LIMIT",
+                      "name": "Limite charge HP",
+                      "value": 88.5,
+                      "unit": "%",
+                      "external_id": "B3TV41.HP_LOAD_LIMIT",
+                      "source": "HMI_20220818_REGULATION"
+                    },
+                    {
+                      "id": "B3.TV.STATUS.THERMAL",
+                      "name": "État thermique",
+                      "value": "CHAUD",
+                      "unit": "",
+                      "external_id": "B3TV41.THERMAL_STATE",
+                      "source": "HMI_20220818_REGULATION",
+                      "type": "enum",
+                      "allowed_values": ["FROID", "CHAUD", "SURCHAUFFE"]
+                    },
+                    {
+                      "id": "B3.TV.SAFETY.ARMED",
+                      "name": "Sécurités armées",
+                      "value": true,
+                      "unit": "",
+                      "external_id": "B3TV41.SAFETY_ARMED",
+                      "source": "HMI_20220818_REGULATION",
+                      "type": "boolean"
+                    },
+                    {
+                      "id": "B3.TV.GRADIENT.ROTOR_1",
+                      "name": "Gradient pression 1ère roue",
+                      "value": 0.0,
+                      "unit": "bar",
+                      "external_id": "B3TV41.GRADIENT_ROTOR_1",
+                      "source": "HMI_20220818_REGULATION"
+                    },
+                    {
+                      "id": "B3.TV.FLOW.VAPOR_HP_B1",
+                      "name": "Débit vapeur HP B1",
+                      "value": 173.1,
+                      "unit": "t/h",
+                      "external_id": "B3TV41.FLOW_HP_B1",
+                      "source": "HMI_20220818_REGULATION"
+                    },
+                    {
+                      "id": "B3.TV.FLOW.VAPOR_HP_B2",
+                      "name": "Débit vapeur HP B2",
+                      "value": 183.4,
+                      "unit": "t/h",
+                      "external_id": "B3TV41.FLOW_HP_B2",
+                      "source": "HMI_20220818_REGULATION"
+                    }
+                  ],
+                  "subsystems": [
+                    { "id": "B3.TV.ARBR", "name": "Ligne d'arbre" },
+                    { "id": "B3.TV.HP", "name": "Circuit HP" },
+                    { "id": "B3.TV.BP", "name": "Circuit BP" },
+                    { "id": "B3.TV.COND", "name": "Condenseur" }
+                  ]
+                }
+              ]
+            
  
 
     

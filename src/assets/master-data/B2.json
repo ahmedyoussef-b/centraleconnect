@@ -305,5 +305,434 @@
       "approved_by": "ENG-SCADA-TEAM",
       "approval_date": "2026-01-29",
       "standard_refs": ["ISO 55001", "ISO 13709"]
-    }
-  ]
+    },
+      {
+        "external_id": "B2.CHAUDIERE.1",
+        "path": "B2/CHAUDIERE/1",
+        "level": 2,
+        "type": "EQUIPMENT",
+        "subtype": "BOILER",
+        "parent_id": "B2",
+        "label_fr": "Chaudière 1 — basse pression",
+        "label_en": "Boiler 1 — low pressure",
+        "tags": ["CHAUDIERE", "BP", "CR1", "B2"],
+        "parameters": [
+          {
+            "name": "temp_sortie",
+            "unit": "°C",
+            "value": 219.7,
+            "critical": true,
+            "max": 225
+          },
+          {
+            "name": "pression",
+            "unit": "BAR",
+            "value": 5.0,
+            "critical": true,
+            "max": 5.2
+          },
+          {
+            "name": "debit_vapeur",
+            "unit": "T/H",
+            "value": 38.3,
+            "critical": true,
+            "min": 35,
+            "max": 40
+          }
+        ],
+        "approved_by": "ENG-SCADA-TEAM",
+        "approval_date": "2026-01-29",
+        "standard_refs": ["ASME BPVC Section I", "IEC 61511"]
+      },
+      {
+        "external_id": "B2.SURCHAUFFEUR.BP",
+        "path": "B2/SURCHAUFFEUR/BP",
+        "level": 2,
+        "type": "EQUIPMENT",
+        "subtype": "SUPERHEATER",
+        "parent_id": "B2.CHAUDIERE.1",
+        "label_fr": "Surchauffeur basse pression — Chaudière 1",
+        "label_en": "Low-pressure superheater — Boiler 1",
+        "tags": ["SURCHAUFFEUR", "BP", "CR1", "B2"],
+        "parameters": [
+          {
+            "name": "temp_sortie",
+            "unit": "°C",
+            "value": 210.6,
+            "critical": true,
+            "max": 215
+          },
+          {
+            "name": "pression",
+            "unit": "BAR",
+            "value": 5.0,
+            "critical": true,
+            "max": 5.2
+          }
+        ],
+        "approved_by": "ENG-SCADA-TEAM",
+        "approval_date": "2026-01-29",
+        "standard_refs": ["ASME VIII", "IEC 61511"]
+      },
+      {
+        "external_id": "B2.BALLON.BP.1",
+        "path": "B2/BALLON/BP/1",
+        "level": 2,
+        "type": "EQUIPMENT",
+        "subtype": "DRUM",
+        "parent_id": "B2.CHAUDIERE.1",
+        "label_fr": "Ballon basse pression — Chaudière 1",
+        "label_en": "LP drum — Boiler 1",
+        "tags": ["BALLON", "BP", "CR1", "B2"],
+        "parameters": [
+          {
+            "name": "niveau",
+            "unit": "MM",
+            "value": 202,
+            "critical": true,
+            "min": 150,
+            "max": 250
+          },
+          {
+            "name": "temp",
+            "unit": "°C",
+            "value": 160,
+            "critical": true,
+            "max": 165
+          },
+          {
+            "name": "pression",
+            "unit": "BAR",
+            "value": 5.2,
+            "critical": true,
+            "max": 5.5
+          }
+        ],
+        "approved_by": "ENG-SCADA-TEAM",
+        "approval_date": "2026-01-29",
+        "standard_refs": ["ASME VIII", "ISO 55001"]
+      },
+      {
+        "external_id": "B2.VA.BP",
+        "path": "B2/VA/BP",
+        "level": 2,
+        "type": "EQUIPMENT",
+        "subtype": "CONTROL_VALVE",
+        "parent_id": "B2.SURCHAUFFEUR.BP",
+        "label_fr": "Vanne d’alimentation VA BP",
+        "label_en": "Feed valve VA BP",
+        "tags": ["VA_BP", "B2"],
+        "parameters": [
+          {
+            "name": "position",
+            "unit": "%",
+            "value": 77.5,
+            "critical": true
+          }
+        ],
+        "approved_by": "ENG-SCADA-TEAM",
+        "approval_date": "2026-01-29",
+        "standard_refs": ["ISA-75.01", "IEC 61511"]
+      },
+      {
+        "external_id": "B2.SR.BP",
+        "path": "B2/SR/BP",
+        "level": 2,
+        "type": "EQUIPMENT",
+        "subtype": "SAFETY_RELIEF_VALVE",
+        "parent_id": "B2.SURCHAUFFEUR.BP",
+        "label_fr": "Soupape de sécurité SR BP",
+        "label_en": "Safety relief valve SR BP",
+        "tags": ["SR_BP", "PSV", "B2"],
+        "parameters": [
+          {
+            "name": "set_pressure",
+            "unit": "BAR",
+            "value": 5.0,
+            "critical": true,
+            "max": 5.1
+          },
+          {
+            "name": "status",
+            "unit": "-",
+            "value": "CLOSED",
+            "critical": true
+          }
+        ],
+        "approved_by": "ENG-SCADA-TEAM",
+        "approval_date": "2026-01-29",
+        "standard_refs": ["ASME Section VIII", "IEC 61511"]
+      },
+      {
+        "external_id": "B2.PCV001",
+        "path": "B2/PCV/001",
+        "level": 2,
+        "type": "EQUIPMENT",
+        "subtype": "PRESSURE_CONTROL_VALVE",
+        "parent_id": "B2",
+        "label_fr": "Vanne de régulation pression PCV001 — contournement BP1",
+        "label_en": "Pressure control valve PCV001 — BP bypass 1",
+        "tags": ["PCV001", "CONTOURNEMENT", "BP", "B2"],
+        "parameters": [
+          {
+            "name": "position",
+            "unit": "%",
+            "value": 1.3,
+            "critical": true
+          },
+          {
+            "name": "debit",
+            "unit": "T/H",
+            "value": 2.5,
+            "critical": false
+          },
+          {
+            "name": "press_downstream",
+            "unit": "BAR",
+            "value": 0.2,
+            "critical": false
+          }
+        ],
+        "approved_by": "ENG-SCADA-TEAM",
+        "approval_date": "2026-01-29",
+        "standard_refs": ["IEC 61511", "ISA-75.01"]
+      },
+      {
+        "external_id": "B2.UV002",
+        "path": "B2/UV/002",
+        "level": 2,
+        "type": "EQUIPMENT",
+        "subtype": "VALVE",
+        "parent_id": "B2.CHAUDIERE.1",
+        "label_fr": "Vanne motorisée UV002 — circuit BP CR1",
+        "label_en": "Motorized valve UV002 — BP circuit CR1",
+        "tags": ["UV002", "CR1", "B2"],
+        "parameters": [
+          {
+            "name": "position",
+            "unit": "%",
+            "value": 100,
+            "critical": false
+          }
+        ],
+        "approved_by": "ENG-SCADA-TEAM",
+        "approval_date": "2026-01-29",
+        "standard_refs": ["ISO 5208"]
+      },
+      {
+        "external_id": "B2.UV004",
+        "path": "B2/UV/004",
+        "level": 2,
+        "type": "EQUIPMENT",
+        "subtype": "VALVE",
+        "parent_id": "B2.CHAUDIERE.1",
+        "label_fr": "Vanne motorisée UV004 — circuit BP CR1",
+        "label_en": "Motorized valve UV004 — BP circuit CR1",
+        "tags": ["UV004", "CR1", "B2"],
+        "parameters": [
+          {
+            "name": "position",
+            "unit": "%",
+            "value": 100,
+            "critical": false
+          }
+        ],
+        "approved_by": "ENG-SCADA-TEAM",
+        "approval_date": "2026-01-29",
+        "standard_refs": ["ISO 5208"]
+      },
+      {
+        "external_id": "B2.B1ACO.UCV002",
+        "path": "B2/B1ACO/UCV/002",
+        "level": 2,
+        "type": "EQUIPMENT",
+        "subtype": "CONTROL_VALVE",
+        "parent_id": "B2",
+        "label_fr": "Vanne de contrôle UCV002 — B1ACO",
+        "label_en": "Control valve UCV002 — B1ACO",
+        "tags": ["UCV002", "B1ACO", "B2"],
+        "parameters": [
+          {
+            "name": "position",
+            "unit": "%",
+            "value": 100,
+            "critical": false
+          }
+        ],
+        "approved_by": "ENG-SCADA-TEAM",
+        "approval_date": "2026-01-29",
+        "standard_refs": ["ISA-75.01"]
+      },
+      {
+        "external_id": "B2.B3ACO.UCV002",
+        "path": "B2/B3ACO/UCV/002",
+        "level": 2,
+        "type": "EQUIPMENT",
+        "subtype": "CONTROL_VALVE",
+        "parent_id": "B2",
+        "label_fr": "Vanne de contrôle UCV002 — B3ACO",
+        "label_en": "Control valve UCV002 — B3ACO",
+        "tags": ["UCV002", "B3ACO", "B2"],
+        "parameters": [
+          {
+            "name": "position",
+            "unit": "%",
+            "value": 100,
+            "critical": false
+          }
+        ],
+        "approved_by": "ENG-SCADA-TEAM",
+        "approval_date": "2026-01-29",
+        "standard_refs": ["ISA-75.01"]
+      },
+      {
+        "external_id": "B2.B3ACO.UCV004",
+        "path": "B2/B3ACO/UCV/004",
+        "level": 2,
+        "type": "EQUIPMENT",
+        "subtype": "CONTROL_VALVE",
+        "parent_id": "B2",
+        "label_fr": "Vanne de contrôle UCV004 — B3ACO",
+        "label_en": "Control valve UCV004 — B3ACO",
+        "tags": ["UCV004", "B3ACO", "B2"],
+        "parameters": [
+          {
+            "name": "position",
+            "unit": "%",
+            "value": 100,
+            "critical": false
+          }
+        ],
+        "approved_by": "ENG-SCADA-TEAM",
+        "approval_date": "2026-01-29",
+        "standard_refs": ["ISA-75.01"]
+      },
+      {
+        "external_id": "B2.DESURCHAUFEUR.1",
+        "path": "B2/DESURCHAUFEUR/1",
+        "level": 2,
+        "type": "EQUIPMENT",
+        "subtype": "DESUPERHEATER",
+        "parent_id": "B2",
+        "label_fr": "Désurchauffeur 1 — 101 DD (BP)",
+        "label_en": "Desuperheater 1 — 101 DD (LP)",
+        "tags": ["DESURCH", "101DD", "BP", "B2"],
+        "parameters": [
+          {
+            "name": "temp_sortie",
+            "unit": "°C",
+            "value": 48.1,
+            "critical": true,
+            "max": 50
+          },
+          {
+            "name": "pression",
+            "unit": "BAR",
+            "value": 12.3,
+            "critical": true,
+            "max": 13.0
+          }
+        ],
+        "approved_by": "ENG-SCADA-TEAM",
+        "approval_date": "2026-01-29",
+        "standard_refs": ["ASME VIII", "IEC 61511"]
+      },
+      {
+        "external_id": "B2.CONDENSEUR",
+        "path": "B2/CONDENSEUR",
+        "level": 2,
+        "type": "EQUIPMENT",
+        "subtype": "CONDENSER",
+        "parent_id": "B2",
+        "label_fr": "Condenseur — circuit BP CR1",
+        "label_en": "Condenser — LP circuit CR1",
+        "tags": ["CONDENSEUR", "CR1", "B2"],
+        "parameters": [
+          {
+            "name": "temp_eau_entree",
+            "unit": "°C",
+            "value": 46.6,
+            "critical": true,
+            "max": 50
+          },
+          {
+            "name": "temp_eau_sortie",
+            "unit": "°C",
+            "value": 48.1,
+            "critical": true,
+            "max": 55
+          },
+          {
+            "name": "niveau",
+            "unit": "MM",
+            "value": 600.7,
+            "critical": true,
+            "min": 500,
+            "max": 650
+          },
+          {
+            "name": "pression_vide",
+            "unit": "mBAR",
+            "value": 96.1,
+            "critical": true,
+            "min": 90,
+            "max": 100
+          },
+          {
+            "name": "conductivity",
+            "unit": "µS/cm",
+            "value": 0.1,
+            "critical": true,
+            "max": 0.2
+          }
+        ],
+        "approved_by": "ENG-SCADA-TEAM",
+        "approval_date": "2026-01-29",
+        "standard_refs": ["ASME VIII", "IEC 61511"]
+      },
+      {
+        "external_id": "B2.UV102",
+        "path": "B2/UV/102",
+        "level": 2,
+        "type": "EQUIPMENT",
+        "subtype": "VALVE",
+        "parent_id": "B2.CONDENSEUR",
+        "label_fr": "Vanne motorisée UV102 — condenseur BP",
+        "label_en": "Motorized valve UV102 — LP condenser",
+        "tags": ["UV102", "CONDENSEUR", "B2"],
+        "parameters": [
+          {
+            "name": "position",
+            "unit": "%",
+            "value": 100,
+            "critical": false
+          }
+        ],
+        "approved_by": "ENG-SCADA-TEAM",
+        "approval_date": "2026-01-29",
+        "standard_refs": ["ISO 5208"]
+      },
+      {
+        "external_id": "B2.UV103",
+        "path": "B2/UV/103",
+        "level": 2,
+        "type": "EQUIPMENT",
+        "subtype": "VALVE",
+        "parent_id": "B2.CONDENSEUR",
+        "label_fr": "Vanne motorisée UV103 — condenseur BP",
+        "label_en": "Motorized valve UV103 — LP condenser",
+        "tags": ["UV103", "CONDENSEUR", "B2"],
+        "parameters": [
+          {
+            "name": "position",
+            "unit": "%",
+            "value": 100,
+            "critical": false
+          }
+        ],
+        "approved_by": "ENG-SCADA-TEAM",
+        "approval_date": "2026-01-29",
+        "standard_refs": ["ISO 5208"]
+      }
+    ]
+  

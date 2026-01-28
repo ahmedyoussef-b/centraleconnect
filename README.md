@@ -140,11 +140,12 @@ Voici un plan de progression logique pour faire évoluer ce MVP robuste vers une
     1.  **Chat Contextuel :** Sur la nouvelle page de détail d'un équipement, ajouter un widget de chat simple.
     2.  **Canaux Ably :** Utiliser des canaux Ably dédiés (ex: `chat:equipment:TG1`) pour que les messages soient pertinents au contexte de travail de l'opérateur.
 
-**4. Finaliser l'Intégration SCADA :**
-*   **Objectif :** Remplacer les données simulées par une connexion à une source de données réelle.
+**4. Finaliser l'Intégration SCADA (en cours) :**
+*   **Objectif :** Remplacer les données simulées par une connexion à une source de données réelle via OPC UA.
+*   **État d'avancement : 60%** - Préparation terminée.
 *   **Étapes clés :**
-    1.  **Connecteur OPC UA/MQTT :** Implémenter un service (côté backend Node.js si l'architecture évolue, ou via un bridge Rust dans Tauri) qui se connecte au serveur SCADA.
-    2.  **Publication sur Ably :** Ce service publiera les données réelles sur le canal `scada:data`, remplaçant ainsi le simulateur actuel sans nécessiter de changement sur l'interface utilisateur.
-    3.  **Validation automatique des procédures :** Utiliser ces données réelles pour valider automatiquement certaines étapes des procédures guidées (ex: "Attendre que la température T > 150°C").
-
-  
+    1.  **Préparation du Mapping (FAIT ✅) :** Un script `npm run generate:scada-map` a été créé pour générer une première version du fichier de mapping (`public/scada-mapping.json`) entre les `external_id` de l'application et les tags SCADA.
+    2.  **Validation du Mapping (À FAIRE ⏳) :** Le fichier `scada-mapping.json` doit être validé et complété manuellement par un ingénieur système pour garantir la correspondance exacte avec les tags du serveur OPC UA.
+    3.  **Implémentation du Connecteur OPC UA (À FAIRE ⏳) :** Développer le service (côté Rust/Tauri) qui se connecte au serveur OPC UA en utilisant le mapping validé.
+    4.  **Publication des Données (À FAIRE ⏳) :** Le connecteur publiera les données temps réel sur le canal Ably `scada:data`.
+*   **Documentation :** Un plan d'intégration détaillé est disponible dans `docs/SCADA_INTEGRATION_PLAN.md`.
