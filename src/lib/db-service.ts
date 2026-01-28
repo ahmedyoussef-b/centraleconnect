@@ -76,7 +76,7 @@ CREATE TABLE IF NOT EXISTS alarms (
     component_id TEXT NOT NULL,
     code TEXT NOT NULL,
     description TEXT,
-    severity TEXT CHECK(severity IN ('INFO', 'WARNING', 'CRITICAL')),
+    severity TEXT CHECK(severity IN ('INFO', 'WARNING', 'CRITICAL', 'EMERGENCY')),
     UNIQUE(component_id, code)
 );
 

@@ -1,19 +1,18 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["driverAdapters"]
-}
-
 datasource db {
   provider = "sqlite"
   url      = "file:./ccpp.db"
 }
 
-/// Modèle pour les composants principaux de la centrale (Turbines, Pompes, etc.)
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
 model Component {
-  id          String     @id @map("id")
+  id          String     @id
   name        String
   description String?
   type        String
@@ -25,9 +24,8 @@ model Component {
   @@map("components")
 }
 
-/// Modèle pour les paramètres techniques d'un composant
 model Parameter {
-  id            Int      @id @default(autoincrement())
+  id            Int       @id @default(autoincrement())
   component_id  String
   name          String
   unit          String?
@@ -39,26 +37,22 @@ model Parameter {
   @@map("parameters")
 }
 
-/// Modèle pour les définitions d'alarmes liées à un composant
 model Alarm {
-  id           Int       @id @default(autoincrement())
+  id           Int     @id @default(autoincrement())
   component_id String
   code         String
   description  String?
-  /// Doit être 'INFO', 'WARNING', ou 'CRITICAL'
-  severity     String
+  severity     String // 'INFO', 'WARNING', 'CRITICAL', 'EMERGENCY'
   component    Component @relation(fields: [component_id], references: [id])
 
   @@unique([component_id, code])
   @@map("alarms")
 }
 
-/// Modèle pour les entrées du journal de bord, avec signature en chaîne pour l'intégrité.
 model LogEntry {
-  id           Int       @id @default(autoincrement())
-  timestamp    DateTime  @default(now())
-  /// Doit être 'AUTO', 'MANUAL', ou 'DOCUMENT_ADDED'
-  type         String
+  id           Int        @id @default(autoincrement())
+  timestamp    DateTime   @default(now())
+  type         String // 'AUTO', 'MANUAL', 'DOCUMENT_ADDED'
   source       String
   message      String
   component_id String?
@@ -68,61 +62,54 @@ model LogEntry {
   @@map("log_entries")
 }
 
-/// Modèle pour les documents multimédias associés à un composant
 model Document {
   id           Int      @id @default(autoincrement())
   component_id String
-  /// Doit être 'PHOTO_ID_PLATE', 'MANUAL_PAGE', ou 'P&ID_SNIPPET'
-  type         String
+  type         String // 'PHOTO_ID_PLATE', 'MANUAL_PAGE', 'P&ID_SNIPPET'
   description  String?
-  /// Données de l'image encodées en Base64
   image_data   String?
   ocr_text     String?
-  created_at   DateTime  @default(now())
+  created_at   DateTime @default(now())
   component    Component @relation(fields: [component_id], references: [id], onDelete: Cascade)
 
   @@map("documents")
 }
 
-/// Modèle pour les noeuds fonctionnels issus des P&ID (norme ISA-88/IEC 61512)
 model FunctionalNode {
-  id                  Int          @id @default(autoincrement())
-  external_id         String       @unique
-  system              String
-  subsystem           String
-  document            String?
-  tag                 String?
-  type                String
-  name                String
-  description         String?
-  location            String?
-  /// Coordonnées au format JSON
-  coordinates         Json?
-  /// Paramètres liés au format JSON
-  linked_parameters   Json?
-  svg_layer           String?
-  fire_zone           String?
-  status              String
-  checksum            String
-  created_at          DateTime
-  updated_at          DateTime
-  approved_by         String?
-  approved_at         DateTime?
-  annotations         Annotation[]
+  id                Int      @id @default(autoincrement())
+  external_id       String   @unique
+  system            String
+  subsystem         String
+  document          String?
+  tag               String?
+  type              String
+  name              String
+  description       String?
+  location          String?
+  coordinates       String? // JSON stored as string
+  linked_parameters String? // JSON stored as string
+  svg_layer         String?
+  fire_zone         String?
+  status            String
+  checksum          String
+  created_at        DateTime
+  updated_at        DateTime
+  approved_by       String?
+  approved_at       DateTime?
+  annotations       Annotation[]
 
   @@map("functional_nodes")
 }
 
-/// Modèle pour les annotations sur les schémas P&ID
 model Annotation {
-  id                        Int          @id @default(autoincrement())
+  id                          Int      @id @default(autoincrement())
   functional_node_external_id String
-  text                      String
-  operator                  String
-  timestamp                 DateTime     @default(now())
-  x_pos                     Float
-  y_pos                     Float
-  functional_node           FunctionalNode @relation(fields: [functional_node_external_id], references: [external_id])
+  text                        String
+  operator                    String
+  timestamp                   DateTime @default(now())
+  x_pos                       Float
+  y_pos                       Float
+  functional_node             FunctionalNode @relation(fields: [functional_node_external_id], references: [external_id])
 
   @@map("annotations")
 }

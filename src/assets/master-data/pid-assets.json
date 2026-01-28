@@ -1,705 +1,1055 @@
-
 {
-    "version": "1.0.0",
-    "generated_at": "2026-01-28T12:00:00Z",
-    "approved_by": "ENG-SCADA-TEAM",
-    "approved_at": null,
-    "standard_references": {
-      "iso_55001": "Asset Management",
-      "iec_61511": "Functional Safety",
-      "eu_ied": "Industrial Emissions Directive"
+  "version": "1.0.0",
+  "generated_at": "2026-01-28T12:00:00Z",
+  "approved_by": "ENG-SCADA-TEAM",
+  "approved_at": "2026-01-28T11:59:14.764Z",
+  "standard_references": {
+    "iso_55001": "Asset Management",
+    "iec_61511": "Functional Safety",
+    "eu_ied": "Industrial Emissions Directive"
+  },
+  "checksum_seed": "168fca182b97f59c076dce422bc7206a8c82ed08c2a3bbbead4745496099d850",
+  "nodes": [
+    {
+      "external_id": "A0.FIRE.DET.DF002",
+      "system": "A0",
+      "subsystem": "FIRE.DET",
+      "document": "part10",
+      "tag": "DF002",
+      "type": "smoke_detector",
+      "name": "Détecteur fumée zone 41",
+      "description": "Détecteur optique de fumée - bâtiment électrique TG niveau -1.00",
+      "location": "BATIMENT_ELEC_TG_NIV_-1.00_ZONE41",
+      "coordinates": {
+        "x": 145,
+        "y": 222,
+        "page": "part10"
+      },
+      "linked_parameters": [
+        "FIRE.ZONE41.ACTIVE",
+        "FIRE.ALARM.STATUS"
+      ],
+      "svg_layer": "detection",
+      "fire_zone": "ZONE41",
+      "status": "PENDING_APPROVAL"
     },
-    "checksum_seed": null,
-    "nodes": [
-      {
-        "external_id": "A0.FIRE.DET.DF002",
-        "system": "A0",
-        "subsystem": "FIRE.DET",
-        "document": "part10",
-        "tag": "DF002",
-        "type": "smoke_detector",
-        "name": "Détecteur fumée zone 41",
-        "description": "Détecteur optique de fumée - bâtiment électrique TG niveau -1.00",
-        "location": "BATIMENT_ELEC_TG_NIV_-1.00_ZONE41",
-        "coordinates": { "x": 145, "y": 222, "page": "part10" },
-        "linked_parameters": ["FIRE.ZONE41.ACTIVE", "FIRE.ALARM.STATUS"],
-        "svg_layer": "detection",
-        "fire_zone": "ZONE41",
-        "status": "PENDING_APPROVAL"
+    {
+      "external_id": "A0.FIRE.DET.DF003",
+      "system": "A0",
+      "subsystem": "FIRE.DET",
+      "document": "part10",
+      "tag": "DF003",
+      "type": "smoke_detector",
+      "name": "Détecteur fumée zone 41",
+      "description": "Détecteur optique de fumée - bâtiment électrique TG niveau -1.00",
+      "location": "BATIMENT_ELEC_TG_NIV_-1.00_ZONE41",
+      "coordinates": {
+        "x": 160,
+        "y": 210,
+        "page": "part10"
       },
-      {
-        "external_id": "A0.FIRE.DET.DF003",
-        "system": "A0",
-        "subsystem": "FIRE.DET",
-        "document": "part10",
-        "tag": "DF003",
-        "type": "smoke_detector",
-        "name": "Détecteur fumée zone 41",
-        "description": "Détecteur optique de fumée - bâtiment électrique TG niveau -1.00",
-        "location": "BATIMENT_ELEC_TG_NIV_-1.00_ZONE41",
-        "coordinates": { "x": 160, "y": 210, "page": "part10" },
-        "linked_parameters": ["FIRE.ZONE41.ACTIVE", "FIRE.ALARM.STATUS"],
-        "svg_layer": "detection",
-        "fire_zone": "ZONE41",
-        "status": "PENDING_APPROVAL"
+      "linked_parameters": [
+        "FIRE.ZONE41.ACTIVE",
+        "FIRE.ALARM.STATUS"
+      ],
+      "svg_layer": "detection",
+      "fire_zone": "ZONE41",
+      "status": "PENDING_APPROVAL"
+    },
+    {
+      "external_id": "A0.FIRE.DET.DF004",
+      "system": "A0",
+      "subsystem": "FIRE.DET",
+      "document": "part10",
+      "tag": "DF004",
+      "type": "smoke_detector",
+      "name": "Détecteur fumée zone 41",
+      "description": "Détecteur optique de fumée - bâtiment électrique TG niveau -1.00",
+      "location": "BATIMENT_ELEC_TG_NIV_-1.00_ZONE41",
+      "coordinates": {
+        "x": 175,
+        "y": 195,
+        "page": "part10"
       },
-      {
-        "external_id": "A0.FIRE.DET.DF004",
-        "system": "A0",
-        "subsystem": "FIRE.DET",
-        "document": "part10",
-        "tag": "DF004",
-        "type": "smoke_detector",
-        "name": "Détecteur fumée zone 41",
-        "description": "Détecteur optique de fumée - bâtiment électrique TG niveau -1.00",
-        "location": "BATIMENT_ELEC_TG_NIV_-1.00_ZONE41",
-        "coordinates": { "x": 175, "y": 195, "page": "part10" },
-        "linked_parameters": ["FIRE.ZONE41.ACTIVE", "FIRE.ALARM.STATUS"],
-        "svg_layer": "detection",
-        "fire_zone": "ZONE41",
-        "status": "PENDING_APPROVAL"
+      "linked_parameters": [
+        "FIRE.ZONE41.ACTIVE",
+        "FIRE.ALARM.STATUS"
+      ],
+      "svg_layer": "detection",
+      "fire_zone": "ZONE41",
+      "status": "PENDING_APPROVAL"
+    },
+    {
+      "external_id": "A0.FIRE.DET.DF005",
+      "system": "A0",
+      "subsystem": "FIRE.DET",
+      "document": "part10",
+      "tag": "DF005",
+      "type": "smoke_detector",
+      "name": "Détecteur fumée zone 41",
+      "description": "Détecteur optique de fumée - bâtiment électrique TG niveau -1.00",
+      "location": "BATIMENT_ELEC_TG_NIV_-1.00_ZONE41",
+      "coordinates": {
+        "x": 190,
+        "y": 180,
+        "page": "part10"
       },
-      {
-        "external_id": "A0.FIRE.DET.DF005",
-        "system": "A0",
-        "subsystem": "FIRE.DET",
-        "document": "part10",
-        "tag": "DF005",
-        "type": "smoke_detector",
-        "name": "Détecteur fumée zone 41",
-        "description": "Détecteur optique de fumée - bâtiment électrique TG niveau -1.00",
-        "location": "BATIMENT_ELEC_TG_NIV_-1.00_ZONE41",
-        "coordinates": { "x": 190, "y": 180, "page": "part10" },
-        "linked_parameters": ["FIRE.ZONE41.ACTIVE", "FIRE.ALARM.STATUS"],
-        "svg_layer": "detection",
-        "fire_zone": "ZONE41",
-        "status": "PENDING_APPROVAL"
+      "linked_parameters": [
+        "FIRE.ZONE41.ACTIVE",
+        "FIRE.ALARM.STATUS"
+      ],
+      "svg_layer": "detection",
+      "fire_zone": "ZONE41",
+      "status": "PENDING_APPROVAL"
+    },
+    {
+      "external_id": "A0.FIRE.DET.DF006",
+      "system": "A0",
+      "subsystem": "FIRE.DET",
+      "document": "part10",
+      "tag": "DF006",
+      "type": "smoke_detector",
+      "name": "Détecteur fumée zone 41",
+      "description": "Détecteur optique de fumée - bâtiment électrique TG niveau -1.00",
+      "location": "BATIMENT_ELEC_TG_NIV_-1.00_ZONE41",
+      "coordinates": {
+        "x": 205,
+        "y": 165,
+        "page": "part10"
       },
-      {
-        "external_id": "A0.FIRE.DET.DF006",
-        "system": "A0",
-        "subsystem": "FIRE.DET",
-        "document": "part10",
-        "tag": "DF006",
-        "type": "smoke_detector",
-        "name": "Détecteur fumée zone 41",
-        "description": "Détecteur optique de fumée - bâtiment électrique TG niveau -1.00",
-        "location": "BATIMENT_ELEC_TG_NIV_-1.00_ZONE41",
-        "coordinates": { "x": 205, "y": 165, "page": "part10" },
-        "linked_parameters": ["FIRE.ZONE41.ACTIVE", "FIRE.ALARM.STATUS"],
-        "svg_layer": "detection",
-        "fire_zone": "ZONE41",
-        "status": "PENDING_APPROVAL"
+      "linked_parameters": [
+        "FIRE.ZONE41.ACTIVE",
+        "FIRE.ALARM.STATUS"
+      ],
+      "svg_layer": "detection",
+      "fire_zone": "ZONE41",
+      "status": "PENDING_APPROVAL"
+    },
+    {
+      "external_id": "A0.FIRE.DET.DF007",
+      "system": "A0",
+      "subsystem": "FIRE.DET",
+      "document": "part10",
+      "tag": "DF007",
+      "type": "smoke_detector",
+      "name": "Détecteur fumée zone 42",
+      "description": "Détecteur optique de fumée - local batterie niveau -1.00",
+      "location": "BATIMENT_ELEC_TG_NIV_-1.00_ZONE42",
+      "coordinates": {
+        "x": 220,
+        "y": 150,
+        "page": "part10"
       },
-      {
-        "external_id": "A0.FIRE.DET.DF007",
-        "system": "A0",
-        "subsystem": "FIRE.DET",
-        "document": "part10",
-        "tag": "DF007",
-        "type": "smoke_detector",
-        "name": "Détecteur fumée zone 42",
-        "description": "Détecteur optique de fumée - local batterie niveau -1.00",
-        "location": "BATIMENT_ELEC_TG_NIV_-1.00_ZONE42",
-        "coordinates": { "x": 220, "y": 150, "page": "part10" },
-        "linked_parameters": ["FIRE.ZONE42.ACTIVE", "FIRE.ALARM.STATUS"],
-        "svg_layer": "detection",
-        "fire_zone": "ZONE42",
-        "status": "PENDING_APPROVAL"
+      "linked_parameters": [
+        "FIRE.ZONE42.ACTIVE",
+        "FIRE.ALARM.STATUS"
+      ],
+      "svg_layer": "detection",
+      "fire_zone": "ZONE42",
+      "status": "PENDING_APPROVAL"
+    },
+    {
+      "external_id": "A0.FIRE.DET.DF008",
+      "system": "A0",
+      "subsystem": "FIRE.DET",
+      "document": "part10",
+      "tag": "DF008",
+      "type": "smoke_detector",
+      "name": "Détecteur fumée zone 42",
+      "description": "Détecteur optique de fumée - local diesel niveau -1.00",
+      "location": "BATIMENT_ELEC_TG_NIV_-1.00_ZONE42",
+      "coordinates": {
+        "x": 235,
+        "y": 135,
+        "page": "part10"
       },
-      {
-        "external_id": "A0.FIRE.DET.DF008",
-        "system": "A0",
-        "subsystem": "FIRE.DET",
-        "document": "part10",
-        "tag": "DF008",
-        "type": "smoke_detector",
-        "name": "Détecteur fumée zone 42",
-        "description": "Détecteur optique de fumée - local diesel niveau -1.00",
-        "location": "BATIMENT_ELEC_TG_NIV_-1.00_ZONE42",
-        "coordinates": { "x": 235, "y": 135, "page": "part10" },
-        "linked_parameters": ["FIRE.ZONE42.ACTIVE", "FIRE.ALARM.STATUS"],
-        "svg_layer": "detection",
-        "fire_zone": "ZONE42",
-        "status": "PENDING_APPROVAL"
+      "linked_parameters": [
+        "FIRE.ZONE42.ACTIVE",
+        "FIRE.ALARM.STATUS"
+      ],
+      "svg_layer": "detection",
+      "fire_zone": "ZONE42",
+      "status": "PENDING_APPROVAL"
+    },
+    {
+      "external_id": "A0.FIRE.DET.DF009",
+      "system": "A0",
+      "subsystem": "FIRE.DET",
+      "document": "part10",
+      "tag": "DF009",
+      "type": "smoke_detector",
+      "name": "Détecteur fumée zone 42",
+      "description": "Détecteur optique de fumée - local diesel niveau -1.00",
+      "location": "BATIMENT_ELEC_TG_NIV_-1.00_ZONE42",
+      "coordinates": {
+        "x": 250,
+        "y": 120,
+        "page": "part10"
       },
-      {
-        "external_id": "A0.FIRE.DET.DF009",
-        "system": "A0",
-        "subsystem": "FIRE.DET",
-        "document": "part10",
-        "tag": "DF009",
-        "type": "smoke_detector",
-        "name": "Détecteur fumée zone 42",
-        "description": "Détecteur optique de fumée - local diesel niveau -1.00",
-        "location": "BATIMENT_ELEC_TG_NIV_-1.00_ZONE42",
-        "coordinates": { "x": 250, "y": 120, "page": "part10" },
-        "linked_parameters": ["FIRE.ZONE42.ACTIVE", "FIRE.ALARM.STATUS"],
-        "svg_layer": "detection",
-        "fire_zone": "ZONE42",
-        "status": "PENDING_APPROVAL"
+      "linked_parameters": [
+        "FIRE.ZONE42.ACTIVE",
+        "FIRE.ALARM.STATUS"
+      ],
+      "svg_layer": "detection",
+      "fire_zone": "ZONE42",
+      "status": "PENDING_APPROVAL"
+    },
+    {
+      "external_id": "A0.FIRE.DET.MS222",
+      "system": "A0",
+      "subsystem": "FIRE.DET",
+      "document": "part10",
+      "tag": "MS222",
+      "type": "heat_detector",
+      "name": "Détecteur thermique",
+      "description": "Détecteur thermostatique - câblage zone 01",
+      "location": "BATIMENT_ELEC_TG_NIV_-1.00_ZONE01",
+      "coordinates": {
+        "x": 265,
+        "y": 105,
+        "page": "part10"
       },
-      {
-        "external_id": "A0.FIRE.DET.MS222",
-        "system": "A0",
-        "subsystem": "FIRE.DET",
-        "document": "part10",
-        "tag": "MS222",
-        "type": "heat_detector",
-        "name": "Détecteur thermique",
-        "description": "Détecteur thermostatique - câblage zone 01",
-        "location": "BATIMENT_ELEC_TG_NIV_-1.00_ZONE01",
-        "coordinates": { "x": 265, "y": 105, "page": "part10" },
-        "linked_parameters": ["FIRE.ZONE01.ACTIVE", "FIRE.ALARM.STATUS"],
-        "svg_layer": "detection",
-        "fire_zone": "ZONE01",
-        "status": "PENDING_APPROVAL"
+      "linked_parameters": [
+        "FIRE.ZONE01.ACTIVE",
+        "FIRE.ALARM.STATUS"
+      ],
+      "svg_layer": "detection",
+      "fire_zone": "ZONE01",
+      "status": "PENDING_APPROVAL"
+    },
+    {
+      "external_id": "A0.FIRE.ALARM.PHN801",
+      "system": "A0",
+      "subsystem": "FIRE.ALARM",
+      "document": "part10",
+      "tag": "PHN801",
+      "type": "acoustic_alarm",
+      "name": "Système diffusion sonore",
+      "description": "Alarme sonore + déclenchement délestage",
+      "location": "BATIMENT_ELEC_TG_NIV_-1.00",
+      "coordinates": {
+        "x": 170,
+        "y": 15,
+        "page": "part10"
       },
-      {
-        "external_id": "A0.FIRE.ALARM.PHN801",
-        "system": "A0",
-        "subsystem": "FIRE.ALARM",
-        "document": "part10",
-        "tag": "PHN801",
-        "type": "acoustic_alarm",
-        "name": "Système diffusion sonore",
-        "description": "Alarme sonore + déclenchement délestage",
-        "location": "BATIMENT_ELEC_TG_NIV_-1.00",
-        "coordinates": { "x": 170, "y": 15, "page": "part10" },
-        "linked_parameters": ["FIRE.ALARM.ACTIVE", "FIRE.ALARM.ACK", "FIRE.DERATE.TRIGGERED"],
-        "svg_layer": "alarm",
-        "fire_zone": "ALL",
-        "status": "PENDING_APPROVAL"
+      "linked_parameters": [
+        "FIRE.ALARM.ACTIVE",
+        "FIRE.ALARM.ACK",
+        "FIRE.DERATE.TRIGGERED"
+      ],
+      "svg_layer": "alarm",
+      "fire_zone": "ALL",
+      "status": "PENDING_APPROVAL"
+    },
+    {
+      "external_id": "A0.ELEC.BUILDING.MAIN",
+      "system": "A0",
+      "subsystem": "ELEC.BUILDING",
+      "document": "part20",
+      "tag": null,
+      "type": "electrical_building",
+      "name": "Bâtiment électrique principal",
+      "description": "Bâtiment électrique principal - niveaux +0.00m, +3.30m, +6.70m, +11.00m",
+      "location": "SITE_CENTRALE_SOUSSE",
+      "coordinates": {
+        "x": 150,
+        "y": 200,
+        "page": "part20"
       },
-      {
-        "external_id": "A0.ELEC.BUILDING.MAIN",
-        "system": "A0",
-        "subsystem": "ELEC.BUILDING",
-        "document": "part20",
-        "tag": null,
-        "type": "electrical_building",
-        "name": "Bâtiment électrique principal",
-        "description": "Bâtiment électrique principal - niveaux +0.00m, +3.30m, +6.70m, +11.00m",
-        "location": "SITE_CENTRALE_SOUSSE",
-        "coordinates": { "x": 150, "y": 200, "page": "part20" },
-        "linked_parameters": ["BUILDING.FIRE.STATUS", "BUILDING.ACCESS.CONTROL"],
-        "svg_layer": "building",
-        "fire_zone": null,
-        "status": "PENDING_APPROVAL"
+      "linked_parameters": [
+        "BUILDING.FIRE.STATUS",
+        "BUILDING.ACCESS.CONTROL"
+      ],
+      "svg_layer": "building",
+      "fire_zone": null,
+      "status": "PENDING_APPROVAL"
+    },
+    {
+      "external_id": "A0.ELEC.ROOM.COMMAND",
+      "system": "A0",
+      "subsystem": "ELEC.ROOM",
+      "document": "part20",
+      "tag": null,
+      "type": "control_room",
+      "name": "Salle de commande",
+      "description": "Salle de commande - niveau +3.30m",
+      "location": "BATIMENT_ELEC_PRINCIPAL_NIV_+3.30M",
+      "coordinates": {
+        "x": 180,
+        "y": 220,
+        "page": "part20"
       },
-      {
-        "external_id": "A0.ELEC.ROOM.COMMAND",
-        "system": "A0",
-        "subsystem": "ELEC.ROOM",
-        "document": "part20",
-        "tag": null,
-        "type": "control_room",
-        "name": "Salle de commande",
-        "description": "Salle de commande - niveau +3.30m",
-        "location": "BATIMENT_ELEC_PRINCIPAL_NIV_+3.30M",
-        "coordinates": { "x": 180, "y": 220, "page": "part20" },
-        "linked_parameters": ["ROOM.ACCESS.AUTHORIZED", "ROOM.FIRE.ALARM"],
-        "svg_layer": "building",
-        "fire_zone": null,
-        "status": "PENDING_APPROVAL"
+      "linked_parameters": [
+        "ROOM.ACCESS.AUTHORIZED",
+        "ROOM.FIRE.ALARM"
+      ],
+      "svg_layer": "building",
+      "fire_zone": null,
+      "status": "PENDING_APPROVAL"
+    },
+    {
+      "external_id": "A0.FIRE.DOOR.AUTO",
+      "system": "A0",
+      "subsystem": "FIRE.DOOR",
+      "document": "part20",
+      "tag": null,
+      "type": "fire_door_actuator",
+      "name": "Fermeture automatique de porte",
+      "description": "Système de fermeture automatique de porte - sécurité incendie",
+      "location": "BATIMENT_ELEC_PRINCIPAL",
+      "coordinates": {
+        "x": 200,
+        "y": 240,
+        "page": "part20"
       },
-      {
-        "external_id": "A0.FIRE.DOOR.AUTO",
-        "system": "A0",
-        "subsystem": "FIRE.DOOR",
-        "document": "part20",
-        "tag": null,
-        "type": "fire_door_actuator",
-        "name": "Fermeture automatique de porte",
-        "description": "Système de fermeture automatique de porte - sécurité incendie",
-        "location": "BATIMENT_ELEC_PRINCIPAL",
-        "coordinates": { "x": 200, "y": 240, "page": "part20" },
-        "linked_parameters": ["DOOR.STATUS", "DOOR.FIRE.TRIGGERED"],
-        "svg_layer": "building",
-        "fire_zone": null,
-        "status": "PENDING_APPROVAL"
+      "linked_parameters": [
+        "DOOR.STATUS",
+        "DOOR.FIRE.TRIGGERED"
+      ],
+      "svg_layer": "building",
+      "fire_zone": null,
+      "status": "PENDING_APPROVAL"
+    },
+    {
+      "external_id": "A0.GAS.REG.STATION",
+      "system": "A0",
+      "subsystem": "GAS.REG",
+      "document": "part16",
+      "tag": null,
+      "type": "pressure_reduction_station",
+      "name": "Poste de réduction de pression gaz",
+      "description": "Station centrale régulation pression gaz - détente HP → MP",
+      "location": "SITE_CENTRALE_SOUSSE",
+      "coordinates": {
+        "x": 200,
+        "y": 150,
+        "page": "part16"
       },
-      {
-        "external_id": "A0.GAS.REG.STATION",
-        "system": "A0",
-        "subsystem": "GAS.REG",
-        "document": "part16",
-        "tag": null,
-        "type": "pressure_reduction_station",
-        "name": "Poste de réduction de pression gaz",
-        "description": "Station centrale régulation pression gaz - détente HP → MP",
-        "location": "SITE_CENTRALE_SOUSSE",
-        "coordinates": { "x": 200, "y": 150, "page": "part16" },
-        "linked_parameters": ["GAS.PRESS.IN.HP", "GAS.PRESS.OUT.MP", "GAS.VALVE.POS", "GAS.FLOW.TOTAL"],
-        "svg_layer": "gas",
-        "fire_zone": null,
-        "status": "PENDING_APPROVAL"
+      "linked_parameters": [
+        "GAS.PRESS.IN.HP",
+        "GAS.PRESS.OUT.MP",
+        "GAS.VALVE.POS",
+        "GAS.FLOW.TOTAL"
+      ],
+      "svg_layer": "gas",
+      "fire_zone": null,
+      "status": "PENDING_APPROVAL"
+    },
+    {
+      "external_id": "A0.GAS.VALVE.PSV",
+      "system": "A0",
+      "subsystem": "GAS.VALVE",
+      "document": "part16",
+      "tag": null,
+      "type": "safety_relief_valve",
+      "name": "Soupape sécurité gaz",
+      "description": "Vanne de sécurité décharge surpression gaz",
+      "location": "POSTE_REDUCTION_GAZ",
+      "coordinates": {
+        "x": 220,
+        "y": 160,
+        "page": "part16"
       },
-      {
-        "external_id": "A0.GAS.VALVE.PSV",
-        "system": "A0",
-        "subsystem": "GAS.VALVE",
-        "document": "part16",
-        "tag": null,
-        "type": "safety_relief_valve",
-        "name": "Soupape sécurité gaz",
-        "description": "Vanne de sécurité décharge surpression gaz",
-        "location": "POSTE_REDUCTION_GAZ",
-        "coordinates": { "x": 220, "y": 160, "page": "part16" },
-        "linked_parameters": ["PSV.LIFTED", "PSV.STATUS", "PSV.PRESSURE"],
-        "svg_layer": "gas",
-        "fire_zone": null,
-        "status": "PENDING_APPROVAL"
+      "linked_parameters": [
+        "PSV.LIFTED",
+        "PSV.STATUS",
+        "PSV.PRESSURE"
+      ],
+      "svg_layer": "gas",
+      "fire_zone": null,
+      "status": "PENDING_APPROVAL"
+    },
+    {
+      "external_id": "A0.GAS.FILT.UPSTREAM",
+      "system": "A0",
+      "subsystem": "GAS.FILT",
+      "document": "part16",
+      "tag": null,
+      "type": "gas_filter",
+      "name": "Filtre amont gaz",
+      "description": "Filtration particules gaz en amont poste réduction",
+      "location": "POSTE_REDUCTION_GAZ",
+      "coordinates": {
+        "x": 240,
+        "y": 170,
+        "page": "part16"
       },
-      {
-        "external_id": "A0.GAS.FILT.UPSTREAM",
-        "system": "A0",
-        "subsystem": "GAS.FILT",
-        "document": "part16",
-        "tag": null,
-        "type": "gas_filter",
-        "name": "Filtre amont gaz",
-        "description": "Filtration particules gaz en amont poste réduction",
-        "location": "POSTE_REDUCTION_GAZ",
-        "coordinates": { "x": 240, "y": 170, "page": "part16" },
-        "linked_parameters": ["FILTER.DP", "FILTER.BYPASS.ACTIVE", "FILTER.STATUS"],
-        "svg_layer": "gas",
-        "fire_zone": null,
-        "status": "PENDING_APPROVAL"
+      "linked_parameters": [
+        "FILTER.DP",
+        "FILTER.BYPASS.ACTIVE",
+        "FILTER.STATUS"
+      ],
+      "svg_layer": "gas",
+      "fire_zone": null,
+      "status": "PENDING_APPROVAL"
+    },
+    {
+      "external_id": "A0.FUEL.TRANSFER.PUMP",
+      "system": "A0",
+      "subsystem": "FUEL.TRANSFER",
+      "document": "part18",
+      "tag": null,
+      "type": "fuel_transfer_pump",
+      "name": "Pompe transfert combustible",
+      "description": "Pompage/transfert combustible entre réservoirs",
+      "location": "ZONE_STOCKAGE_COMBUSTIBLE",
+      "coordinates": {
+        "x": 180,
+        "y": 120,
+        "page": "part18"
       },
-      {
-        "external_id": "A0.FUEL.TRANSFER.PUMP",
-        "system": "A0",
-        "subsystem": "FUEL.TRANSFER",
-        "document": "part18",
-        "tag": null,
-        "type": "fuel_transfer_pump",
-        "name": "Pompe transfert combustible",
-        "description": "Pompage/transfert combustible entre réservoirs",
-        "location": "ZONE_STOCKAGE_COMBUSTIBLE",
-        "coordinates": { "x": 180, "y": 120, "page": "part18" },
-        "linked_parameters": ["PUMP.RUNNING", "PUMP.FAULT", "FLOW.RATE", "PUMP.DISCHARGE.PRESS"],
-        "svg_layer": "fuel",
-        "fire_zone": null,
-        "status": "PENDING_APPROVAL"
+      "linked_parameters": [
+        "PUMP.RUNNING",
+        "PUMP.FAULT",
+        "FLOW.RATE",
+        "PUMP.DISCHARGE.PRESS"
+      ],
+      "svg_layer": "fuel",
+      "fire_zone": null,
+      "status": "PENDING_APPROVAL"
+    },
+    {
+      "external_id": "A0.FUEL.VALVE.SAFETY",
+      "system": "A0",
+      "subsystem": "FUEL.VALVE",
+      "document": "part18",
+      "tag": null,
+      "type": "safety_isolation_valve",
+      "name": "Vanne sécurité transfert",
+      "description": "Isolement d'urgence circuit transfert combustible",
+      "location": "ZONE_STOCKAGE_COMBUSTIBLE",
+      "coordinates": {
+        "x": 200,
+        "y": 130,
+        "page": "part18"
       },
-      {
-        "external_id": "A0.FUEL.VALVE.SAFETY",
-        "system": "A0",
-        "subsystem": "FUEL.VALVE",
-        "document": "part18",
-        "tag": null,
-        "type": "safety_isolation_valve",
-        "name": "Vanne sécurité transfert",
-        "description": "Isolement d'urgence circuit transfert combustible",
-        "location": "ZONE_STOCKAGE_COMBUSTIBLE",
-        "coordinates": { "x": 200, "y": 130, "page": "part18" },
-        "linked_parameters": ["VALVE.CLOSED", "VALVE.EMERGENCY.ACTIVE", "VALVE.POSITION"],
-        "svg_layer": "fuel",
-        "fire_zone": null,
-        "status": "PENDING_APPROVAL"
+      "linked_parameters": [
+        "VALVE.CLOSED",
+        "VALVE.EMERGENCY.ACTIVE",
+        "VALVE.POSITION"
+      ],
+      "svg_layer": "fuel",
+      "fire_zone": null,
+      "status": "PENDING_APPROVAL"
+    },
+    {
+      "external_id": "B1.FIRE.CO2.T61",
+      "system": "B1",
+      "subsystem": "FIRE.CO2",
+      "document": "part11",
+      "tag": "T61",
+      "type": "co2_container",
+      "name": "Conteneur CO₂ TG1",
+      "description": "Stockage agent extincteur CO₂ - turbine gaz 1",
+      "location": "PACKAGE_ACOUSTIQUE_TG1",
+      "coordinates": {
+        "x": 210,
+        "y": 180,
+        "page": "part11"
       },
-      {
-        "external_id": "B1.FIRE.CO2.T61",
-        "system": "B1",
-        "subsystem": "FIRE.CO2",
-        "document": "part11",
-        "tag": "T61",
-        "type": "co2_container",
-        "name": "Conteneur CO₂ TG1",
-        "description": "Stockage agent extincteur CO₂ - turbine gaz 1",
-        "location": "PACKAGE_ACOUSTIQUE_TG1",
-        "coordinates": { "x": 210, "y": 180, "page": "part11" },
-        "linked_parameters": ["CO2.PRESSURE", "CO2.LEVEL", "CO2.STATUS", "CO2.RELEASE.ACTIVE"],
-        "svg_layer": "extinction",
-        "fire_zone": "ZONE_TG1",
-        "status": "PENDING_APPROVAL"
+      "linked_parameters": [
+        "CO2.PRESSURE",
+        "CO2.LEVEL",
+        "CO2.STATUS",
+        "CO2.RELEASE.ACTIVE"
+      ],
+      "svg_layer": "extinction",
+      "fire_zone": "ZONE_TG1",
+      "status": "PENDING_APPROVAL"
+    },
+    {
+      "external_id": "B1.GAS.DET.B1",
+      "system": "B1",
+      "subsystem": "GAS.DET",
+      "document": "part11",
+      "tag": "B1",
+      "type": "gas_detector",
+      "name": "Détecteur gaz TG1",
+      "description": "Détection fuite gaz combustible - turbine gaz 1",
+      "location": "PACKAGE_ACOUSTIQUE_TG1",
+      "coordinates": {
+        "x": 230,
+        "y": 190,
+        "page": "part11"
       },
-      {
-        "external_id": "B1.GAS.DET.B1",
-        "system": "B1",
-        "subsystem": "GAS.DET",
-        "document": "part11",
-        "tag": "B1",
-        "type": "gas_detector",
-        "name": "Détecteur gaz TG1",
-        "description": "Détection fuite gaz combustible - turbine gaz 1",
-        "location": "PACKAGE_ACOUSTIQUE_TG1",
-        "coordinates": { "x": 230, "y": 190, "page": "part11" },
-        "linked_parameters": ["GAS.LEVEL", "GAS.ALARM", "GAS.LEAK.DETECTED"],
-        "svg_layer": "gas_detection",
-        "fire_zone": "ZONE_TG1",
-        "status": "PENDING_APPROVAL"
+      "linked_parameters": [
+        "GAS.LEVEL",
+        "GAS.ALARM",
+        "GAS.LEAK.DETECTED"
+      ],
+      "svg_layer": "gas_detection",
+      "fire_zone": "ZONE_TG1",
+      "status": "PENDING_APPROVAL"
+    },
+    {
+      "external_id": "B1.FIRE.CO2.CR",
+      "system": "B1",
+      "subsystem": "FIRE.CO2",
+      "document": "part11",
+      "tag": "CR",
+      "type": "release_valve",
+      "name": "Vanne libération CO₂ TG1",
+      "description": "Vanne de distribution CO₂ zones critiques TG1",
+      "location": "PACKAGE_ACOUSTIQUE_TG1",
+      "coordinates": {
+        "x": 250,
+        "y": 200,
+        "page": "part11"
       },
-      {
-        "external_id": "B1.FIRE.CO2.CR",
-        "system": "B1",
-        "subsystem": "FIRE.CO2",
-        "document": "part11",
-        "tag": "CR",
-        "type": "release_valve",
-        "name": "Vanne libération CO₂ TG1",
-        "description": "Vanne de distribution CO₂ zones critiques TG1",
-        "location": "PACKAGE_ACOUSTIQUE_TG1",
-        "coordinates": { "x": 250, "y": 200, "page": "part11" },
-        "linked_parameters": ["CO2.VALVE.POS", "CO2.RELEASE.CMD", "CO2.FLOW.RATE"],
-        "svg_layer": "extinction",
-        "fire_zone": "ZONE_TG1",
-        "status": "PENDING_APPROVAL"
+      "linked_parameters": [
+        "CO2.VALVE.POS",
+        "CO2.RELEASE.CMD",
+        "CO2.FLOW.RATE"
+      ],
+      "svg_layer": "extinction",
+      "fire_zone": "ZONE_TG1",
+      "status": "PENDING_APPROVAL"
+    },
+    {
+      "external_id": "B1.FUEL.FAZ",
+      "system": "B1",
+      "subsystem": "FUEL",
+      "document": "part13",
+      "tag": "B1.FAZ",
+      "type": "fuel_admission_zone",
+      "name": "Zone admission gaz TG1",
+      "description": "Zone admission gaz combustible turbine gaz 1",
+      "location": "TURBINE_GAZ_1",
+      "coordinates": {
+        "x": 180,
+        "y": 120,
+        "page": "part13"
       },
-      {
-        "external_id": "B1.FUEL.FAZ",
-        "system": "B1",
-        "subsystem": "FUEL",
-        "document": "part13",
-        "tag": "B1.FAZ",
-        "type": "fuel_admission_zone",
-        "name": "Zone admission gaz TG1",
-        "description": "Zone admission gaz combustible turbine gaz 1",
-        "location": "TURBINE_GAZ_1",
-        "coordinates": { "x": 180, "y": 120, "page": "part13" },
-        "linked_parameters": ["FUEL.PRESSURE", "FUEL.FLOW", "FUEL.VALVE.POS", "FUEL.TEMP"],
-        "svg_layer": "fuel",
-        "fire_zone": null,
-        "status": "PENDING_APPROVAL"
+      "linked_parameters": [
+        "FUEL.PRESSURE",
+        "FUEL.FLOW",
+        "FUEL.VALVE.POS",
+        "FUEL.TEMP"
+      ],
+      "svg_layer": "fuel",
+      "fire_zone": null,
+      "status": "PENDING_APPROVAL"
+    },
+    {
+      "external_id": "B1.FUEL.VALVE.HV001A",
+      "system": "B1",
+      "subsystem": "FUEL.VALVE",
+      "document": "part13",
+      "tag": "HV001A",
+      "type": "motorized_valve",
+      "name": "Vanne motorisée gaz TG1",
+      "description": "Vanne motorisée régulation/isolement flux gaz TG1",
+      "location": "TURBINE_GAZ_1",
+      "coordinates": {
+        "x": 200,
+        "y": 130,
+        "page": "part13"
       },
-      {
-        "external_id": "B1.FUEL.VALVE.HV001A",
-        "system": "B1",
-        "subsystem": "FUEL.VALVE",
-        "document": "part13",
-        "tag": "HV001A",
-        "type": "motorized_valve",
-        "name": "Vanne motorisée gaz TG1",
-        "description": "Vanne motorisée régulation/isolement flux gaz TG1",
-        "location": "TURBINE_GAZ_1",
-        "coordinates": { "x": 200, "y": 130, "page": "part13" },
-        "linked_parameters": ["VALVE.OPEN", "VALVE.CLOSE", "VALVE.FAULT", "VALVE.POSITION"],
-        "svg_layer": "fuel",
-        "fire_zone": null,
-        "status": "PENDING_APPROVAL"
+      "linked_parameters": [
+        "VALVE.OPEN",
+        "VALVE.CLOSE",
+        "VALVE.FAULT",
+        "VALVE.POSITION"
+      ],
+      "svg_layer": "fuel",
+      "fire_zone": null,
+      "status": "PENDING_APPROVAL"
+    },
+    {
+      "external_id": "B1.FUEL.VALVE.V001T",
+      "system": "B1",
+      "subsystem": "FUEL.VALVE",
+      "document": "part13",
+      "tag": "V001T",
+      "type": "isolation_valve",
+      "name": "Vanne isolement DN25 TG1",
+      "description": "Vanne d'isolement DN25 gaz TG1",
+      "location": "TURBINE_GAZ_1",
+      "coordinates": {
+        "x": 220,
+        "y": 140,
+        "page": "part13"
       },
-      {
-        "external_id": "B1.FUEL.VALVE.V001T",
-        "system": "B1",
-        "subsystem": "FUEL.VALVE",
-        "document": "part13",
-        "tag": "V001T",
-        "type": "isolation_valve",
-        "name": "Vanne isolement DN25 TG1",
-        "description": "Vanne d'isolement DN25 gaz TG1",
-        "location": "TURBINE_GAZ_1",
-        "coordinates": { "x": 220, "y": 140, "page": "part13" },
-        "linked_parameters": ["VALVE.ISOLATED", "VALVE.LEAKAGE", "VALVE.STATUS"],
-        "svg_layer": "fuel",
-        "fire_zone": null,
-        "status": "PENDING_APPROVAL"
+      "linked_parameters": [
+        "VALVE.ISOLATED",
+        "VALVE.LEAKAGE",
+        "VALVE.STATUS"
+      ],
+      "svg_layer": "fuel",
+      "fire_zone": null,
+      "status": "PENDING_APPROVAL"
+    },
+    {
+      "external_id": "B1.SAFETY.N2.INJ",
+      "system": "B1",
+      "subsystem": "SAFETY.N2",
+      "document": "part13",
+      "tag": null,
+      "type": "nitrogen_injection",
+      "name": "Injection azote TG1",
+      "description": "Système inertage sécurité par injection azote TG1 (post-arrêt ou fuite)",
+      "location": "TURBINE_GAZ_1",
+      "coordinates": {
+        "x": 240,
+        "y": 150,
+        "page": "part13"
       },
-      {
-        "external_id": "B1.SAFETY.N2.INJ",
-        "system": "B1",
-        "subsystem": "SAFETY.N2",
-        "document": "part13",
-        "tag": null,
-        "type": "nitrogen_injection",
-        "name": "Injection azote TG1",
-        "description": "Système inertage sécurité par injection azote TG1 (post-arrêt ou fuite)",
-        "location": "TURBINE_GAZ_1",
-        "coordinates": { "x": 240, "y": 150, "page": "part13" },
-        "linked_parameters": ["N2.PRESSURE", "N2.FLOW", "N2.ACTIVE", "N2.INJECTION.CMD"],
-        "svg_layer": "safety",
-        "fire_zone": null,
-        "status": "PENDING_APPROVAL"
+      "linked_parameters": [
+        "N2.PRESSURE",
+        "N2.FLOW",
+        "N2.ACTIVE",
+        "N2.INJECTION.CMD"
+      ],
+      "svg_layer": "safety",
+      "fire_zone": null,
+      "status": "PENDING_APPROVAL"
+    },
+    {
+      "external_id": "B1.SEPARATOR.MAIN",
+      "system": "B1",
+      "subsystem": "SEPARATOR",
+      "document": "part18",
+      "tag": null,
+      "type": "gas_liquid_separator",
+      "name": "Séparateur turbine gaz 1",
+      "description": "Séparation phases liquide/gaz dans circuit combustible TG1",
+      "location": "TURBINE_GAZ_1",
+      "coordinates": {
+        "x": 190,
+        "y": 160,
+        "page": "part18"
       },
-      {
-        "external_id": "B1.SEPARATOR.MAIN",
-        "system": "B1",
-        "subsystem": "SEPARATOR",
-        "document": "part18",
-        "tag": null,
-        "type": "gas_liquid_separator",
-        "name": "Séparateur turbine gaz 1",
-        "description": "Séparation phases liquide/gaz dans circuit combustible TG1",
-        "location": "TURBINE_GAZ_1",
-        "coordinates": { "x": 190, "y": 160, "page": "part18" },
-        "linked_parameters": ["SEP.PRESSURE", "SEP.LEVEL", "SEP.DRAIN.ACTIVE", "SEP.STATUS"],
-        "svg_layer": "separator",
-        "fire_zone": null,
-        "status": "PENDING_APPROVAL"
+      "linked_parameters": [
+        "SEP.PRESSURE",
+        "SEP.LEVEL",
+        "SEP.DRAIN.ACTIVE",
+        "SEP.STATUS"
+      ],
+      "svg_layer": "separator",
+      "fire_zone": null,
+      "status": "PENDING_APPROVAL"
+    },
+    {
+      "external_id": "B2.FIRE.CO2.T62",
+      "system": "B2",
+      "subsystem": "FIRE.CO2",
+      "document": "part11",
+      "tag": "T62",
+      "type": "co2_container",
+      "name": "Conteneur CO₂ TG2",
+      "description": "Stockage agent extincteur CO₂ - turbine gaz 2",
+      "location": "PACKAGE_ACOUSTIQUE_TG2",
+      "coordinates": {
+        "x": 270,
+        "y": 180,
+        "page": "part11"
       },
-      {
-        "external_id": "B2.FIRE.CO2.T62",
-        "system": "B2",
-        "subsystem": "FIRE.CO2",
-        "document": "part11",
-        "tag": "T62",
-        "type": "co2_container",
-        "name": "Conteneur CO₂ TG2",
-        "description": "Stockage agent extincteur CO₂ - turbine gaz 2",
-        "location": "PACKAGE_ACOUSTIQUE_TG2",
-        "coordinates": { "x": 270, "y": 180, "page": "part11" },
-        "linked_parameters": ["CO2.PRESSURE", "CO2.LEVEL", "CO2.STATUS", "CO2.RELEASE.ACTIVE"],
-        "svg_layer": "extinction",
-        "fire_zone": "ZONE_TG2",
-        "status": "PENDING_APPROVAL"
+      "linked_parameters": [
+        "CO2.PRESSURE",
+        "CO2.LEVEL",
+        "CO2.STATUS",
+        "CO2.RELEASE.ACTIVE"
+      ],
+      "svg_layer": "extinction",
+      "fire_zone": "ZONE_TG2",
+      "status": "PENDING_APPROVAL"
+    },
+    {
+      "external_id": "B2.GAS.DET.B2",
+      "system": "B2",
+      "subsystem": "GAS.DET",
+      "document": "part11",
+      "tag": "B2",
+      "type": "gas_detector",
+      "name": "Détecteur gaz TG2",
+      "description": "Détection fuite gaz combustible - turbine gaz 2",
+      "location": "PACKAGE_ACOUSTIQUE_TG2",
+      "coordinates": {
+        "x": 290,
+        "y": 190,
+        "page": "part11"
       },
-      {
-        "external_id": "B2.GAS.DET.B2",
-        "system": "B2",
-        "subsystem": "GAS.DET",
-        "document": "part11",
-        "tag": "B2",
-        "type": "gas_detector",
-        "name": "Détecteur gaz TG2",
-        "description": "Détection fuite gaz combustible - turbine gaz 2",
-        "location": "PACKAGE_ACOUSTIQUE_TG2",
-        "coordinates": { "x": 290, "y": 190, "page": "part11" },
-        "linked_parameters": ["GAS.LEVEL", "GAS.ALARM", "GAS.LEAK.DETECTED"],
-        "svg_layer": "gas_detection",
-        "fire_zone": "ZONE_TG2",
-        "status": "PENDING_APPROVAL"
+      "linked_parameters": [
+        "GAS.LEVEL",
+        "GAS.ALARM",
+        "GAS.LEAK.DETECTED"
+      ],
+      "svg_layer": "gas_detection",
+      "fire_zone": "ZONE_TG2",
+      "status": "PENDING_APPROVAL"
+    },
+    {
+      "external_id": "B2.FIRE.CO2.CR",
+      "system": "B2",
+      "subsystem": "FIRE.CO2",
+      "document": "part11",
+      "tag": "CR",
+      "type": "release_valve",
+      "name": "Vanne libération CO₂ TG2",
+      "description": "Vanne de distribution CO₂ zones critiques TG2",
+      "location": "PACKAGE_ACOUSTIQUE_TG2",
+      "coordinates": {
+        "x": 310,
+        "y": 200,
+        "page": "part11"
       },
-      {
-        "external_id": "B2.FIRE.CO2.CR",
-        "system": "B2",
-        "subsystem": "FIRE.CO2",
-        "document": "part11",
-        "tag": "CR",
-        "type": "release_valve",
-        "name": "Vanne libération CO₂ TG2",
-        "description": "Vanne de distribution CO₂ zones critiques TG2",
-        "location": "PACKAGE_ACOUSTIQUE_TG2",
-        "coordinates": { "x": 310, "y": 200, "page": "part11" },
-        "linked_parameters": ["CO2.VALVE.POS", "CO2.RELEASE.CMD", "CO2.FLOW.RATE"],
-        "svg_layer": "extinction",
-        "fire_zone": "ZONE_TG2",
-        "status": "PENDING_APPROVAL"
+      "linked_parameters": [
+        "CO2.VALVE.POS",
+        "CO2.RELEASE.CMD",
+        "CO2.FLOW.RATE"
+      ],
+      "svg_layer": "extinction",
+      "fire_zone": "ZONE_TG2",
+      "status": "PENDING_APPROVAL"
+    },
+    {
+      "external_id": "B2.LUB.TPF",
+      "system": "B2",
+      "subsystem": "LUB.TPF",
+      "document": "part12",
+      "tag": "B2.TPF",
+      "type": "filtration_system",
+      "name": "Turbine Protection Filtration TG2",
+      "description": "Système filtration huile lubrification turbine gaz 2",
+      "location": "TURBINE_GAZ_2",
+      "coordinates": {
+        "x": 300,
+        "y": 250,
+        "page": "part12"
       },
-      {
-        "external_id": "B2.LUB.TPF",
-        "system": "B2",
-        "subsystem": "LUB.TPF",
-        "document": "part12",
-        "tag": "B2.TPF",
-        "type": "filtration_system",
-        "name": "Turbine Protection Filtration TG2",
-        "description": "Système filtration huile lubrification turbine gaz 2",
-        "location": "TURBINE_GAZ_2",
-        "coordinates": { "x": 300, "y": 250, "page": "part12" },
-        "linked_parameters": ["LUB.PRESSURE.IN", "LUB.PRESSURE.OUT", "LUB.TEMP", "LUB.FILTER.DP", "LUB.FLOW"],
-        "svg_layer": "lubrication",
-        "fire_zone": null,
-        "status": "PENDING_APPROVAL"
+      "linked_parameters": [
+        "LUB.PRESSURE.IN",
+        "LUB.PRESSURE.OUT",
+        "LUB.TEMP",
+        "LUB.FILTER.DP",
+        "LUB.FLOW"
+      ],
+      "svg_layer": "lubrication",
+      "fire_zone": null,
+      "status": "PENDING_APPROVAL"
+    },
+    {
+      "external_id": "B2.LUB.FILT.SKID",
+      "system": "B2",
+      "subsystem": "LUB.FILT",
+      "document": "part12",
+      "tag": null,
+      "type": "skid_module",
+      "name": "Skid filtration TG2",
+      "description": "Module compact filtration huile TG2",
+      "location": "TURBINE_GAZ_2",
+      "coordinates": {
+        "x": 320,
+        "y": 260,
+        "page": "part12"
       },
-      {
-        "external_id": "B2.LUB.FILT.SKID",
-        "system": "B2",
-        "subsystem": "LUB.FILT",
-        "document": "part12",
-        "tag": null,
-        "type": "skid_module",
-        "name": "Skid filtration TG2",
-        "description": "Module compact filtration huile TG2",
-        "location": "TURBINE_GAZ_2",
-        "coordinates": { "x": 320, "y": 260, "page": "part12" },
-        "linked_parameters": ["FILT.STATUS", "FILT.BYPASS.ACTIVE", "FILT.PRESSURE.DP"],
-        "svg_layer": "lubrication",
-        "fire_zone": null,
-        "status": "PENDING_APPROVAL"
+      "linked_parameters": [
+        "FILT.STATUS",
+        "FILT.BYPASS.ACTIVE",
+        "FILT.PRESSURE.DP"
+      ],
+      "svg_layer": "lubrication",
+      "fire_zone": null,
+      "status": "PENDING_APPROVAL"
+    },
+    {
+      "external_id": "B2.LUB.PUMP.MAIN",
+      "system": "B2",
+      "subsystem": "LUB.PUMP",
+      "document": "part12",
+      "tag": null,
+      "type": "oil_pump",
+      "name": "Pompe huile principale TG2",
+      "description": "Pompe principale circulation huile lubrification TG2",
+      "location": "TURBINE_GAZ_2",
+      "coordinates": {
+        "x": 340,
+        "y": 270,
+        "page": "part12"
       },
-      {
-        "external_id": "B2.LUB.PUMP.MAIN",
-        "system": "B2",
-        "subsystem": "LUB.PUMP",
-        "document": "part12",
-        "tag": null,
-        "type": "oil_pump",
-        "name": "Pompe huile principale TG2",
-        "description": "Pompe principale circulation huile lubrification TG2",
-        "location": "TURBINE_GAZ_2",
-        "coordinates": { "x": 340, "y": 270, "page": "part12" },
-        "linked_parameters": ["PUMP.RUNNING", "PUMP.FAULT", "PUMP.DISCHARGE.PRESS", "PUMP.FLOW"],
-        "svg_layer": "lubrication",
-        "fire_zone": null,
-        "status": "PENDING_APPROVAL"
+      "linked_parameters": [
+        "PUMP.RUNNING",
+        "PUMP.FAULT",
+        "PUMP.DISCHARGE.PRESS",
+        "PUMP.FLOW"
+      ],
+      "svg_layer": "lubrication",
+      "fire_zone": null,
+      "status": "PENDING_APPROVAL"
+    },
+    {
+      "external_id": "B2.LUB.PUMP.STBY",
+      "system": "B2",
+      "subsystem": "LUB.PUMP",
+      "document": "part12",
+      "tag": null,
+      "type": "oil_pump",
+      "name": "Pompe huile secours TG2",
+      "description": "Pompe secours circulation huile lubrification TG2",
+      "location": "TURBINE_GAZ_2",
+      "coordinates": {
+        "x": 360,
+        "y": 280,
+        "page": "part12"
       },
-      {
-        "external_id": "B2.LUB.PUMP.STBY",
-        "system": "B2",
-        "subsystem": "LUB.PUMP",
-        "document": "part12",
-        "tag": null,
-        "type": "oil_pump",
-        "name": "Pompe huile secours TG2",
-        "description": "Pompe secours circulation huile lubrification TG2",
-        "location": "TURBINE_GAZ_2",
-        "coordinates": { "x": 360, "y": 280, "page": "part12" },
-        "linked_parameters": ["PUMP.STBY.READY", "PUMP.AUTO.START", "PUMP.STATUS"],
-        "svg_layer": "lubrication",
-        "fire_zone": null,
-        "status": "PENDING_APPROVAL"
+      "linked_parameters": [
+        "PUMP.STBY.READY",
+        "PUMP.AUTO.START",
+        "PUMP.STATUS"
+      ],
+      "svg_layer": "lubrication",
+      "fire_zone": null,
+      "status": "PENDING_APPROVAL"
+    },
+    {
+      "external_id": "B2.LUB.TANK",
+      "system": "B2",
+      "subsystem": "LUB",
+      "document": "part12",
+      "tag": null,
+      "type": "oil_tank",
+      "name": "Réservoir huile TG2",
+      "description": "Stockage huile lubrification turbine gaz 2",
+      "location": "TURBINE_GAZ_2",
+      "coordinates": {
+        "x": 380,
+        "y": 290,
+        "page": "part12"
       },
-      {
-        "external_id": "B2.LUB.TANK",
-        "system": "B2",
-        "subsystem": "LUB",
-        "document": "part12",
-        "tag": null,
-        "type": "oil_tank",
-        "name": "Réservoir huile TG2",
-        "description": "Stockage huile lubrification turbine gaz 2",
-        "location": "TURBINE_GAZ_2",
-        "coordinates": { "x": 380, "y": 290, "page": "part12" },
-        "linked_parameters": ["TANK.LEVEL", "TANK.TEMP", "TANK.PRESSURE", "TANK.LOW.LEVEL.ALARM"],
-        "svg_layer": "lubrication",
-        "fire_zone": null,
-        "status": "PENDING_APPROVAL"
+      "linked_parameters": [
+        "TANK.LEVEL",
+        "TANK.TEMP",
+        "TANK.PRESSURE",
+        "TANK.LOW.LEVEL.ALARM"
+      ],
+      "svg_layer": "lubrication",
+      "fire_zone": null,
+      "status": "PENDING_APPROVAL"
+    },
+    {
+      "external_id": "B2.LUB.PSV202F",
+      "system": "B2",
+      "subsystem": "LUB.VALVE",
+      "document": "part12",
+      "tag": "PSV202F",
+      "type": "safety_valve",
+      "name": "Soupape sécurité filtration TG2",
+      "description": "Soupape sécurité circuit filtration huile TG2",
+      "location": "TURBINE_GAZ_2",
+      "coordinates": {
+        "x": 400,
+        "y": 300,
+        "page": "part12"
       },
-      {
-        "external_id": "B2.LUB.PSV202F",
-        "system": "B2",
-        "subsystem": "LUB.VALVE",
-        "document": "part12",
-        "tag": "PSV202F",
-        "type": "safety_valve",
-        "name": "Soupape sécurité filtration TG2",
-        "description": "Soupape sécurité circuit filtration huile TG2",
-        "location": "TURBINE_GAZ_2",
-        "coordinates": { "x": 400, "y": 300, "page": "part12" },
-        "linked_parameters": ["PSV.STATUS", "PSV.LIFTED", "PSV.PRESSURE"],
-        "svg_layer": "lubrication",
-        "fire_zone": null,
-        "status": "PENDING_APPROVAL"
+      "linked_parameters": [
+        "PSV.STATUS",
+        "PSV.LIFTED",
+        "PSV.PRESSURE"
+      ],
+      "svg_layer": "lubrication",
+      "fire_zone": null,
+      "status": "PENDING_APPROVAL"
+    },
+    {
+      "external_id": "B2.FUEL.FAZ",
+      "system": "B2",
+      "subsystem": "FUEL",
+      "document": "part13",
+      "tag": "B2.FAZ",
+      "type": "fuel_admission_zone",
+      "name": "Zone admission gaz TG2",
+      "description": "Zone admission gaz combustible turbine gaz 2",
+      "location": "TURBINE_GAZ_2",
+      "coordinates": {
+        "x": 210,
+        "y": 120,
+        "page": "part13"
       },
-      {
-        "external_id": "B2.FUEL.FAZ",
-        "system": "B2",
-        "subsystem": "FUEL",
-        "document": "part13",
-        "tag": "B2.FAZ",
-        "type": "fuel_admission_zone",
-        "name": "Zone admission gaz TG2",
-        "description": "Zone admission gaz combustible turbine gaz 2",
-        "location": "TURBINE_GAZ_2",
-        "coordinates": { "x": 210, "y": 120, "page": "part13" },
-        "linked_parameters": ["FUEL.PRESSURE", "FUEL.FLOW", "FUEL.VALVE.POS", "FUEL.TEMP"],
-        "svg_layer": "fuel",
-        "fire_zone": null,
-        "status": "PENDING_APPROVAL"
+      "linked_parameters": [
+        "FUEL.PRESSURE",
+        "FUEL.FLOW",
+        "FUEL.VALVE.POS",
+        "FUEL.TEMP"
+      ],
+      "svg_layer": "fuel",
+      "fire_zone": null,
+      "status": "PENDING_APPROVAL"
+    },
+    {
+      "external_id": "B2.FUEL.VALVE.HV012",
+      "system": "B2",
+      "subsystem": "FUEL.VALVE",
+      "document": "part13",
+      "tag": "HV012",
+      "type": "motorized_valve",
+      "name": "Vanne motorisée gaz TG2",
+      "description": "Vanne motorisée régulation/isolement flux gaz TG2",
+      "location": "TURBINE_GAZ_2",
+      "coordinates": {
+        "x": 230,
+        "y": 130,
+        "page": "part13"
       },
-      {
-        "external_id": "B2.FUEL.VALVE.HV012",
-        "system": "B2",
-        "subsystem": "FUEL.VALVE",
-        "document": "part13",
-        "tag": "HV012",
-        "type": "motorized_valve",
-        "name": "Vanne motorisée gaz TG2",
-        "description": "Vanne motorisée régulation/isolement flux gaz TG2",
-        "location": "TURBINE_GAZ_2",
-        "coordinates": { "x": 230, "y": 130, "page": "part13" },
-        "linked_parameters": ["VALVE.OPEN", "VALVE.CLOSE", "VALVE.FAULT", "VALVE.POSITION"],
-        "svg_layer": "fuel",
-        "fire_zone": null,
-        "status": "PENDING_APPROVAL"
+      "linked_parameters": [
+        "VALVE.OPEN",
+        "VALVE.CLOSE",
+        "VALVE.FAULT",
+        "VALVE.POSITION"
+      ],
+      "svg_layer": "fuel",
+      "fire_zone": null,
+      "status": "PENDING_APPROVAL"
+    },
+    {
+      "external_id": "B2.SAFETY.N2.INJ",
+      "system": "B2",
+      "subsystem": "SAFETY.N2",
+      "document": "part13",
+      "tag": null,
+      "type": "nitrogen_injection",
+      "name": "Injection azote TG2",
+      "description": "Système inertage sécurité par injection azote TG2 (post-arrêt ou fuite)",
+      "location": "TURBINE_GAZ_2",
+      "coordinates": {
+        "x": 250,
+        "y": 150,
+        "page": "part13"
       },
-      {
-        "external_id": "B2.SAFETY.N2.INJ",
-        "system": "B2",
-        "subsystem": "SAFETY.N2",
-        "document": "part13",
-        "tag": null,
-        "type": "nitrogen_injection",
-        "name": "Injection azote TG2",
-        "description": "Système inertage sécurité par injection azote TG2 (post-arrêt ou fuite)",
-        "location": "TURBINE_GAZ_2",
-        "coordinates": { "x": 250, "y": 150, "page": "part13" },
-        "linked_parameters": ["N2.PRESSURE", "N2.FLOW", "N2.ACTIVE", "N2.INJECTION.CMD"],
-        "svg_layer": "safety",
-        "fire_zone": null,
-        "status": "PENDING_APPROVAL"
+      "linked_parameters": [
+        "N2.PRESSURE",
+        "N2.FLOW",
+        "N2.ACTIVE",
+        "N2.INJECTION.CMD"
+      ],
+      "svg_layer": "safety",
+      "fire_zone": null,
+      "status": "PENDING_APPROVAL"
+    },
+    {
+      "external_id": "B3.FUEL.PREHEAT.N2x4.55",
+      "system": "B3",
+      "subsystem": "FUEL.PREHEAT",
+      "document": "part14",
+      "tag": "N2x4.55",
+      "type": "gas_preheater",
+      "name": "Réchauffeur gaz N2×4.55",
+      "description": "Réchauffage gaz combustible avant admission turbine vapeur",
+      "location": "CYCLE_VAPEUR",
+      "coordinates": {
+        "x": 250,
+        "y": 300,
+        "page": "part14"
       },
-      {
-        "external_id": "B3.FUEL.PREHEAT.N2x4.55",
-        "system": "B3",
-        "subsystem": "FUEL.PREHEAT",
-        "document": "part14",
-        "tag": "N2x4.55",
-        "type": "gas_preheater",
-        "name": "Réchauffeur gaz N2×4.55",
-        "description": "Réchauffage gaz combustible avant admission turbine vapeur",
-        "location": "CYCLE_VAPEUR",
-        "coordinates": { "x": 250, "y": 300, "page": "part14" },
-        "linked_parameters": ["GAS.TEMP.IN", "GAS.TEMP.OUT", "GAS.FLOW", "PREHEAT.STATUS", "GAS.PRESSURE"],
-        "svg_layer": "preheat",
-        "fire_zone": null,
-        "status": "PENDING_APPROVAL"
+      "linked_parameters": [
+        "GAS.TEMP.IN",
+        "GAS.TEMP.OUT",
+        "GAS.FLOW",
+        "PREHEAT.STATUS",
+        "GAS.PRESSURE"
+      ],
+      "svg_layer": "preheat",
+      "fire_zone": null,
+      "status": "PENDING_APPROVAL"
+    },
+    {
+      "external_id": "B3.BOILER.GAS.MAIN",
+      "system": "B3",
+      "subsystem": "BOILER.GAS",
+      "document": "part14",
+      "tag": null,
+      "type": "auxiliary_boiler",
+      "name": "Chaudière gaz auxiliaire",
+      "description": "Chaudière alimentée au gaz - production vapeur auxiliaire",
+      "location": "CYCLE_VAPEUR",
+      "coordinates": {
+        "x": 270,
+        "y": 310,
+        "page": "part14"
       },
-      {
-        "external_id": "B3.BOILER.GAS.MAIN",
-        "system": "B3",
-        "subsystem": "BOILER.GAS",
-        "document": "part14",
-        "tag": null,
-        "type": "auxiliary_boiler",
-        "name": "Chaudière gaz auxiliaire",
-        "description": "Chaudière alimentée au gaz - production vapeur auxiliaire",
-        "location": "CYCLE_VAPEUR",
-        "coordinates": { "x": 270, "y": 310, "page": "part14" },
-        "linked_parameters": ["BOILER.PRESSURE", "BOILER.TEMP", "GAS.VALVE.POS", "BOILER.STATUS"],
-        "svg_layer": "boiler",
-        "fire_zone": null,
-        "status": "PENDING_APPROVAL"
+      "linked_parameters": [
+        "BOILER.PRESSURE",
+        "BOILER.TEMP",
+        "GAS.VALVE.POS",
+        "BOILER.STATUS"
+      ],
+      "svg_layer": "boiler",
+      "fire_zone": null,
+      "status": "PENDING_APPROVAL"
+    },
+    {
+      "external_id": "B3.BOILER.COOL.CIRCUIT",
+      "system": "B3",
+      "subsystem": "BOILER.COOL",
+      "document": "part15",
+      "tag": null,
+      "type": "cooling_circuit",
+      "name": "Circuit eau refroidissement chaudières",
+      "description": "Boucle eau refroidissement chaudières auxiliaires 1,2,3",
+      "location": "CYCLE_VAPEUR",
+      "coordinates": {
+        "x": 290,
+        "y": 320,
+        "page": "part15"
       },
-      {
-        "external_id": "B3.BOILER.COOL.CIRCUIT",
-        "system": "B3",
-        "subsystem": "BOILER.COOL",
-        "document": "part15",
-        "tag": null,
-        "type": "cooling_circuit",
-        "name": "Circuit eau refroidissement chaudières",
-        "description": "Boucle eau refroidissement chaudières auxiliaires 1,2,3",
-        "location": "CYCLE_VAPEUR",
-        "coordinates": { "x": 290, "y": 320, "page": "part15" },
-        "linked_parameters": ["FLOW.RATE", "TEMP.RETURN", "TEMP.SUPPLY", "COOLING.PUMP.STATUS"],
-        "svg_layer": "cooling",
-        "fire_zone": null,
-        "status": "PENDING_APPROVAL"
+      "linked_parameters": [
+        "FLOW.RATE",
+        "TEMP.RETURN",
+        "TEMP.SUPPLY",
+        "COOLING.PUMP.STATUS"
+      ],
+      "svg_layer": "cooling",
+      "fire_zone": null,
+      "status": "PENDING_APPROVAL"
+    },
+    {
+      "external_id": "B3.BOILER.PUMP.REDUCE",
+      "system": "B3",
+      "subsystem": "BOILER.PUMP",
+      "document": "part15",
+      "tag": null,
+      "type": "pressure_reduction_pump",
+      "name": "Pompe réduction pression",
+      "description": "Pompe régulation pression circuit eau refroidissement",
+      "location": "CYCLE_VAPEUR",
+      "coordinates": {
+        "x": 310,
+        "y": 330,
+        "page": "part15"
       },
-      {
-        "external_id": "B3.BOILER.PUMP.REDUCE",
-        "system": "B3",
-        "subsystem": "BOILER.PUMP",
-        "document": "part15",
-        "tag": null,
-        "type": "pressure_reduction_pump",
-        "name": "Pompe réduction pression",
-        "description": "Pompe régulation pression circuit eau refroidissement",
-        "location": "CYCLE_VAPEUR",
-        "coordinates": { "x": 310, "y": 330, "page": "part15" },
-        "linked_parameters": ["PUMP.RUNNING", "PUMP.DISCHARGE.PRESS", "PUMP.FAULT", "PUMP.FLOW"],
-        "svg_layer": "cooling",
-        "fire_zone": null,
-        "status": "PENDING_APPROVAL"
+      "linked_parameters": [
+        "PUMP.RUNNING",
+        "PUMP.DISCHARGE.PRESS",
+        "PUMP.FAULT",
+        "PUMP.FLOW"
+      ],
+      "svg_layer": "cooling",
+      "fire_zone": null,
+      "status": "PENDING_APPROVAL"
+    },
+    {
+      "external_id": "B3.BOILER.PRESS.REG",
+      "system": "B3",
+      "subsystem": "BOILER.PRESS",
+      "document": "part15",
+      "tag": null,
+      "type": "pressure_reg_station",
+      "name": "Poste réduction pression",
+      "description": "Station régulation pression circuit eau refroidissement",
+      "location": "CYCLE_VAPEUR",
+      "coordinates": {
+        "x": 330,
+        "y": 340,
+        "page": "part15"
       },
-      {
-        "external_id": "B3.BOILER.PRESS.REG",
-        "system": "B3",
-        "subsystem": "BOILER.PRESS",
-        "document": "part15",
-        "tag": null,
-        "type": "pressure_reg_station",
-        "name": "Poste réduction pression",
-        "description": "Station régulation pression circuit eau refroidissement",
-        "location": "CYCLE_VAPEUR",
-        "coordinates": { "x": 330, "y": 340, "page": "part15" },
-        "linked_parameters": ["PRESS.IN", "PRESS.OUT", "VALVE.POS", "PRESS.STATUS"],
-        "svg_layer": "cooling",
-        "fire_zone": null,
-        "status": "PENDING_APPROVAL"
-      }
-    ]
-  }
-
-    
+      "linked_parameters": [
+        "PRESS.IN",
+        "PRESS.OUT",
+        "VALVE.POS",
+        "PRESS.STATUS"
+      ],
+      "svg_layer": "cooling",
+      "fire_zone": null,
+      "status": "PENDING_APPROVAL"
+    }
+  ]
+}
