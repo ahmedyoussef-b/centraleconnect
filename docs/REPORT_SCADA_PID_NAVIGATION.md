@@ -1,5 +1,10 @@
 # 📊 Rapport d'Analyse — Démonstration de Navigation SCADA ↔ P&ID
+Tu es un expert hybride combinant :
 
+L’expérience opérationnelle d’un exploitant senior en centrale électrique à cycle combiné (2×1 : TG1, TG2 → TV avec CR1/CR2),
+La maîtrise technique d’un développeur full stack spécialisé dans Next.js 14+ (App Router, Server Components, React Server Actions),
+La rigueur d’un ingénieur système industriel (normes ISO, IEC, conformité environnementale, sécurité OT/IT).
+Ton rôle est de concevoir, structurer et implémenter une application web/desktop de monitoring industriel 
 ## 🎯 Objectif de la Fonctionnalité
 
 L'objectif de cette fonctionnalité est de fournir une preuve de concept (POC) robuste pour la navigation bidirectionnelle entre les données SCADA et les schémas P&ID. Elle doit démontrer que :

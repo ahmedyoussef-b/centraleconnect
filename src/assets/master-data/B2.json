@@ -1,0 +1,309 @@
+[
+    {
+      "external_id": "B2.BALLON.HP",
+      "path": "B2/BALLON/HP",
+      "level": 3,
+      "type": "EQUIPMENT",
+      "subtype": "STEAM_DRUM",
+      "parent_id": "B2",
+      "label_fr": "Ballon vapeur haute pression TG2",
+      "label_en": "High-pressure steam drum TG2",
+      "tags": ["BALLON_HP", "CR2", "B2"],
+      "parameters": [
+        { "name": "temp", "unit": "°C", "value": 287, "critical": true, "max": 295 },
+        { "name": "press", "unit": "BAR", "value": 71, "critical": true, "max": 75 },
+        { "name": "level", "unit": "MM", "value": 197, "critical": true, "min": 180, "max": 220 }
+      ],
+      "approved_by": "ENG-SCADA-TEAM",
+      "approval_date": "2026-01-29",
+      "standard_refs": ["IEC 61511", "ASME VIII", "ISO 55001"]
+    },
+    {
+      "external_id": "B2.BALLON.BP",
+      "path": "B2/BALLON/BP",
+      "level": 3,
+      "type": "EQUIPMENT",
+      "subtype": "SEPARATOR_TANK",
+      "parent_id": "B2",
+      "label_fr": "Ballon séparation vapeur basse pression TG2",
+      "label_en": "Low-pressure steam separator drum TG2",
+      "tags": ["BALLON_BP", "CR2", "B2"],
+      "parameters": [
+        { "name": "temp", "unit": "°C", "value": 160, "critical": true, "max": 170 },
+        { "name": "press", "unit": "BAR", "value": 5.1, "critical": true, "max": 6.0 },
+        { "name": "level", "unit": "MM", "value": 197, "critical": true, "min": 150, "max": 250 }
+      ],
+      "approved_by": "ENG-SCADA-TEAM",
+      "approval_date": "2026-01-29",
+      "standard_refs": ["IEC 61511", "ASME VIII", "ISO 55001"]
+    },
+    {
+      "external_id": "B2.TURBINE.HP",
+      "path": "B2/TURBINE/HP",
+      "level": 3,
+      "type": "EQUIPMENT",
+      "subtype": "STEAM_TURBINE",
+      "parent_id": "B2",
+      "label_fr": "Turbine vapeur haute pression TG2",
+      "label_en": "High-pressure steam turbine TG2",
+      "tags": ["TURBINE_HP", "CR2", "B2"],
+      "parameters": [
+        { "name": "temp_inlet", "unit": "°C", "value": 510, "critical": true, "max": 520 },
+        { "name": "flow", "unit": "T/H", "value": 183, "critical": true, "min": 150, "max": 200 },
+        { "name": "press_inlet", "unit": "BAR", "value": 68, "critical": true, "max": 72 },
+        { "name": "load", "unit": "%", "value": 99, "critical": true, "max": 100 }
+      ],
+      "approved_by": "ENG-SCADA-TEAM",
+      "approval_date": "2026-01-29",
+      "standard_refs": ["IEC 61511", "API 612", "ISO 55001"]
+    },
+    {
+      "external_id": "B2.TURBINE.BP",
+      "path": "B2/TURBINE/BP",
+      "level": 3,
+      "type": "EQUIPMENT",
+      "subtype": "STEAM_TURBINE",
+      "parent_id": "B2",
+      "label_fr": "Turbine vapeur basse pression TG2",
+      "label_en": "Low-pressure steam turbine TG2",
+      "tags": ["TURBINE_BP", "CR2", "B2"],
+      "parameters": [
+        { "name": "temp_inlet", "unit": "°C", "value": 214, "critical": true, "max": 220 },
+        { "name": "flow", "unit": "T/H", "value": 35.8, "critical": true, "min": 30, "max": 40 },
+        { "name": "press_inlet", "unit": "BAR", "value": 5.0, "critical": true, "max": 6.0 }
+      ],
+      "approved_by": "ENG-SCADA-TEAM",
+      "approval_date": "2026-01-29",
+      "standard_refs": ["IEC 61511", "API 612", "ISO 55001"]
+    },
+    {
+      "external_id": "B2.EVAPORATEUR.HP",
+      "path": "B2/EVAPORATEUR/HP",
+      "level": 3,
+      "type": "EQUIPMENT",
+      "subtype": "EVAPORATOR",
+      "parent_id": "B2",
+      "label_fr": "Évaporateur haute pression TG2",
+      "label_en": "High-pressure evaporator TG2",
+      "tags": ["EVAPORATEUR_HP", "CR2", "B2"],
+      "parameters": [
+        { "name": "temp_in", "unit": "°C", "value": 294, "critical": true, "max": 300 },
+        { "name": "temp_out", "unit": "°C", "value": 458, "critical": true, "max": 465 },
+        { "name": "temp_metal_3", "unit": "°C", "value": 297, "critical": true, "max": 305 }
+      ],
+      "approved_by": "ENG-SCADA-TEAM",
+      "approval_date": "2026-01-29",
+      "standard_refs": ["IEC 61511", "ASME VIII"]
+    },
+    {
+      "external_id": "B2.SURCHAUFFEUR.HP",
+      "path": "B2/SURCHAUFFEUR/HP",
+      "level": 3,
+      "type": "EQUIPMENT",
+      "subtype": "SUPERHEATER",
+      "parent_id": "B2",
+      "label_fr": "Surchauffeur haute pression TG2",
+      "label_en": "High-pressure superheater TG2",
+      "tags": ["SURCH_HP", "CR2", "B2"],
+      "parameters": [
+        { "name": "temp_metal_1", "unit": "°C", "value": 505, "critical": true, "min": 480, "max": 560 },
+        { "name": "temp_metal_2", "unit": "°C", "value": 552, "critical": true, "min": 480, "max": 560 },
+        { "name": "temp_metal_3", "unit": "°C", "value": 531, "critical": true, "min": 480, "max": 560 }
+      ],
+      "approved_by": "ENG-SCADA-TEAM",
+      "approval_date": "2026-01-29",
+      "standard_refs": ["IEC 61511", "ASME BPVC Section I"]
+    },
+    {
+      "external_id": "B2.ECONOMISEUR.BP",
+      "path": "B2/ECONOMISEUR/BP",
+      "level": 3,
+      "type": "EQUIPMENT",
+      "subtype": "ECONOMIZER",
+      "parent_id": "B2",
+      "label_fr": "Économiseur basse pression TG2",
+      "label_en": "Low-pressure economizer TG2",
+      "tags": ["ECONO_BP", "CR2", "B2"],
+      "parameters": [
+        { "name": "temp_in", "unit": "°C", "value": 150, "critical": true, "max": 155 },
+        { "name": "temp_out", "unit": "°C", "value": 143, "critical": false }
+      ],
+      "approved_by": "ENG-SCADA-TEAM",
+      "approval_date": "2026-01-29",
+      "standard_refs": ["IEC 61511", "ASME VIII"]
+    },
+    {
+      "external_id": "B2.UV001",
+      "path": "B2/UV/001",
+      "level": 3,
+      "type": "EQUIPMENT",
+      "subtype": "VALVE",
+      "parent_id": "B2",
+      "label_fr": "Vanne motorisée UV001",
+      "label_en": "Motorized valve UV001",
+      "tags": ["UV001", "DIST", "B2"],
+      "parameters": [
+        { "name": "position", "unit": "%", "value": 100, "critical": false },
+        { "name": "press_upstream", "unit": "BAR", "value": 1.21, "critical": true, "max": 2.0 }
+      ],
+      "approved_by": "ENG-SCADA-TEAM",
+      "approval_date": "2026-01-29",
+      "standard_refs": ["IEC 61511", "ISO 5208"]
+    },
+    {
+      "external_id": "B2.UV002",
+      "path": "B2/UV/002",
+      "level": 3,
+      "type": "EQUIPMENT",
+      "subtype": "VALVE",
+      "parent_id": "B2",
+      "label_fr": "Vanne motorisée UV002",
+      "label_en": "Motorized valve UV002",
+      "tags": ["UV002", "DIST", "B2"],
+      "parameters": [
+        { "name": "position", "unit": "%", "value": 100, "critical": false }
+      ],
+      "approved_by": "ENG-SCADA-TEAM",
+      "approval_date": "2026-01-29",
+      "standard_refs": ["IEC 61511", "ISO 5208"]
+    },
+    {
+      "external_id": "B2.UV003",
+      "path": "B2/UV/003",
+      "level": 3,
+      "type": "EQUIPMENT",
+      "subtype": "VALVE",
+      "parent_id": "B2",
+      "label_fr": "Vanne motorisée UV003",
+      "label_en": "Motorized valve UV003",
+      "tags": ["UV003", "DIST", "B2"],
+      "parameters": [
+        { "name": "position", "unit": "%", "value": 100, "critical": false }
+      ],
+      "approved_by": "ENG-SCADA-TEAM",
+      "approval_date": "2026-01-29",
+      "standard_refs": ["IEC 61511", "ISO 5208"]
+    },
+    {
+      "external_id": "B2.UV004",
+      "path": "B2/UV/004",
+      "level": 3,
+      "type": "EQUIPMENT",
+      "subtype": "VALVE",
+      "parent_id": "B2",
+      "label_fr": "Vanne motorisée UV004",
+      "label_en": "Motorized valve UV004",
+      "tags": ["UV004", "DIST", "B2"],
+      "parameters": [
+        { "name": "position", "unit": "%", "value": 100, "critical": false }
+      ],
+      "approved_by": "ENG-SCADA-TEAM",
+      "approval_date": "2026-01-29",
+      "standard_refs": ["IEC 61511", "ISO 5208"]
+    },
+    {
+      "external_id": "B2.UV005",
+      "path": "B2/UV/005",
+      "level": 3,
+      "type": "EQUIPMENT",
+      "subtype": "VALVE",
+      "parent_id": "B2",
+      "label_fr": "Vanne motorisée UV00",
+      "label_en": "Motorized valve UV005",
+      "tags": ["UV005", "DIST", "B2"],
+      "parameters": [
+        { "name": "position", "unit": "%", "value": 100, "critical": false }
+      ],
+      "approved_by": "ENG-SCADA-TEAM",
+      "approval_date": "2026-01-29",
+      "standard_refs": ["IEC 61511", "ISO 5208"]
+    },
+    {
+      "external_id": "B2.LCV050A",
+      "path": "B2/LCV/050A",
+      "level": 3,
+      "type": "EQUIPMENT",
+      "subtype": "CONTROL_VALVE",
+      "parent_id": "B2",
+      "label_fr": "Vanne de régulation LCV050A",
+      "label_en": "Control valve LCV050A",
+      "tags": ["LCV050A", "B2"],
+      "parameters": [
+        { "name": "position", "unit": "%", "value": 45, "critical": true },
+        { "name": "press_diff", "unit": "BAR", "value": 0.5, "critical": false }
+      ],
+      "approved_by": "ENG-SCADA-TEAM",
+      "approval_date": "2026-01-29",
+      "standard_refs": ["IEC 61511", "ISA-75.01"]
+    },
+    {
+      "external_id": "B2.LCV050B",
+      "path": "B2/LCV/050B",
+      "level": 3,
+      "type": "EQUIPMENT",
+      "subtype": "CONTROL_VALVE",
+      "parent_id": "B2",
+      "label_fr": "Vanne de régulation LCV050B",
+      "label_en": "Control valve LCV050B",
+      "tags": ["LCV050B", "B2"],
+      "parameters": [
+        { "name": "position", "unit": "%", "value": 0, "critical": true }
+      ],
+      "approved_by": "ENG-SCADA-TEAM",
+      "approval_date": "2026-01-29",
+      "standard_refs": ["IEC 61511", "ISA-75.01"]
+    },
+    {
+      "external_id": "B2.TCV057",
+      "path": "B2/TCV/057",
+      "level": 3,
+      "type": "EQUIPMENT",
+      "subtype": "TEMP_CONTROL_VALVE",
+      "parent_id": "B2",
+      "label_fr": "Vanne de régulation température TCV057",
+      "label_en": "Temperature control valve TCV057",
+      "tags": ["TCV057", "B2"],
+      "parameters": [
+        { "name": "position", "unit": "%", "value": 21, "critical": true }
+      ],
+      "approved_by": "ENG-SCADA-TEAM",
+      "approval_date": "2026-01-29",
+      "standard_refs": ["IEC 61511", "ISA-75.01"]
+    },
+    {
+      "external_id": "B2.PP.APB",
+      "path": "B2/PP/APB",
+      "level": 3,
+      "type": "EQUIPMENT",
+      "subtype": "PUMP",
+      "parent_id": "B2",
+      "label_fr": "Pompe pressurisation APB",
+      "label_en": "Pressurization pump APB",
+      "tags": ["PP_APB", "B2"],
+      "parameters": [
+        { "name": "press", "unit": "BAR", "value": 16.1, "critical": true, "max": 17.0 },
+        { "name": "flow", "unit": "T/H", "value": 36.3, "critical": true }
+      ],
+      "approved_by": "ENG-SCADA-TEAM",
+      "approval_date": "2026-01-29",
+      "standard_refs": ["ISO 55001", "ISO 13709"]
+    },
+    {
+      "external_id": "B2.PP.APH",
+      "path": "B2/PP/APH",
+      "level": 3,
+      "type": "EQUIPMENT",
+      "subtype": "PUMP",
+      "parent_id": "B2",
+      "label_fr": "Pompe pressurisation APH",
+      "label_en": "Pressurization pump APH",
+      "tags": ["PP_APH", "B2"],
+      "parameters": [
+        { "name": "press", "unit": "BAR", "value": 100, "critical": true, "max": 105 },
+        { "name": "flow", "unit": "T/H", "value": 186, "critical": true }
+      ],
+      "approved_by": "ENG-SCADA-TEAM",
+      "approval_date": "2026-01-29",
+      "standard_refs": ["ISO 55001", "ISO 13709"]
+    }
+  ]
