@@ -3,6 +3,7 @@
 
 import {
   Activity,
+  BellRing,
   Book,
   Bot,
   Camera,
@@ -51,6 +52,7 @@ const VocalAssistant = dynamic(
 const pageTitles: { [key: string]: string } = {
     '/dashboard': 'Tableau de Bord',
     '/scada': 'Supervision SCADA',
+    '/alarms': 'Liste des Alarmes',
     '/procedures': 'Procédures',
     '/equipments': 'Équipements',
     '/logbook': 'Journal de Bord',
@@ -121,6 +123,14 @@ export default function MainLayout({
                       <Link href="/scada">
                           <Activity />
                           Supervision SCADA
+                      </Link>
+                  </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                  <SidebarMenuButton asChild tooltip="Alarmes" isActive={pathname === '/alarms'}>
+                      <Link href="/alarms">
+                          <BellRing />
+                          Alarmes
                       </Link>
                   </SidebarMenuButton>
               </SidebarMenuItem>
