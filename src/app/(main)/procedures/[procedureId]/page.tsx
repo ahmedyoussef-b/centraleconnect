@@ -1,5 +1,3 @@
-'use client';
-
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, ClipboardCheck } from 'lucide-react';
