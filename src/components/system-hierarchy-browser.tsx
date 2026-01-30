@@ -217,14 +217,14 @@ export function SystemHierarchyBrowser() {
                                         )}
                                         {cat.type === 'tree' && (
                                             <div className="space-y-1">
-                                                {(cat.data as EquipmentWithChildren[]).map(node => (
-                                                    <Card key={node.externalId} className="overflow-hidden">
-                                                        <div className="flex items-center gap-3 p-3 font-semibold bg-muted/50 cursor-pointer" onClick={() => router.push(`/equipments/${encodeURIComponent(node.externalId)}`)}>
-                                                            <Turbine className="h-6 w-6 text-primary" />
-                                                            {node.name}
+                                                {(cat.data as EquipmentWithChildren[]).map(tg => (
+                                                    <Card key={tg.externalId} className="overflow-hidden">
+                                                         <div className="flex items-center gap-3 p-3 font-semibold bg-muted/50 cursor-pointer" onClick={() => router.push(`/equipments/${encodeURIComponent(tg.externalId)}`)}>
+                                                            <Cog className="h-6 w-6 text-primary" />
+                                                            {tg.name}
                                                         </div>
                                                         <div className="p-2 space-y-1">
-                                                            {node.children && node.children.map(child => (
+                                                            {tg.children && tg.children.map(child => (
                                                                 <EquipmentItem key={child.externalId} node={child} />
                                                             ))}
                                                         </div>
