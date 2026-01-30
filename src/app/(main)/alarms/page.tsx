@@ -1,14 +1,16 @@
 'use client';
 
+import Link from 'next/link';
 import { getAlarms } from '@/lib/alarms-service';
 import type { Alarm } from '@/types/db';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge, type BadgeProps } from '@/components/ui/badge';
-import { BellRing, Wind, Cog, Zap, Factory, ChevronDown, AlertTriangle, Shield } from 'lucide-react';
+import { BellRing, Wind, Cog, Zap, Factory, ChevronDown, AlertTriangle, Shield, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import React from 'react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Button } from '@/components/ui/button';
 
 type AlarmWithRef = Alarm & { standardRef?: string };
 
@@ -52,34 +54,48 @@ function AlarmList({ alarms }: { alarms: AlarmWithRef[] }) {
                         <ChevronDown className="ml-4 h-4 w-4 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-180" />
                     </CollapsibleTrigger>
                     <CollapsibleContent>
-                        <div className="border-t p-4 space-y-4 text-sm bg-muted/30 rounded-b-lg">
-                            {alarm.parameter && (
-                                <div className="flex items-start gap-3">
-                                    <AlertTriangle className="h-5 w-5 text-yellow-500 mt-0.5 flex-shrink-0" />
-                                    <div>
-                                        <h4 className="font-semibold">Paramètre de déclenchement</h4>
-                                        <p className="text-muted-foreground">{alarm.parameter}</p>
-                                    </div>
+                        <div className="border-t bg-muted/30 rounded-b-lg p-4">
+                            <div className="grid grid-cols-1 md:grid-cols-5 gap-6 text-sm">
+                                <div className="md:col-span-3 space-y-4">
+                                    {alarm.parameter && (
+                                        <div className="flex items-start gap-3">
+                                            <AlertTriangle className="h-5 w-5 text-yellow-500 mt-0.5 flex-shrink-0" />
+                                            <div>
+                                                <h4 className="font-semibold">Paramètre de déclenchement</h4>
+                                                <p className="text-muted-foreground">{alarm.parameter}</p>
+                                            </div>
+                                        </div>
+                                    )}
+                                    {alarm.standardRef && (
+                                        <div className="flex items-start gap-3">
+                                            <Cog className="h-5 w-5 text-muted-foreground mt-0.5 flex-shrink-0" />
+                                            <div>
+                                                <h4 className="font-semibold">Référence Norme</h4>
+                                                <p className="text-muted-foreground">{alarm.standardRef}</p>
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
-                            )}
-                             {alarm.reset_procedure && (
-                                <div className="flex items-start gap-3">
-                                    <Shield className="h-5 w-5 text-blue-500 mt-0.5 flex-shrink-0" />
-                                    <div>
-                                        <h4 className="font-semibold">Procédure de Réarmement</h4>
-                                        <p className="text-muted-foreground">{alarm.reset_procedure}</p>
-                                    </div>
+                                <div className="md:col-span-2 space-y-4">
+                                     {alarm.reset_procedure && (
+                                        <div className="flex items-start gap-3 bg-background/50 p-3 rounded-md border border-blue-500/20">
+                                            <Shield className="h-5 w-5 text-blue-500 mt-0.5 flex-shrink-0" />
+                                            <div>
+                                                <h4 className="font-semibold">Procédure de Réarmement</h4>
+                                                <p className="text-muted-foreground">{alarm.reset_procedure}</p>
+                                            </div>
+                                        </div>
+                                    )}
+                                     {alarm.component_id && (
+                                         <Button asChild variant="outline" size="sm">
+                                            <Link href={`/equipments/${encodeURIComponent(alarm.component_id)}`}>
+                                                Voir l'équipement
+                                                <ArrowRight className="ml-2 h-4 w-4" />
+                                            </Link>
+                                        </Button>
+                                    )}
                                 </div>
-                            )}
-                             {alarm.standardRef && (
-                                <div className="flex items-start gap-3">
-                                    <Cog className="h-5 w-5 text-muted-foreground mt-0.5 flex-shrink-0" />
-                                    <div>
-                                        <h4 className="font-semibold">Référence Norme</h4>
-                                        <p className="text-muted-foreground">{alarm.standardRef}</p>
-                                    </div>
-                                </div>
-                            )}
+                            </div>
                         </div>
                     </CollapsibleContent>
                 </Collapsible>
@@ -87,6 +103,7 @@ function AlarmList({ alarms }: { alarms: AlarmWithRef[] }) {
         </div>
     );
 }
+
 
 interface AlarmCategory {
     name: string;
