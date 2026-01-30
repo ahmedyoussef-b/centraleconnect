@@ -255,7 +255,62 @@
         ]
       }
     ]
+  },
+  {
+    "id": "gas-turbine-shutdown",
+    "name": "Arrêt Turbine à Gaz",
+    "description": "Procédures d'arrêt normal, d'urgence et de refroidissement de la turbine à gaz.",
+    "version": "1.0.0",
+    "steps": [
+      {
+        "id": "gts-s1",
+        "title": "Mode 1 : Arrêt Normal (Programmé)",
+        "type": "group",
+        "details": "Procédure graduelle destinée à minimiser les contraintes thermiques.",
+        "steps": [
+          { "id": "gts-s1a", "title": "Initier l'arrêt", "type": "check", "details": "Appuyer sur le bouton STOP puis EXECUTE pour générer le signal L94X." },
+          { "id": "gts-s1b", "title": "Observer la réduction de charge", "type": "instruction", "details": "Si la turbine est couplée, la charge est réduite progressivement (baisse du FSR)." },
+          { "id": "gts-s1c", "title": "Vérifier l'ouverture du disjoncteur", "type": "check", "details": "Le disjoncteur de l'alternateur doit s'ouvrir automatiquement par retour de puissance." },
+          { "id": "gts-s1d", "title": "Surveiller la décélération avec flamme", "type": "check", "details": "La flamme est maintenue jusqu'à environ 40-50% de la vitesse nominale (signal L14HA)." },
+          { "id": "gts-s1e", "title": "Confirmer la coupure du combustible", "type": "check", "details": "À l'atteinte du seuil L14HA, le FSR est forcé à zéro et les vannes d'arrêt combustible se ferment." },
+          { "id": "gts-s1f", "title": "Vérifier le refroidissement des auxiliaires", "type": "check", "details": "Les ventilateurs du compartiment turbine doivent continuer de tourner pour dissiper la chaleur." }
+        ]
+      },
+      {
+        "id": "gts-s2",
+        "title": "Mode 2 : Arrêt d'Urgence (Déclenchement)",
+        "type": "group",
+        "details": "Actions automatiques en cas de dépassement des limites de sécurité.",
+        "steps": [
+            { "id": "gts-s2a", "title": "Identifier la cause du déclenchement", "type": "instruction", "details": "Causes typiques: Survitesse (L12H), surchauffe (L86TXT), vibrations excessives, perte de flamme (L28FD)." },
+            { "id": "gts-s2b", "title": "Constater l'action immédiate", "type": "instruction", "details": "Le circuit maître de protection L4 est désexcité, entraînant une fermeture rapide (<0.5s) des vannes de combustible." },
+            { "id": "gts-s2c", "title": "Vérifier la configuration de sécurité", "type": "instruction", "details": "Les vannes anti-pompage doivent s'ouvrir et les aubes orientables (I.G.V.) se ferment." }
+        ]
+      },
+      {
+        "id": "gts-s3",
+        "title": "Phase 3 : Virage et Refroidissement (Post-Arrêt)",
+        "type": "group",
+        "details": "Séquence indispensable pour éviter la flèche thermique de l'arbre.",
+        "steps": [
+          { "id": "gts-s3a", "title": "Vérifier la lubrification de maintien", "type": "check", "details": "La pompe à huile auxiliaire (88QA) doit démarrer automatiquement sous 95% de vitesse (L14HS)." },
+          { "id": "gts-s3b", "title": "Confirmer la mise au virage", "type": "check", "details": "Le moteur de virage (88TG) doit démarrer lorsque la vitesse descend à environ 48-50 t/min." },
+          { "id": "gts-s3c", "title": "Surveiller la rotation lente", "type": "instruction", "details": "L'arbre est maintenu en rotation à ~120 t/min pour un refroidissement uniforme." },
+          { "id": "gts-s3d", "title": "Noter la durée de la séquence", "type": "instruction", "details": "Le refroidissement doit durer au moins 20 heures et son arrêt est manuel." }
+        ]
+      },
+       {
+        "id": "gts-s4",
+        "title": "Paramètres et Signaux Clés de l'Arrêt",
+        "type": "group",
+        "details": "Récapitulatif des seuils et actions automatiques.",
+        "steps": [
+          { "id": "gts-s4a", "title": "Vitesse de service (L14HS - 95%)", "type": "instruction", "details": "Action : Démarrage de la pompe à huile auxiliaire 88QA." },
+          { "id": "gts-s4b", "title": "Vitesse de coupure fuel (L14HA - 40-50%)", "type": "instruction", "details": "Action : Fermeture des vannes d'arrêt en mode d'arrêt normal." },
+          { "id": "gts-s4c", "title": "Vitesse de virage (~48 R.P.M.)", "type": "instruction", "details": "Action : Mise en route du moteur de virage 88TG." },
+          { "id": "gts-s4d", "title": "Surveillance huile (88QE)", "type": "instruction", "details": "Action : La pompe de secours prend le relais en cas de perte de courant alternatif." }
+        ]
+      }
+    ]
   }
 ]
-
-    
