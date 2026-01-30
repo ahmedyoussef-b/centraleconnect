@@ -14,6 +14,7 @@ import b1Data from '../src/assets/master-data/B1.json';
 import b2Data from '../src/assets/master-data/B2.json';
 import b3Data from '../src/assets/master-data/B3.json';
 import proceduresData from '../src/assets/master-data/procedures.json';
+import tgData from '../src/assets/master-data/TG.json';
 
 const prisma = new PrismaClient();
 
@@ -42,10 +43,10 @@ async function main() {
     return createHash('sha256').update(JSON.stringify(data)).digest('hex');
   };
 
-  const detailedData = [...b0Data, ...b1Data, ...b2Data, ...b3Data, ...pidAssetsData.nodes, ...componentsData];
+  const detailedData = [...b0Data, ...b1Data, ...b2Data, ...b3Data, ...pidAssetsData.nodes, ...componentsData, ...tgData];
 
   for (const item of detailedData as any[]) {
-    const id = item.external_id || item.tag;
+    const id = item.externalId || item.tag;
     if (!id) continue;
     
     const existing = allEquipments.get(id) || { externalId: id };
@@ -56,7 +57,8 @@ async function main() {
       description: item.description || existing.description,
       type: item.type || existing.type,
       subtype: item.subtype || existing.subtype,
-      systemCode: item.system || existing.systemCode,
+      parentId: item.parentId || item.parent_id || existing.parentId,
+      systemCode: item.systemCode || item.system || existing.systemCode,
       subSystem: item.subsystem || existing.subSystem,
       location: item.location || existing.location,
       manufacturer: item.manufacturer || existing.manufacturer,

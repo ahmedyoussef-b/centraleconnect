@@ -15,6 +15,7 @@ import equipmentB0Data from '@/assets/master-data/B0.json';
 import equipmentB1Data from '@/assets/master-data/B1.json';
 import equipmentB2Data from '@/assets/master-data/B2.json';
 import equipmentB3Data from '@/assets/master-data/B3.json';
+import equipmentTGData from '@/assets/master-data/TG.json';
 import allParameterData from '@/assets/master-data/parameters.json';
 
 
@@ -149,10 +150,10 @@ function getClientSideData() {
     }
 
     const allEquipmentsMap = new Map<string, any>();
-    const detailedData = [...equipmentB0Data, ...equipmentB1Data, ...equipmentB2Data, ...equipmentB3Data, ...equipmentPidAssetsData.nodes, ...equipmentComponentsData];
+    const detailedData = [...equipmentB0Data, ...equipmentB1Data, ...equipmentB2Data, ...equipmentB3Data, ...equipmentPidAssetsData.nodes, ...equipmentComponentsData, ...equipmentTGData];
 
     for (const item of detailedData as any[]) {
-        const id = item.external_id || item.tag;
+        const id = item.externalId || item.tag;
         if (!id) continue;
         
         const existing = allEquipmentsMap.get(id) || { externalId: id };
@@ -163,7 +164,8 @@ function getClientSideData() {
             description: item.description || existing.description,
             type: item.type || existing.type,
             subtype: item.subtype || existing.subtype,
-            systemCode: item.system || existing.systemCode,
+            parentId: item.parentId || item.parent_id || existing.parentId,
+            systemCode: item.systemCode || item.system || existing.systemCode,
             subSystem: item.subsystem || existing.subSystem,
             location: item.location || existing.location,
             manufacturer: item.manufacturer || existing.manufacturer,
@@ -268,6 +270,7 @@ export async function getEquipments(): Promise<Equipment[]> {
         return nodes.map(node => ({
             ...node,
             externalId: node.external_id,
+            parentId: node.parent_id,
             systemCode: node.system_code,
             subSystem: node.sub_system,
             serialNumber: node.serial_number,
@@ -300,6 +303,7 @@ export async function getEquipmentById(id: string): Promise<Equipment | null> {
         return {
             ...node,
             externalId: node.external_id,
+            parentId: node.parent_id,
             systemCode: node.system_code,
             subSystem: node.sub_system,
             serialNumber: node.serial_number,
