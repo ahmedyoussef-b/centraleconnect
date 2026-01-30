@@ -33,11 +33,12 @@ const nextConfig: NextConfig = {
     ],
   },
   webpack: (config, { isServer }) => {
-    // This is needed to prevent errors from `vosk-browser` which tries to import 'fs'
+    // This is needed to prevent errors from `vosk-browser` which tries to import 'fs' and 'worker_threads'
     if (!isServer) {
       config.resolve.fallback = {
         ...config.resolve.fallback,
         fs: false,
+        worker_threads: false,
       };
     }
     return config;
