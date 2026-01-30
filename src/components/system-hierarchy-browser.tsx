@@ -8,7 +8,7 @@ import type { Equipment } from '@/types/db';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Folder, Cog, Database, ChevronRight, Home, Search, X, Package, Wind, Droplets, Turbine } from 'lucide-react';
+import { Folder, Cog, Database, ChevronRight, Home, Search, X, Package, Wind, Droplets } from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -104,7 +104,7 @@ export function SystemHierarchyBrowser() {
         const tgTree = buildTree(tgEquipments);
         
         return [
-            { id: 'TG', name: 'Turbines à Gaz', data: tgTree, icon: Turbine, type: 'tree', count: tgEquipments.length },
+            { id: 'TG', name: 'Turbines à Gaz', data: tgTree, icon: Cog, type: 'tree', count: tgEquipments.length },
             { id: 'A0', name: 'Utilitaires (A0)', data: nodes.filter(n => n.systemCode === 'A0'), icon: Package, type: 'grid', count: nodes.filter(n => n.systemCode === 'A0').length },
             { id: 'B0', name: 'Auxiliaires Communs (B0)', data: nodes.filter(n => n.systemCode === 'B0'), icon: Cog, type: 'grid', count: nodes.filter(n => n.systemCode === 'B0').length },
             { id: 'B1', name: 'Cycle Eau-Vapeur CR1 (B1)', data: nodes.filter(n => n.systemCode === 'B1'), icon: Droplets, type: 'grid', count: nodes.filter(n => n.systemCode === 'B1').length },
