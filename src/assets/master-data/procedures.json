@@ -106,13 +106,10 @@
           { "id": "s5a", "title": "TG associée synchronisée", "type": "check" },
           { "id": "s5b", "title": "Au moins une pompe APH en service", "type": "check" },
           { "id": "s5c", "title": "Au moins une pompe APB en service", "type": "check" },
-          { "id": "s5d", "title": "Une pompe CEX en service", "type": "check" },
           { "id": "s5e", "title": "Une pompe FSR en service et ΔP correct", "type": "check" },
           { "id": "s5f", "title": "Une pompe FLB en service et ΔP correct", "type": "check" },
           { "id": "s5g", "title": "Niveau gonflement ballon HP détecté (-475 mm)", "type": "check" },
-          { "id": "s5h", "title": "Niveau gonflement ballon BP détecté (-580 mm)", "type": "check" },
-          { "id": "s5i", "title": "Absence d'eau dans pot condensat vapeur surchauffe HP", "type": "check" },
-          { "id": "s5j", "title": "Absence d'eau dans pot condensat vapeur surchauffe BP", "type": "check" }
+          { "id": "s5h", "title": "Niveau gonflement ballon BP détecté (-580 mm)", "type": "check" }
         ]
       },
       {
@@ -174,89 +171,91 @@
   },
   {
     "id": "gas-turbine-startup",
-    "name": "Démarrage Turbine à Gaz",
-    "description": "Procédure de démarrage de la turbine à gaz, du lancement à la synchronisation.",
-    "version": "1.0.0",
+    "name": "Démarrage Turbine à Gaz (MS 9001 E)",
+    "description": "Procédure de démarrage de la turbine à gaz, du lancement à la synchronisation, avec alarmes intégrées.",
+    "version": "1.1.0",
     "steps": [
       {
         "id": "tg-s1",
-        "title": "Préparation et Permissifs",
+        "title": "Étape 1 : Conditions Préalables (Permissifs)",
         "type": "group",
-        "details": "Vérification des sécurités de base par le système Speedtronic Mark IV.",
+        "details": "Vérification des sécurités et systèmes auxiliaires par le Speedtronic Mark IV.",
         "steps": [
-          { "id": "tg-s1a", "title": "Viscosité de l'huile < 800 SSU", "type": "check", "details": "Garantit la lubrification des paliers." },
-          { "id": "tg-s1b", "title": "Température de l'huile correcte (Thermostat 26 QN-1)", "type": "check", "details": "Interdit le démarrage si l'huile est trop froide." },
-          { "id": "tg-s1c", "title": "Vannes anti-pompage (x4) confirmées 100% ouvertes (33 CB-1 à 4)", "type": "check" },
-          { "id": "tg-s1d", "title": "Aubes orientables (I.G.V.) en position fermée (34°)", "type": "check" }
+          { "id": "tg-s1a", "title": "Vérifier la viscosité de l'huile", "type": "check", "details": "Alarme associée : Température huile basse (L26QN-1). Danger : Moyen (Empêche le lancement si > 800 SSU). Remède : Activer les résistances de chauffage de la cuve (23 QT) et la pompe auxiliaire." },
+          { "id": "tg-s1b", "title": "Vérifier les capteurs de vibration", "type": "check", "details": "Alarme associée : Inhibition démarrage vibrations. Danger : Élevé (Blocage du démarrage). Remède : Vérifier/remplacer les transducteurs si ≥ 3 (turbine) or ≥ 2 (alternateur) sont défectueux." },
+          { "id": "tg-s1c", "title": "Vérifier ouverture vannes anti-pompage", "type": "check", "details": "Doivent être 100% ouvertes (33 CB-1 à 4). Alarme : L33CB-FAULT. Danger : Critique (Risque de pompage compresseur). Remède : Vérifier l'alimentation en air comprimé et les fins de course." },
+          { "id": "tg-s1d", "title": "Vérifier position des aubes orientables (I.G.V.)", "type": "check", "details": "Doivent être en position fermée (34°). Alarme : L86GVT-FAULT. Danger : Élevé. Remède : Vérifier transmetteurs LVDT (96 TV-1, 2) et servovalve 90 TV." }
         ]
       },
       {
         "id": "tg-s2",
-        "title": "Lancement et Décollement (Breakaway)",
+        "title": "Étape 2 : Lancement et Décollement (Breakaway)",
         "type": "group",
         "steps": [
-          { "id": "tg-s2a", "title": "Circuit maître 'L4' activé, embrayage engagé, moteur de lancement en rotation", "type": "check" },
-          { "id": "tg-s2b", "title": "Signal de vitesse nulle (L14HR) désactivé", "type": "check", "details": "Se désactive dès que la rotation commence (> 0 t/min)." }
+          { "id": "tg-s2a", "title": "Activer le circuit maître 'L1_START'", "type": "check", "details": "Engage l'embrayage et le moteur de lancement (88 CR). Alarme : Défaut de rotation (L14HR-FAULT). Danger : Élevé. Remède : Vérifier engagement embrayage et niveau de fluide du convertisseur." },
+          { "id": "tg-s2b", "title": "Confirmer la désactivation du signal de vitesse nulle (L14HR)", "type": "check", "details": "Se désactive dès que l'arbre de la turbine commence à tourner." }
         ]
       },
       {
         "id": "tg-s3",
-        "title": "Cycle de Purge",
+        "title": "Étape 3 : Cycle de Purge",
         "type": "group",
         "steps": [
-          { "id": "tg-s3a", "title": "Turbine maintenue à la vitesse de purge (~18%, 540 t/min, L14HM)", "type": "check" },
-          { "id": "tg-s3b", "title": "Fin de la temporisation de sécurité (L2TV)", "type": "check", "details": "Assure l'évacuation des gaz combustibles résiduels." }
+          { "id": "tg-s3a", "title": "Maintenir la vitesse de purge (~18%, 540 t/min)", "type": "check", "details": "La vitesse est maintenue par le moteur de lancement (L14HM)." },
+          { "id": "tg-s3b", "title": "Attendre la fin de la temporisation de sécurité (L2TV)", "type": "check", "details": "Évacue les gaz résiduels. Alarme : Purge interrompue (L2TV-FAIL). Danger : Élevé (Risque d'explosion). Remède : Assurer la stabilité de la vitesse et relancer le cycle." }
         ]
       },
       {
         "id": "tg-s4",
-        "title": "Allumage et Détection de Flamme",
+        "title": "Étape 4 : Allumage et Détection de Flamme",
         "type": "group",
         "steps": [
-          { "id": "tg-s4a", "title": "Débit de combustible (FSR) au niveau 'débit d'allumage'", "type": "check" },
-          { "id": "tg-s4b", "title": "Bougies d'allumage (95SP) activées", "type": "check" },
-          { "id": "tg-s4c", "title": "Présence de flamme validée par au moins 2/4 détecteurs UV (L28FD)", "type": "check", "details": "Doit être confirmé avant la fin de la temporisation L2F." }
+          { "id": "tg-s4a", "title": "Vérifier le débit de combustible au niveau 'allumage'", "type": "check" },
+          { "id": "tg-s4b", "title": "Vérifier l'activation des bougies d'allumage (95SP)", "type": "check" },
+          { "id": "tg-s4c", "title": "Confirmer la détection de flamme (L28FD)", "type": "check", "details": "Validée par au moins 2/4 détecteurs UV. Alarme : Faux départ (L2F-FAIL). Danger : Moyen. Remède : Le système draine les imbrûlés (VA 17-1/2), une nouvelle purge est obligatoire." },
+          { "id": "tg-s4d", "title": "Surveiller le débit de combustible liquide", "type": "check", "details": "Alarme : Défaut débit liquide (L60FFLH). Danger: Élevé. Remède : Vérifier la servovalve de dérivation (65 FP) et réarmer." }
         ]
       },
       {
         "id": "tg-s5",
-        "title": "Phase de Réchauffement (Warm-up)",
+        "title": "Étape 5 : Phase de Réchauffement (Warm-up)",
         "type": "group",
         "steps": [
-          { "id": "tg-s5a", "title": "FSR réduit au niveau 'MONTEE EN TEMPERATURE'", "type": "check" },
-          { "id": "tg-s5b", "title": "Fin de la temporisation de réchauffement (L2W)", "type": "check", "details": "Minimise les contraintes thermiques." }
+          { "id": "tg-s5a", "title": "FSR réduit au niveau 'Montée en température' pendant L2W", "type": "check", "details": "Alarme : Écart de température (L30SPA). Danger : Moyen. Remède : Inspecter injecteurs et thermocouples." }
         ]
       },
       {
         "id": "tg-s6",
-        "title": "Accélération de la Turbine",
+        "title": "Étape 6 : Accélération",
         "type": "group",
         "steps": [
-          { "id": "tg-s6a", "type": "instruction", "title": "Phase d'accélération active (L14HA: 40-50%)", "details": "Seuil entre 1200-1500 t/min. Le débit de combustible augmente progressivement." },
-          { "id": "tg-s6b", "type": "instruction", "title": "Retrait automatique des bougies d'allumage", "details": "Se produit à 1500 t/min (50%)." },
-          { "id": "tg-s6c", "title": "Turbine auto-sustentée, moteur de lancement arrêté", "type": "check", "details": "Seuil L14HC (50-70%). L'embrayage se désengage." }
+          { "id": "tg-s6a", "type": "instruction", "title": "Le FSR suit une pente croissante.", "details": "Alarme : Vibrations élevées (VIB-HIGH-TRIP). Danger : Critique (Arrêt d'urgence). Remède : Inspection mécanique des paliers, équilibrage rotor." },
+          { "id": "tg-s6b", "type": "instruction", "title": "Retrait des bougies à 50% de vitesse (1500 t/min).", "details": "Alarme : Surchauffe échappement (L30TXA). Danger : Élevé. Remède : Le Speedtronic réduit le FSR ; vérifier le contrôle de température (TTXM)." },
+          { "id": "tg-s6c", "title": "Désengagement du moteur de lancement", "type": "check", "details": "Se produit entre 50% et 70% de vitesse (L14HC)." }
         ]
       },
       {
         "id": "tg-s7",
-        "title": "Pleine Vitesse à Vide (FSNL)",
+        "title": "Étape 7 : Pleine Vitesse à Vide (FSNL)",
         "type": "group",
         "steps": [
           { "id": "tg-s7a", "title": "Vitesse de service atteinte (~95%, 2850 t/min, L14HS)", "type": "check" },
-          { "id": "tg-s7b", "title": "Vannes anti-pompage fermées automatiquement", "type": "check" },
-          { "id": "tg-s7c", "title": "Aubes orientables (I.G.V.) ouvertes à l'angle minimal de pleine vitesse (~57°)", "type": "check" },
+          { "id": "tg-s7b", "title": "Fermeture automatique des vannes anti-pompage", "type": "check" },
+          { "id": "tg-s7c", "title": "Ouverture des I.G.V. à 57°", "type": "check", "details": "Alarme : Défaut position I.G.V. (L86GVT-FAULT). Danger : Élevé (Risque de pompage). Remède : Vérifier transmetteurs LVDT et servovalve 90 TV." },
           { "id": "tg-s7d", "title": "Signal 'Séquence complète' émis (vitesse stabilisée à 3000 t/min)", "type": "check" }
         ]
       },
       {
         "id": "tg-s8",
-        "title": "Synchronisation",
+        "title": "Étape 8 : Synchronisation",
         "type": "group",
         "steps": [
-          { "id": "tg-s8a", "title": "Référence de vitesse (TNR) portée à 100.3% (3009 t/min)", "type": "check" },
-          { "id": "tg-s8b", "title": "Disjoncteur de l'alternateur fermé après validation du synchronisme", "type": "check" }
+          { "id": "tg-s8a", "title": "Référence de vitesse portée à 100.3% (3009 t/min)", "type": "check", "details": "Alarme : Survitesse électrique (L12H). Danger : Critique. Remède : Déclenchement immédiat, réarmement manuel requis." },
+          { "id": "tg-s8b", "title": "Fermeture du disjoncteur de l'alternateur (L25)", "type": "check", "details": "Alarme : Déclenchement détection gaz (L45HHTRP). Danger : Critique (Risque d'explosion). Remède : Fermeture vannes et ventilation forcée." }
         ]
       }
     ]
   }
 ]
+
+    
