@@ -371,5 +371,90 @@
         ]
       }
     ]
+  },
+  {
+    "id": "single-boiler-shutdown",
+    "name": "Arrêt d'une chaudière seule (KCA)",
+    "description": "Procédure d'arrêt d'une seule chaudière (l'autre restant en service) via l'automate KCA, basée sur la Table 3.",
+    "version": "1.0.0",
+    "steps": [
+      {
+        "id": "sbs-s1",
+        "title": "Phase 1 : Réduction de charge et fermeture des gaz",
+        "type": "group",
+        "steps": [
+          {
+            "id": "sbs-s1a",
+            "title": "a - Commande au système de registre (TTA)",
+            "type": "check",
+            "details": "L'automate envoie un ordre d'arrêt normal au système de gestion du registre des gaz d'échappement (TTA). Le registre (diverter) commence à se déplacer de la position chaudière vers la position cheminée.\nParamètres critiques:\n- Position intermédiaire du registre : 75 % puis 67 % pour valider la progression."
+          }
+        ]
+      },
+      {
+        "id": "sbs-s2",
+        "title": "Phase 2 : Déclenchement et isolation vapeur",
+        "type": "group",
+        "steps": [
+          {
+            "id": "sbs-s2a",
+            "title": "a - Déclenchement interne et fermeture étanche",
+            "type": "check",
+            "details": "Une fois le registre suffisamment basculé vers la cheminée, un ordre de déclenchement est activé pour fermer complètement l'admission de chaleur. Simultanément, les vannes d'isolement vapeur sont fermées pour séparer la chaudière du collecteur commun.\nParamètres critiques:\n- Fermeture du registre chaudière à 100 %.\n- Fermeture des vannes d'isolement HP (UV 001) et BP (UV 002).\n- Fermeture des vannes de réchauffage HP (ACO UV 003) et BP (ACO UV 004)."
+          }
+        ]
+      },
+      {
+        "id": "sbs-s3",
+        "title": "Phase 3 : Mise hors service des groupes fonctionnels vapeur",
+        "type": "group",
+        "steps": [
+          {
+            "id": "sbs-s3a",
+            "title": "a - Arrêt des circuits vapeur et contournement (GBP/GHP)",
+            "type": "check",
+            "details": "L'automate désactive successivement les fonctions liées à la gestion de la vapeur de la chaudière arrêtée. Le contournement BP de la chaudière déclenchée est maintenu fermé pour conserver la chaudière sous pression et température, facilitant ainsi un redémarrage rapide.\nParamètres critiques:\n- Groupe fonctionnel \"Vapeur et contournement BP\" sur OFF.\n- Groupe fonctionnel \"Vapeur et contournement HP\" sur OFF."
+          }
+        ]
+      },
+      {
+        "id": "sbs-s4",
+        "title": "Phase 4 : Arrêt des circuits d'eau et de circulation",
+        "type": "group",
+        "steps": [
+          {
+            "id": "sbs-s4a",
+            "title": "a - Désactivation des pompes et circuits d'eau (FSR/FLB)",
+            "type": "check",
+            "details": "Une fois la chaudière isolée du cycle vapeur, l'automate arrête les pompes de circulation qui assuraient le mouvement de l'eau dans les évaporateurs.\nParamètres critiques:\n- Groupe fonctionnel \"Circuits HP\" sur OFF.\n- Groupe fonctionnel \"Circuits BP\" sur OFF."
+          }
+        ]
+      },
+      {
+        "id": "sbs-s5",
+        "title": "Information : Gestion de la Turbine à Vapeur (TV)",
+        "type": "group",
+        "steps": [
+          {
+            "id": "sbs-s5a",
+            "title": "Ajustement de la charge",
+            "type": "instruction",
+            "details": "Si une chaudière s'arrête, la turbine à vapeur reste en service si la seconde chaudière est opérationnelle. L'automate de régulation de la TV ajuste alors l'ouverture des vannes d'admission pour stabiliser la puissance en fonction du nouveau débit de vapeur disponible."
+          },
+          {
+            "id": "sbs-s5b",
+            "title": "Maintien BP",
+            "type": "instruction",
+            "details": "La vanne d'admission BP de la turbine se repositionne automatiquement pour garder une pression de vapeur BP constante dans le barillet commun, malgré la perte d'une source de production."
+          }
+        ]
+      },
+      {
+        "id": "sbs-s6",
+        "title": "Note de sécurité",
+        "type": "instruction",
+        "details": "Si le registre ne parvient pas à se fermer complètement dans les 40 secondes suivant l'ordre d'arrêt ou de déclenchement, l'automate provoque par sécurité le déclenchement de la Turbine à Gaz (TG) associée."
+      }
+    ]
   }
 ]
