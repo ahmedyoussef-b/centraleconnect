@@ -546,5 +546,84 @@
         ]
       }
     ]
+  },
+  {
+    "id": "sva-startup",
+    "name": "Mise en Service du Système Vapeur Auxiliaire (SVA)",
+    "description": "Détaille le rôle et la séquence de mise en service du SVA lors d'un redémarrage.",
+    "version": "1.0.0",
+    "steps": [
+      {
+        "id": "sva-s1",
+        "title": "Phase 1 : Rôle et Consommateurs du SVA",
+        "type": "group",
+        "steps": [
+          {
+            "id": "sva-s1a",
+            "title": "Confirmer les 4 fonctions critiques du SVA",
+            "type": "instruction",
+            "details": "Le SVA détend et désurchauffe la vapeur HP pour alimenter :\n- Les labyrinthes d'étanchéité de la TV.\n- Les éjecteurs de vide du condenseur.\n- Le réchauffage de masse de la bâche alimentaire.\n- La vapeur de dégazage de la bâche alimentaire."
+          }
+        ]
+      },
+      {
+        "id": "sva-s2",
+        "title": "Phase 2 : Provenance de la vapeur au redémarrage",
+        "type": "group",
+        "steps": [
+          {
+            "id": "sva-s2a",
+            "title": "Vérifier la source de vapeur",
+            "type": "check",
+            "details": "Deux scénarios possibles :\n- **Source externe (Etape A)** : La vanne UV 002 est ouverte, fournissant la vapeur immédiatement.\n- **Redémarrage autonome** : Attendre que la pression HP de la première chaudière atteigne environ 40 bar abs."
+          }
+        ]
+      },
+      {
+        "id": "sva-s3",
+        "title": "Phase 3 : Séquence de mise en service des auxiliaires",
+        "type": "group",
+        "details": "S'active une fois la source de vapeur confirmée.",
+        "steps": [
+          {
+            "id": "sva-s3a",
+            "title": "a - Alimentation des étanchéités Turbine",
+            "type": "check",
+            "details": "Les labyrinthes sont alimentés en premier pour 'sceller' la turbine.\nParamètres critiques:\n- Pression SVA : 7 bars\n- Température SVA : 250 °C"
+          },
+          {
+            "id": "sva-s3b",
+            "title": "b - Mise sous vide du condenseur (CVI)",
+            "type": "check",
+            "details": "L'éjecteur de démarrage s'active automatiquement dès que les labyrinthes sont alimentés.\nParamètres critiques:\n- Pression vapeur motrice : 8,7 bar abs"
+          },
+          {
+            "id": "sva-s3c",
+            "title": "c - Prise de relais par l'éjecteur d'entretien",
+            "type": "instruction",
+            "details": "L'éjecteur de démarrage s'arrête lorsque le vide atteint 150 mbar abs, et l'éjecteur d'entretien prend le relais."
+          }
+        ]
+      },
+      {
+        "id": "sva-s4",
+        "title": "Phase 4 : Paramètres critiques et Sécurités",
+        "type": "group",
+        "steps": [
+          {
+            "id": "sva-s4a",
+            "title": "Surveiller les conditions de déclenchement du SVA",
+            "type": "instruction",
+            "details": "Le système se déclenche (fermeture UV 001) si :\n- Pression SVA très haute (PSHH 001).\n- Température SVA > 325 °C (TSHH 002).\n- Pression d'eau de désurchauffe insuffisante."
+          },
+          {
+            "id": "sva-s4b",
+            "title": "Vérifier la régulation de pression",
+            "type": "instruction",
+            "details": "La pression est maintenue constante par les vannes PCV 001 et PCV 002 en mode 'split-range'."
+          }
+        ]
+      }
+    ]
   }
 ]
