@@ -201,7 +201,7 @@
         "steps": [
           { "id": "tg-s7a", "title": "Vitesse de service atteinte (~95%, 2850 t/min, L14HS)", "type": "check" },
           { "id": "tg-s7b", "title": "Fermeture automatique des vannes anti-pompage", "type": "check" },
-          { "id": "tg-s7c", "title": "Ouverture des I.G.V. à 57°", "type": "check", "details": "Alarme : Défaut position I.G.V. (L86GVT-FAULT). Danger : Élevé (Risque de pompage). Remède : Vérifier transmetteurs LVDT et servovalve 90 TV." },
+          { "id": "tg-s7c", "title": "Ouverture des I.G.V. à 57°", "type": "check", "details": "Alarme : Défaut position I.G.V. (L86GVT-FAULT). Danger : Élevé (Risque de pompage). Remède : Vérifier transmetteurs LVDT (96 TV-1, 2) et servovalve 90 TV." },
           { "id": "tg-s7d", "title": "Signal 'Séquence complète' émis (vitesse stabilisée à 3000 t/min)", "type": "check" }
         ]
       },
@@ -487,7 +487,7 @@
             "id": "ptr-s2a",
             "title": "a - Vérification du circuit Bypass",
             "type": "check",
-            "details": "Le circuit doit être prêt pour permettre la montée en pression sans envoyer de vapeur à la turbine.\nParamètres critiques:\n- Vide condenseur : Pression < 300 mbar\n- Température vapeur surchauffée : > 300 °C\n- Pression d'eau de désurchauffe : > 7 bars (fournie par les pompes CEX)"
+            "details": "Le circuit doit être prêt pour permettre la montée en pression sans envoyer de vapeur à la turbine.\nParamètres critiques:\n- Vide condenseur : Pression < 300 mbar\n- Température vapeur surchauffée : > 300 °C\n- Pression d'eau de désurchauffe : > 7 bar (fournie par les pompes CEX)"
           }
         ]
       },
@@ -629,63 +629,66 @@
   {
     "id": "boiler-trip-causes",
     "name": "Déclenchement Chaudière (Causes Communes)",
-    "description": "Liste des causes de déclenchement d'une chaudière de récupération gérées par le système de Sécurité Générale Chaudière (FSE).",
-    "version": "1.0.0",
+    "description": "Analyse des causes de déclenchement (trip) d'une chaudière de récupération, gérées par le système de Sécurité Générale Chaudière (FSE).",
+    "version": "2.0.0",
     "steps": [
       {
         "id": "btc-s1",
-        "title": "1. Non-respect des conditions de sécurité générale (FSE)",
+        "title": "1. Rupture des 10 conditions fondamentales de sécurité (FSE)",
         "type": "group",
-        "details": "La perte de l'une de ces 10 conditions critiques provoque un déclenchement immédiat.",
+        "details": "Le système FSE provoque un déclenchement immédiat et la fermeture à grande vitesse du registre (diverter) si l'une des 10 conditions suivantes est perdue.",
         "steps": [
-          { "id": "btc-s1a", "title": "Arrêt ou perte de synchro de la Turbine à Gaz (TG) associée.", "type": "instruction" },
-          { "id": "btc-s1b", "title": "Perte des pompes alimentaires (APH/APB).", "type": "instruction" },
-          { "id": "btc-s1c", "title": "Perte de la pompe d'extraction (CEX).", "type": "instruction" },
-          { "id": "btc-s1d", "title": "Défaut de circulation (pompes FSR/FLB).", "type": "instruction" },
-          { "id": "btc-s1e", "title": "Niveaux de gonflement non détectés dans les ballons.", "type": "instruction", "details": "Seuils : -475 mm (HP) et -580 mm (BP)." }
+          { "id": "btc-s1a", "type": "instruction", "title": "Perte de la Turbine à Gaz (TG) : La TG associée doit être en service et synchronisée au réseau." },
+          { "id": "btc-s1b", "type": "instruction", "title": "Perte des auxiliaires de pompage : Absence d'au moins une pompe alimentaire HP (APH), une pompe alimentaire BP (APB) ou une pompe d'extraction (CEX) en service." },
+          { "id": "btc-s1c", "type": "instruction", "title": "Défaut de circulation : Arrêt ou pression différentielle (ΔP) incorrecte sur les pompes de circulation HP (FSR) ou BP (FLB)." },
+          { "id": "btc-s1d", "type": "instruction", "title": "Niveaux de sécurité : Absence de détection du niveau de gonflement dans les ballons HP (-475 mm) ou BP (-580 mm)." },
+          { "id": "btc-s1e", "type": "instruction", "title": "Protection vapeur : Présence d'eau détectée dans les pots de condensats de vapeur de surchauffe HP ou BP." }
         ]
       },
       {
         "id": "btc-s2",
-        "title": "2. Anomalies de niveaux dans les réservoirs (Ballons)",
+        "title": "2. Anomalies de niveaux dans les réservoirs (Seuils critiques)",
         "type": "group",
+        "details": "Des niveaux extrêmes, mesurés par des relais de seuil, déclenchent la chaudière pour protéger les tubes ou la turbine à vapeur.",
         "steps": [
-          { "id": "btc-s2a", "title": "Ballon Haute Pression (HP) : Niveau très haut (+500 mm) ou très bas (-675 mm).", "type": "instruction" },
-          { "id": "btc-s2b", "title": "Ballon Basse Pression (BP) : Niveau très haut (+450 mm) ou très bas (-750 mm).", "type": "instruction" },
-          { "id": "btc-s2c", "title": "Bâche Alimentaire (ADG) : Niveau très haut (> 2850 mm) déclenche les pompes CEX, menant à un trip.", "type": "instruction" }
+          { "id": "btc-s2a", "type": "instruction", "title": "Ballon Haute Pression (HP) : Déclenchement si le niveau est très haut (NTH > +500 mm) ou très bas (NTB < -675 mm)." },
+          { "id": "btc-s2b", "type": "instruction", "title": "Ballon Basse Pression (BP) : Déclenchement si le niveau est très haut (NTH > +450 mm) ou très bas (NTB < -750 mm)." },
+          { "id": "btc-s2c", "type": "instruction", "title": "Bâche Alimentaire (ADG) : Un niveau très haut (LSHH 001 > 2850 mm) provoque le déclenchement des pompes CEX, ce qui entraîne par cascade le déclenchement de la chaudière." },
+          { "id": "btc-s2d", "type": "instruction", "title": "Condenseur : Un niveau très haut (LSHH 001 > 1000 mm) provoque le déclenchement de la Turbine à Vapeur, ce qui peut mener au déclenchement chaudière si le contournement n'est pas disponible." }
         ]
       },
       {
         "id": "btc-s3",
-        "title": "3. Incidents sur le circuit Vapeur",
+        "title": "3. Défaillances des circuits de vapeur et contournement",
         "type": "group",
+        "details": "",
         "steps": [
-          { "id": "btc-s3a", "title": "Détection d'eau dans les pots de condensats de surchauffe.", "type": "instruction" },
-          { "id": "btc-s3b", "title": "Défaut d'ouverture des évents après 2 min si bypass indisponible.", "type": "instruction" },
-          { "id": "btc-s3c", "title": "Température vapeur trop élevée en sortie de désurchauffeur.", "type": "instruction" }
+            { "id": "btc-s3a", "type": "instruction", "title": "Indisponibilité du contournement (Bypass) : Si la turbine à vapeur déclenche et que le contournement est indisponible, la chaudière déclenche." },
+            { "id": "btc-s3b", "type": "instruction", "title": "Défaut d'évents : Si les évents de sortie chaudière (UV 008) restent fermés plus de 2 minutes alors que le contournement est indisponible." },
+            { "id": "btc-s3c", "type": "instruction", "title": "Pression au condenseur : Une pression supérieure au seuil maximal (> 300 mbar) rend le contournement indisponible, provoquant le déclenchement des chaudières." }
         ]
       },
       {
         "id": "btc-s4",
-        "title": "4. Défaillances des servitudes (Électricité et Air)",
+        "title": "4. Défauts techniques et mécaniques des auxiliaires",
         "type": "group",
+        "details": "Le déclenchement d'une chaudière peut être la conséquence directe du trip de ses pompes principales.",
         "steps": [
-          { "id": "btc-s4a", "title": "Perte de tension de contrôle (48 VCC).", "type": "instruction" },
-          { "id": "btc-s4b", "title": "Manque d'air de régulation.", "type": "instruction" },
-          { "id": "btc-s4c", "title": "Défaut électrique sur les moteurs des pompes critiques.", "type": "instruction" }
+            { "id": "btc-s4a", "type": "instruction", "title": "Défaut des pompes de circulation (FSR/FLB) : Causé par une température de palier trop élevée (> 90 °C), un défaut électrique, ou une pression différentielle trop basse pendant plus de 5 secondes." },
+            { "id": "btc-s4b", "type": "instruction", "title": "Défaut des pompes alimentaires (APH/APB) : Causé par des vibrations excessives (> 6,3 mm/s), une température d'enroulement moteur trop haute (> 130 °C) ou une pression de refoulement insuffisante." }
         ]
       },
       {
         "id": "btc-s5",
-        "title": "5. Actions de l'opérateur et défauts matériels",
+        "title": "5. Défaillances des servitudes et sécurité logique",
         "type": "group",
+        "details": "",
         "steps": [
-          { "id": "btc-s5a", "title": "Action manuelle sur le bouton d'arrêt d'urgence.", "type": "instruction" },
-          { "id": "btc-s5b", "title": "Défaut de fermeture du registre (Diverter).", "type": "instruction", "details": "Si le registre ne se ferme pas en 40s, la TG associée est déclenchée par sécurité." }
+            { "id": "btc-s5a", "type": "instruction", "title": "Perte des énergies de contrôle : La défaillance de l'alimentation électrique (48 VCC) ou de l'air de régulation provoque la mise en sécurité (fermeture) des vannes de régulation d'eau, menant à un niveau bas ballon et au déclenchement." },
+            { "id": "btc-s5b", "type": "instruction", "title": "Défaut du registre (Diverter) : Si après un ordre de fermeture, le registre n'est pas fermé dans les 40 secondes, la Turbine à Gaz associée est alors déclenchée." },
+            { "id": "btc-s5c", "type": "instruction", "title": "Action Manuelle : Utilisation du bouton poussoir d'arrêt d'urgence de la chaudière en salle de commande." }
         ]
       }
     ]
   }
 ]
-
-    
