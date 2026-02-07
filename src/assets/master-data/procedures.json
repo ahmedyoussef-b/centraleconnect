@@ -272,5 +272,104 @@
         ]
       }
     ]
+  },
+  {
+    "id": "kca-startup",
+    "name": "Démarrage Automatique (KCA)",
+    "description": "Procédure de démarrage automatique du cycle combiné via l'automate KCA, contrôlant les communs, les deux chaudières et la turbine à vapeur à travers 7 phases.",
+    "version": "1.0.0",
+    "steps": [
+      {
+        "id": "kca-s1",
+        "title": "Phase 1 : Poste d'eau en service",
+        "type": "group",
+        "steps": [
+          {
+            "id": "kca-s1a",
+            "title": "a - Mise en service des systèmes d'eau",
+            "type": "check",
+            "details": "Extraction (CEX) : Démarrage de la pompe d'extraction sélectionnée, ouverture des vannes de refoulement et contrôle automatique du niveau du condenseur.\nBâche alimentaire (ADG) : Activation des contrôles de niveau et de pression. La vanne de réchauffage de masse est asservie à deux seuils de température.\nPompes alimentaires BP/HP : Démarrage automatique des pompes sélectionnées (APB/APH).\nLubrification et Virage : Activation du graissage turbine et mise en rotation de l'arbre par le vireur pour éviter la flexion thermique.\nParamètres critiques:\n- Vitesse de virage : 120 tr/mn\n- Niveau de travail bâche alimentaire : 2530 mm\n- Niveau de travail condenseur : 610 mm"
+          }
+        ]
+      },
+      {
+        "id": "kca-s2",
+        "title": "Phase 2 : Circuits chaudière en service",
+        "type": "group",
+        "steps": [
+          {
+            "id": "kca-s2a",
+            "title": "a - Remplissage, Circulation et Introduction des gaz",
+            "type": "check",
+            "details": "Circuits BP/HP : Mise en automatique de la régulation de niveau des ballons et démarrage des pompes de circulation (FLB/FSR).\nContournement (Bypass) : Armement des vannes de contournement HP et BP pour diriger la vapeur vers le condenseur.\nIntroduction des gaz : Ouverture progressive du registre (diverter) des gaz d'échappement de la Turbine à Gaz (TG) vers la chaudière.\nParamètres critiques:\n- Niveaux de démarrage ballons : -475 mm (HP) et -580 mm (BP)\n- État TG : 70 à 80 MW recommandés"
+          }
+        ]
+      },
+      {
+        "id": "kca-s3",
+        "title": "Phase 3 : Conditionnement chaudière / TV déclenchée",
+        "type": "group",
+        "steps": [
+          {
+            "id": "kca-s3a",
+            "title": "a - Montée en pression et Établissement du vide",
+            "type": "check",
+            "details": "Conditionnement : Montée en pression de la vapeur contrôlée par les vannes de contournement. Les gaz sont admis partiellement pour limiter les contraintes thermiques.\nVide au condenseur (CVI) : Dès que les labyrinthes TV sont alimentés en vapeur auxiliaire, l'éjecteur de démarrage s'active automatiquement.\nParamètres critiques:\n- Pressions cibles : 40 bar abs (HP) et 7 bar abs (BP)\n- Arrêt éjecteur de démarrage : 150 mbar abs"
+          }
+        ]
+      },
+      {
+        "id": "kca-s4",
+        "title": "Phase 4 : Réchauffage / Conditionnement TV",
+        "type": "group",
+        "steps": [
+          {
+            "id": "kca-s4a",
+            "title": "a - Armement des sécurités",
+            "type": "check",
+            "details": "Sécurités TV : Armement des systèmes de protection de la turbine à vapeur. La turbine est alors prête à recevoir de la vapeur pour sa mise en vitesse.\nVapeur : La vapeur circule via les bypass pour stabiliser les températures avant admission.\nParamètres critiques:\n- Température vapeur surchauffée : > 300 °C pour disponibilité du contournement"
+          }
+        ]
+      },
+      {
+        "id": "kca-s5",
+        "title": "Phase 5 : TV à vitesse nominale",
+        "type": "group",
+        "steps": [
+          {
+            "id": "kca-s5a",
+            "title": "a - Accélération N1, N2 et Excitation",
+            "type": "check",
+            "details": "Vitesse N1 : Accélération de la turbine jusqu'au palier de réchauffage (warmup).\nVitesse N2 : Accélération finale jusqu'à la vitesse nominale.\nExcitation : Fermeture du contacteur d'excitation de l'alternateur à vitesse nominale.\nParamètres critiques:\n- Vitesse nominale : 3000 tr/mn"
+          }
+        ]
+      },
+      {
+        "id": "kca-s6",
+        "title": "Phase 6 : TV couplée à charge minimale",
+        "type": "group",
+        "steps": [
+          {
+            "id": "kca-s6a",
+            "title": "a - Synchronisation et Stabilisation",
+            "type": "check",
+            "details": "Synchronisation : Couplage automatique au réseau électrique.\nCharge initiale : Prise immédiate d'une charge de 5 % pour éviter le retour de puissance, puis maintien à un palier de 10 % pour stabilisation thermique.\nParamètres critiques:\n- Charge de stabilisation : 10 % (pendant un temps dépendant de l'état thermique)"
+          }
+        ]
+      },
+      {
+        "id": "kca-s7",
+        "title": "Phase 7 : TV en charge",
+        "type": "group",
+        "steps": [
+          {
+            "id": "kca-s7a",
+            "title": "a - Montée en charge, Admission BP et Pression glissante",
+            "type": "check",
+            "details": "Montée en charge : Prise de charge HP et BP suivant une pente calculée (état froid, tiède ou chaud).\nAdmission BP : Ouverture progressive de la vanne d'admission BP dès que la charge TV dépasse 25 %, entraînant la fermeture du contournement BP.\nPression glissante : Les vannes d'admission HP s'ouvrent à 100 %. La puissance varie alors selon la production des chaudières.\nParamètres critiques:\n- Couplage HP (VVP) : Température ≥ 450 °C et ΔP ≤ 2 bars\n- Couplage BP (VVP) : Température ≥ 175 °C et ΔP ≤ 0,5 bar"
+          }
+        ]
+      }
+    ]
   }
 ]
