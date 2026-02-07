@@ -2,7 +2,7 @@
 'use client';
 
 import { useEffect, useState, useMemo } from 'react';
-import { Info, ChevronsUpDown } from 'lucide-react';
+import { Info, ChevronsUpDown, AlertTriangle } from 'lucide-react';
 import type { Procedure, ProcedureStep } from '@/types/db';
 import { CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -56,6 +56,11 @@ function StepRenderer({
     );
   }
 
+  const detailsParts = step.details?.split('Paramètres critiques:');
+  const mainDetails = detailsParts?.[0].trim();
+  const criticalParams = detailsParts?.[1]?.trim();
+
+
   return (
     <div
       className={cn(
@@ -70,7 +75,7 @@ function StepRenderer({
         className="mt-1 h-5 w-5"
         disabled={!isTauri}
       />
-      <div className="grid gap-1">
+      <div className="grid gap-1.5 flex-1">
         <label
           htmlFor={step.id}
           className={cn(
@@ -80,8 +85,21 @@ function StepRenderer({
         >
           {step.title}
         </label>
-        {step.details && (
-          <p className="text-sm text-muted-foreground">{step.details}</p>
+        {mainDetails && (
+          <p className="text-sm text-muted-foreground whitespace-pre-line">{mainDetails}</p>
+        )}
+        {criticalParams && (
+             <div className="mt-2 p-3 border-l-4 border-accent bg-accent/20 text-accent-foreground/80 rounded-r-md">
+                <h5 className="font-bold text-xs mb-2 flex items-center gap-2"><AlertTriangle className="h-4 w-4" />PARAMÈTRES CRITIQUES</h5>
+                <ul className="space-y-1.5 text-xs">
+                    {criticalParams.split('\n- ').map((param, index) => (
+                       param && <li key={index} className="flex items-start">
+                            <span className="mr-2 mt-1">-</span>
+                            <span>{param}</span>
+                        </li>
+                    ))}
+                </ul>
+            </div>
         )}
       </div>
     </div>

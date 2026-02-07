@@ -2,170 +2,130 @@
 [
   {
     "id": "boiler-startup",
-    "name": "Démarrage Chaudière",
-    "description": "Procédure de préparation et de remplissage de la chaudière, basée sur le document de référence.",
-    "version": "1.1.0",
+    "name": "Démarrage Chaudière & Turbine Vapeur",
+    "description": "Procédure complète de démarrage de l'installation, du poste d'eau au couplage de la turbine à vapeur.",
+    "version": "1.2.0",
     "steps": [
       {
-        "id": "s1",
-        "title": "Vérifier que la Turbine à Gaz est en service",
-        "type": "check",
-        "details": "La puissance de la TG associée doit être de préférence entre 70 et 80 MW."
-      },
-      {
-        "id": "s2",
-        "title": "Remplissage de la chaudière",
+        "id": "phase1",
+        "title": "Phase 1 : Poste d'eau en service (Préparatifs Mécaniques)",
         "type": "group",
         "steps": [
           {
-            "id": "s2a",
-            "title": "Remplir le réchauffeur avec le circuit SER et ouvrir l'évent HV701",
-            "type": "check"
-          },
-          {
-            "id": "s2b",
-            "title": "Après sortie d'eau, fermer la vanne de remplissage SER et les vannes d'évent",
-            "type": "check"
-          },
-          {
-            "id": "s2c",
-            "title": "Remplir l'économiseur HP et BP avec circuit SER, ouvrir évents HV701 et HV702",
-            "type": "check"
-          },
-          {
-            "id": "s2d",
-            "title": "Après sortie d'eau, fermer vanne remplissage SER et évents",
-            "type": "check"
-          },
-          {
-            "id": "s2e",
-            "title": "Mettre en service pompe APH et pompe APB",
-            "type": "check"
-          },
-          {
-            "id": "s2f",
-            "title": "Ouvrir l'entrée économiseur HP et BP (HV001)",
-            "type": "check"
-          },
-          {
-            "id": "s2g",
-            "title": "Ouvrir légèrement les vannes d'évent HV701 et HV702",
-            "type": "check"
-          },
-          {
-            "id": "s2h",
-            "title": "Fermer tous les évents après remplissage",
-            "type": "check"
-          },
-          {
-            "id": "s2i",
-            "title": "Ouvrir les vannes motorisées d'évent FSR UV008 et FLB UV008",
-            "type": "check"
-          },
-          {
-            "id": "s2j",
-            "title": "Ouvrir les vannes de purge de pot de condensat FSR UV010 et FLB UV010",
+            "id": "phase1a",
+            "title": "a - Mise en service de l'extraction (Système CEX)",
             "type": "check",
-            "details": "Note: sur-débit pompe APH est de 225T/H, sur-débit pompe APB est de 110T/H."
+            "details": "Démarrage de la pompe d'extraction sélectionnée (101PO ou 201PO). Le circuit doit être préalablement rempli en eau déminéralisée via le système SER. La vanne de recyclage FCV 001 assure un débit minimum de 150 m3/h pour protéger la pompe.\nParamètres critiques:\n- Niveau condenseur de travail: 610 mm\n- Seuil de déclenchement (protection pompe): < 240 mm"
           },
           {
-            "id": "s2k",
-            "title": "Ouvrir vannes UV050C et LCV050C (ligne de démarrage) pour remplissage ballon HP",
-            "type": "check"
-          },
-          {
-            "id": "s2l",
-            "title": "Remplir ballons HP et BP jusqu'aux niveaux de démarrage",
+            "id": "phase1b",
+            "title": "b - Préparation de la bâche alimentaire (Système ADG)",
             "type": "check",
-            "details": "Niveau cible HP: -475 mm. Niveau cible BP: -580 mm."
+            "details": "Mise en service des contrôles de niveau et de pression. Le dégazage thermique est préparé pour l'admission ultérieure de vapeur.\nParamètres critiques:\n- Niveau de travail bâche: 2530 mm\n- Alarme niveau très haut (provoque le déclenchement des pompes CEX): 2850 mm"
           },
           {
-            "id": "s2m",
-            "title": "Mettre en service une pompe FSR et une pompe FLB",
-            "type": "check"
+            "id": "phase1c",
+            "title": "c - Lubrification et Virage de la TV",
+            "type": "check",
+            "details": "Activation du graissage turbine (pompe à huile). Mise en service du dispositif de soulèvement et de virage pour faire tourner l'arbre et éviter sa flexion thermique.\nParamètres critiques:\n- Vitesse de virage: 120 tr/mn\n- Vibrations d'arbre HP (Alarme): 75 µm (Déclenchement à 100 µm)"
           }
         ]
       },
       {
-        "id": "s3",
-        "title": "Vérifier conditions d'armement chaudière",
-        "type": "check",
-        "details": "Le registre doit être ouvert."
-      },
-      {
-        "id": "s4",
-        "title": "Vérifier conditions d'armement turbine à vapeur",
-        "type": "check",
-        "details": "Les vannes d'arrêt doivent être ouvertes."
-      },
-      {
-        "id": "s5",
-        "title": "Vérifier la sécurité chaudière (FSE)",
+        "id": "phase2",
+        "title": "Phase 2 : Circuits chaudière en service (Mise en eau et Gaz)",
         "type": "group",
         "steps": [
-          { "id": "s5a", "title": "TG associée synchronisée", "type": "check" },
-          { "id": "s5b", "title": "Au moins une pompe APH en service", "type": "check" },
-          { "id": "s5c", "title": "Au moins une pompe APB en service", "type": "check" },
-          { "id": "s5e", "title": "Une pompe FSR en service et ΔP correct", "type": "check" },
-          { "id": "s5f", "title": "Une pompe FLB en service et ΔP correct", "type": "check" },
-          { "id": "s5g", "title": "Niveau gonflement ballon HP détecté (-475 mm)", "type": "check" },
-          { "id": "s5h", "title": "Niveau gonflement ballon BP détecté (-580 mm)", "type": "check" }
+          {
+            "id": "phase2a",
+            "title": "a - Remplissage et circulation (Systèmes FSR/FLB)",
+            "type": "check",
+            "details": "Remplissage des réchauffeurs et économiseurs HP/BP avec le circuit SER. Ouverture des évents (HV701, HV702) jusqu'à sortie d'eau. Démarrage d'une pompe de circulation HP (FSR) et une BP (FLB).\nParamètres critiques:\n- Niveau de démarrage Ballon HP: -475 mm\n- Niveau de démarrage Ballon BP: -580 mm\n- Pression différentielle (ΔP) pompes de circulation: Doit être correcte pour l'armement."
+          },
+          {
+            "id": "phase2b",
+            "title": "b - Introduction des gaz d'échappement (Système TTA)",
+            "type": "check",
+            "details": "La TG associée doit être en service (70 à 80 MW de préférence). Ouverture progressive du registre (diverter) vers la chaudière.\nParamètres critiques:\n- 10 conditions FSE réunies (incluant marche APH, APB, CEX, FSR, FLB et niveaux ballons).\n- Température gaz entrée chaudière: environ 543 °C"
+          }
         ]
       },
       {
-        "id": "s6",
-        "title": "Vérifier conditions d'ouverture registre (Système TTA)",
+        "id": "phase3",
+        "title": "Phase 3 : Conditionnement chaudière (Montée en pression)",
         "type": "group",
         "steps": [
-          { "id": "s6a", "title": "La sécurité chaudière est armée (B1FSEUS005)", "type": "check" },
-          { "id": "s6b", "title": "La pompe hydraulique est sans-défaut et disponible", "type": "check" },
-          { "id": "s6c", "title": "Le niveau d'huile régulation registre est N-très bas", "type": "check" },
-          { "id": "s6d", "title": "La température d'huile régulation registre N-très haute", "type": "check" },
-          { "id": "s6e", "title": "La température de l'armoire locale registre N-haute", "type": "check" },
-          { "id": "s6f", "title": "Aucunes conditions de déclenchement", "type": "check" }
+          {
+            "id": "phase3a",
+            "title": "a - Montée en pression vapeur",
+            "type": "check",
+            "details": "La vapeur est produite et dirigée vers les circuits de contournement (Bypass) HP et BP tant que la turbine n'est pas prête.\nParamètres critiques:\n- Pression vapeur HP cible: 40 bar abs\n- Pression vapeur BP cible: 7 bar abs"
+          },
+          {
+            "id": "phase3b",
+            "title": "b - Étanchéités et Mise à vide du condenseur",
+            "type": "check",
+            "details": "Une fois la pression HP suffisante (~40 bar), alimentation des labyrinthes TV en vapeur. Activation de l'éjecteur de démarrage (CVI) pour établir le vide.\nParamètres critiques:\n- Pression vapeur motrice éjecteurs: 8,7 bar abs\n- Vide pour arrêt éjecteur de démarrage: 150 mbar abs\n- Vide correct pour contournement: < 300 mbar"
+          }
         ]
       },
       {
-        "id": "s7",
-        "title": "Vérifier la disponibilité du contournement",
+        "id": "phase4",
+        "title": "Phase 4 : Réchauffage / Conditionnement TV",
         "type": "group",
         "steps": [
-          { "id": "s7a", "title": "Chaudière Armé (FSE vérifié)", "type": "check" },
-          { "id": "s7b", "title": "Registre de chaudière non-fermé", "type": "check" },
-          { "id": "s7c", "title": "Absence de défaut sur l'unité hydraulique", "type": "check" },
-          { "id": "s7d", "title": "Armoire contournement en service (ON)", "type": "check" },
-          { "id": "s7e", "title": "Pression eau de désurchauffe correcte (> 7 bars)", "type": "check", "details": "Validation scada : P_cex > 7 bars" },
-          { "id": "s7f", "title": "Au moins un demi-condenseur est réfrigéré (vannes entrée et sortie ouvertes)", "type": "check" },
-          { "id": "s7g", "title": "Le vide condenseur est correct (< 300 mbar)", "type": "check", "details": "Validation scada : Pression < 300 mbar" },
-          { "id": "s7h", "title": "La température de vapeur surchauffé est haute (> 300°C)", "type": "check", "details": "Validation scada : B1ACOTE001 > 300°C" },
-          { "id": "s7i", "title": "Absence de conditions de déclenchement", "type": "check", "details": "Pression avant vanne détente PCV001 < 16 bars (PSHH01) ET Température en aval surchauffeur < 100°C (TSH101)" }
+          {
+            "id": "phase4a",
+            "title": "a - Armement des sécurités et contournement",
+            "type": "check",
+            "details": "Armement des sécurités TV (Sécurités ON). La vapeur circule en bypass pour réchauffer les tuyauteries.\nParamètres critiques:\n- Température vapeur surchauffée: > 300 °C\n- Pression d'eau de désurchauffe contournement: > 7 bar"
+          }
         ]
       },
       {
-        "id": "s8",
-        "title": "Notes Opératoires sur le contournement",
+        "id": "phase5",
+        "title": "Phase 5 : Mise en vitesse (Montée à 3000 tr/mn)",
         "type": "group",
         "steps": [
-            { "id": "s8a", "type": "instruction", "title": "Remarque sur vannes de désurchauffe", "details": "La 1ère vanne de désurchauffe s'ouvre dès l'ouverture du by-pass. La 2ème s'ouvre si la pression en aval de PCV001 est haute à 6.8 bars." },
-            { "id": "s8b", "type": "instruction", "title": "Conditions d'ouverture groupe CET", "details": "S'ouvre lorsque Pression SVA = 7 bars et T = 250°C. Déclenchement (ouverture vanne SVA) à P = 11 bars et T = 325°C." },
-            { "id": "s8c", "type": "instruction", "title": "Paramètres CET au démarrage", "details": "180°C et 1.2 bars." },
-            { "id": "s8d", "type": "instruction", "title": "Mise en service groupe CVI", "details": "À 1 bar: éjecteur de démarrage en marche. À 250 mbar: éjecteur d'entretien en service. À 150 mbar: arrêt éjecteur de démarrage." },
-            { "id": "s8e", "type": "instruction", "title": "Disponibilité By-pass", "details": "Disponible si P_vide < 300 mbar et T_B1ACOSUP > 300°C. S'ouvrent à 39 bars (HP) et 7 bars (BP)." }
+          {
+            "id": "phase5a",
+            "title": "a - Accélération automatique",
+            "type": "check",
+            "details": "Le système de régulation prend le contrôle de l'accélération. Passage par un palier de stabilisation thermique (vitesse N1).\nParamètres critiques:\n- Vitesse nominale: 3000 tr/mn\n- Excitation alternateur: Activée à la vitesse nominale"
+          }
         ]
       },
       {
-        "id": "s9",
-        "title": "Vérifier conditions pour couplage chaudières",
+        "id": "phase6",
+        "title": "Phase 6 : TV couplée à charge minimale",
         "type": "group",
         "steps": [
-          { "id": "s9a", "title": "Couplage HP (UV001/UV002)", "type": "check", "details": "Conditions maître: Ouverture registre. Conditions esclave: T ≥ 450°C (B2VVPTSH001 ou B1VVPTSH001) ET ΔP ≤ 2 bars." },
-          { "id": "s9b", "title": "Couplage BP (UV001/UV002)", "type": "check", "details": "Conditions maître: Ouverture registre. Conditions esclave: T ≥ 175°C (B2VVPTSH002 ou B1VVPTSH002) ET ΔP ≤ 0.5 bars." }
+          {
+            "id": "phase6a",
+            "title": "a - Synchronisation et prise de charge initiale",
+            "type": "check",
+            "details": "Couplage automatique de l'alternateur au réseau. Prise immédiate d'une charge de 5% pour éviter le retour de puissance, puis maintien à 10%.\nParamètres critiques:\n- Charge initiale: 5% (~6 MW)\n- Palier de stabilisation: 10%"
+          }
         ]
       },
       {
-        "id": "s10",
-        "title": "Fin de disposition de chaudière après la confirmation de chimiste",
-        "type": "check"
+        "id": "phase7",
+        "title": "Phase 7 : TV en charge (Couplage HP/BP et Pleine puissance)",
+        "type": "group",
+        "steps": [
+          {
+            "id": "phase7a",
+            "title": "a - Couplage des circuits HP et BP (VVP)",
+            "type": "check",
+            "details": "Ouverture des vannes d'isolement vapeur (UV001/UV002) pour admettre la vapeur HP puis BP dans la turbine. \nParamètres critiques HP:\n- Température vapeur HP: > 450 °C\n- Pression différentielle ΔP HP: < 2 bars\nParamètres critiques BP:\n- Température vapeur BP: > 175 °C\n- Pression différentielle ΔP BP: < 0,5 bar"
+          },
+          {
+            "id": "phase7b",
+            "title": "b - Passage en pression glissante",
+            "type": "check",
+            "details": "Les vannes d'admission HP s'ouvrent à 100%. La puissance est désormais régulée par la quantité de vapeur produite par les chaudières.\nParamètres critiques:\n- Ouverture admission BP: Activée quand charge TV > 25%\n- Pression HP minimum en glissant: 35 bar"
+          }
+        ]
       }
     ]
   },
@@ -307,7 +267,7 @@
         "steps": [
           { "id": "gts-s4a", "title": "Vitesse de service (L14HS - 95%)", "type": "instruction", "details": "Action : Démarrage de la pompe à huile auxiliaire 88QA." },
           { "id": "gts-s4b", "title": "Vitesse de coupure fuel (L14HA - 40-50%)", "type": "instruction", "details": "Action : Fermeture des vannes d'arrêt en mode d'arrêt normal." },
-          { "id": "gts-s4c", "title": "Vitesse de virage (~48 R.P.M.)", "type": "instruction", "details": "Action : Mise en route du moteur de virage 88TG." },
+          { "id": "gts-s4c", "title": "Vitesse de virage (~48 R.P.M.)", "type": "instruction", "details": "Action : Mise en route du moteur de rotation 88TG." },
           { "id": "gts-s4d", "title": "Surveillance huile (88QE)", "type": "instruction", "details": "Action : La pompe de secours prend le relais en cas de perte de courant alternatif." }
         ]
       }
