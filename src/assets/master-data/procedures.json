@@ -538,7 +538,7 @@
         "details": "Rétablissement de l'étanchéité de la turbine et du vide condenseur.",
         "steps": [
           {
-            "id": "ptr-s5a",
+            "id": "sva-s5a",
             "title": "a - Conditions SVA et Éjecteurs",
             "type": "check",
             "details": "La vapeur auxiliaire est nécessaire pour alimenter les labyrinthes et les éjecteurs.\nParamètres critiques SVA:\n- Pression SVA : 7 bars\n- Température SVA : 250 °C\nParamètres critiques Éjecteurs:\n- Démarrage éjecteur de démarrage : 1 bar abs\n- Prise de relais éjecteur d'entretien : 250 mbar"
@@ -562,7 +562,7 @@
             "id": "sva-s1a",
             "title": "Confirmer les 4 fonctions critiques du SVA",
             "type": "instruction",
-            "details": "Le SVA détend et désurchauffe la vapeur HP pour alimenter :\n- Les labyrinthes d'étanchéité de la TV.\n- Les éjecteurs de vide du condenseur.\n- Le réchauffage de masse de la bâche alimentaire.\n- La vapeur de dégazage de la bâche alimentaire."
+            "details": "Le SVA détend et désurchauffe la vapeur HP pour alimenter :\n- Les labyrinthes d'étanchéité de la TV.\n- Les éjecteurs de vide du condenseur.\n- Le réchauffage de masse de l'eau dans la bâche alimentaire (ADG).\n- La vapeur de dégazage de la bâche alimentaire."
           }
         ]
       },
@@ -625,5 +625,67 @@
         ]
       }
     ]
+  },
+  {
+    "id": "boiler-trip-causes",
+    "name": "Déclenchement Chaudière (Causes Communes)",
+    "description": "Liste des causes de déclenchement d'une chaudière de récupération gérées par le système de Sécurité Générale Chaudière (FSE).",
+    "version": "1.0.0",
+    "steps": [
+      {
+        "id": "btc-s1",
+        "title": "1. Non-respect des conditions de sécurité générale (FSE)",
+        "type": "group",
+        "details": "La perte de l'une de ces 10 conditions critiques provoque un déclenchement immédiat.",
+        "steps": [
+          { "id": "btc-s1a", "title": "Arrêt ou perte de synchro de la Turbine à Gaz (TG) associée.", "type": "instruction" },
+          { "id": "btc-s1b", "title": "Perte des pompes alimentaires (APH/APB).", "type": "instruction" },
+          { "id": "btc-s1c", "title": "Perte de la pompe d'extraction (CEX).", "type": "instruction" },
+          { "id": "btc-s1d", "title": "Défaut de circulation (pompes FSR/FLB).", "type": "instruction" },
+          { "id": "btc-s1e", "title": "Niveaux de gonflement non détectés dans les ballons.", "type": "instruction", "details": "Seuils : -475 mm (HP) et -580 mm (BP)." }
+        ]
+      },
+      {
+        "id": "btc-s2",
+        "title": "2. Anomalies de niveaux dans les réservoirs (Ballons)",
+        "type": "group",
+        "steps": [
+          { "id": "btc-s2a", "title": "Ballon Haute Pression (HP) : Niveau très haut (+500 mm) ou très bas (-675 mm).", "type": "instruction" },
+          { "id": "btc-s2b", "title": "Ballon Basse Pression (BP) : Niveau très haut (+450 mm) ou très bas (-750 mm).", "type": "instruction" },
+          { "id": "btc-s2c", "title": "Bâche Alimentaire (ADG) : Niveau très haut (> 2850 mm) déclenche les pompes CEX, menant à un trip.", "type": "instruction" }
+        ]
+      },
+      {
+        "id": "btc-s3",
+        "title": "3. Incidents sur le circuit Vapeur",
+        "type": "group",
+        "steps": [
+          { "id": "btc-s3a", "title": "Détection d'eau dans les pots de condensats de surchauffe.", "type": "instruction" },
+          { "id": "btc-s3b", "title": "Défaut d'ouverture des évents après 2 min si bypass indisponible.", "type": "instruction" },
+          { "id": "btc-s3c", "title": "Température vapeur trop élevée en sortie de désurchauffeur.", "type": "instruction" }
+        ]
+      },
+      {
+        "id": "btc-s4",
+        "title": "4. Défaillances des servitudes (Électricité et Air)",
+        "type": "group",
+        "steps": [
+          { "id": "btc-s4a", "title": "Perte de tension de contrôle (48 VCC).", "type": "instruction" },
+          { "id": "btc-s4b", "title": "Manque d'air de régulation.", "type": "instruction" },
+          { "id": "btc-s4c", "title": "Défaut électrique sur les moteurs des pompes critiques.", "type": "instruction" }
+        ]
+      },
+      {
+        "id": "btc-s5",
+        "title": "5. Actions de l'opérateur et défauts matériels",
+        "type": "group",
+        "steps": [
+          { "id": "btc-s5a", "title": "Action manuelle sur le bouton d'arrêt d'urgence.", "type": "instruction" },
+          { "id": "btc-s5b", "title": "Défaut de fermeture du registre (Diverter).", "type": "instruction", "details": "Si le registre ne se ferme pas en 40s, la TG associée est déclenchée par sécurité." }
+        ]
+      }
+    ]
   }
 ]
+
+    
