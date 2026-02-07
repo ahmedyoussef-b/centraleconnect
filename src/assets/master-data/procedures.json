@@ -15,19 +15,19 @@
             "id": "phase1a",
             "title": "a - Mise en service de l'extraction (Système CEX)",
             "type": "check",
-            "details": "Démarrage de la pompe d'extraction sélectionnée (101PO ou 201PO). Le circuit doit être préalablement rempli en eau déminéralisée via le système SER. La vanne de recyclage FCV 001 assure un débit minimum de 150 m3/h pour protéger la pompe.\nParamètres critiques:\n- Niveau condenseur de travail: 610 mm\n- Seuil de déclenchement (protection pompe): < 240 mm"
+            "details": "Détails procédure : Démarrage de la pompe d'extraction sélectionnée (101PO ou 201PO). Le circuit doit être préalablement rempli en eau déminéralisée via le système SER. La vanne de recyclage FCV 001 assure un débit minimum de 150 m3/h pour protéger la pompe.\nParamètres critiques:\n- Niveau condenseur de travail : 610 mm\n- Seuil de déclenchement (protection pompe) : < 240 mm"
           },
           {
             "id": "phase1b",
             "title": "b - Préparation de la bâche alimentaire (Système ADG)",
             "type": "check",
-            "details": "Mise en service des contrôles de niveau et de pression. Le dégazage thermique est préparé pour l'admission ultérieure de vapeur.\nParamètres critiques:\n- Niveau de travail bâche: 2530 mm\n- Alarme niveau très haut (provoque le déclenchement des pompes CEX): 2850 mm"
+            "details": "Détails procédure : Mise en service des contrôles de niveau et de pression. Le dégazage thermique est préparé pour l'admission ultérieure de vapeur.\nParamètres critiques:\n- Niveau de travail bâche : 2530 mm\n- Alarme niveau très haut : 2850 mm (provoque le déclenchement des pompes CEX)."
           },
           {
             "id": "phase1c",
             "title": "c - Lubrification et Virage de la TV",
             "type": "check",
-            "details": "Activation du graissage turbine (pompe à huile). Mise en service du dispositif de soulèvement et de virage pour faire tourner l'arbre et éviter sa flexion thermique.\nParamètres critiques:\n- Vitesse de virage: 120 tr/mn\n- Vibrations d'arbre HP (Alarme): 75 µm (Déclenchement à 100 µm)"
+            "details": "Détails procédure : Activation du graissage turbine (pompe à huile). Mise en service du dispositif de soulèvement et de virage pour faire tourner l'arbre et éviter sa flexion thermique.\nParamètres critiques:\n- Vitesse de virage : 120 tr/mn\n- Vibrations d'arbre HP (Alarme) : 75 µm (Déclenchement à 100 µm)."
           }
         ]
       },
@@ -40,13 +40,13 @@
             "id": "phase2a",
             "title": "a - Remplissage et circulation (Systèmes FSR/FLB)",
             "type": "check",
-            "details": "Remplissage des réchauffeurs et économiseurs HP/BP avec le circuit SER. Ouverture des évents (HV701, HV702) jusqu'à sortie d'eau. Démarrage d'une pompe de circulation HP (FSR) et une BP (FLB).\nParamètres critiques:\n- Niveau de démarrage Ballon HP: -475 mm\n- Niveau de démarrage Ballon BP: -580 mm\n- Pression différentielle (ΔP) pompes de circulation: Doit être correcte pour l'armement."
+            "details": "Détails procédure : Remplissage des réchauffeurs et économiseurs HP/BP avec le circuit SER. Ouverture des évents (HV701, HV702) jusqu'à sortie d'eau. Démarrage d'une pompe de circulation HP (FSR) et une BP (FLB).\nParamètres critiques:\n- Niveau de démarrage Ballon HP : -475 mm\n- Niveau de démarrage Ballon BP : -580 mm\n- Pression différentielle (ΔP) pompes de circulation : Doit être correcte pour l'armement."
           },
           {
             "id": "phase2b",
             "title": "b - Introduction des gaz d'échappement (Système TTA)",
             "type": "check",
-            "details": "La TG associée doit être en service (70 à 80 MW de préférence). Ouverture progressive du registre (diverter) vers la chaudière.\nParamètres critiques:\n- 10 conditions FSE réunies (incluant marche APH, APB, CEX, FSR, FLB et niveaux ballons).\n- Température gaz entrée chaudière: environ 543 °C"
+            "details": "Détails procédure : La TG associée doit être en service (70 à 80 MW de préférence). Ouverture progressive du registre (diverter) vers la chaudière.\nParamètres critiques:\n- 10 conditions FSE réunies (incluant marche APH, APB, CEX, FSR, FLB et niveaux ballons).\n- Température gaz entrée chaudière : environ 543 °C."
           }
         ]
       },
@@ -59,13 +59,13 @@
             "id": "phase3a",
             "title": "a - Montée en pression vapeur",
             "type": "check",
-            "details": "La vapeur est produite et dirigée vers les circuits de contournement (Bypass) HP et BP tant que la turbine n'est pas prête.\nParamètres critiques:\n- Pression vapeur HP cible: 40 bar abs\n- Pression vapeur BP cible: 7 bar abs"
+            "details": "Détails procédure : La vapeur est produite et dirigée vers les circuits de contournement (Bypass) HP et BP tant que la turbine n'est pas prête.\nParamètres critiques:\n- Pression vapeur HP cible : 40 bar abs\n- Pression vapeur BP cible : 7 bar abs."
           },
           {
             "id": "phase3b",
             "title": "b - Étanchéités et Mise à vide du condenseur",
             "type": "check",
-            "details": "Une fois la pression HP suffisante (~40 bar), alimentation des labyrinthes TV en vapeur. Activation de l'éjecteur de démarrage (CVI) pour établir le vide.\nParamètres critiques:\n- Pression vapeur motrice éjecteurs: 8,7 bar abs\n- Vide pour arrêt éjecteur de démarrage: 150 mbar abs\n- Vide correct pour contournement: < 300 mbar"
+            "details": "Détails procédure : Une fois la pression HP suffisante (~40 bar), alimentation des labyrinthes TV en vapeur. Activation de l'éjecteur de démarrage (CVI) pour établir le vide.\nParamètres critiques:\n- Pression vapeur motrice éjecteurs : 8,7 bar abs\n- Vide pour arrêt éjecteur de démarrage : 150 mbar abs\n- Vide correct pour contournement : < 300 mbar."
           }
         ]
       },
@@ -78,7 +78,7 @@
             "id": "phase4a",
             "title": "a - Armement des sécurités et contournement",
             "type": "check",
-            "details": "Armement des sécurités TV (Sécurités ON). La vapeur circule en bypass pour réchauffer les tuyauteries.\nParamètres critiques:\n- Température vapeur surchauffée: > 300 °C\n- Pression d'eau de désurchauffe contournement: > 7 bar"
+            "details": "Détails procédure : Armement des sécurités TV (Sécurités ON). La vapeur circule en bypass pour réchauffer les tuyauteries.\nParamètres critiques:\n- Température vapeur surchauffée : > 300 °C\n- Pression d'eau de désurchauffe contournement : > 7 bar."
           }
         ]
       },
@@ -91,7 +91,7 @@
             "id": "phase5a",
             "title": "a - Accélération automatique",
             "type": "check",
-            "details": "Le système de régulation prend le contrôle de l'accélération. Passage par un palier de stabilisation thermique (vitesse N1).\nParamètres critiques:\n- Vitesse nominale: 3000 tr/mn\n- Excitation alternateur: Activée à la vitesse nominale"
+            "details": "Détails procédure : Le système de régulation prend le contrôle de l'accélération. Passage par un palier de stabilisation thermique (vitesse N1).\nParamètres critiques:\n- Vitesse nominale : 3000 tr/mn\n- Excitation alternateur : Activée à la vitesse nominale."
           }
         ]
       },
@@ -104,7 +104,7 @@
             "id": "phase6a",
             "title": "a - Synchronisation et prise de charge initiale",
             "type": "check",
-            "details": "Couplage automatique de l'alternateur au réseau. Prise immédiate d'une charge de 5% pour éviter le retour de puissance, puis maintien à 10%.\nParamètres critiques:\n- Charge initiale: 5% (~6 MW)\n- Palier de stabilisation: 10%"
+            "details": "Détails procédure : Couplage automatique de l'alternateur au réseau. Prise immédiate d'une charge de 5% pour éviter le retour de puissance, puis maintien à 10%.\nParamètres critiques:\n- Charge initiale : 5% (~6 MW)\n- Palier de stabilisation : 10%."
           }
         ]
       },
@@ -117,13 +117,13 @@
             "id": "phase7a",
             "title": "a - Couplage des circuits HP et BP (VVP)",
             "type": "check",
-            "details": "Ouverture des vannes d'isolement vapeur (UV001/UV002) pour admettre la vapeur HP puis BP dans la turbine. \nParamètres critiques HP:\n- Température vapeur HP: > 450 °C\n- Pression différentielle ΔP HP: < 2 bars\nParamètres critiques BP:\n- Température vapeur BP: > 175 °C\n- Pression différentielle ΔP BP: < 0,5 bar"
+            "details": "Détails procédure : Ouverture des vannes d'isolement vapeur (UV001/UV002) pour admettre la vapeur HP puis BP dans la turbine. \nParamètres critiques HP:\n- Température vapeur HP : > 450 °C\n- Pression différentielle ΔP HP : < 2 bars\nParamètres critiques BP:\n- Température vapeur BP : > 175 °C\n- Pression différentielle ΔP BP : < 0,5 bar."
           },
           {
             "id": "phase7b",
             "title": "b - Passage en pression glissante",
             "type": "check",
-            "details": "Les vannes d'admission HP s'ouvrent à 100%. La puissance est désormais régulée par la quantité de vapeur produite par les chaudières.\nParamètres critiques:\n- Ouverture admission BP: Activée quand charge TV > 25%\n- Pression HP minimum en glissant: 35 bar"
+            "details": "Détails procédure : Les vannes d'admission HP s'ouvrent à 100%. La puissance est désormais régulée par la quantité de vapeur produite par les chaudières.\nParamètres critiques:\n- Ouverture admission BP : Activée quand charge TV > 25%\n- Pression HP minimum en glissant : 35 bar."
           }
         ]
       }
@@ -288,7 +288,7 @@
             "id": "kca-s1a",
             "title": "a - Mise en service des systèmes d'eau",
             "type": "check",
-            "details": "Extraction (CEX) : Démarrage de la pompe d'extraction sélectionnée, ouverture des vannes de refoulement et contrôle automatique du niveau du condenseur.\nBâche alimentaire (ADG) : Activation des contrôles de niveau et de pression. La vanne de réchauffage de masse est asservie à deux seuils de température.\nPompes alimentaires BP/HP : Démarrage automatique des pompes sélectionnées (APB/APH).\nLubrification et Virage : Activation du graissage turbine et mise en rotation de l'arbre par le vireur pour éviter la flexion thermique.\nParamètres critiques:\n- Vitesse de virage : 120 tr/mn\n- Niveau de travail bâche alimentaire : 2530 mm\n- Niveau de travail condenseur : 610 mm"
+            "details": "Détails procédure :\n- Extraction : Démarrage de la pompe d'extraction (CEX) sélectionnée, ouverture des vannes de refoulement et contrôle automatique du niveau du condenseur.\n- Bâche alimentaire (ADG) : Activation des contrôles de niveau et de pression. La vanne de réchauffage de masse est asservie à deux seuils de température.\n- Pompes alimentaires BP/HP : Démarrage automatique des pompes sélectionnées (APB/APH).\n- Lubrification et Virage : Activation du graissage turbine et mise en rotation de l'arbre par le vireur pour éviter la flexion thermique.\nParamètres critiques:\n- Vitesse de virage : 120 tr/mn\n- Niveau de travail bâche alimentaire : 2530 mm\n- Niveau de travail condenseur : 610 mm"
           }
         ]
       },
@@ -301,7 +301,7 @@
             "id": "kca-s2a",
             "title": "a - Remplissage, Circulation et Introduction des gaz",
             "type": "check",
-            "details": "Circuits BP/HP : Mise en automatique de la régulation de niveau des ballons et démarrage des pompes de circulation (FLB/FSR).\nContournement (Bypass) : Armement des vannes de contournement HP et BP pour diriger la vapeur vers le condenseur.\nIntroduction des gaz : Ouverture progressive du registre (diverter) des gaz d'échappement de la Turbine à Gaz (TG) vers la chaudière.\nParamètres critiques:\n- Niveaux de démarrage ballons : -475 mm (HP) et -580 mm (BP)\n- État TG : 70 à 80 MW recommandés"
+            "details": "Détails procédure :\n- Circuits BP/HP : Mise en automatique de la régulation de niveau des ballons et démarrage des pompes de circulation (FLB/FSR).\n- Contournement (Bypass) : Armement des vannes de contournement HP et BP pour diriger la vapeur vers le condenseur.\n- Introduction des gaz : Ouverture progressive du registre (diverter) des gaz d'échappement de la Turbine à Gaz (TG) vers la chaudière.\nParamètres critiques:\n- Niveaux de démarrage ballons : -475 mm (HP) et -580 mm (BP)\n- État TG : 70 à 80 MW recommandés."
           }
         ]
       },
@@ -314,7 +314,7 @@
             "id": "kca-s3a",
             "title": "a - Montée en pression et Établissement du vide",
             "type": "check",
-            "details": "Conditionnement : Montée en pression de la vapeur contrôlée par les vannes de contournement. Les gaz sont admis partiellement pour limiter les contraintes thermiques.\nVide au condenseur (CVI) : Dès que les labyrinthes TV sont alimentés en vapeur auxiliaire, l'éjecteur de démarrage s'active automatiquement.\nParamètres critiques:\n- Pressions cibles : 40 bar abs (HP) et 7 bar abs (BP)\n- Arrêt éjecteur de démarrage : 150 mbar abs"
+            "details": "Détails procédure :\n- Conditionnement : Montée en pression de la vapeur contrôlée par les vannes de contournement. Les gaz sont admis partiellement pour limiter les contraintes thermiques.\n- Vide au condenseur (CVI) : Dès que les labyrinthes TV sont alimentés en vapeur auxiliaire, l'éjecteur de démarrage s'active automatiquement.\nParamètres critiques:\n- Pressions cibles : 40 bar abs (HP) et 7 bar abs (BP)\n- Arrêt éjecteur de démarrage : 150 mbar abs."
           }
         ]
       },
@@ -327,7 +327,7 @@
             "id": "kca-s4a",
             "title": "a - Armement des sécurités",
             "type": "check",
-            "details": "Sécurités TV : Armement des systèmes de protection de la turbine à vapeur. La turbine est alors prête à recevoir de la vapeur pour sa mise en vitesse.\nVapeur : La vapeur circule via les bypass pour stabiliser les températures avant admission.\nParamètres critiques:\n- Température vapeur surchauffée : > 300 °C pour disponibilité du contournement"
+            "details": "Détails procédure :\n- Sécurités TV : Armement des systèmes de protection de la turbine à vapeur. La turbine est alors prête à recevoir de la vapeur pour sa mise en vitesse.\n- Vapeur : La vapeur circule via les bypass pour stabiliser les températures avant admission.\nParamètres critiques:\n- Température vapeur surchauffée : > 300 °C pour disponibilité du contournement."
           }
         ]
       },
@@ -340,7 +340,7 @@
             "id": "kca-s5a",
             "title": "a - Accélération N1, N2 et Excitation",
             "type": "check",
-            "details": "Vitesse N1 : Accélération de la turbine jusqu'au palier de réchauffage (warmup).\nVitesse N2 : Accélération finale jusqu'à la vitesse nominale.\nExcitation : Fermeture du contacteur d'excitation de l'alternateur à vitesse nominale.\nParamètres critiques:\n- Vitesse nominale : 3000 tr/mn"
+            "details": "Détails procédure :\n- Vitesse N1 : Accélération de la turbine jusqu'au palier de réchauffage (warmup).\n- Vitesse N2 : Accélération finale jusqu'à la vitesse nominale.\n- Excitation : Fermeture du contacteur d'excitation de l'alternateur à vitesse nominale.\nParamètres critiques:\n- Vitesse nominale : 3000 tr/mn."
           }
         ]
       },
@@ -353,7 +353,7 @@
             "id": "kca-s6a",
             "title": "a - Synchronisation et Stabilisation",
             "type": "check",
-            "details": "Synchronisation : Couplage automatique au réseau électrique.\nCharge initiale : Prise immédiate d'une charge de 5 % pour éviter le retour de puissance, puis maintien à un palier de 10 % pour stabilisation thermique.\nParamètres critiques:\n- Charge de stabilisation : 10 % (pendant un temps dépendant de l'état thermique)"
+            "details": "Détails procédure :\n- Synchronisation : Couplage automatique au réseau électrique.\n- Charge initiale : Prise immédiate d'une charge de 5 % pour éviter le retour de puissance, puis maintien à un palier de 10 % pour stabilisation thermique.\nParamètres critiques:\n- Charge de stabilisation : 10 % (pendant un temps dépendant de l'état thermique)."
           }
         ]
       },
@@ -366,7 +366,7 @@
             "id": "kca-s7a",
             "title": "a - Montée en charge, Admission BP et Pression glissante",
             "type": "check",
-            "details": "Montée en charge : Prise de charge HP et BP suivant une pente calculée (état froid, tiède ou chaud).\nAdmission BP : Ouverture progressive de la vanne d'admission BP dès que la charge TV dépasse 25 %, entraînant la fermeture du contournement BP.\nPression glissante : Les vannes d'admission HP s'ouvrent à 100 %. La puissance varie alors selon la production des chaudières.\nParamètres critiques:\n- Couplage HP (VVP) : Température ≥ 450 °C et ΔP ≤ 2 bars\n- Couplage BP (VVP) : Température ≥ 175 °C et ΔP ≤ 0,5 bar"
+            "details": "Détails procédure :\n- Montée en charge : Prise de charge HP et BP suivant une pente calculée (état froid, tiède ou chaud).\n- Admission BP : Ouverture progressive de la vanne d'admission BP dès que la charge TV dépasse 25 %, entraînant la fermeture du contournement BP.\n- Pression glissante : Les vannes d'admission HP s'ouvrent à 100 %. La puissance varie alors selon la production des chaudières.\nParamètres critiques:\n- Couplage HP (VVP) : Température ≥ 450 °C et ΔP ≤ 2 bars\n- Couplage BP (VVP) : Température ≥ 175 °C et ΔP ≤ 0,5 bar."
           }
         ]
       }
@@ -387,7 +387,7 @@
             "id": "sbs-s1a",
             "title": "a - Commande au système de registre (TTA)",
             "type": "check",
-            "details": "L'automate envoie un ordre d'arrêt normal au système de gestion du registre des gaz d'échappement (TTA). Le registre (diverter) commence à se déplacer de la position chaudière vers la position cheminée.\nParamètres critiques:\n- Position intermédiaire du registre : 75 % puis 67 % pour valider la progression."
+            "details": "Détails procédure : L'automate envoie un ordre d'arrêt normal au système de gestion du registre des gaz d'échappement (TTA). Le registre (diverter) commence à se déplacer de la position chaudière vers la position cheminée.\nParamètres critiques:\n- Position intermédiaire du registre : 75 % puis 67 % pour valider la progression."
           }
         ]
       },
@@ -400,7 +400,7 @@
             "id": "sbs-s2a",
             "title": "a - Déclenchement interne et fermeture étanche",
             "type": "check",
-            "details": "Une fois le registre suffisamment basculé vers la cheminée, un ordre de déclenchement est activé pour fermer complètement l'admission de chaleur. Simultanément, les vannes d'isolement vapeur sont fermées pour séparer la chaudière du collecteur commun.\nParamètres critiques:\n- Fermeture du registre chaudière à 100 %.\n- Fermeture des vannes d'isolement HP (UV 001) et BP (UV 002).\n- Fermeture des vannes de réchauffage HP (ACO UV 003) et BP (ACO UV 004)."
+            "details": "Détails procédure : Une fois le registre suffisamment basculé vers la cheminée, un ordre de déclenchement est activé pour fermer complètement l'admission de chaleur. Simultanément, les vannes d'isolement vapeur sont fermées pour séparer la chaudière du collecteur commun.\nParamètres critiques:\n- Fermeture du registre chaudière à 100 %.\n- Fermeture des vannes d'isolement HP (UV 001) et BP (UV 002).\n- Fermeture des vannes de réchauffage HP (ACO UV 003) et BP (ACO UV 004)."
           }
         ]
       },
@@ -413,7 +413,7 @@
             "id": "sbs-s3a",
             "title": "a - Arrêt des circuits vapeur et contournement (GBP/GHP)",
             "type": "check",
-            "details": "L'automate désactive successivement les fonctions liées à la gestion de la vapeur de la chaudière arrêtée. Le contournement BP de la chaudière déclenchée est maintenu fermé pour conserver la chaudière sous pression et température, facilitant ainsi un redémarrage rapide.\nParamètres critiques:\n- Groupe fonctionnel \"Vapeur et contournement BP\" sur OFF.\n- Groupe fonctionnel \"Vapeur et contournement HP\" sur OFF."
+            "details": "Détails procédure : L'automate désactive successivement les fonctions liées à la gestion de la vapeur de la chaudière arrêtée. Le contournement BP de la chaudière déclenchée est maintenu fermé pour conserver la chaudière sous pression et température, facilitant ainsi un redémarrage rapide.\nParamètres critiques:\n- Groupe fonctionnel \"Vapeur et contournement BP\" sur OFF.\n- Groupe fonctionnel \"Vapeur et contournement HP\" sur OFF."
           }
         ]
       },
@@ -426,7 +426,7 @@
             "id": "sbs-s4a",
             "title": "a - Désactivation des pompes et circuits d'eau (FSR/FLB)",
             "type": "check",
-            "details": "Une fois la chaudière isolée du cycle vapeur, l'automate arrête les pompes de circulation qui assuraient le mouvement de l'eau dans les évaporateurs.\nParamètres critiques:\n- Groupe fonctionnel \"Circuits HP\" sur OFF.\n- Groupe fonctionnel \"Circuits BP\" sur OFF."
+            "details": "Détails procédure : Une fois la chaudière isolée du cycle vapeur, l'automate arrête les pompes de circulation qui assuraient le mouvement de l'eau dans les évaporateurs.\nParamètres critiques:\n- Groupe fonctionnel \"Circuits HP\" sur OFF.\n- Groupe fonctionnel \"Circuits BP\" sur OFF."
           }
         ]
       },
@@ -454,6 +454,96 @@
         "title": "Note de sécurité",
         "type": "instruction",
         "details": "Si le registre ne parvient pas à se fermer complètement dans les 40 secondes suivant l'ordre d'arrêt ou de déclenchement, l'automate provoque par sécurité le déclenchement de la Turbine à Gaz (TG) associée."
+      }
+    ]
+  },
+  {
+    "id": "post-trip-restart",
+    "name": "Redémarrage Après Déclenchement",
+    "description": "Conditions de sécurité et de stabilisation thermique pour ramener le cycle combiné à un état opérationnel après un déclenchement.",
+    "version": "1.0.0",
+    "steps": [
+      {
+        "id": "ptr-s1",
+        "title": "Phase 1 : Conditions de sécurité générale (Armement FSE)",
+        "type": "group",
+        "details": "Pour autoriser la réouverture du registre des gaz, les 10 conditions de sécurité FSE doivent être rétablies et réunies simultanément.",
+        "steps": [
+          {
+            "id": "ptr-s1a",
+            "title": "a - Vérification des conditions FSE",
+            "type": "check",
+            "details": "Les 10 conditions doivent être remplies.\nDétails procédure :\n- Turbine à Gaz (TG) : La TG associée doit être en service et synchronisée au réseau.\n- Pompes alimentaires : Au moins une pompe APH (HP) et une pompe APB (BP) doivent être en service.\n- Pompes d'extraction et circulation : Une pompe CEX (extraction), une pompe FSR (HP) et une pompe FLB (BP) doivent fonctionner avec une pression différentielle (ΔP) correcte.\n- Niveaux des ballons : Les niveaux doivent être détectés aux seuils de gonflement.\n- Pots de condensats : Absence totale d'eau détectée dans les pots de condensats de vapeur de surchauffe HP et BP.\nParamètres critiques:\n- Niveau de démarrage Ballon HP : -475 mm\n- Niveau de démarrage Ballon BP : -580 mm"
+          }
+        ]
+      },
+      {
+        "id": "ptr-s2",
+        "title": "Phase 2 : Disponibilité du contournement (Bypass)",
+        "type": "group",
+        "details": "Le circuit de contournement doit être prêt à évacuer la vapeur vers le condenseur.",
+        "steps": [
+          {
+            "id": "ptr-s2a",
+            "title": "a - Vérification du circuit Bypass",
+            "type": "check",
+            "details": "Le circuit doit être prêt pour permettre la montée en pression sans envoyer de vapeur à la turbine.\nParamètres critiques:\n- Vide condenseur : Pression < 300 mbar\n- Température vapeur surchauffée : > 300 °C\n- Pression d'eau de désurchauffe : > 7 bars (fournie par les pompes CEX)"
+          }
+        ]
+      },
+      {
+        "id": "ptr-s3",
+        "title": "Phase 3 : Cas spécifique - Redémarrage TV seule",
+        "type": "group",
+        "details": "Procédure si seule la turbine à vapeur a déclenché et que le condenseur reste opérationnel.",
+        "steps": [
+          {
+            "id": "ptr-s3a",
+            "title": "a - Maintien en pression des chaudières",
+            "type": "check",
+            "details": "Le circuit de contournement BP est utilisé pour contrôler la pression dans les chaudières, les maintenant prêtes pour un redémarrage rapide.\nParamètres critiques:\n- Pression consigne collecteur BP : 7 bar abs"
+          },
+          {
+            "id": "ptr-s3b",
+            "title": "b - Parallélisme",
+            "type": "instruction",
+            "details": "Le redémarrage de la turbine peut s'effectuer avec les deux chaudières en parallèle si leurs paramètres sont stabilisés."
+          }
+        ]
+      },
+      {
+        "id": "ptr-s4",
+        "title": "Phase 4 : Conditions de couplage (si une chaudière en service)",
+        "type": "group",
+        "details": "Conditions pour coupler une chaudière redémarrée au collecteur commun (si l'autre est déjà en ligne).",
+        "steps": [
+          {
+            "id": "ptr-s4a",
+            "title": "a - Conditions de couplage HP/BP",
+            "type": "check",
+            "details": "Vérifier les conditions avant d'ouvrir les vannes d'isolement.\nParamètres critiques Circuit HP:\n- Température ≥ 450 °C\n- Écart de pression (ΔP) ≤ 2 bars\nParamètres critiques Circuit BP:\n- Température ≥ 175 °C\n- ΔP ≤ 0,5 bar"
+          },
+          {
+            "id": "ptr-s4b",
+            "title": "b - Validation Chimiste",
+            "type": "check",
+            "details": "La disposition finale de la chaudière doit être confirmée par l'avis du chimiste après vérification de la qualité de l'eau."
+          }
+        ]
+      },
+      {
+        "id": "ptr-s5",
+        "title": "Phase 5 : Système de Vapeur Auxiliaire (SVA) et Vide",
+        "type": "group",
+        "details": "Rétablissement de l'étanchéité de la turbine et du vide condenseur.",
+        "steps": [
+          {
+            "id": "ptr-s5a",
+            "title": "a - Conditions SVA et Éjecteurs",
+            "type": "check",
+            "details": "La vapeur auxiliaire est nécessaire pour alimenter les labyrinthes et les éjecteurs.\nParamètres critiques SVA:\n- Pression SVA : 7 bars\n- Température SVA : 250 °C\nParamètres critiques Éjecteurs:\n- Démarrage éjecteur de démarrage : 1 bar abs\n- Prise de relais éjecteur d'entretien : 250 mbar"
+          }
+        ]
       }
     ]
   }
