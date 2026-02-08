@@ -235,7 +235,7 @@
     "name": "Démarrage Pompe de Réfrigération Principale (CRF)",
     "description": "Procédure de démarrage d'une pompe de réfrigération principale (101 PO ou 201 PO), basée sur les systèmes CRF, KCA et CFI.",
     "version": "1.0.0",
-    "category": "Démarrage et Opérations",
+    "category": "Auxiliaires",
     "steps": [
       {
         "id": "crf-s1",
@@ -969,5 +969,3 @@
     ]
   }
 ]
-
-    

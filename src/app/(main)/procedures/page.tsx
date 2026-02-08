@@ -3,7 +3,7 @@
 
 import { useMemo } from 'react';
 import Link from 'next/link';
-import { ClipboardCheck, ArrowRight, Wrench, Shield, Play } from "lucide-react";
+import { ClipboardCheck, ArrowRight, Wrench, Shield, Play, Factory } from "lucide-react";
 
 import { getProcedures } from '@/lib/procedures-service';
 import type { Procedure } from '@/types/db';
@@ -16,6 +16,7 @@ const categoryIcons: Record<string, React.ElementType> = {
     "Démarrage et Opérations": Play,
     "Arrêt et Maintenance": Wrench,
     "Analyse et Sécurité": Shield,
+    "Auxiliaires": Factory,
 };
 
 export default function ProceduresPage() {
