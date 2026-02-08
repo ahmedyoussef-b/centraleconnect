@@ -40,6 +40,10 @@ const nextConfig: NextConfig = {
         worker_threads: false,
       };
     }
+    
+    // This prevents webpack from trying to parse a library that uses dynamic requires.
+    config.module.noParse = /ort\.min\.js/;
+
     return config;
   },
 };
