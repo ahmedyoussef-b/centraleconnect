@@ -1,91 +1,61 @@
 'use client';
 
-import Image from 'next/image';
+import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { cn } from '@/lib/utils';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { getPidSvgContent } from '@/lib/pid-service';
+import { Skeleton } from './ui/skeleton';
+import { Alert, AlertDescription, AlertTitle } from './ui/alert';
 
-// Define the position and target for each hotspot
-const hotspots = [
-  {
-    id: 'TG',
-    name: 'Turbine à Gaz',
-    // These are percentages for top, left, width, height
-    position: { top: '75%', left: '48%', width: '10%', height: '15%' },
-    target: '/equipments/TG1' // Example target
-  },
-  {
-    id: 'RESERVOIR_1',
-    name: 'Réservoir 1',
-    position: { top: '35%', left: '20%', width: '15%', height: '10%' },
-    target: '#' // Placeholder, update with a real ID e.g., /equipments/ID_RESERVOIR_1
-  },
-  {
-    id: 'RESERVOIR_2',
-    name: 'Réservoir 2',
-    position: { top: '35%', left: '65%', width: '15%', height: '10%' },
-    target: '#' // Placeholder, update with a real ID e.g., /equipments/ID_RESERVOIR_2
-  }
-];
-
-// Path to the real synoptic image.
-const synopticImage = {
-    imageUrl: '/assets/synoptics/IMG_20260207_071515_602.svg',
-    description: 'Schéma synoptique principal du cycle combiné',
-};
-
+const SYNOPTIC_SVG_PATH = '/assets/synoptics/IMG_20260207_071515_602.svg';
 
 export function SynopticView() {
+  const [svgContent, setSvgContent] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
-  const handleHotspotClick = (target: string) => {
-    if (target === '#') {
-        // In a real scenario, you could show a toast or a modal
-        console.warn('Target for this hotspot is not configured yet.');
-        return;
+  useEffect(() => {
+    getPidSvgContent(SYNOPTIC_SVG_PATH)
+      .then(setSvgContent)
+      .catch((err) => {
+        console.error("Failed to load synoptic SVG:", err);
+        setError("Le fichier du schéma synoptique n'a pas pu être chargé. Assurez-vous qu'il se trouve bien dans 'public/assets/synoptics/'.");
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  const handleSvgClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    const target = e.target as SVGElement;
+    const hotspotElement = target.closest<SVGElement>('[data-external-id]');
+    
+    if (hotspotElement) {
+      const targetId = hotspotElement.getAttribute('data-external-id');
+      if (targetId) {
+        router.push(`/equipments/${encodeURIComponent(targetId)}`);
+      }
     }
-    router.push(target);
-  };
+  }, [router]);
+
+  if (loading) {
+    return <Skeleton className="w-full h-[600px] bg-muted rounded-md" />;
+  }
+
+  if (error) {
+    return <Alert variant="destructive"><AlertTitle>Erreur</AlertTitle><AlertDescription>{error}</AlertDescription></Alert>;
+  }
 
   return (
-    <TooltipProvider>
-      <div className="relative w-full">
-        {synopticImage ? (
-            <Image
-                src={synopticImage.imageUrl}
-                alt={synopticImage.description}
-                width={1200}
-                height={800}
-                className="w-full h-auto rounded-md bg-muted" // Added bg-muted for better visibility if image is missing
-            />
-        ) : (
-            <div className="w-full h-[600px] bg-muted rounded-md flex items-center justify-center">
-                <p>Image du synoptique non trouvée.</p>
-            </div>
-        )}
-
-        {/* Hotspot overlays */}
-        {hotspots.map(hotspot => (
-          <Tooltip key={hotspot.id}>
-            <TooltipTrigger asChild>
-              <button
-                onClick={() => handleHotspotClick(hotspot.target)}
-                className={cn(
-                  'absolute border-2 border-transparent rounded-sm hover:border-primary hover:bg-primary/20 transition-all',
-                )}
-                style={hotspot.position}
-                aria-label={`Accéder à ${hotspot.name}`}
-              />
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Voir les détails pour : {hotspot.name}</p>
-            </TooltipContent>
-          </Tooltip>
-        ))}
-         <div className="absolute top-2 left-2 bg-background/80 p-2 rounded-md">
-            <p className="text-xs text-muted-foreground">NOTE: Ajustez la position des hotspots pour correspondre à votre image.</p>
-        </div>
+    <div className="relative w-full">
+      <div 
+        onClick={handleSvgClick}
+        dangerouslySetInnerHTML={{ __html: svgContent }}
+        className="[&>svg]:w-full [&>svg]:h-auto [&>svg]:rounded-md [&>svg]:bg-muted cursor-pointer"
+      />
+      <div className="absolute top-2 left-2 bg-background/80 p-2 rounded-md">
+        <p className="text-xs text-muted-foreground">
+          INFO : Pour rendre les éléments interactifs, modifiez le fichier SVG et ajoutez l'attribut `data-external-id="ID_DE_L_EQUIPEMENT"` aux éléments cliquables.
+        </p>
       </div>
-    </TooltipProvider>
+    </div>
   );
 }
