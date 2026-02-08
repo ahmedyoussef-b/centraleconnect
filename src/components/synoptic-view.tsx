@@ -29,9 +29,8 @@ const hotspots = [
 ];
 
 // Path to the real synoptic image.
-// You should place your image file at `public/assets/synoptics/ccpp-main-synoptic.svg`
 const synopticImage = {
-    imageUrl: '/assets/synoptics/ccpp-main-synoptic.svg',
+    imageUrl: '/assets/synoptics/IMG_20260207_071515_602.svg',
     description: 'Schéma synoptique principal du cycle combiné',
 };
 
