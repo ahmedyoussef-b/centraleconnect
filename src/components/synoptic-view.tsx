@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { getPidSvgContent } from '@/lib/pid-service';
 import { Skeleton } from './ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from './ui/alert';
-import { cn } from '@/lib/utils';
 
 const SYNOPTIC_SVG_PATH = '/assets/synoptics/IMG_20260207_071515_602.svg';
 
@@ -50,21 +49,7 @@ export function SynopticView() {
       <div 
         onClick={handleSvgClick}
         dangerouslySetInnerHTML={{ __html: svgContent }}
-        className={cn(
-          "cursor-pointer",
-          "[&>svg]:w-full [&>svg]:h-auto [&>svg]:rounded-md [&>svg]:bg-muted",
-          // Override SVG colors for dark theme visibility
-          "[&_path]:!stroke-muted-foreground",
-          "[&_line]:!stroke-muted-foreground",
-          "[&_polyline]:!stroke-muted-foreground",
-          "[&_polygon]:!stroke-muted-foreground",
-          "[&_rect]:!stroke-muted-foreground",
-          "[&_circle]:!stroke-muted-foreground",
-          "[&_ellipse]:!stroke-muted-foreground",
-          "[&_text]:!fill-foreground",
-          // Style for interactive hotspots
-          "[&_[data-external-id]]:hover:!stroke-primary"
-        )}
+        className="synoptic-diagram-override"
       />
       <div className="absolute top-2 left-2 bg-background/80 p-2 rounded-md">
         <p className="text-xs text-muted-foreground">
