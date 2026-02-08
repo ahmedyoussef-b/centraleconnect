@@ -1020,6 +1020,133 @@
         "details": "Le système CFI agit comme un verrou de sécurité : il impose un nettoyage préalable de l'eau d'aspiration et une attente de 6 minutes avant de permettre au moteur de la pompe CRF de s'enclencher, protégeant ainsi les échangeurs du condenseur contre l'encrassement immédiat."
       }
     ]
+  },
+  {
+    "id": "operational-handbook",
+    "name": "Manuel de Conduite Opérationnel",
+    "description": "Synthèse des protocoles de régulation et de sécurité des systèmes critiques.",
+    "version": "1.0.0",
+    "category": "Analyse et Sécurité",
+    "steps": [
+      {
+        "id": "op-handbook-cex",
+        "title": "1. Gestion du Cycle Eau d’Extraction (CEX) et Appoint (CAP)",
+        "type": "group",
+        "details": "Le maintien rigoureux du niveau au condenseur est impératif pour garantir la stabilité du cycle thermique et l’intégrité mécanique des pompes d’extraction.",
+        "steps": [
+          {
+            "id": "cex-thresholds",
+            "title": "Protocoles de Niveau Condenseur",
+            "type": "instruction",
+            "details": "La surveillance repose sur les instruments LSHH001 à LSLL001.\n\nInstrument\tRéglage (mm)\tAction Corrective / Impact Opérationnel\n--------------------------------------------------------------------------------\nLSHH001\t\t1000 mm\t\tAlarme + Déclenchement (Trip) TVcc\nLSH004\t\t800 mm\t\tAlarme + Ouverture vanne de décharge LV001 vers bâche tampon\nLSH003\t\t750 mm\t\tAlarme de niveau haut\nLSH002\t\t700 mm\t\tFermeture de la vanne de décharge LV001\nLSH001\t\t630 mm\t\tFermeture vannes d'appoint normal (LCV001) et rapide (UV001)\nNominal\t\t610 mm\t\tNiveau de travail (Set-point)\nLSL001\t\t580 mm\t\tOuverture vanne d'appoint normal CAP LCV001\nLSL002\t\t530 mm\t\tOuverture vanne d'appoint rapide CAP UV001\nLSL003\t\t370 mm\t\tAlarme + Interdiction de démarrage des pompes CEX\nLSLL001\t\t240 mm\t\tAlarme + Déclenchement (Trip) de la pompe CEX en service\n\nAnalyse technique : Le seuil de 370 mm constitue une barrière de sécurité active. En deçà, la charge hydrostatique est insuffisante pour prévenir le vortex."
+          },
+          {
+            "id": "cex-pump-logic",
+            "title": "Logique de Commande des Pompes CEX (101PO/102PO)",
+            "type": "instruction",
+            "details": "Conditions de Démarrage :\n- Absence de défaut électrique ET Niveau condenseur > 370 mm.\n\nConditions de Déclenchement (Trip) :\n- Niveau condenseur très bas < 240 mm.\n- Niveau bâche alimentaire (ADG) très haut > 2850 mm.\n- Vibration très haute (VSHH) > 4,5 mm/s.\n- Température palier très haute (TSHH103) > 90°C (Alarme à 80°C).\n- Température enroulement moteur très haute (TSHH 105/106/107) > 130°C (Alarme à 120°C).\n- Vanne de refoulement non ouverte après 1 min de marche ou fermée pendant plus de 5 s."
+          },
+          {
+            "id": "cex-cap-logic",
+            "title": "Gestion de la Bâche Tampon (CAP)",
+            "type": "instruction",
+            "details": "Le stockage intermédiaire est régulé pour compenser les variations du cycle :\n\n- LSHH001 (3070 mm) : Alarme + verrouillage de la vanne d'appoint SER LCV001/LCV002.\n- Consigne (2210 mm) : Fermeture des vannes d'appoint.\n- LSLL001 (750 mm) : Alarme niveau très bas (risque de rupture d'appoint)."
+          }
+        ]
+      },
+      {
+        "id": "op-handbook-adg",
+        "title": "2. Préchauffage et Stockage : Systèmes FBP et ADG",
+        "type": "group",
+        "details": "La maîtrise des paramètres de la bâche alimentaire (ADG) est critique pour l'élimination de l'oxygène (dégazage) et la préparation thermique de l'eau alimentaire.",
+        "steps": [
+          {
+            "id": "adg-fbp-pump",
+            "title": "Pompage FBP (101PO/201PO)",
+            "type": "instruction",
+            "details": "Démarrage :\n- Groupe en service ET vanne d'isolement réchauffeur UV001 ouverte ET au moins une pompe CEX en service.\n\nDéclenchement :\n- Pression différentielle trop basse (PDSLL002).\n- Température palier (TSHH104/108) ou corps de pompe (TSHH105) excessive.\n- Arrêt des deux pompes CEX (temporisation de 5 s)."
+          },
+          {
+            "id": "adg-regulation",
+            "title": "Régulation de la Bâche Alimentaire (ADG)",
+            "type": "instruction",
+            "details": "L'échelle d'intervention sur l'ADG corrèle les niveaux aux organes de réglage :\n\n- 2850 mm (LSHH001) : Déclenchement pompes CEX + fermeture vannes isolement UV001/UV002.\n- 2720 mm (LSH003) : Fermeture vanne de régulation LCV001.\n- 2630 mm (LSH002) : Ouverture vanne de trop-plein UV006.\n- 2550 mm (LSH001) : Fermeture clapet assisté de soutirage UV007/UV008.\n- 2430 mm (LSL002) : Fermeture vanne de chauffage de masse UV003 + Fermeture vanne de trop-plein UV006.\n- 1290 mm (LSL001) : Interdiction de démarrage des pompes alimentaires HP/BP.\n- 530 mm (LSLL001) : Déclenchement des pompes alimentaires HP/BP."
+          }
+        ]
+      },
+      {
+        "id": "op-handbook-aph-apb",
+        "title": "3. Pompage Eau Alimentaire (APH & APB)",
+        "type": "group",
+        "details": "Gestion du pompage haute et basse pression.",
+        "steps": [
+          {
+            "id": "aph-apb-protection",
+            "title": "Conditions de Démarrage et Protection Flux",
+            "type": "instruction",
+            "details": "Démarrage : Niveau ADG > 1290 mm ET ouverture des vannes d'aspiration.\n\nTrip APH : Débit pompe très haut > 225 t/h pendant 10 s.\nTrip APB : Débit pompe très haut > 110 t/h pendant 15 s."
+          },
+          {
+            "id": "aph-monitoring",
+            "title": "Surveillance Thermique et Vibratoire (APH)",
+            "type": "instruction",
+            "details": "Désignation\t\tAlarme\t\tTrip (Déclenchement)\n--------------------------------------------------------------------------------\nTempérature Butée Pompe\t80°C\t\t90°C\nTempérature Palier Pompe\t90°C\t\t100°C\nTempérature Palier CA Moteur\t80°C\t\t95°C\nTempérature Enroulement\t120°C\t\t130°C\nVibrations Butées/Paliers\t4,2 mm/s\t6,3 mm/s (t=5s)"
+          },
+          {
+            "id": "aph-apb-discharge-protection",
+            "title": "Protection du Refoulement (UV101)",
+            "type": "instruction",
+            "details": "Pour APH et APB, la vanne UV101 se ferme immédiatement en cas de :\n\n1. Dévirage pompe (détection de rotation inverse).\n2. Déclenchement du groupe ou du sous-groupe associé.\n3. Pression de refoulement insuffisante (90 bar pour APH / 13 bar pour APB)."
+          }
+        ]
+      },
+      {
+        "id": "op-handbook-fsr-flb",
+        "title": "4. Circuits Eau/Vapeur : Systèmes FSR (HP) et FLB (BP)",
+        "type": "group",
+        "details": "La stabilité des ballons prévient les chocs hydrauliques dans les lignes de vapeur.",
+        "steps": [
+          {
+            "id": "fsr-flb-levels",
+            "title": "Paramètres de Niveau et Sécurité Chaudière",
+            "type": "instruction",
+            "details": "HP (FSR) :\n- +500 mm : Trip Chaudière.\n- -475 mm : Niveau de gonflement (Autorisation alimentation).\n- -675 mm : Trip Chaudière + Arrêt pompes circulation HP.\n\nBP (FLB) :\n- +450 mm : Trip Chaudière.\n- -575 mm : Niveau de gonflement.\n- -750 mm : Trip Chaudière + Arrêt pompes circulation BP."
+          },
+          {
+            "id": "fsr-flb-purge",
+            "title": "Logiques de Purge et d'Évent",
+            "type": "instruction",
+            "details": "- Purge Intermittente (UV007) : Ouverture si Mémoire sous-groupe = ON ET Niveau réservoir haut (+450 mm HP / +350 mm BP). Fermeture après temporisation de 20 s si le niveau n'est plus haut.\n- Vanne de Purge (UV010) : Ouverture si Mémoire sous-groupe = ON ET Détection d'eau pot de condensats (LSH010). Maintien de l'ouverture pendant 15 min. Fermeture automatique après 10 s d'absence de détection.\n- Vanne d'Évent Surchauffeur (UV008) : Ouverture conditionnée par l'absence d'eau (LSL010), la turbine à gaz en service et le by-pass HP indisponible."
+          }
+        ]
+      },
+      {
+        "id": "op-handbook-vvp",
+        "title": "5. Protection de la Turbine (VVP & Vibrations)",
+        "type": "group",
+        "details": "Protocoles de protection de la turbine à vapeur.",
+        "steps": [
+          {
+            "id": "vvp-logic",
+            "title": "Vannes d'Isolement CR1 (Admission VVP)",
+            "type": "instruction",
+            "details": "L'autorisation d'ouverture de l'isolement HP (UV001) et BP (UV002) repose sur une logique de protection contre les chocs thermiques.\n\nVanne HP (UV001) :\n- 1er Cas : Vanne isolement CR2 fermée ET ΔP < 10 bar ET Vanne réchauffage ACO UCV003 ouverte.\n- 2ème Cas : Vanne isolement CR2 ouverte ET Température vapeur HP > 450°C ET ΔP < 2 bar ET Température de saturation NON détectée ET Vanne réchauffage ACO UCV003 ouverte.\n\nVanne BP (UV002) :\n- 1er Cas : Vanne isolement CR2 fermée ET ΔP < 4 bar ET Vanne réchauffage ACO UCV004 ouverte.\n- 2ème Cas : Vanne isolement CR2 ouverte ET Température vapeur BP > 175°C ET ΔP < 0,5 bar ET Vanne réchauffage ACO UCV004 ouverte."
+          },
+          {
+            "id": "vvp-vibrations",
+            "title": "Limites de Vibration d'Arbre",
+            "type": "instruction",
+            "details": "Composant\t\tAlarme (µm)\t\tDéclenchement / Trip (µm)\n--------------------------------------------------------------------------------\nCorps HP\t\t75 µm\t\t100 µm\nCorps BP\t\t100 µm\t\t130 µm\nAlternateur (ALTR)\t165 µm\t\t260 µm"
+          },
+          {
+            "id": "vvp-safety-summary",
+            "title": "Synthèse de Mise en Sécurité",
+            "type": "instruction",
+            "details": "La mise en sécurité totale est déclenchée par :\n1. Trip TVcc : Niveau condenseur > 1000 mm OU Vibrations d'arbre.\n2. Trip Chaudière : Niveaux extrêmes ballons HP/BP OU Perte des pompes alimentaires HP/BP.\n3. Protection Groupes : Dévirage pompe OU Débit excessif (APH > 225 t/h ; APB > 110 t/h)."
+          }
+        ]
+      }
+    ]
   }
 ]
 
