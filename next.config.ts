@@ -1,3 +1,4 @@
+
 import type {NextConfig} from 'next';
 
 const nextConfig: NextConfig = {
@@ -39,10 +40,11 @@ const nextConfig: NextConfig = {
         fs: false,
         worker_threads: false,
       };
+      
+      // This prevents webpack from trying to parse a library that uses dynamic requires.
+      config.module.noParse = /ort\.min\.js/;
     }
     
-    // This prevents webpack from trying to parse a library that uses dynamic requires.
-    config.module.noParse = /ort\.min\.js/;
 
     return config;
   },
