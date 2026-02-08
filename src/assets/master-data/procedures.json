@@ -904,7 +904,6 @@
         "id": "btc-s3",
         "title": "3. Défaillances des circuits de vapeur et contournement",
         "type": "group",
-        "details": "",
         "steps": [
           {
             "id": "btc-s3a",
@@ -950,7 +949,6 @@
         "id": "btc-s5",
         "title": "5. Défaillances des servitudes et sécurité logique",
         "type": "group",
-        "details": "",
         "steps": [
           {
             "id": "btc-s5a",
@@ -976,25 +974,105 @@
         "id": "btc-s6",
         "title": "6. Cause indirecte : Défaillance de la réfrigération principale (CRF)",
         "type": "group",
-        "details": "Une défaillance du circuit d'eau de réfrigération principale (CRF) provoque une chaîne d'événements menant inévitablement au déclenchement de la chaudière.",
+        "details": "Une défaillance du circuit CRF provoque une chaîne d'événements menant inévitablement au déclenchement de la chaudière.",
         "steps": [
           {
             "id": "btc-s6a",
+            "title": "a - Indisponibilité du contournement (Bypass)",
             "type": "instruction",
-            "title": "Indisponibilité du contournement (Bypass)",
-            "details": "Le refroidissement du condenseur est perdu (signal CRF US 120/220), ce qui rend le bypass indisponible ou provoque sa fermeture forcée."
+            "details": "Le circuit CRF assure le refroidissement du condenseur. Si le refroidissement fait défaut (signal CRF US 120/220 'demi-condenseur non réfrigéré'), le système de contournement BP est immédiatement déclaré indisponible ou reçoit un ordre de fermeture forcée.\nConséquence : Sans contournement disponible pour évacuer la vapeur produite, la chaudière ne peut pas rester en service si la turbine à vapeur n'est pas en mesure d'absorber cette vapeur."
           },
           {
             "id": "btc-s6b",
+            "title": "b - Déclenchement par cascade (TV vers Chaudière)",
             "type": "instruction",
-            "title": "Déclenchement de la Turbine à Vapeur (TV) par cascade",
-            "details": "La perte de refroidissement entraîne une montée en pression du condenseur (> 900 mbar), ce qui déclenche la TV."
+            "details": "La perte du circuit CRF entraîne une montée rapide de la pression au condenseur. Plusieurs seuils critiques provoquent alors des déclenchements successifs :\n- Pression > 300 mbar : Rend le contournement indisponible.\n- Pression > 900 mbar abs : Provoque le déclenchement des étanchéités turbine.\n- Déclenchement de la Turbine à Vapeur (TV) : Si la TV déclenche à cause d'un manque de vide (causé par un défaut CRF) et que le contournement est indisponible, les registres d'échappement des gaz se ferment et la chaudière déclenche immédiatement pour protéger l'installation."
           },
           {
             "id": "btc-s6c",
+            "title": "c - Conditions de sécurité et d'armement",
             "type": "instruction",
-            "title": "Déclenchement final de la chaudière",
-            "details": "Si la TV déclenche et que le bypass est indisponible (ce qui est le cas), la chaudière déclenche pour éviter une surpression."
+            "details": "Bien que le circuit CRF ne figure pas explicitement dans la liste des 10 conditions de sécurité générale (FSE) nécessaires à l'armement initial, il est une condition impérative de disponibilité pour le fonctionnement stabilisé :\n- Réfrigération du condenseur : Au moins un demi-condenseur doit être réfrigéré par le circuit CRF pour autoriser l'ouverture du bypass.\n- Liaison logique : La perte des groupes fonctionnels CRF implique par cascade un déclenchement chaudière ou TV selon les configurations de marche."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "sva-startup",
+    "name": "Mise en Service du Système Vapeur Auxiliaire (SVA)",
+    "description": "Détaille le rôle et la séquence de mise en service du SVA lors d'un redémarrage.",
+    "version": "1.0.0",
+    "category": "Démarrage et Opérations",
+    "steps": [
+      {
+        "id": "sva-s1",
+        "title": "Phase 1 : Rôle et Consommateurs du SVA",
+        "type": "group",
+        "steps": [
+          {
+            "id": "sva-s1a",
+            "title": "Confirmer les 4 fonctions critiques du SVA",
+            "type": "instruction",
+            "details": "Le SVA détend et désurchauffe la vapeur HP pour alimenter :\n- Les labyrinthes d'étanchéité de la TV.\n- Les éjecteurs de vide du condenseur.\n- Le réchauffage de masse de l'eau dans la bâche alimentaire (ADG).\n- La vapeur de dégazage de la bâche alimentaire."
+          }
+        ]
+      },
+      {
+        "id": "sva-s2",
+        "title": "Phase 2 : Provenance de la vapeur au redémarrage",
+        "type": "group",
+        "steps": [
+          {
+            "id": "sva-s2a",
+            "title": "Vérifier la source de vapeur",
+            "type": "check",
+            "details": "Deux scénarios possibles :\n- **Source externe (Etape A)** : La vanne UV 002 est ouverte, fournissant la vapeur immédiatement.\n- **Redémarrage autonome** : Attendre que la pression HP de la première chaudière atteigne environ 40 bar abs."
+          }
+        ]
+      },
+      {
+        "id": "sva-s3",
+        "title": "Phase 3 : Séquence de mise en service des auxiliaires",
+        "type": "group",
+        "details": "S'active une fois la source de vapeur confirmée.",
+        "steps": [
+          {
+            "id": "sva-s3a",
+            "title": "a - Alimentation des étanchéités Turbine",
+            "type": "check",
+            "details": "Les labyrinthes sont alimentés en premier pour 'sceller' la turbine.\nParamètres critiques:\n- Pression SVA : 7 bars\n- Température SVA : 250 °C"
+          },
+          {
+            "id": "sva-s3b",
+            "title": "b - Mise sous vide du condenseur (CVI)",
+            "type": "check",
+            "details": "L'éjecteur de démarrage s'active automatiquement dès que les labyrinthes sont alimentés.\nParamètres critiques:\n- Pression vapeur motrice : 8,7 bar abs"
+          },
+          {
+            "id": "sva-s3c",
+            "title": "c - Prise de relais par l'éjecteur d'entretien",
+            "type": "instruction",
+            "details": "L'éjecteur de démarrage s'arrête lorsque le vide atteint 150 mbar abs, et l'éjecteur d'entretien prend le relais."
+          }
+        ]
+      },
+      {
+        "id": "sva-s4",
+        "title": "Phase 4 : Paramètres critiques et Sécurités",
+        "type": "group",
+        "steps": [
+          {
+            "id": "sva-s4a",
+            "title": "Surveiller les conditions de déclenchement du SVA",
+            "type": "instruction",
+            "details": "Le système se déclenche (fermeture UV 001) si :\n- Pression SVA très haute (PSHH 001).\n- Température SVA > 325 °C (TSHH 002).\n- Pression d'eau de désurchauffe insuffisante."
+          },
+          {
+            "id": "sva-s4b",
+            "title": "Vérifier la régulation de pression",
+            "type": "instruction",
+            "details": "La pression est maintenue constante par les vannes PCV 001 et PCV 002 en mode 'split-range'."
           }
         ]
       }
@@ -1002,4 +1080,4 @@
   }
 ]
 
-  
+    
