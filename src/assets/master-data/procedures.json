@@ -5,6 +5,7 @@
     "name": "Démarrage Chaudière & Turbine Vapeur",
     "description": "Procédure complète de démarrage de l'installation, du poste d'eau au couplage de la turbine à vapeur.",
     "version": "1.2.0",
+    "category": "Démarrage et Opérations",
     "steps": [
       {
         "id": "phase1",
@@ -15,19 +16,19 @@
             "id": "phase1a",
             "title": "a - Mise en service de l'extraction (Système CEX)",
             "type": "check",
-            "details": "Détails procédure : Démarrage de la pompe d'extraction sélectionnée (101PO ou 201PO). Le circuit doit être préalablement rempli en eau déminéralisée via le système SER. La vanne de recyclage FCV 001 assure un débit minimum de 150 m3/h pour protéger la pompe.\nParamètres critiques:\n- Niveau condenseur de travail : 610 mm\n- Seuil de déclenchement (protection pompe) : < 240 mm"
+            "details": "Détails procédure :\nDémarrage de la pompe d'extraction sélectionnée (101PO ou 201PO). Le circuit doit être préalablement rempli en eau déminéralisée via le système SER. La vanne de recyclage FCV 001 assure un débit minimum de 150 m3/h pour protéger la pompe.\nParamètres critiques:\n- Niveau condenseur de travail : 610 mm\n- Seuil de déclenchement (protection pompe) : < 240 mm"
           },
           {
             "id": "phase1b",
             "title": "b - Préparation de la bâche alimentaire (Système ADG)",
             "type": "check",
-            "details": "Détails procédure : Mise en service des contrôles de niveau et de pression. Le dégazage thermique est préparé pour l'admission ultérieure de vapeur.\nParamètres critiques:\n- Niveau de travail bâche : 2530 mm\n- Alarme niveau très haut : 2850 mm (provoque le déclenchement des pompes CEX)."
+            "details": "Détails procédure :\nMise en service des contrôles de niveau et de pression. Le dégazage thermique est préparé pour l'admission ultérieure de vapeur.\nParamètres critiques:\n- Niveau de travail bâche : 2530 mm\n- Alarme niveau très haut : 2850 mm (provoque le déclenchement des pompes CEX)."
           },
           {
             "id": "phase1c",
             "title": "c - Lubrification et Virage de la TV",
             "type": "check",
-            "details": "Détails procédure : Activation du graissage turbine (pompe à huile). Mise en service du dispositif de soulèvement et de virage pour faire tourner l'arbre et éviter sa flexion thermique.\nParamètres critiques:\n- Vitesse de virage : 120 tr/mn\n- Vibrations d'arbre HP (Alarme) : 75 µm (Déclenchement à 100 µm)."
+            "details": "Détails procédure :\nActivation du graissage turbine (pompe à huile). Mise en service du dispositif de soulèvement et de virage pour faire tourner l'arbre et éviter sa flexion thermique.\nParamètres critiques:\n- Vitesse de virage : 120 tr/mn\n- Vibrations d'arbre HP (Alarme) : 75 µm (Déclenchement à 100 µm)."
           }
         ]
       },
@@ -40,13 +41,13 @@
             "id": "phase2a",
             "title": "a - Remplissage et circulation (Systèmes FSR/FLB)",
             "type": "check",
-            "details": "Détails procédure : Remplissage des réchauffeurs et économiseurs HP/BP avec le circuit SER. Ouverture des évents (HV701, HV702) jusqu'à sortie d'eau. Démarrage d'une pompe de circulation HP (FSR) et une BP (FLB).\nParamètres critiques:\n- Niveau de démarrage Ballon HP : -475 mm\n- Niveau de démarrage Ballon BP : -580 mm\n- Pression différentielle (ΔP) pompes de circulation : Doit être correcte pour l'armement."
+            "details": "Détails procédure :\nRemplissage des réchauffeurs et économiseurs HP/BP avec le circuit SER. Ouverture des évents (HV701, HV702) jusqu'à sortie d'eau. Démarrage d'une pompe de circulation HP (FSR) et une BP (FLB).\nParamètres critiques:\n- Niveau de démarrage Ballon HP : -475 mm\n- Niveau de démarrage Ballon BP : -580 mm\n- Pression différentielle (ΔP) pompes de circulation : Doit être correcte pour l'armement."
           },
           {
             "id": "phase2b",
             "title": "b - Introduction des gaz d'échappement (Système TTA)",
             "type": "check",
-            "details": "Détails procédure : La TG associée doit être en service (70 à 80 MW de préférence). Ouverture progressive du registre (diverter) vers la chaudière.\nParamètres critiques:\n- 10 conditions FSE réunies (incluant marche APH, APB, CEX, FSR, FLB et niveaux ballons).\n- Température gaz entrée chaudière : environ 543 °C."
+            "details": "Détails procédure :\nLa TG associée doit être en service (70 à 80 MW de préférence). Ouverture progressive du registre (diverter) vers la chaudière.\nParamètres critiques:\n- 10 conditions FSE réunies (incluant marche APH, APB, CEX, FSR, FLB et niveaux ballons).\n- Température gaz entrée chaudière : environ 543 °C."
           }
         ]
       },
@@ -59,13 +60,13 @@
             "id": "phase3a",
             "title": "a - Montée en pression vapeur",
             "type": "check",
-            "details": "Détails procédure : La vapeur est produite et dirigée vers les circuits de contournement (Bypass) HP et BP tant que la turbine n'est pas prête.\nParamètres critiques:\n- Pression vapeur HP cible : 40 bar abs\n- Pression vapeur BP cible : 7 bar abs."
+            "details": "Détails procédure :\nLa vapeur est produite et dirigée vers les circuits de contournement (Bypass) HP et BP tant que la turbine n'est pas prête.\nParamètres critiques:\n- Pression vapeur HP cible : 40 bar abs\n- Pression vapeur BP cible : 7 bar abs."
           },
           {
             "id": "phase3b",
             "title": "b - Étanchéités et Mise à vide du condenseur",
             "type": "check",
-            "details": "Détails procédure : Une fois la pression HP suffisante (~40 bar), alimentation des labyrinthes TV en vapeur. Activation de l'éjecteur de démarrage (CVI) pour établir le vide.\nParamètres critiques:\n- Pression vapeur motrice éjecteurs : 8,7 bar abs\n- Vide pour arrêt éjecteur de démarrage : 150 mbar abs\n- Vide correct pour contournement : < 300 mbar."
+            "details": "Détails procédure :\nUne fois la pression HP suffisante (~40 bar), alimentation des labyrinthes TV en vapeur. Activation de l'éjecteur de démarrage (CVI) pour établir le vide.\nParamètres critiques:\n- Pression vapeur motrice éjecteurs : 8,7 bar abs\n- Vide pour arrêt éjecteur de démarrage : 150 mbar abs\n- Vide correct pour contournement : < 300 mbar."
           }
         ]
       },
@@ -78,7 +79,7 @@
             "id": "phase4a",
             "title": "a - Armement des sécurités et contournement",
             "type": "check",
-            "details": "Détails procédure : Armement des sécurités TV (Sécurités ON). La vapeur circule en bypass pour réchauffer les tuyauteries.\nParamètres critiques:\n- Température vapeur surchauffée : > 300 °C\n- Pression d'eau de désurchauffe contournement : > 7 bar."
+            "details": "Détails procédure :\nArmement des sécurités TV (Sécurités ON). La vapeur circule en bypass pour réchauffer les tuyauteries.\nParamètres critiques:\n- Température vapeur surchauffée : > 300 °C\n- Pression d'eau de désurchauffe contournement : > 7 bar."
           }
         ]
       },
@@ -91,7 +92,7 @@
             "id": "phase5a",
             "title": "a - Accélération automatique",
             "type": "check",
-            "details": "Détails procédure : Le système de régulation prend le contrôle de l'accélération. Passage par un palier de stabilisation thermique (vitesse N1).\nParamètres critiques:\n- Vitesse nominale : 3000 tr/mn\n- Excitation alternateur : Activée à la vitesse nominale."
+            "details": "Détails procédure :\nLe système de régulation prend le contrôle de l'accélération. Passage par un palier de stabilisation thermique (vitesse N1).\nParamètres critiques:\n- Vitesse nominale : 3000 tr/mn\n- Excitation alternateur : Activée à la vitesse nominale."
           }
         ]
       },
@@ -104,7 +105,7 @@
             "id": "phase6a",
             "title": "a - Synchronisation et prise de charge initiale",
             "type": "check",
-            "details": "Détails procédure : Couplage automatique de l'alternateur au réseau. Prise immédiate d'une charge de 5% pour éviter le retour de puissance, puis maintien à 10%.\nParamètres critiques:\n- Charge initiale : 5% (~6 MW)\n- Palier de stabilisation : 10%."
+            "details": "Détails procédure :\nCouplage automatique de l'alternateur au réseau. Prise immédiate d'une charge de 5% pour éviter le retour de puissance, puis maintien à 10%.\nParamètres critiques:\n- Charge initiale : 5% (~6 MW)\n- Palier de stabilisation : 10%."
           }
         ]
       },
@@ -117,158 +118,14 @@
             "id": "phase7a",
             "title": "a - Couplage des circuits HP et BP (VVP)",
             "type": "check",
-            "details": "Détails procédure : Ouverture des vannes d'isolement vapeur (UV001/UV002) pour admettre la vapeur HP puis BP dans la turbine. \nParamètres critiques HP:\n- Température vapeur HP : > 450 °C\n- Pression différentielle ΔP HP : < 2 bars\nParamètres critiques BP:\n- Température vapeur BP : > 175 °C\n- Pression différentielle ΔP BP : < 0,5 bar."
+            "details": "Détails procédure :\nOuverture des vannes d'isolement vapeur (UV001/UV002) pour admettre la vapeur HP puis BP dans la turbine. \nParamètres critiques HP:\n- Température vapeur HP : > 450 °C\n- Pression différentielle ΔP HP : < 2 bars\nParamètres critiques BP:\n- Température vapeur BP : > 175 °C\n- Pression différentielle ΔP BP : < 0,5 bar."
           },
           {
             "id": "phase7b",
             "title": "b - Passage en pression glissante",
             "type": "check",
-            "details": "Détails procédure : Les vannes d'admission HP s'ouvrent à 100%. La puissance est désormais régulée par la quantité de vapeur produite par les chaudières.\nParamètres critiques:\n- Ouverture admission BP : Activée quand charge TV > 25%\n- Pression HP minimum en glissant : 35 bar."
+            "details": "Détails procédure :\nLes vannes d'admission HP s'ouvrent à 100%. La puissance est désormais régulée par la quantité de vapeur produite par les chaudières.\nParamètres critiques:\n- Ouverture admission BP : Activée quand charge TV > 25%\n- Pression HP minimum en glissant : 35 bar."
           }
-        ]
-      }
-    ]
-  },
-  {
-    "id": "gas-turbine-startup",
-    "name": "Démarrage Turbine à Gaz (MS 9001 E)",
-    "description": "Procédure de démarrage de la turbine à gaz, du lancement à la synchronisation, avec alarmes intégrées.",
-    "version": "1.1.0",
-    "steps": [
-      {
-        "id": "tg-s1",
-        "title": "Étape 1 : Conditions Préalables (Permissifs)",
-        "type": "group",
-        "details": "Vérification des sécurités et systèmes auxiliaires par le Speedtronic Mark IV.",
-        "steps": [
-          { "id": "tg-s1a", "title": "Vérifier la viscosité de l'huile", "type": "check", "details": "Alarme associée : Température huile basse (L26QN-1). Danger : Moyen (Empêche le lancement si > 800 SSU). Remède : Activer les résistances de chauffage de la cuve (23 QT) et la pompe auxiliaire." },
-          { "id": "tg-s1b", "title": "Vérifier les capteurs de vibration", "type": "check", "details": "Alarme associée : Inhibition démarrage vibrations. Danger : Élevé (Blocage du démarrage). Remède : Vérifier/remplacer les transducteurs si ≥ 3 (turbine) or ≥ 2 (alternateur) sont défectueux." },
-          { "id": "tg-s1c", "title": "Vérifier ouverture vannes anti-pompage", "type": "check", "details": "Doivent être 100% ouvertes (33 CB-1 à 4). Alarme : L33CB-FAULT. Danger : Critique (Risque de pompage compresseur). Remède : Vérifier l'alimentation en air comprimé et les fins de course." },
-          { "id": "tg-s1d", "title": "Vérifier position des aubes orientables (I.G.V.)", "type": "check", "details": "Doivent être en position fermée (34°). Alarme : L86GVT-FAULT. Danger : Élevé. Remède : Vérifier transmetteurs LVDT (96 TV-1, 2) et servovalve 90 TV." }
-        ]
-      },
-      {
-        "id": "tg-s2",
-        "title": "Étape 2 : Lancement et Décollement (Breakaway)",
-        "type": "group",
-        "steps": [
-          { "id": "tg-s2a", "title": "Activer le circuit maître 'L1_START'", "type": "check", "details": "Engage l'embrayage et le moteur de lancement (88 CR). Alarme : Défaut de rotation (L14HR-FAULT). Danger : Élevé. Remède : Vérifier engagement embrayage et niveau de fluide du convertisseur." },
-          { "id": "tg-s2b", "title": "Confirmer la désactivation du signal de vitesse nulle (L14HR)", "type": "check", "details": "Se désactive dès que l'arbre de la turbine commence à tourner." }
-        ]
-      },
-      {
-        "id": "tg-s3",
-        "title": "Étape 3 : Cycle de Purge",
-        "type": "group",
-        "steps": [
-          { "id": "tg-s3a", "title": "Maintenir la vitesse de purge (~18%, 540 t/min)", "type": "check", "details": "La vitesse est maintenue par le moteur de lancement (L14HM)." },
-          { "id": "tg-s3b", "title": "Attendre la fin de la temporisation de sécurité (L2TV)", "type": "check", "details": "Évacue les gaz résiduels. Alarme : Purge interrompue (L2TV-FAIL). Danger : Élevé (Risque d'explosion). Remède : Assurer la stabilité de la vitesse et relancer le cycle." }
-        ]
-      },
-      {
-        "id": "tg-s4",
-        "title": "Étape 4 : Allumage et Détection de Flamme",
-        "type": "group",
-        "steps": [
-          { "id": "tg-s4a", "title": "Vérifier le débit de combustible au niveau 'allumage'", "type": "check" },
-          { "id": "tg-s4b", "title": "Vérifier l'activation des bougies d'allumage (95SP)", "type": "check" },
-          { "id": "tg-s4c", "title": "Confirmer la détection de flamme (L28FD)", "type": "check", "details": "Validée par au moins 2/4 détecteurs UV. Alarme : Faux départ (L2F-FAIL). Danger : Moyen. Remède : Le système draine les imbrûlés (VA 17-1/2), une nouvelle purge est obligatoire." },
-          { "id": "tg-s4d", "title": "Surveiller le débit de combustible liquide", "type": "check", "details": "Alarme : Défaut débit liquide (L60FFLH). Danger: Élevé. Remède : Vérifier la servovalve de dérivation (65 FP) et réarmer." }
-        ]
-      },
-      {
-        "id": "tg-s5",
-        "title": "Étape 5 : Phase de Réchauffement (Warm-up)",
-        "type": "group",
-        "steps": [
-          { "id": "tg-s5a", "title": "FSR réduit au niveau 'Montée en température' pendant L2W", "type": "check", "details": "Alarme : Écart de température (L30SPA). Danger : Moyen. Remède : Inspecter injecteurs et thermocouples." }
-        ]
-      },
-      {
-        "id": "tg-s6",
-        "title": "Étape 6 : Accélération",
-        "type": "group",
-        "steps": [
-          { "id": "tg-s6a", "type": "instruction", "title": "Le FSR suit une pente croissante.", "details": "Alarme : Vibrations élevées (VIB-HIGH-TRIP). Danger : Critique (Arrêt d'urgence). Remède : Inspection mécanique des paliers, équilibrage rotor." },
-          { "id": "tg-s6b", "type": "instruction", "title": "Retrait des bougies à 50% de vitesse (1500 t/min).", "details": "Alarme : Surchauffe échappement (L30TXA). Danger : Élevé. Remède : Le Speedtronic réduit le FSR ; vérifier le contrôle de température (TTXM)." },
-          { "id": "tg-s6c", "title": "Désengagement du moteur de lancement", "type": "check", "details": "Se produit entre 50% et 70% de vitesse (L14HC)." }
-        ]
-      },
-      {
-        "id": "tg-s7",
-        "title": "Étape 7 : Pleine Vitesse à Vide (FSNL)",
-        "type": "group",
-        "steps": [
-          { "id": "tg-s7a", "title": "Vitesse de service atteinte (~95%, 2850 t/min, L14HS)", "type": "check" },
-          { "id": "tg-s7b", "title": "Fermeture automatique des vannes anti-pompage", "type": "check" },
-          { "id": "tg-s7c", "title": "Ouverture des I.G.V. à 57°", "type": "check", "details": "Alarme : Défaut position I.G.V. (L86GVT-FAULT). Danger : Élevé (Risque de pompage). Remède : Vérifier transmetteurs LVDT (96 TV-1, 2) et servovalve 90 TV." },
-          { "id": "tg-s7d", "title": "Signal 'Séquence complète' émis (vitesse stabilisée à 3000 t/min)", "type": "check" }
-        ]
-      },
-      {
-        "id": "tg-s8",
-        "title": "Étape 8 : Synchronisation",
-        "type": "group",
-        "steps": [
-          { "id": "tg-s8a", "title": "Référence de vitesse portée à 100.3% (3009 t/min)", "type": "check", "details": "Alarme : Survitesse électrique (L12H). Danger : Critique. Remède : Déclenchement immédiat, réarmement manuel requis." },
-          { "id": "tg-s8b", "title": "Fermeture du disjoncteur de l'alternateur (L25)", "type": "check", "details": "Alarme : Déclenchement détection gaz (L45HHTRP). Danger : Critique (Risque d'explosion). Remède : Fermeture vannes et ventilation forcée." }
-        ]
-      }
-    ]
-  },
-  {
-    "id": "gas-turbine-shutdown",
-    "name": "Arrêt Turbine à Gaz",
-    "description": "Procédures d'arrêt normal, d'urgence et de refroidissement de la turbine à gaz.",
-    "version": "1.0.0",
-    "steps": [
-      {
-        "id": "gts-s1",
-        "title": "Mode 1 : Arrêt Normal (Programmé)",
-        "type": "group",
-        "details": "Procédure graduelle destinée à minimiser les contraintes thermiques.",
-        "steps": [
-          { "id": "gts-s1a", "title": "Initier l'arrêt", "type": "check", "details": "Appuyer sur le bouton STOP puis EXECUTE pour générer le signal L94X." },
-          { "id": "gts-s1b", "title": "Observer la réduction de charge", "type": "instruction", "details": "Si la turbine est couplée, la charge est réduite progressivement (baisse du FSR)." },
-          { "id": "gts-s1c", "title": "Vérifier l'ouverture du disjoncteur", "type": "check", "details": "Le disjoncteur de l'alternateur doit s'ouvrir automatiquement par retour de puissance." },
-          { "id": "gts-s1d", "title": "Surveiller la décélération avec flamme", "type": "check", "details": "La flamme est maintenue jusqu'à environ 40-50% de la vitesse nominale (signal L14HA)." },
-          { "id": "gts-s1e", "title": "Confirmer la coupure du combustible", "type": "check", "details": "À l'atteinte du seuil L14HA, le FSR est forcé à zéro et les vannes d'arrêt combustible se ferment." },
-          { "id": "gts-s1f", "title": "Vérifier le refroidissement des auxiliaires", "type": "check", "details": "Les ventilateurs du compartiment turbine doivent continuer de tourner pour dissiper la chaleur." }
-        ]
-      },
-      {
-        "id": "gts-s2",
-        "title": "Mode 2 : Arrêt d'Urgence (Déclenchement)",
-        "type": "group",
-        "details": "Actions automatiques en cas de dépassement des limites de sécurité.",
-        "steps": [
-            { "id": "gts-s2a", "title": "Identifier la cause du déclenchement", "type": "instruction", "details": "Causes typiques: Survitesse (L12H), surchauffe (L86TXT), vibrations excessives, perte de flamme (L28FD)." },
-            { "id": "gts-s2b", "title": "Constater l'action immédiate", "type": "instruction", "details": "Le circuit maître de protection L4 est désexcité, entraînant une fermeture rapide (<0.5s) des vannes de combustible." },
-            { "id": "gts-s2c", "title": "Vérifier la configuration de sécurité", "type": "instruction", "details": "Les vannes anti-pompage doivent s'ouvrir et les aubes orientables (I.G.V.) se ferment." }
-        ]
-      },
-      {
-        "id": "gts-s3",
-        "title": "Phase 3 : Virage et Refroidissement (Post-Arrêt)",
-        "type": "group",
-        "details": "Séquence indispensable pour éviter la flèche thermique de l'arbre.",
-        "steps": [
-          { "id": "gts-s3a", "title": "Vérifier la lubrification de maintien", "type": "check", "details": "La pompe à huile auxiliaire (88QA) doit démarrer automatiquement sous 95% de vitesse (L14HS)." },
-          { "id": "gts-s3b", "title": "Confirmer la mise au virage", "type": "check", "details": "Le moteur de virage (88TG) doit démarrer lorsque la vitesse descend à environ 48-50 t/min." },
-          { "id": "gts-s3c", "title": "Surveiller la rotation lente", "type": "instruction", "details": "L'arbre est maintenu en rotation à ~120 t/min pour un refroidissement uniforme." },
-          { "id": "gts-s3d", "title": "Noter la durée de la séquence", "type": "instruction", "details": "Le refroidissement doit durer au moins 20 heures et son arrêt est manuel." }
-        ]
-      },
-       {
-        "id": "gts-s4",
-        "title": "Paramètres et Signaux Clés de l'Arrêt",
-        "type": "group",
-        "details": "Récapitulatif des seuils et actions automatiques.",
-        "steps": [
-          { "id": "gts-s4a", "title": "Vitesse de service (L14HS - 95%)", "type": "instruction", "details": "Action : Démarrage de la pompe à huile auxiliaire 88QA." },
-          { "id": "gts-s4b", "title": "Vitesse de coupure fuel (L14HA - 40-50%)", "type": "instruction", "details": "Action : Fermeture des vannes d'arrêt en mode d'arrêt normal." },
-          { "id": "gts-s4c", "title": "Vitesse de virage (~48 R.P.M.)", "type": "instruction", "details": "Action : Mise en route du moteur de rotation 88TG." },
-          { "id": "gts-s4d", "title": "Surveillance huile (88QE)", "type": "instruction", "details": "Action : La pompe de secours prend le relais en cas de perte de courant alternatif." }
         ]
       }
     ]
@@ -278,6 +135,7 @@
     "name": "Démarrage Automatique (KCA)",
     "description": "Procédure de démarrage automatique du cycle combiné via l'automate KCA, contrôlant les communs, les deux chaudières et la turbine à vapeur à travers 7 phases.",
     "version": "1.0.0",
+    "category": "Démarrage et Opérations",
     "steps": [
       {
         "id": "kca-s1",
@@ -373,10 +231,427 @@
     ]
   },
   {
+    "id": "gas-turbine-startup",
+    "name": "Démarrage Turbine à Gaz (MS 9001 E)",
+    "description": "Procédure de démarrage de la turbine à gaz, du lancement à la synchronisation, avec alarmes intégrées.",
+    "version": "1.1.0",
+    "category": "Démarrage et Opérations",
+    "steps": [
+      {
+        "id": "tg-s1",
+        "title": "Étape 1 : Conditions Préalables (Permissifs)",
+        "type": "group",
+        "details": "Vérification des sécurités et systèmes auxiliaires par le Speedtronic Mark IV.",
+        "steps": [
+          {
+            "id": "tg-s1a",
+            "title": "Vérifier la viscosité de l'huile",
+            "type": "check",
+            "details": "Alarme associée : Température huile basse (L26QN-1). Danger : Moyen (Empêche le lancement si > 800 SSU). Remède : Activer les résistances de chauffage de la cuve (23 QT) et la pompe auxiliaire."
+          },
+          {
+            "id": "tg-s1b",
+            "title": "Vérifier les capteurs de vibration",
+            "type": "check",
+            "details": "Alarme associée : Inhibition démarrage vibrations. Danger : Élevé (Blocage du démarrage). Remède : Vérifier/remplacer les transducteurs si ≥ 3 (turbine) or ≥ 2 (alternateur) sont défectueux."
+          },
+          {
+            "id": "tg-s1c",
+            "title": "Vérifier ouverture vannes anti-pompage",
+            "type": "check",
+            "details": "Doivent être 100% ouvertes (33 CB-1 à 4). Alarme : L33CB-FAULT. Danger : Critique (Risque de pompage compresseur). Remède : Vérifier l'alimentation en air comprimé et les fins de course."
+          },
+          {
+            "id": "tg-s1d",
+            "title": "Vérifier position des aubes orientables (I.G.V.)",
+            "type": "check",
+            "details": "Doivent être en position fermée (34°). Alarme : L86GVT-FAULT. Danger : Élevé. Remède : Vérifier transmetteurs LVDT (96 TV-1, 2) et servovalve 90 TV."
+          }
+        ]
+      },
+      {
+        "id": "tg-s2",
+        "title": "Étape 2 : Lancement et Décollement (Breakaway)",
+        "type": "group",
+        "steps": [
+          {
+            "id": "tg-s2a",
+            "title": "Activer le circuit maître 'L1_START'",
+            "type": "check",
+            "details": "Engage l'embrayage et le moteur de lancement (88 CR). Alarme : Défaut de rotation (L14HR-FAULT). Danger : Élevé. Remède : Vérifier engagement embrayage et niveau de fluide du convertisseur."
+          },
+          {
+            "id": "tg-s2b",
+            "title": "Confirmer la désactivation du signal de vitesse nulle (L14HR)",
+            "type": "check",
+            "details": "Se désactive dès que l'arbre de la turbine commence à tourner."
+          }
+        ]
+      },
+      {
+        "id": "tg-s3",
+        "title": "Étape 3 : Cycle de Purge",
+        "type": "group",
+        "steps": [
+          {
+            "id": "tg-s3a",
+            "title": "Maintenir la vitesse de purge (~18%, 540 t/min)",
+            "type": "check",
+            "details": "La vitesse est maintenue par le moteur de lancement (L14HM)."
+          },
+          {
+            "id": "tg-s3b",
+            "title": "Attendre la fin de la temporisation de sécurité (L2TV)",
+            "type": "check",
+            "details": "Évacue les gaz résiduels. Alarme : Purge interrompue (L2TV-FAIL). Danger : Élevé (Risque d'explosion). Remède : Assurer la stabilité de la vitesse et relancer le cycle."
+          }
+        ]
+      },
+      {
+        "id": "tg-s4",
+        "title": "Étape 4 : Allumage et Détection de Flamme",
+        "type": "group",
+        "steps": [
+          {
+            "id": "tg-s4a",
+            "title": "Vérifier le débit de combustible au niveau 'allumage'",
+            "type": "check"
+          },
+          {
+            "id": "tg-s4b",
+            "title": "Vérifier l'activation des bougies d'allumage (95SP)",
+            "type": "check"
+          },
+          {
+            "id": "tg-s4c",
+            "title": "Confirmer la détection de flamme (L28FD)",
+            "type": "check",
+            "details": "Validée par au moins 2/4 détecteurs UV. Alarme : Faux départ (L2F-FAIL). Danger : Moyen. Remède : Le système draine les imbrûlés (VA 17-1/2), une nouvelle purge est obligatoire."
+          },
+          {
+            "id": "tg-s4d",
+            "title": "Surveiller le débit de combustible liquide",
+            "type": "check",
+            "details": "Alarme : Défaut débit liquide (L60FFLH). Danger: Élevé. Remède : Vérifier la servovalve de dérivation (65 FP) et réarmer."
+          }
+        ]
+      },
+      {
+        "id": "tg-s5",
+        "title": "Étape 5 : Phase de Réchauffement (Warm-up)",
+        "type": "group",
+        "steps": [
+          {
+            "id": "tg-s5a",
+            "title": "FSR réduit au niveau 'Montée en température' pendant L2W",
+            "type": "check",
+            "details": "Alarme : Écart de température (L30SPA). Danger : Moyen. Remède : Inspecter injecteurs et thermocouples."
+          }
+        ]
+      },
+      {
+        "id": "tg-s6",
+        "title": "Étape 6 : Accélération",
+        "type": "group",
+        "steps": [
+          {
+            "id": "tg-s6a",
+            "type": "instruction",
+            "title": "Le FSR suit une pente croissante.",
+            "details": "Alarme : Vibrations élevées (VIB-HIGH-TRIP). Danger : Critique (Arrêt d'urgence). Remède : Inspection mécanique des paliers, équilibrage rotor."
+          },
+          {
+            "id": "tg-s6b",
+            "type": "instruction",
+            "title": "Retrait des bougies à 50% de vitesse (1500 t/min).",
+            "details": "Alarme : Surchauffe échappement (L30TXA). Danger : Élevé. Remède : Le Speedtronic réduit le FSR ; vérifier le contrôle de température (TTXM)."
+          },
+          {
+            "id": "tg-s6c",
+            "title": "Désengagement du moteur de lancement",
+            "type": "check",
+            "details": "Se produit entre 50% et 70% de vitesse (L14HC)."
+          }
+        ]
+      },
+      {
+        "id": "tg-s7",
+        "title": "Étape 7 : Pleine Vitesse à Vide (FSNL)",
+        "type": "group",
+        "steps": [
+          {
+            "id": "tg-s7a",
+            "title": "Vitesse de service atteinte (~95%, 2850 t/min, L14HS)",
+            "type": "check"
+          },
+          {
+            "id": "tg-s7b",
+            "title": "Fermeture automatique des vannes anti-pompage",
+            "type": "check"
+          },
+          {
+            "id": "tg-s7c",
+            "title": "Ouverture des I.G.V. à 57°",
+            "type": "check",
+            "details": "Alarme : Défaut position I.G.V. (L86GVT-FAULT). Danger : Élevé (Risque de pompage). Remède : Vérifier transmetteurs LVDT (96 TV-1, 2) et servovalve 90 TV."
+          },
+          {
+            "id": "tg-s7d",
+            "title": "Signal 'Séquence complète' émis (vitesse stabilisée à 3000 t/min)",
+            "type": "check"
+          }
+        ]
+      },
+      {
+        "id": "tg-s8",
+        "title": "Étape 8 : Synchronisation",
+        "type": "group",
+        "steps": [
+          {
+            "id": "tg-s8a",
+            "title": "Référence de vitesse portée à 100.3% (3009 t/min)",
+            "type": "check",
+            "details": "Alarme : Survitesse électrique (L12H). Danger : Critique. Remède : Déclenchement immédiat, réarmement manuel requis."
+          },
+          {
+            "id": "tg-s8b",
+            "title": "Fermeture du disjoncteur de l'alternateur (L25)",
+            "type": "check",
+            "details": "Alarme : Déclenchement détection gaz (L45HHTRP). Danger : Critique (Risque d'explosion). Remède : Fermeture vannes et ventilation forcée."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "sva-startup",
+    "name": "Mise en Service du Système Vapeur Auxiliaire (SVA)",
+    "description": "Détaille le rôle et la séquence de mise en service du SVA lors d'un redémarrage.",
+    "version": "1.0.0",
+    "category": "Démarrage et Opérations",
+    "steps": [
+      {
+        "id": "sva-s1",
+        "title": "Phase 1 : Rôle et Consommateurs du SVA",
+        "type": "group",
+        "steps": [
+          {
+            "id": "sva-s1a",
+            "title": "Confirmer les 4 fonctions critiques du SVA",
+            "type": "instruction",
+            "details": "Le SVA détend et désurchauffe la vapeur HP pour alimenter :\n- Les labyrinthes d'étanchéité de la TV.\n- Les éjecteurs de vide du condenseur.\n- Le réchauffage de masse de l'eau dans la bâche alimentaire (ADG).\n- La vapeur de dégazage de la bâche alimentaire."
+          }
+        ]
+      },
+      {
+        "id": "sva-s2",
+        "title": "Phase 2 : Provenance de la vapeur au redémarrage",
+        "type": "group",
+        "steps": [
+          {
+            "id": "sva-s2a",
+            "title": "Vérifier la source de vapeur",
+            "type": "check",
+            "details": "Deux scénarios possibles :\n- **Source externe (Etape A)** : La vanne UV 002 est ouverte, fournissant la vapeur immédiatement.\n- **Redémarrage autonome** : Attendre que la pression HP de la première chaudière atteigne environ 40 bar abs."
+          }
+        ]
+      },
+      {
+        "id": "sva-s3",
+        "title": "Phase 3 : Séquence de mise en service des auxiliaires",
+        "type": "group",
+        "details": "S'active une fois la source de vapeur confirmée.",
+        "steps": [
+          {
+            "id": "sva-s3a",
+            "title": "a - Alimentation des étanchéités Turbine",
+            "type": "check",
+            "details": "Les labyrinthes sont alimentés en premier pour 'sceller' la turbine.\nParamètres critiques:\n- Pression SVA : 7 bars\n- Température SVA : 250 °C"
+          },
+          {
+            "id": "sva-s3b",
+            "title": "b - Mise sous vide du condenseur (CVI)",
+            "type": "check",
+            "details": "L'éjecteur de démarrage s'active automatiquement dès que les labyrinthes sont alimentés.\nParamètres critiques:\n- Pression vapeur motrice : 8,7 bar abs"
+          },
+          {
+            "id": "sva-s3c",
+            "title": "c - Prise de relais par l'éjecteur d'entretien",
+            "type": "instruction",
+            "details": "L'éjecteur de démarrage s'arrête lorsque le vide atteint 150 mbar abs, et l'éjecteur d'entretien prend le relais."
+          }
+        ]
+      },
+      {
+        "id": "sva-s4",
+        "title": "Phase 4 : Paramètres critiques et Sécurités",
+        "type": "group",
+        "steps": [
+          {
+            "id": "sva-s4a",
+            "title": "Surveiller les conditions de déclenchement du SVA",
+            "type": "instruction",
+            "details": "Le système se déclenche (fermeture UV 001) si :\n- Pression SVA très haute (PSHH 001).\n- Température SVA > 325 °C (TSHH 002).\n- Pression d'eau de désurchauffe insuffisante."
+          },
+          {
+            "id": "sva-s4b",
+            "title": "Vérifier la régulation de pression",
+            "type": "instruction",
+            "details": "La pression est maintenue constante par les vannes PCV 001 et PCV 002 en mode 'split-range'."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "gas-turbine-shutdown",
+    "name": "Arrêt Turbine à Gaz",
+    "description": "Procédures d'arrêt normal, d'urgence et de refroidissement de la turbine à gaz.",
+    "version": "1.0.0",
+    "category": "Arrêt et Maintenance",
+    "steps": [
+      {
+        "id": "gts-s1",
+        "title": "Mode 1 : Arrêt Normal (Programmé)",
+        "type": "group",
+        "details": "Procédure graduelle destinée à minimiser les contraintes thermiques.",
+        "steps": [
+          {
+            "id": "gts-s1a",
+            "title": "Initier l'arrêt",
+            "type": "check",
+            "details": "Appuyer sur le bouton STOP puis EXECUTE pour générer le signal L94X."
+          },
+          {
+            "id": "gts-s1b",
+            "title": "Observer la réduction de charge",
+            "type": "instruction",
+            "details": "Si la turbine est couplée, la charge est réduite progressivement (baisse du FSR)."
+          },
+          {
+            "id": "gts-s1c",
+            "title": "Vérifier l'ouverture du disjoncteur",
+            "type": "check",
+            "details": "Le disjoncteur de l'alternateur doit s'ouvrir automatiquement par retour de puissance."
+          },
+          {
+            "id": "gts-s1d",
+            "title": "Surveiller la décélération avec flamme",
+            "type": "check",
+            "details": "La flamme est maintenue jusqu'à environ 40-50% de la vitesse nominale (signal L14HA)."
+          },
+          {
+            "id": "gts-s1e",
+            "title": "Confirmer la coupure du combustible",
+            "type": "check",
+            "details": "À l'atteinte du seuil L14HA, le FSR est forcé à zéro et les vannes d'arrêt combustible se ferment."
+          },
+          {
+            "id": "gts-s1f",
+            "title": "Vérifier le refroidissement des auxiliaires",
+            "type": "check",
+            "details": "Les ventilateurs du compartiment turbine doivent continuer de tourner pour dissiper la chaleur."
+          }
+        ]
+      },
+      {
+        "id": "gts-s2",
+        "title": "Mode 2 : Arrêt d'Urgence (Déclenchement)",
+        "type": "group",
+        "details": "Actions automatiques en cas de dépassement des limites de sécurité.",
+        "steps": [
+          {
+            "id": "gts-s2a",
+            "title": "Identifier la cause du déclenchement",
+            "type": "instruction",
+            "details": "Causes typiques: Survitesse (L12H), surchauffe (L86TXT), vibrations excessives, perte de flamme (L28FD)."
+          },
+          {
+            "id": "gts-s2b",
+            "title": "Constater l'action immédiate",
+            "type": "instruction",
+            "details": "Le circuit maître de protection L4 est désexcité, entraînant une fermeture rapide (<0.5s) des vannes de combustible."
+          },
+          {
+            "id": "gts-s2c",
+            "title": "Vérifier la configuration de sécurité",
+            "type": "instruction",
+            "details": "Les vannes anti-pompage doivent s'ouvrir et les aubes orientables (I.G.V.) se ferment."
+          }
+        ]
+      },
+      {
+        "id": "gts-s3",
+        "title": "Phase 3 : Virage et Refroidissement (Post-Arrêt)",
+        "type": "group",
+        "details": "Séquence indispensable pour éviter la flèche thermique de l'arbre.",
+        "steps": [
+          {
+            "id": "gts-s3a",
+            "title": "Vérifier la lubrification de maintien",
+            "type": "check",
+            "details": "La pompe à huile auxiliaire (88QA) doit démarrer automatiquement sous 95% de vitesse (L14HS)."
+          },
+          {
+            "id": "gts-s3b",
+            "title": "Confirmer la mise au virage",
+            "type": "check",
+            "details": "Le moteur de virage (88TG) doit démarrer lorsque la vitesse descend à environ 48-50 t/min."
+          },
+          {
+            "id": "gts-s3c",
+            "title": "Surveiller la rotation lente",
+            "type": "instruction",
+            "details": "L'arbre est maintenu en rotation à ~120 t/min pour un refroidissement uniforme."
+          },
+          {
+            "id": "gts-s3d",
+            "title": "Noter la durée de la séquence",
+            "type": "instruction",
+            "details": "Le refroidissement doit durer au moins 20 heures et son arrêt est manuel."
+          }
+        ]
+      },
+      {
+        "id": "gts-s4",
+        "title": "Paramètres et Signaux Clés de l'Arrêt",
+        "type": "group",
+        "details": "Récapitulatif des seuils et actions automatiques.",
+        "steps": [
+          {
+            "id": "gts-s4a",
+            "title": "Vitesse de service (L14HS - 95%)",
+            "type": "instruction",
+            "details": "Action : Démarrage de la pompe à huile auxiliaire 88QA."
+          },
+          {
+            "id": "gts-s4b",
+            "title": "Vitesse de coupure fuel (L14HA - 40-50%)",
+            "type": "instruction",
+            "details": "Action : Fermeture des vannes d'arrêt en mode d'arrêt normal."
+          },
+          {
+            "id": "gts-s4c",
+            "title": "Vitesse de virage (~48 R.P.M.)",
+            "type": "instruction",
+            "details": "Action : Mise en route du moteur de rotation 88TG."
+          },
+          {
+            "id": "gts-s4d",
+            "title": "Surveillance huile (88QE)",
+            "type": "instruction",
+            "details": "Action : La pompe de secours prend le relais en cas de perte de courant alternatif."
+          }
+        ]
+      }
+    ]
+  },
+  {
     "id": "single-boiler-shutdown",
     "name": "Arrêt d'une chaudière seule (KCA)",
     "description": "Procédure d'arrêt d'une seule chaudière (l'autre restant en service) via l'automate KCA, basée sur la Table 3.",
     "version": "1.0.0",
+    "category": "Arrêt et Maintenance",
     "steps": [
       {
         "id": "sbs-s1",
@@ -462,6 +737,7 @@
     "name": "Redémarrage Après Déclenchement",
     "description": "Conditions de sécurité et de stabilisation thermique pour ramener le cycle combiné à un état opérationnel après un déclenchement.",
     "version": "1.0.0",
+    "category": "Analyse et Sécurité",
     "steps": [
       {
         "id": "ptr-s1",
@@ -548,89 +824,11 @@
     ]
   },
   {
-    "id": "sva-startup",
-    "name": "Mise en Service du Système Vapeur Auxiliaire (SVA)",
-    "description": "Détaille le rôle et la séquence de mise en service du SVA lors d'un redémarrage.",
-    "version": "1.0.0",
-    "steps": [
-      {
-        "id": "sva-s1",
-        "title": "Phase 1 : Rôle et Consommateurs du SVA",
-        "type": "group",
-        "steps": [
-          {
-            "id": "sva-s1a",
-            "title": "Confirmer les 4 fonctions critiques du SVA",
-            "type": "instruction",
-            "details": "Le SVA détend et désurchauffe la vapeur HP pour alimenter :\n- Les labyrinthes d'étanchéité de la TV.\n- Les éjecteurs de vide du condenseur.\n- Le réchauffage de masse de l'eau dans la bâche alimentaire (ADG).\n- La vapeur de dégazage de la bâche alimentaire."
-          }
-        ]
-      },
-      {
-        "id": "sva-s2",
-        "title": "Phase 2 : Provenance de la vapeur au redémarrage",
-        "type": "group",
-        "steps": [
-          {
-            "id": "sva-s2a",
-            "title": "Vérifier la source de vapeur",
-            "type": "check",
-            "details": "Deux scénarios possibles :\n- **Source externe (Etape A)** : La vanne UV 002 est ouverte, fournissant la vapeur immédiatement.\n- **Redémarrage autonome** : Attendre que la pression HP de la première chaudière atteigne environ 40 bar abs."
-          }
-        ]
-      },
-      {
-        "id": "sva-s3",
-        "title": "Phase 3 : Séquence de mise en service des auxiliaires",
-        "type": "group",
-        "details": "S'active une fois la source de vapeur confirmée.",
-        "steps": [
-          {
-            "id": "sva-s3a",
-            "title": "a - Alimentation des étanchéités Turbine",
-            "type": "check",
-            "details": "Les labyrinthes sont alimentés en premier pour 'sceller' la turbine.\nParamètres critiques:\n- Pression SVA : 7 bars\n- Température SVA : 250 °C"
-          },
-          {
-            "id": "sva-s3b",
-            "title": "b - Mise sous vide du condenseur (CVI)",
-            "type": "check",
-            "details": "L'éjecteur de démarrage s'active automatiquement dès que les labyrinthes sont alimentés.\nParamètres critiques:\n- Pression vapeur motrice : 8,7 bar abs"
-          },
-          {
-            "id": "sva-s3c",
-            "title": "c - Prise de relais par l'éjecteur d'entretien",
-            "type": "instruction",
-            "details": "L'éjecteur de démarrage s'arrête lorsque le vide atteint 150 mbar abs, et l'éjecteur d'entretien prend le relais."
-          }
-        ]
-      },
-      {
-        "id": "sva-s4",
-        "title": "Phase 4 : Paramètres critiques et Sécurités",
-        "type": "group",
-        "steps": [
-          {
-            "id": "sva-s4a",
-            "title": "Surveiller les conditions de déclenchement du SVA",
-            "type": "instruction",
-            "details": "Le système se déclenche (fermeture UV 001) si :\n- Pression SVA très haute (PSHH 001).\n- Température SVA > 325 °C (TSHH 002).\n- Pression d'eau de désurchauffe insuffisante."
-          },
-          {
-            "id": "sva-s4b",
-            "title": "Vérifier la régulation de pression",
-            "type": "instruction",
-            "details": "La pression est maintenue constante par les vannes PCV 001 et PCV 002 en mode 'split-range'."
-          }
-        ]
-      }
-    ]
-  },
-  {
     "id": "boiler-trip-causes",
     "name": "Déclenchement Chaudière (Causes Communes)",
     "description": "Analyse des causes de déclenchement (trip) d'une chaudière de récupération, gérées par le système de Sécurité Générale Chaudière (FSE).",
     "version": "2.0.0",
+    "category": "Analyse et Sécurité",
     "steps": [
       {
         "id": "btc-s1",
@@ -638,11 +836,36 @@
         "type": "group",
         "details": "Le système FSE provoque un déclenchement immédiat et la fermeture à grande vitesse du registre (diverter) si l'une des 10 conditions suivantes est perdue.",
         "steps": [
-          { "id": "btc-s1a", "type": "instruction", "title": "Perte de la Turbine à Gaz (TG) : La TG associée doit être en service et synchronisée au réseau." },
-          { "id": "btc-s1b", "type": "instruction", "title": "Perte des auxiliaires de pompage : Absence d'au moins une pompe alimentaire HP (APH), une pompe alimentaire BP (APB) ou une pompe d'extraction (CEX) en service." },
-          { "id": "btc-s1c", "type": "instruction", "title": "Défaut de circulation : Arrêt ou pression différentielle (ΔP) incorrecte sur les pompes de circulation HP (FSR) ou BP (FLB)." },
-          { "id": "btc-s1d", "type": "instruction", "title": "Niveaux de sécurité : Absence de détection du niveau de gonflement dans les ballons HP (-475 mm) ou BP (-580 mm)." },
-          { "id": "btc-s1e", "type": "instruction", "title": "Protection vapeur : Présence d'eau détectée dans les pots de condensats de vapeur de surchauffe HP ou BP." }
+          {
+            "id": "btc-s1a",
+            "type": "instruction",
+            "title": "Perte de la Turbine à Gaz (TG)",
+            "details": "La TG associée doit être en service et synchronisée au réseau."
+          },
+          {
+            "id": "btc-s1b",
+            "type": "instruction",
+            "title": "Perte des auxiliaires de pompage",
+            "details": "Absence d'au moins une pompe alimentaire HP (APH), une pompe alimentaire BP (APB) ou une pompe d'extraction (CEX) en service."
+          },
+          {
+            "id": "btc-s1c",
+            "type": "instruction",
+            "title": "Défaut de circulation",
+            "details": "Arrêt ou pression différentielle (ΔP) incorrecte sur les pompes de circulation HP (FSR) ou BP (FLB)."
+          },
+          {
+            "id": "btc-s1d",
+            "type": "instruction",
+            "title": "Niveaux de sécurité",
+            "details": "Absence de détection du niveau de gonflement dans les ballons HP (-475 mm) ou BP (-580 mm)."
+          },
+          {
+            "id": "btc-s1e",
+            "type": "instruction",
+            "title": "Protection vapeur",
+            "details": "Présence d'eau détectée dans les pots de condensats de vapeur de surchauffe HP ou BP."
+          }
         ]
       },
       {
@@ -651,10 +874,30 @@
         "type": "group",
         "details": "Des niveaux extrêmes, mesurés par des relais de seuil, déclenchent la chaudière pour protéger les tubes ou la turbine à vapeur.",
         "steps": [
-          { "id": "btc-s2a", "type": "instruction", "title": "Ballon Haute Pression (HP) : Déclenchement si le niveau est très haut (NTH > +500 mm) ou très bas (NTB < -675 mm)." },
-          { "id": "btc-s2b", "type": "instruction", "title": "Ballon Basse Pression (BP) : Déclenchement si le niveau est très haut (NTH > +450 mm) ou très bas (NTB < -750 mm)." },
-          { "id": "btc-s2c", "type": "instruction", "title": "Bâche Alimentaire (ADG) : Un niveau très haut (LSHH 001 > 2850 mm) provoque le déclenchement des pompes CEX, ce qui entraîne par cascade le déclenchement de la chaudière." },
-          { "id": "btc-s2d", "type": "instruction", "title": "Condenseur : Un niveau très haut (LSHH 001 > 1000 mm) provoque le déclenchement de la Turbine à Vapeur, ce qui peut mener au déclenchement chaudière si le contournement n'est pas disponible." }
+          {
+            "id": "btc-s2a",
+            "type": "instruction",
+            "title": "Ballon Haute Pression (HP)",
+            "details": "Déclenchement si le niveau est très haut (NTH > +500 mm) ou très bas (NTB < -675 mm)."
+          },
+          {
+            "id": "btc-s2b",
+            "type": "instruction",
+            "title": "Ballon Basse Pression (BP)",
+            "details": "Déclenchement si le niveau est très haut (NTH > +450 mm) ou très bas (NTB < -750 mm)."
+          },
+          {
+            "id": "btc-s2c",
+            "type": "instruction",
+            "title": "Bâche Alimentaire (ADG)",
+            "details": "Un niveau très haut (LSHH 001 > 2850 mm) provoque le déclenchement des pompes CEX, ce qui entraîne par cascade le déclenchement de la chaudière."
+          },
+          {
+            "id": "btc-s2d",
+            "type": "instruction",
+            "title": "Condenseur",
+            "details": "Un niveau très haut (LSHH 001 > 1000 mm) provoque le déclenchement de la Turbine à Vapeur, ce qui peut mener au déclenchement chaudière si le contournement n'est pas disponible."
+          }
         ]
       },
       {
@@ -663,9 +906,24 @@
         "type": "group",
         "details": "",
         "steps": [
-            { "id": "btc-s3a", "type": "instruction", "title": "Indisponibilité du contournement (Bypass) : Si la turbine à vapeur déclenche et que le contournement est indisponible, la chaudière déclenche." },
-            { "id": "btc-s3b", "type": "instruction", "title": "Défaut d'évents : Si les évents de sortie chaudière (UV 008) restent fermés plus de 2 minutes alors que le contournement est indisponible." },
-            { "id": "btc-s3c", "type": "instruction", "title": "Pression au condenseur : Une pression supérieure au seuil maximal (> 300 mbar) rend le contournement indisponible, provoquant le déclenchement des chaudières." }
+          {
+            "id": "btc-s3a",
+            "type": "instruction",
+            "title": "Indisponibilité du contournement (Bypass)",
+            "details": "Si la turbine à vapeur déclenche et que le contournement est indisponible, la chaudière déclenche."
+          },
+          {
+            "id": "btc-s3b",
+            "type": "instruction",
+            "title": "Défaut d'évents",
+            "details": "Si les évents de sortie chaudière (UV 008) restent fermés plus de 2 minutes alors que le contournement est indisponible."
+          },
+          {
+            "id": "btc-s3c",
+            "type": "instruction",
+            "title": "Pression au condenseur",
+            "details": "Une pression supérieure au seuil maximal (> 300 mbar) rend le contournement indisponible, provoquant le déclenchement des chaudières."
+          }
         ]
       },
       {
@@ -674,8 +932,18 @@
         "type": "group",
         "details": "Le déclenchement d'une chaudière peut être la conséquence directe du trip de ses pompes principales.",
         "steps": [
-            { "id": "btc-s4a", "type": "instruction", "title": "Défaut des pompes de circulation (FSR/FLB) : Causé par une température de palier trop élevée (> 90 °C), un défaut électrique, ou une pression différentielle trop basse pendant plus de 5 secondes." },
-            { "id": "btc-s4b", "type": "instruction", "title": "Défaut des pompes alimentaires (APH/APB) : Causé par des vibrations excessives (> 6,3 mm/s), une température d'enroulement moteur trop haute (> 130 °C) ou une pression de refoulement insuffisante." }
+          {
+            "id": "btc-s4a",
+            "type": "instruction",
+            "title": "Défaut des pompes de circulation (FSR/FLB)",
+            "details": "Causé par une température de palier trop élevée (> 90 °C), un défaut électrique, ou une pression différentielle trop basse pendant plus de 5 secondes."
+          },
+          {
+            "id": "btc-s4b",
+            "type": "instruction",
+            "title": "Défaut des pompes alimentaires (APH/APB)",
+            "details": "Causé par des vibrations excessives (> 6,3 mm/s), une température d'enroulement moteur trop haute (> 130 °C) ou une pression de refoulement insuffisante."
+          }
         ]
       },
       {
@@ -684,9 +952,24 @@
         "type": "group",
         "details": "",
         "steps": [
-            { "id": "btc-s5a", "type": "instruction", "title": "Perte des énergies de contrôle : La défaillance de l'alimentation électrique (48 VCC) ou de l'air de régulation provoque la mise en sécurité (fermeture) des vannes de régulation d'eau, menant à un niveau bas ballon et au déclenchement." },
-            { "id": "btc-s5b", "type": "instruction", "title": "Défaut du registre (Diverter) : Si après un ordre de fermeture, le registre n'est pas fermé dans les 40 secondes, la Turbine à Gaz associée est alors déclenchée." },
-            { "id": "btc-s5c", "type": "instruction", "title": "Action Manuelle : Utilisation du bouton poussoir d'arrêt d'urgence de la chaudière en salle de commande." }
+          {
+            "id": "btc-s5a",
+            "type": "instruction",
+            "title": "Perte des énergies de contrôle",
+            "details": "La défaillance de l'alimentation électrique (48 VCC) ou de l'air de régulation provoque la mise en sécurité (fermeture) des vannes de régulation d'eau, menant à un niveau bas ballon et au déclenchement."
+          },
+          {
+            "id": "btc-s5b",
+            "type": "instruction",
+            "title": "Défaut du registre (Diverter)",
+            "details": "Si après un ordre de fermeture, le registre n'est pas fermé dans les 40 secondes, la Turbine à Gaz associée est alors déclenchée."
+          },
+          {
+            "id": "btc-s5c",
+            "type": "instruction",
+            "title": "Action Manuelle",
+            "details": "Utilisation du bouton poussoir d'arrêt d'urgence de la chaudière en salle de commande."
+          }
         ]
       },
       {
@@ -719,4 +1002,4 @@
   }
 ]
 
-    
+  

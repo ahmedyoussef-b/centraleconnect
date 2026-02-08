@@ -84,6 +84,7 @@ export interface Procedure {
     name: string;
     description: string;
     version: string;
+    category?: string;
     steps: ProcedureStep[];
 }
 
