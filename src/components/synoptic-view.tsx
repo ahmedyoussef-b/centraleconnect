@@ -2,7 +2,6 @@
 
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
@@ -29,9 +28,16 @@ const hotspots = [
   }
 ];
 
+// Path to the real synoptic image.
+// You should place your image file at `public/assets/synoptics/ccpp-main-synoptic.svg`
+const synopticImage = {
+    imageUrl: '/assets/synoptics/ccpp-main-synoptic.svg',
+    description: 'Schéma synoptique principal du cycle combiné',
+};
+
+
 export function SynopticView() {
   const router = useRouter();
-  const synopticImage = PlaceHolderImages.find(p => p.id === 'synoptic-diagram');
 
   const handleHotspotClick = (target: string) => {
     if (target === '#') {
@@ -51,8 +57,7 @@ export function SynopticView() {
                 alt={synopticImage.description}
                 width={1200}
                 height={800}
-                className="w-full h-auto rounded-md"
-                data-ai-hint={synopticImage.imageHint}
+                className="w-full h-auto rounded-md bg-muted" // Added bg-muted for better visibility if image is missing
             />
         ) : (
             <div className="w-full h-[600px] bg-muted rounded-md flex items-center justify-center">
@@ -79,7 +84,7 @@ export function SynopticView() {
           </Tooltip>
         ))}
          <div className="absolute top-2 left-2 bg-background/80 p-2 rounded-md">
-            <p className="text-xs text-muted-foreground">NOTE: Remplacez l'image de démo et ajustez les hotspots dans ce composant.</p>
+            <p className="text-xs text-muted-foreground">NOTE: Ajustez la position des hotspots pour correspondre à votre image.</p>
         </div>
       </div>
     </TooltipProvider>
