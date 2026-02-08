@@ -688,7 +688,35 @@
             { "id": "btc-s5b", "type": "instruction", "title": "Défaut du registre (Diverter) : Si après un ordre de fermeture, le registre n'est pas fermé dans les 40 secondes, la Turbine à Gaz associée est alors déclenchée." },
             { "id": "btc-s5c", "type": "instruction", "title": "Action Manuelle : Utilisation du bouton poussoir d'arrêt d'urgence de la chaudière en salle de commande." }
         ]
+      },
+      {
+        "id": "btc-s6",
+        "title": "6. Cause indirecte : Défaillance de la réfrigération principale (CRF)",
+        "type": "group",
+        "details": "Une défaillance du circuit d'eau de réfrigération principale (CRF) provoque une chaîne d'événements menant inévitablement au déclenchement de la chaudière.",
+        "steps": [
+          {
+            "id": "btc-s6a",
+            "type": "instruction",
+            "title": "Indisponibilité du contournement (Bypass)",
+            "details": "Le refroidissement du condenseur est perdu (signal CRF US 120/220), ce qui rend le bypass indisponible ou provoque sa fermeture forcée."
+          },
+          {
+            "id": "btc-s6b",
+            "type": "instruction",
+            "title": "Déclenchement de la Turbine à Vapeur (TV) par cascade",
+            "details": "La perte de refroidissement entraîne une montée en pression du condenseur (> 900 mbar), ce qui déclenche la TV."
+          },
+          {
+            "id": "btc-s6c",
+            "type": "instruction",
+            "title": "Déclenchement final de la chaudière",
+            "details": "Si la TV déclenche et que le bypass est indisponible (ce qui est le cas), la chaudière déclenche pour éviter une surpression."
+          }
+        ]
       }
     ]
   }
 ]
+
+    
