@@ -231,85 +231,6 @@
     ]
   },
   {
-    "id": "crf-pump-startup",
-    "name": "Démarrage Pompe de Réfrigération Principale (CRF)",
-    "description": "Procédure de démarrage d'une pompe de réfrigération principale (101 PO ou 201 PO), basée sur les systèmes CRF, KCA et CFI.",
-    "version": "1.0.0",
-    "category": "Auxiliaires",
-    "steps": [
-      {
-        "id": "crf-s1",
-        "title": "Phase 1 : Préparation et vérification des conditions d'armement",
-        "type": "group",
-        "steps": [
-          {
-            "id": "crf-s1a",
-            "title": "a - Vérification des servitudes et niveaux",
-            "type": "check",
-            "details": "Détails procédure :\nS'assurer de la disponibilité du groupe hydraulique 001 GO qui fournit l'huile de commande nécessaire aux vannes clapets de refoulement. Vérifier que les batardeaux d'aspiration sont retirés et que le bassin est alimenté.\nParamètres critiques:\n- Pression d'huile de commande adéquate (CRF PSLL 301).\n- Niveau du bassin d'aspiration supérieur à -5,00 m (relais de seuil CRF LSL 101).\n- Absence de défaut électrique sur le moteur 101 MO ou 201 MO."
-          },
-          {
-            "id": "crf-s1b",
-            "title": "b - Configuration de la ligne de réfrigération",
-            "type": "check",
-            "details": "Détails procédure :\nVérifier que la vanne d'aspiration manuelle (HV 101/201) est pleine ouverte (fin de course ZSH 101 détectée). S'assurer que la vanne clapet de refoulement (UV 101/201) est initialement fermée."
-          }
-        ]
-      },
-      {
-        "id": "crf-s2",
-        "title": "Phase 2 : Séquence de lancement et démarrage moteur",
-        "type": "group",
-        "steps": [
-          {
-            "id": "crf-s2a",
-            "title": "a - Pré-séquence de filtration (Système CFI)",
-            "type": "check",
-            "details": "Détails procédure :\nL'ordre de démarrage d'une pompe CRF lance automatiquement une séquence de lavage de la grille rotative associée (système CFI). Le moteur de la pompe ne sera mis sous tension que 6 minutes après le début de cette séquence.\nParamètres critiques:\n- Perte de charge sur la grille rotative associée < 200 mm CE (relais CFI LDSHH 192).\n- Grille rotative en position \"non en arrêt\"."
-          },
-          {
-            "id": "crf-s2b",
-            "title": "b - Mise sous tension du moteur",
-            "type": "check",
-            "details": "Détails procédure :\nUne fois les 6 minutes écoulées et les conditions CFI validées, l'automate envoie l'ordre de fermeture du disjoncteur moteur.\nParamètres critiques:\n- Tension d'alimentation moteur : 6,6 kV.\n- Vitesse de rotation nominale : 375 tr/mn."
-          }
-        ]
-      },
-      {
-        "id": "crf-s3",
-        "title": "Phase 3 : Mise en service hydraulique (Ouverture du refoulement)",
-        "type": "group",
-        "steps": [
-          {
-            "id": "crf-s3a",
-            "title": "a - Séquence d'ouverture de la vanne clapet (UV 101/201)",
-            "type": "check",
-            "details": "Détails procédure :\nLa vanne au refoulement s'ouvre automatiquement dès que le moteur démarre. Pour éviter les coups de bélier et assurer un remplissage progressif de la tuyauterie BONNA vers le condenseur, l'ouverture suit trois paliers :\n1. Ouverture rapide de 0 à 30 %.\n2. Maintien en position intermédiaire à 30 %.\n3. Ouverture finale de 30 à 100 %.\nParamètres critiques:\n- Temps de manoeuvre 0 à 30 % : 54 secondes.\n- Temps de maintien à 30 % : 150 secondes.\n- Temps de manoeuvre 30 à 100 % : 126 secondes."
-          }
-        ]
-      },
-      {
-        "id": "crf-s4",
-        "title": "Phase 4 : Surveillance en marche normale et sécurités",
-        "type": "group",
-        "steps": [
-          {
-            "id": "crf-s4a",
-            "title": "a - Paramètres de fonctionnement stabilisé",
-            "type": "check",
-            "details": "Détails procédure :\nUne fois la pompe à 100 % d'ouverture au refoulement, surveiller les paramètres mécaniques et thermiques. Le débit nominal d'une pompe est de 18 100 m3/h.\nParamètres critiques (Seuils de déclenchement/Trip):\n- Température paliers pompe ou moteur : > 90 °C.\n- Température enroulements moteur : > 120 °C.\n- Vibrations butée/paliers : > 4,5 mm/s.\n- Pression différentielle pompe trop faible (après 10s de marche).\n- Niveau bassin très bas : < -5,50 m."
-          },
-          {
-            "id": "crf-s4b",
-            "title": "b - Protection du condenseur",
-            "type": "instruction",
-            "details": "Au moins une pompe CRF doit être en service pour autoriser l'ouverture du contournement (Bypass) turbine vers le condenseur. La perte des deux pompes entraîne l'indisponibilité immédiate du bypass."
-          }
-        ]
-      }
-    ]
-  },
-  {
     "id": "gas-turbine-shutdown",
     "name": "Arrêt Turbine à Gaz",
     "description": "Procédure d'arrêt normal, d'urgence et de refroidissement de la turbine à gaz.",
@@ -967,5 +888,139 @@
         ]
       }
     ]
+  },
+  {
+    "id": "crf-pump-startup",
+    "name": "Démarrage Pompe de Réfrigération Principale (CRF)",
+    "description": "Procédure de démarrage d'une pompe de réfrigération principale (101 PO ou 201 PO), basée sur les systèmes CRF, KCA et CFI.",
+    "version": "1.0.0",
+    "category": "Auxiliaires",
+    "steps": [
+      {
+        "id": "crf-s1",
+        "title": "Phase 1 : Préparation et vérification des conditions d'armement",
+        "type": "group",
+        "steps": [
+          {
+            "id": "crf-s1a",
+            "title": "a - Vérification des servitudes et niveaux",
+            "type": "check",
+            "details": "Détails procédure :\nS'assurer de la disponibilité du groupe hydraulique 001 GO qui fournit l'huile de commande nécessaire aux vannes clapets de refoulement. Vérifier que les batardeaux d'aspiration sont retirés et que le bassin est alimenté.\nParamètres critiques:\n- Pression d'huile de commande adéquate (CRF PSLL 301).\n- Niveau du bassin d'aspiration supérieur à -5,00 m (relais de seuil CRF LSL 101).\n- Absence de défaut électrique sur le moteur 101 MO ou 201 MO."
+          },
+          {
+            "id": "crf-s1b",
+            "title": "b - Configuration de la ligne de réfrigération",
+            "type": "check",
+            "details": "Détails procédure :\nVérifier que la vanne d'aspiration manuelle (HV 101/201) est pleine ouverte (fin de course ZSH 101 détectée). S'assurer que la vanne clapet de refoulement (UV 101/201) est initialement fermée."
+          }
+        ]
+      },
+      {
+        "id": "crf-s2",
+        "title": "Phase 2 : Séquence de lancement et démarrage moteur",
+        "type": "group",
+        "steps": [
+          {
+            "id": "crf-s2a",
+            "title": "a - Pré-séquence de filtration (Système CFI)",
+            "type": "check",
+            "details": "Détails procédure :\nL'ordre de démarrage d'une pompe CRF lance automatiquement une séquence de lavage de la grille rotative associée (système CFI). Le moteur de la pompe ne sera mis sous tension que 6 minutes après le début de cette séquence.\nParamètres critiques:\n- Perte de charge sur la grille rotative associée < 200 mm CE (relais CFI LDSHH 192).\n- Grille rotative en position \"non en arrêt\"."
+          },
+          {
+            "id": "crf-s2b",
+            "title": "b - Mise sous tension du moteur",
+            "type": "check",
+            "details": "Détails procédure :\nUne fois les 6 minutes écoulées et les conditions CFI validées, l'automate envoie l'ordre de fermeture du disjoncteur moteur.\nParamètres critiques:\n- Tension d'alimentation moteur : 6,6 kV.\n- Vitesse de rotation nominale : 375 tr/mn."
+          }
+        ]
+      },
+      {
+        "id": "crf-s3",
+        "title": "Phase 3 : Mise en service hydraulique (Ouverture du refoulement)",
+        "type": "group",
+        "steps": [
+          {
+            "id": "crf-s3a",
+            "title": "a - Séquence d'ouverture de la vanne clapet (UV 101/201)",
+            "type": "check",
+            "details": "Détails procédure :\nLa vanne au refoulement s'ouvre automatiquement dès que le moteur démarre. Pour éviter les coups de bélier et assurer un remplissage progressif de la tuyauterie BONNA vers le condenseur, l'ouverture suit trois paliers :\n1. Ouverture rapide de 0 à 30 %.\n2. Maintien en position intermédiaire à 30 %.\n3. Ouverture finale de 30 à 100 %.\nParamètres critiques:\n- Temps de manoeuvre 0 à 30 % : 54 secondes.\n- Temps de maintien à 30 % : 150 secondes.\n- Temps de manoeuvre 30 à 100 % : 126 secondes."
+          }
+        ]
+      },
+      {
+        "id": "crf-s4",
+        "title": "Phase 4 : Surveillance en marche normale et sécurités",
+        "type": "group",
+        "steps": [
+          {
+            "id": "crf-s4a",
+            "title": "a - Paramètres de fonctionnement stabilisé",
+            "type": "check",
+            "details": "Détails procédure :\nUne fois la pompe à 100 % d'ouverture au refoulement, surveiller les paramètres mécaniques et thermiques. Le débit nominal d'une pompe est de 18 100 m3/h.\nParamètres critiques (Seuils de déclenchement/Trip):\n- Température paliers pompe ou moteur : > 90 °C.\n- Température enroulements moteur : > 120 °C.\n- Vibrations butée/paliers : > 4,5 mm/s.\n- Pression différentielle pompe trop faible (après 10s de marche).\n- Niveau bassin très bas : < -5,50 m."
+          },
+          {
+            "id": "crf-s4b",
+            "title": "b - Protection du condenseur",
+            "type": "instruction",
+            "details": "Au moins une pompe CRF doit être en service pour autoriser l'ouverture du contournement (Bypass) turbine vers le condenseur. La perte des deux pompes entraîne l'indisponibilité immédiate du bypass."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "crf-cfi-interaction",
+    "name": "Interaction Démarrage CRF-CFI",
+    "description": "Procédure détaillant l'interaction et les verrouillages de sécurité entre le système de filtration (CFI) et le démarrage d'une pompe de réfrigération principale (CRF).",
+    "version": "1.0.0",
+    "category": "Auxiliaires",
+    "steps": [
+      {
+        "id": "cfi-s1",
+        "title": "Phase 1 : Séquence de démarrage automatique",
+        "type": "group",
+        "steps": [
+          {
+            "id": "cfi-s1a",
+            "title": "a - Déclenchement de la séquence CFI",
+            "type": "instruction",
+            "details": "L'ordre de démarrage d'une pompe CRF (101 PO ou 201 PO) lance systématiquement une séquence de démarrage du système de filtration CFI associé, incluant la mise en marche de la grille rotative filtrante et de sa rampe de lavage."
+          },
+          {
+            "id": "cfi-s1b",
+            "title": "b - Temporisation de pré-lavage",
+            "type": "check",
+            "details": "Le moteur de la pompe CRF ne démarre pas immédiatement. Une temporisation est active pour garantir que la filtration est opérationnelle.\nDétails procédure :\nLa séquence de lavage de la grille rotative CFI doit fonctionner pendant 6 minutes avant que la mise sous tension du moteur de la pompe de circulation ne soit autorisée. Ce délai permet de s'assurer que les filtres sont propres.\nParamètres critiques:\n- Délai d'attente avant démarrage moteur CRF : 6 minutes."
+          }
+        ]
+      },
+      {
+        "id": "cfi-s2",
+        "title": "Phase 2 : Conditions de validation et sécurités",
+        "type": "group",
+        "steps": [
+          {
+            "id": "cfi-s2a",
+            "title": "a - Vérification des conditions logiques du CFI",
+            "type": "check",
+            "details": "Pour que l'automate valide le démarrage de la pompe CRF, plusieurs critères du système CFI doivent être réunis.\nDétails procédure :\n- Le système de filtration du bassin d'aspiration doit être en mode 'Automatique'.\n- La grille rotative doit être confirmée comme étant 'non en arrêt'.\nParamètres critiques:\n- Perte de charge grille rotative : < 200 mm CE (seuil d'alarme), < 500 mm CE (seuil de déclenchement)."
+          },
+          {
+            "id": "cfi-s2b",
+            "title": "b - Liaison mécanique et logique",
+            "type": "instruction",
+            "details": "En plus de l'automate, des filtres physiques dits 'filtres à moules' sont installés par le système CFI à l'entrée du condenseur pour compléter la filtration assurée par les grilles rotatives en amont."
+          }
+        ]
+      },
+      {
+        "id": "cfi-s3",
+        "title": "Résumé de la fonction de verrouillage",
+        "type": "instruction",
+        "details": "Le système CFI agit comme un verrou de sécurité : il impose un nettoyage préalable de l'eau d'aspiration et une attente de 6 minutes avant de permettre au moteur de la pompe CRF de s'enclencher, protégeant ainsi les échangeurs du condenseur contre l'encrassement immédiat."
+      }
+    ]
   }
 ]
+
+    
