@@ -11,6 +11,7 @@ import {
   Database,
   FlaskConical,
   LayoutDashboard,
+  LayoutGrid,
   Settings,
 } from 'lucide-react';
 import Link from 'next/link';
@@ -51,6 +52,7 @@ const VocalAssistant = dynamic(
 
 const pageTitles: { [key: string]: string } = {
     '/dashboard': 'Tableau de Bord',
+    '/synoptic': 'Synoptique Interactif',
     '/scada': 'Supervision SCADA',
     '/alarms': 'Liste des Alarmes',
     '/procedures': 'Procédures',
@@ -126,6 +128,14 @@ export default function MainLayout({
                           Tableau de Bord
                       </Link>
                   </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild tooltip="Synoptique" isActive={pathname === '/synoptic'}>
+                    <Link href="/synoptic">
+                        <LayoutGrid />
+                        Synoptique
+                    </Link>
+                </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
                   <SidebarMenuButton asChild tooltip="Supervision SCADA" isActive={pathname === '/scada'}>
