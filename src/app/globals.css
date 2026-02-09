@@ -80,25 +80,3 @@
     @apply bg-background text-foreground;
   }
 }
-
-@layer components {
-  .synoptic-diagram-override svg {
-    @apply h-auto w-full rounded-md bg-muted;
-  }
-  .synoptic-diagram-override svg *, .synoptic-diagram-override svg {
-    /* Set default colors */
-    stroke: hsl(var(--muted-foreground)) !important;
-    fill: transparent !important;
-  }
-  .synoptic-diagram-override svg text {
-    /* Text should be more visible */
-    fill: hsl(var(--foreground)) !important;
-    stroke: none !important;
-  }
-  .synoptic-diagram-override svg [data-external-id]:hover,
-  .synoptic-diagram-override svg [data-external-id]:focus {
-     /* Hover effect for interactive elements */
-    stroke: hsl(var(--primary)) !important;
-    cursor: pointer;
-  }
-}
