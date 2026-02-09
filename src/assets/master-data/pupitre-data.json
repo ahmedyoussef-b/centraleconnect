@@ -8,115 +8,10 @@
       "description": "High Pressure Reservoir",
       "criticality": "high",
       "ui": {
-        "path": "M 120 85 H 260 V 145 H 120 Z",
-        "color": "#ED8936",
-        "hoverEffect": "pulse",
-        "criticalityX": 250,
-        "criticalityY": 95
-      }
-    },
-    {
-      "id": "RESERVOIR_BP",
-      "name": "RESERVOIR BP",
-      "type": "Reservoir",
-      "description": "Low Pressure Reservoir",
-      "criticality": "medium",
-      "ui": {
-        "path": "M 120 155 H 260 V 215 H 120 Z",
-        "color": "#4299E1",
-        "criticalityX": 250,
-        "criticalityY": 165
-      }
-    },
-    {
-      "id": "POMPES_ALIM_HP",
-      "name": "POMPES ALIM HP",
-      "type": "Pump",
-      "description": "High Pressure Feed Pumps",
-      "criticality": "critical",
-      "ui": {
-        "path": "M 270 85 H 330 V 145 H 270 Z",
+        "path": "M120,85 L120,145 L260,145 L260,85 Z",
         "color": "#E53E3E",
-        "criticalityX": 320,
-        "criticalityY": 95
-      }
-    },
-    {
-      "id": "POMPES_ALIM_BP",
-      "name": "POMPES ALIM BP",
-      "type": "Pump",
-      "description": "Low Pressure Feed Pumps",
-      "criticality": "high",
-      "ui": {
-        "path": "M 270 155 H 330 V 215 H 270 Z",
-        "color": "#ED8936",
-        "criticalityX": 320,
-        "criticalityY": 165
-      }
-    },
-    {
-      "id": "BALLON_PURGES_CR",
-      "name": "BALLON PURGES CR",
-      "type": "Drum",
-      "description": "CR Purge Drum",
-      "criticality": "medium",
-      "ui": {
-        "path": "M 530 85 H 630 V 135 H 530 Z",
-        "color": "#4299E1",
-        "criticalityX": 620,
-        "criticalityY": 95
-      }
-    },
-    {
-      "id": "CONDENSEUR",
-      "name": "CONDENSEUR",
-      "type": "Condenser",
-      "description": "Steam Condenser",
-      "criticality": "critical",
-      "ui": {
-        "path": "M 530 155 H 630 V 255 H 530 Z",
-        "color": "#E53E3E",
-        "criticalityX": 620,
-        "criticalityY": 165
-      }
-    },
-    {
-      "id": "EAU_DESURCHAUFFEE",
-      "name": "EAU DESURCHAUFFEE",
-      "type": "Water",
-      "description": "Superheated Water",
-      "criticality": "high",
-      "ui": {
-        "path": "M 640 85 H 760 V 135 H 640 Z",
-        "color": "#ED8936",
-        "criticalityX": 750,
-        "criticalityY": 95
-      }
-    },
-    {
-      "id": "TV_CIRCUIT_HP",
-      "name": "TV CIRCUIT HP",
-      "type": "Circuit",
-      "description": "High Pressure Turbine Circuit",
-      "criticality": "critical",
-      "ui": {
-        "path": "M 340 85 H 520 V 135 H 340 Z",
-        "color": "#E53E3E",
-        "criticalityX": 510,
-        "criticalityY": 95
-      }
-    },
-    {
-      "id": "TV_CIRCUIT_BP",
-      "name": "TV CIRCUIT BP",
-      "type": "Circuit",
-      "description": "Low Pressure Turbine Circuit",
-      "criticality": "critical",
-      "ui": {
-        "path": "M 340 155 H 520 V 205 H 340 Z",
-        "color": "#E53E3E",
-        "criticalityX": 510,
-        "criticalityY": 165
+        "criticalityX": 190,
+        "criticalityY": 115
       }
     },
     {
@@ -126,50 +21,36 @@
       "description": "Turbine-Generator Unit",
       "criticality": "critical",
       "ui": {
-        "path": "M 340 210 H 520 V 330 H 340 Z",
-        "color": "#E53E3E",
-        "hoverEffect": "glow",
-        "criticalityX": 510,
-        "criticalityY": 220
+        "path": "M340,210 L340,330 L520,330 L520,210 Z",
+        "color": "#ED64A6",
+        "criticalityX": 430,
+        "criticalityY": 270
       }
     },
     {
-      "id": "TURBINE",
-      "name": "TURBINE",
-      "type": "Turbine",
-      "description": "Steam Turbine",
+      "id": "CONDENSEUR",
+      "name": "CONDENSEUR",
+      "type": "Condenser",
+      "description": "Steam Condenser",
       "criticality": "critical",
       "ui": {
-        "path": "M 340 340 H 520 V 420 H 340 Z",
-        "color": "#E53E3E",
-        "criticalityX": 510,
-        "criticalityY": 350
-      }
-    },
-    {
-      "id": "GENERATOR",
-      "name": "G",
-      "type": "Generator",
-      "description": "Electrical Generator",
-      "criticality": "critical",
-      "ui": {
-        "path": "M 530 265 H 630 V 365 H 530 Z",
-        "color": "#E53E3E",
-        "criticalityX": 620,
-        "criticalityY": 275
-      }
-    },
-    {
-      "id": "TRANSFO_SOUSTIRAGE",
-      "name": "TRANSFO DE SOUSTIRAGE",
-      "type": "Transformer",
-      "description": "Underexcitation Transformer",
-      "criticality": "medium",
-      "ui": {
-        "path": "M 640 265 H 760 V 365 H 640 Z",
+        "path": "M100,400 L100,480 L180,480 L180,400 Z",
         "color": "#4299E1",
-        "criticalityX": 750,
-        "criticalityY": 275
+        "criticalityX": 140,
+        "criticalityY": 440
+      }
+    },
+    {
+      "id": "TV_CIRCUIT_HP",
+      "name": "TV CIRCUIT HP",
+      "type": "Circuit",
+      "description": "High Pressure Turbine Circuit",
+      "criticality": "high",
+      "ui": {
+        "path": "M200,150 L200,250 L400,250 L400,150 Z",
+        "color": "#9F7AEA",
+        "criticalityX": 300,
+        "criticalityY": 200
       }
     }
   ],
