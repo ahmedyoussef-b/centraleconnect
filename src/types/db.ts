@@ -11,12 +11,11 @@ export interface Component {
   maxResponseTime?: number; // From user snippet
   isValidated?: boolean; // From user snippet
   ui?: {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
+    path: string;
     color: string;
     hoverEffect?: 'pulse' | 'glow';
+    criticalityX?: number;
+    criticalityY?: number;
   };
   alarms?: any[]; // From user snippet
   procedures?: any[]; // From user snippet
