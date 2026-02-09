@@ -8,13 +8,14 @@
 
 import type { Component } from '@/types/db';
 import { useComponentInteraction } from '@/lib/interactions';
+import { cn } from '@/lib/utils';
 
 export default function PidViewer({
   components,
   onComponentClick,
 }: {
   components: Component[];
-  onComponentClick: (component: Component) => void;
+  onComponentClick?: (component: Component) => void;
 }) {
   const { isHovered, handleMouseEnter, handleMouseLeave } =
     useComponentInteraction();
@@ -33,9 +34,11 @@ export default function PidViewer({
       {components.map((component) => (
         <div
           key={component.id}
-          className={`absolute cursor-pointer transition-all duration-200 ${
+          className={cn(
+            'absolute transition-all duration-200',
+            onComponentClick && 'cursor-pointer',
             isHovered[component.id] ? 'z-20 scale-105' : 'z-10'
-          }`}
+          )}
           style={{
             left: `${component.ui?.x}px`,
             top: `${component.ui?.y}px`,
@@ -50,10 +53,10 @@ export default function PidViewer({
           }}
           onMouseEnter={() => handleMouseEnter(component.id)}
           onMouseLeave={() => handleMouseLeave(component.id)}
-          onClick={() => onComponentClick(component)}
+          onClick={() => onComponentClick?.(component)}
           aria-label={`Interactive element: ${component.name}`}
           role="button"
-          tabIndex={0}
+          tabIndex={onComponentClick ? 0 : -1}
         >
           {/* Criticality indicator */}
           <div
