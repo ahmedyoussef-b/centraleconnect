@@ -19,7 +19,7 @@ export default function PidViewer({
   const { isHovered, handleMouseEnter, handleMouseLeave } = useComponentInteraction();
   
   return (
-    <div className="relative bg-slate-900 border-2 border-slate-700 rounded-lg overflow-hidden">
+    <div className="relative bg-slate-900 border-2 border-slate-700 rounded-lg overflow-hidden synoptic-diagram-override">
       {/* Base schematic image with enhanced visibility */}
       <img 
         src="/assets/synoptics/IMG_20260207_071515_602.svg" 
@@ -47,6 +47,7 @@ export default function PidViewer({
                 onMouseEnter={() => handleMouseEnter(component.id)}
                 onMouseLeave={() => handleMouseLeave(component.id)}
                 onClick={() => onComponentClick?.(component)}
+                style={{ cursor: 'pointer' }}
               />
               
               {/* Hover highlight effect */}
