@@ -1,10 +1,31 @@
 'use client';
 
-import { SynopticView } from '@/components/synoptic-view';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import PidViewer from '@/components/PidViewer';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from '@/components/ui/card';
 import { LayoutGrid } from 'lucide-react';
+import { getComponents } from '@/lib/component-service';
+import type { Component } from '@/types/db';
 
 export default function SynopticPage() {
+  const router = useRouter();
+  const [components, setComponents] = useState<Component[]>([]);
+
+  useEffect(() => {
+    getComponents().then(setComponents);
+  }, []);
+
+  const handleComponentClick = (component: Component) => {
+    router.push(`/components/${component.id}`);
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -13,11 +34,15 @@ export default function SynopticPage() {
           Synoptique Interactif
         </CardTitle>
         <CardDescription>
-          Navigation dans les systèmes du cycle combiné. Cliquez sur un équipement pour voir ses détails.
+          Navigation dans les systèmes du cycle combiné. Cliquez sur un
+          équipement pour voir ses détails.
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <SynopticView />
+        <PidViewer
+          components={components}
+          onComponentClick={handleComponentClick}
+        />
       </CardContent>
     </Card>
   );

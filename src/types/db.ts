@@ -1,5 +1,27 @@
 export type LogEntryType = 'AUTO' | 'MANUAL' | 'DOCUMENT_ADDED';
 
+export interface Component {
+  id: string;
+  name: string;
+  type: string;
+  description: string;
+  criticality: 'critical' | 'high' | 'medium' | 'low';
+  equipmentId?: string; // To link back to Equipment model if needed
+  externalId?: string; // To link back to Equipment model if needed
+  maxResponseTime?: number; // From user snippet
+  isValidated?: boolean; // From user snippet
+  ui?: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    color: string;
+    hoverEffect?: 'pulse' | 'glow';
+  };
+  alarms?: any[]; // From user snippet
+  procedures?: any[]; // From user snippet
+}
+
 export interface Equipment {
     externalId: string;
     name: string;

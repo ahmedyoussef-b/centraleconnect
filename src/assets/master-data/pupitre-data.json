@@ -1,0 +1,198 @@
+{
+  "power_plant": "Sousse B",
+  "components": [
+    {
+      "id": "RESERVOIR_HP",
+      "name": "RESERVOIR HP",
+      "type": "Reservoir",
+      "description": "High Pressure Reservoir",
+      "criticality": "high",
+      "ui": {
+        "x": 120,
+        "y": 85,
+        "width": 140,
+        "height": 60,
+        "color": "#E53E3E",
+        "hoverEffect": "pulse"
+      }
+    },
+    {
+      "id": "RESERVOIR_BP",
+      "name": "RESERVOIR BP",
+      "type": "Reservoir",
+      "description": "Low Pressure Reservoir",
+      "criticality": "medium",
+      "ui": {
+        "x": 120,
+        "y": 155,
+        "width": 140,
+        "height": 60,
+        "color": "#ED8936"
+      }
+    },
+    {
+      "id": "POMPES_ALIM_HP",
+      "name": "POMPES ALIM HP",
+      "type": "Pump",
+      "description": "High Pressure Feed Pumps",
+      "criticality": "critical",
+      "ui": {
+        "x": 270,
+        "y": 85,
+        "width": 60,
+        "height": 60,
+        "color": "#E53E3E"
+      }
+    },
+    {
+      "id": "POMPES_ALIM_BP",
+      "name": "POMPES ALIM BP",
+      "type": "Pump",
+      "description": "Low Pressure Feed Pumps",
+      "criticality": "high",
+      "ui": {
+        "x": 270,
+        "y": 155,
+        "width": 60,
+        "height": 60,
+        "color": "#ED8936"
+      }
+    },
+    {
+      "id": "BALLON_PURGES_CR",
+      "name": "BALLON PURGES CR",
+      "type": "Drum",
+      "description": "CR Purge Drum",
+      "criticality": "medium",
+      "ui": {
+        "x": 530,
+        "y": 85,
+        "width": 100,
+        "height": 50,
+        "color": "#4299E1"
+      }
+    },
+    {
+      "id": "CONDENSEUR",
+      "name": "CONDENSEUR",
+      "type": "Condenser",
+      "description": "Steam Condenser",
+      "criticality": "critical",
+      "ui": {
+        "x": 530,
+        "y": 155,
+        "width": 100,
+        "height": 100,
+        "color": "#4299E1"
+      }
+    },
+    {
+      "id": "EAU_DESURCHAUFFEE",
+      "name": "EAU DESURCHAUFFEE",
+      "type": "Water",
+      "description": "Superheated Water",
+      "criticality": "high",
+      "ui": {
+        "x": 640,
+        "y": 85,
+        "width": 120,
+        "height": 50,
+        "color": "#4FD1C5"
+      }
+    },
+    {
+      "id": "TV_CIRCUIT_HP",
+      "name": "TV CIRCUIT HP",
+      "type": "Circuit",
+      "description": "High Pressure Turbine Circuit",
+      "criticality": "critical",
+      "ui": {
+        "x": 340,
+        "y": 85,
+        "width": 180,
+        "height": 50,
+        "color": "#ED64A6"
+      }
+    },
+    {
+      "id": "TV_CIRCUIT_BP",
+      "name": "TV CIRCUIT BP",
+      "type": "Circuit",
+      "description": "Low Pressure Turbine Circuit",
+      "criticality": "critical",
+      "ui": {
+        "x": 340,
+        "y": 155,
+        "width": 180,
+        "height": 50,
+        "color": "#ED64A6"
+      }
+    },
+    {
+      "id": "TG",
+      "name": "TG",
+      "type": "Turbine-Generator",
+      "description": "Turbine-Generator Unit",
+      "criticality": "critical",
+      "ui": {
+        "x": 340,
+        "y": 210,
+        "width": 180,
+        "height": 120,
+        "color": "#ED64A6",
+        "hoverEffect": "glow"
+      }
+    },
+    {
+      "id": "TURBINE",
+      "name": "TURBINE",
+      "type": "Turbine",
+      "description": "Steam Turbine",
+      "criticality": "critical",
+      "ui": {
+        "x": 340,
+        "y": 340,
+        "width": 180,
+        "height": 80,
+        "color": "#ED64A6"
+      }
+    },
+    {
+      "id": "GENERATOR",
+      "name": "G",
+      "type": "Generator",
+      "description": "Electrical Generator",
+      "criticality": "critical",
+      "ui": {
+        "x": 530,
+        "y": 265,
+        "width": 100,
+        "height": 100,
+        "color": "#F6E05E"
+      }
+    },
+    {
+      "id": "TRANSFO_SOUSTIRAGE",
+      "name": "TRANSFO DE SOUSTIRAGE",
+      "type": "Transformer",
+      "description": "Underexcitation Transformer",
+      "criticality": "medium",
+      "ui": {
+        "x": 640,
+        "y": 265,
+        "width": 120,
+        "height": 100,
+        "color": "#F6E05E"
+      }
+    }
+  ],
+  "metadata": {
+    "created_at": "2026-02-09T14:30:00Z",
+    "source": "Sousse B Control Panel Schematic",
+    "validation_status": "pending_engineer_review",
+    "compliance_tags": [
+      "IEC_61511",
+      "ISO_55001"
+    ]
+  }
+}
