@@ -360,24 +360,6 @@ export function CameraView() {
     setCapturedImage(imageDataUrl);
 
     try {
-        if (isTauri) {
-            setStatusText('Synchronisation des données...');
-            console.log('[IDENTIFY_FLOW] Triggering remote-to-local DB sync.');
-            const { syncWithRemote } = await import('@/lib/db-service');
-            const stats = await syncWithRemote();
-            console.log('[IDENTIFY_FLOW] Sync complete.', stats);
-            
-            let toastDescription = `${stats.synced} enregistrements mis à jour depuis le serveur.`;
-            if (stats.cleaned) {
-                toastDescription += " La base de données distante a été nettoyée avec succès.";
-            }
-
-            toast({
-                title: 'Synchronisation terminée',
-                description: toastDescription,
-            });
-        }
-
         setStatusText('Récupération de la base de données visuelle locale...');
         const { getLocalVisualDatabase } = await import('@/lib/db-service');
         const localVisualDb = await getLocalVisualDatabase();
@@ -427,7 +409,7 @@ export function CameraView() {
         toast({ variant: 'destructive', title: 'Erreur d\'analyse', description: error.message || 'La comparaison visuelle a échoué.' });
         handleReset();
     }
-  }, [toast, handleReset, isTauri]);
+  }, [toast, handleReset]);
 
   const processProvisioning = useCallback(async (imageDataUrl: string) => {
     console.log('[PROVISION_FLOW] Starting provisioning process.');
@@ -488,46 +470,34 @@ export function CameraView() {
   const handleSaveProvision = async (componentData: NewComponentFormData) => {
     console.log('[PROVISION_FLOW] Starting save provision process for component:', componentData.id);
     try {
-      setStatusText('Calcul du hachage...');
-      console.log('[PROVISION_FLOW] Computing perceptual hash for new image.');
-      const perceptualHash = await computePHash(capturedImage);
-      console.log(`[PROVISION_FLOW] Image hash: ${perceptualHash}`);
-      
-      const payload = {
-        component: {
-          externalId: componentData.id,
-          name: componentData.name,
-          type: componentData.type,
-        },
-        document: {
-          imageData: capturedImage,
-          ocrText: ocrText,
-          description: `Plaque signalétique pour ${componentData.id}`,
-          perceptualHash,
-        }
-      };
-      console.log('[PROVISION_FLOW] Assembled payload for API:', payload);
+        const { addComponentAndDocument } = await import('@/lib/db-service');
 
-      setStatusText('Sauvegarde sur le serveur distant...');
-      console.log('[PROVISION_FLOW] Sending payload to /api/provision.');
-      const response = await fetch('/api/provision', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      });
+        setStatusText('Calcul du hachage...');
+        console.log('[PROVISION_FLOW] Computing perceptual hash for new image.');
+        const perceptualHash = await computePHash(capturedImage);
+        console.log(`[PROVISION_FLOW] Image hash: ${perceptualHash}`);
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error('[PROVISION_FLOW] Server returned an error:', { status: response.status, error: errorData });
-        throw new Error(errorData.error || `Erreur HTTP: ${response.status}`);
-      }
+        const componentPayload = {
+            externalId: componentData.id,
+            name: componentData.name,
+            type: componentData.type,
+        };
 
-      const responseData = await response.json();
-      console.log('[PROVISION_FLOW] Server responded with success. Provisioning complete.', responseData);
-      toast({ title: 'Succès', description: `La fiche pour le composant ${componentData.id} a été ajoutée au serveur.` });
-      handleReset();
+        const documentPayload = {
+            imageData: capturedImage,
+            ocrText: ocrText,
+            description: `Plaque signalétique pour ${componentData.id}`,
+            perceptualHash,
+        };
+        
+        setStatusText('Sauvegarde...');
+        console.log('[PROVISION_FLOW] Saving component and document...');
+        await addComponentAndDocument(componentPayload, documentPayload);
+        
+        console.log('[PROVISION_FLOW] Save complete.');
+        toast({ title: 'Succès', description: `La fiche pour le composant ${componentData.id} a été ajoutée.` });
+        handleReset();
+
     } catch (error: any) {
       console.error('[PROVISION_FLOW] Error saving provision:', error);
       toast({ variant: 'destructive', title: 'Erreur de sauvegarde', description: error.message || "Impossible d'enregistrer." });
@@ -603,7 +573,7 @@ export function CameraView() {
                                   {isTauri ? <Server className="h-8 w-8"/> : <Cloud className="h-8 w-8"/>}
                                   <div>
                                       <p className="font-bold">Identifier</p>
-                                      <p className="font-normal text-xs text-primary-foreground/80">{isTauri ? 'Sync & Compare (Local)' : 'Compare (Remote)'}</p>
+                                      <p className="font-normal text-xs text-primary-foreground/80">{isTauri ? 'Comparer (Local)' : 'Comparer (Distant)'}</p>
                                   </div>
                                 </div>
                             </Button>
@@ -647,7 +617,7 @@ export function CameraView() {
                                   {isTauri ? <Server className="h-8 w-8"/> : <Cloud className="h-8 w-8"/>}
                                   <div>
                                       <p className="font-bold">Identifier</p>
-                                      <p className="font-normal text-xs text-primary-foreground/80">{isTauri ? 'Sync & Compare (Local)' : 'Compare (Remote)'}</p>
+                                      <p className="font-normal text-xs text-primary-foreground/80">{isTauri ? 'Comparer (Local)' : 'Comparer (Distant)'}</p>
                                   </div>
                                 </div>
                             </Button>
