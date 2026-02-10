@@ -221,6 +221,7 @@ function ProvisioningForm({
 // Main Component
 export function CameraView() {
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
+  const [isCameraActive, setIsCameraActive] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
@@ -238,38 +239,44 @@ export function CameraView() {
 
   const [isTauri, setIsTauri] = useState(false);
 
+  const activateCamera = async () => {
+    if (videoRef.current && !videoRef.current.srcObject) {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+        setHasCameraPermission(true);
+        videoRef.current.srcObject = stream;
+        setIsCameraActive(true);
+      } catch (error) {
+        console.error('Error accessing camera:', error);
+        setHasCameraPermission(false);
+        setIsCameraActive(false);
+        toast({
+          variant: 'destructive',
+          title: 'Accès Caméra Refusé',
+          description: "Veuillez autoriser l'accès à la caméra dans les paramètres de votre navigateur.",
+        });
+      }
+    }
+  };
+
+  const stopCamera = useCallback(() => {
+      if (videoRef.current && videoRef.current.srcObject) {
+        const stream = videoRef.current.srcObject as MediaStream;
+        stream.getTracks().forEach(track => track.stop());
+        videoRef.current.srcObject = null;
+        setIsCameraActive(false);
+      }
+  }, []);
+
   useEffect(() => {
     const isTauriEnv = !!window.__TAURI__;
     setIsTauri(isTauriEnv);
 
-    if (analysisMode === 'camera') {
-        const getCameraPermission = async () => {
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-            setHasCameraPermission(true);
-            if (videoRef.current) {
-            videoRef.current.srcObject = stream;
-            }
-        } catch (error) {
-            console.error('Error accessing camera:', error);
-            setHasCameraPermission(false);
-            toast({
-            variant: 'destructive',
-            title: 'Camera Access Denied',
-            description: 'Please enable camera permissions in your browser settings to use this app.',
-            });
-        }
-        };
-        getCameraPermission();
-    }
-
+    // Cleanup camera on component unmount
     return () => {
-      if (videoRef.current && videoRef.current.srcObject) {
-        const stream = videoRef.current.srcObject as MediaStream;
-        stream.getTracks().forEach(track => track.stop());
-      }
+      stopCamera();
     }
-  }, [toast, analysisMode]);
+  }, [stopCamera]);
 
   useEffect(() => {
     // OCR is only available in Tauri
@@ -311,6 +318,7 @@ export function CameraView() {
   }, [toast, isTauri]);
   
   const handleReset = useCallback(() => {
+    stopCamera();
     setViewMode('idle');
     setFileImage(null);
     setScanResult(null);
@@ -321,7 +329,12 @@ export function CameraView() {
      if(fileInputRef.current) {
       fileInputRef.current.value = '';
     }
-  }, []);
+  }, [stopCamera]);
+  
+  const handleTabChange = (value: string) => {
+    setAnalysisMode(value as AnalysisMode);
+    handleReset();
+  }
 
   const processIdentification = useCallback(async (imageDataUrl: string) => {
     console.log('[IDENTIFY_FLOW] Starting identification process.');
@@ -431,7 +444,7 @@ export function CameraView() {
   }, [toast, isTauri]);
   
   const captureFromVideo = useCallback(() => {
-    if (!videoRef.current) return null;
+    if (!videoRef.current || !isCameraActive) return null;
     const canvas = document.createElement('canvas');
     canvas.width = videoRef.current.videoWidth;
     canvas.height = videoRef.current.videoHeight;
@@ -439,7 +452,7 @@ export function CameraView() {
     if (!ctx) return null;
     ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
     return canvas.toDataURL('image/jpeg', 0.9);
-  }, []);
+  }, [isCameraActive]);
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -465,12 +478,15 @@ export function CameraView() {
           id: componentData.id,
           name: componentData.name,
           type: componentData.type,
+          version: 1,
+          isImmutable: false,
         },
         document: {
           imageData: capturedImage,
           ocrText: ocrText,
           description: `Plaque signalétique pour ${componentData.id}`,
           perceptualHash,
+          createdAt: new Date().toISOString(),
         }
       };
 
@@ -513,7 +529,7 @@ export function CameraView() {
             ) : viewMode === 'provisioning' ? (
                 <ProvisioningForm imageData={capturedImage} ocrText={ocrText} onSave={handleSaveProvision} onCancel={handleReset} />
             ) : (
-                <Tabs value={analysisMode} onValueChange={(value) => { setAnalysisMode(value as AnalysisMode); handleReset(); }} className="w-full">
+                <Tabs value={analysisMode} onValueChange={handleTabChange} className="w-full">
                     <TabsList className="grid w-full grid-cols-2">
                         <TabsTrigger value="camera"><Camera className="mr-2"/>Analyse par Caméra</TabsTrigger>
                         <TabsTrigger value="file"><Upload className="mr-2"/>Analyse par Fichier</TabsTrigger>
@@ -521,13 +537,38 @@ export function CameraView() {
                     
                     <TabsContent value="camera" className="mt-4 space-y-4">
                         <div className="relative aspect-video w-full overflow-hidden rounded-md border-2 border-dashed bg-muted">
-                            <video
+                           {isCameraActive ? (
+                             <video
                                 ref={videoRef}
                                 className={cn("h-full w-full object-cover transition-opacity", !isIdle && 'opacity-30')}
                                 autoPlay
                                 muted
                                 playsInline
                             />
+                           ) : (
+                            <div className="flex h-full flex-col items-center justify-center p-4 text-center">
+                                {hasCameraPermission === false ? (
+                                    <>
+                                        <CameraOff className="h-12 w-12 text-destructive" />
+                                        <Alert variant="destructive" className="mt-4">
+                                            <AlertTitle>Accès Caméra Refusé</AlertTitle>
+                                            <AlertDescription>Veuillez autoriser l'accès à la caméra pour continuer.</AlertDescription>
+                                        </Alert>
+                                        <Button onClick={activateCamera} className="mt-4"><RefreshCcw className="mr-2" />Réessayer</Button>
+                                    </>
+                                ) : (
+                                    <>
+                                        <CameraOff className="h-12 w-12 text-muted-foreground" />
+                                        <p className="mt-2 text-sm text-muted-foreground">La caméra est désactivée.</p>
+                                        <Button onClick={activateCamera} className="mt-4">
+                                            <Camera className="mr-2" />
+                                            Activer la caméra
+                                        </Button>
+                                    </>
+                                )}
+                            </div>
+                           )}
+
                             {!isIdle && (
                                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 text-primary bg-background/80">
                                     <ScanLine className="h-24 w-24 animate-pulse" />
@@ -535,18 +576,9 @@ export function CameraView() {
                                     <Progress value={progress} className="w-1/2" />
                                 </div>
                             )}
-                            {hasCameraPermission === false && (
-                                <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/80 p-4">
-                                    <CameraOff className="h-12 w-12 text-destructive" />
-                                    <Alert variant="destructive" className="mt-4">
-                                    <AlertTitle>Accès Caméra Requis</AlertTitle>
-                                    <AlertDescription>Veuillez autoriser l'accès à la caméra.</AlertDescription>
-                                    </Alert>
-                                </div>
-                            )}
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <Button onClick={() => { const img = captureFromVideo(); if (img) processIdentification(img); }} disabled={!isIdle || hasCameraPermission === false} size="lg" className="h-16 text-lg">
+                            <Button onClick={() => { const img = captureFromVideo(); if (img) processIdentification(img); }} disabled={!isIdle || !isCameraActive} size="lg" className="h-16 text-lg">
                                 <div className="flex items-center gap-3">
                                   {isTauri ? <Server className="h-8 w-8"/> : <Cloud className="h-8 w-8"/>}
                                   <div>
@@ -555,7 +587,7 @@ export function CameraView() {
                                   </div>
                                 </div>
                             </Button>
-                            <Button onClick={() => { const img = captureFromVideo(); if (img) processProvisioning(img); }} disabled={!isIdle || hasCameraPermission === false} size="lg" variant="secondary" className="h-16 text-lg">
+                            <Button onClick={() => { const img = captureFromVideo(); if (img) processProvisioning(img); }} disabled={!isIdle || !isCameraActive} size="lg" variant="secondary" className="h-16 text-lg">
                                 <div className="flex items-center gap-3">
                                 <FileUp className="h-8 w-8"/>
                                 <div>
