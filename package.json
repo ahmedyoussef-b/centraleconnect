@@ -12,7 +12,8 @@
     "db:seed": "prisma db push --force-reset && tsx scripts/seed.ts",
     "generate:scada-map": "tsx scripts/generate-scada-mapping.ts",
     "genkit:dev": "genkit start -- tsx src/ai/dev.ts",
-    "genkit:watch": "genkit start -- tsx --watch src/ai/dev.ts"
+    "genkit:watch": "genkit start -- tsx --watch src/ai/dev.ts",
+    "models:download": "node scripts/download-vosk-model.js"
   },
   "dependencies": {
     "@genkit-ai/google-genai": "^1.20.0",
