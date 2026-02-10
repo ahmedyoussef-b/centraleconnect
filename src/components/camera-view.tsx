@@ -477,7 +477,7 @@ export function CameraView() {
       
       const payload = {
         component: {
-          id: componentData.id,
+          externalId: componentData.id,
           name: componentData.name,
           type: componentData.type,
           version: 1,
@@ -488,7 +488,7 @@ export function CameraView() {
           ocrText: ocrText,
           description: `Plaque signalétique pour ${componentData.id}`,
           perceptualHash,
-          createdAt: new Date(),
+          createdAt: new Date().toISOString(),
         }
       };
       console.log('[PROVISION_FLOW] Assembled payload for API:', payload);
