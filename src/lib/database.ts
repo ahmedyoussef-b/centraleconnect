@@ -2,7 +2,7 @@
 export async function getComponentById(id: string) {
     // 🔒 Validation des permissions avant accès
     if (!hasPermission('component:read')) {
-      throw new Error('Accès refusé - niveau d'autorisation insuffisant');
+      throw new Error("Accès refusé - niveau d'autorisation insuffisant");
     }
     
     // ⚠️ Pas de données non validées dans l'UI critique
