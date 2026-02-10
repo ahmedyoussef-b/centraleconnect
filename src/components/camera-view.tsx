@@ -1,9 +1,11 @@
+
 'use client';
 
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { Camera, CameraOff, RefreshCcw, ScanLine, Save, X, ScanSearch, Upload, Image as ImageIcon, FileUp } from 'lucide-react';
+import { Camera, CameraOff, RefreshCcw, ScanLine, Save, X, ScanSearch, Upload, FileUp } from 'lucide-react';
 import type Tesseract from 'tesseract.js';
-import Image from 'next/image';
+// Replace next/image with a standard img tag for better data URI handling
+// import Image from 'next/image';
 
 import { Alert, AlertDescription, AlertTitle } from './ui/alert';
 import { Button } from './ui/button';
@@ -65,11 +67,11 @@ function ResultView({ result, onReset }: { result: ScanResult; onReset: () => vo
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
                             <div className="space-y-2">
                                 <Label>Image Capturée</Label>
-                                <Image src={capturedImage} alt="Capture" width={400} height={300} className="rounded-md border-2 border-dashed" />
+                                <img src={capturedImage} alt="Capture" width={400} height={300} className="rounded-md border-2 border-dashed aspect-video object-contain" />
                             </div>
                             <div className="space-y-2">
                                 <Label>Meilleure Correspondance</Label>
-                                <Image src={match.imageUrl} alt={match.name} width={400} height={300} className="rounded-md border-2 border-primary" />
+                                <img src={match.imageUrl} alt={match.name} width={400} height={300} className="rounded-md border-2 border-primary aspect-video object-contain" />
                             </div>
                         </div>
                         <Card className="bg-muted/50">
@@ -178,7 +180,7 @@ function ProvisioningForm({
                 <div className="space-y-2">
                 <Label>Image Capturée</Label>
                 <div className="overflow-hidden rounded-md border">
-                    <Image
+                    <img
                     src={imageData}
                     alt="Capture de composant"
                     width={300}
@@ -251,24 +253,26 @@ export function CameraView() {
   useEffect(() => {
     setIsTauri(!!window.__TAURI__);
 
-    const getCameraPermission = async () => {
-       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        setHasCameraPermission(true);
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
+    if (analysisMode === 'camera') {
+        const getCameraPermission = async () => {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+            setHasCameraPermission(true);
+            if (videoRef.current) {
+            videoRef.current.srcObject = stream;
+            }
+        } catch (error) {
+            console.error('Error accessing camera:', error);
+            setHasCameraPermission(false);
+            toast({
+            variant: 'destructive',
+            title: 'Camera Access Denied',
+            description: 'Please enable camera permissions in your browser settings to use this app.',
+            });
         }
-      } catch (error) {
-        console.error('Error accessing camera:', error);
-        setHasCameraPermission(false);
-        toast({
-          variant: 'destructive',
-          title: 'Camera Access Denied',
-          description: 'Please enable camera permissions in your browser settings to use this app.',
-        });
-      }
-    };
-    getCameraPermission();
+        };
+        getCameraPermission();
+    }
 
     return () => {
       if (videoRef.current && videoRef.current.srcObject) {
@@ -276,9 +280,10 @@ export function CameraView() {
         stream.getTracks().forEach(track => track.stop());
       }
     }
-  }, [toast]);
+  }, [toast, analysisMode]);
 
   useEffect(() => {
+    // Only run in tauri environment
     if (!isTauri) return;
 
     const initializeWorker = async () => {
@@ -473,14 +478,14 @@ export function CameraView() {
                             )}
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <Button onClick={() => { const img = captureFromVideo(); if (img) processIdentification(img); }} disabled={!isIdle || !hasCameraPermission} size="lg" className="h-16 text-lg">
+                            <Button onClick={() => { const img = captureFromVideo(); if (img) processIdentification(img); }} disabled={!isIdle || hasCameraPermission === false} size="lg" className="h-16 text-lg">
                                 <ScanSearch className="mr-3 h-8 w-8"/>
                                 <div>
                                     <p className="font-bold">Identifier</p>
                                     <p className="font-normal text-xs text-primary-foreground/80">Comparer avec la BDD</p>
                                 </div>
                             </Button>
-                            <Button onClick={() => { const img = captureFromVideo(); if (img) processProvisioning(img); }} disabled={!isIdle || !hasCameraPermission || (isTauri && !workerRef.current)} size="lg" variant="secondary" className="h-16 text-lg">
+                            <Button onClick={() => { const img = captureFromVideo(); if (img) processProvisioning(img); }} disabled={!isIdle || hasCameraPermission === false || (isTauri && !workerRef.current)} size="lg" variant="secondary" className="h-16 text-lg">
                                 <FileUp className="mr-3 h-8 w-8"/>
                                 <div>
                                     <p className="font-bold">Provisionner</p>
@@ -493,7 +498,7 @@ export function CameraView() {
                     <TabsContent value="file" className="mt-4 space-y-4">
                         <div className="relative aspect-video w-full overflow-hidden rounded-md border-2 border-dashed bg-muted">
                            {fileImage ? (
-                                <Image src={fileImage} alt="Fichier sélectionné" layout="fill" objectFit="contain" />
+                                <img src={fileImage} alt="Fichier sélectionné" className="h-full w-full object-contain" />
                            ) : (
                                 <div 
                                     className="flex flex-col items-center justify-center h-full cursor-pointer hover:bg-muted/50"
