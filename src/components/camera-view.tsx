@@ -1,8 +1,8 @@
 
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import { Camera, CameraOff, RefreshCcw, ScanLine, Save, X, ScanSearch, PlusCircle } from 'lucide-react';
+import { useEffect, useRef, useState, useCallback } from 'react';
+import { Camera, CameraOff, RefreshCcw, ScanLine, Save, X, ScanSearch, PlusCircle, Upload } from 'lucide-react';
 import type Tesseract from 'tesseract.js';
 import Image from 'next/image';
 
@@ -242,6 +242,8 @@ export function CameraView() {
   const [scanResult, setScanResult] = useState<ScanResult | null>(null);
 
   const [isTauri, setIsTauri] = useState(false);
+  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setIsTauri(!!window.__TAURI__);
@@ -311,19 +313,19 @@ export function CameraView() {
     };
   }, [isTauri, toast]);
 
-  const handleIdentify = async () => {
-    if (!videoRef.current) return;
-    
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setUploadedImage(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const processIdentification = useCallback(async (imageDataUrl: string) => {
     setViewMode('scanning');
-    setStatusText('Capture en cours...');
-    
-    const canvas = document.createElement('canvas');
-    canvas.width = videoRef.current.videoWidth;
-    canvas.height = videoRef.current.videoHeight;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
-    const imageDataUrl = canvas.toDataURL('image/jpeg', 0.9);
     setCapturedImage(imageDataUrl);
 
     try {
@@ -356,13 +358,29 @@ export function CameraView() {
         toast({ variant: 'destructive', title: 'Erreur d\'analyse', description: 'La comparaison visuelle a échoué.' });
         setViewMode('idle');
     }
-  };
+  }, [toast]);
 
-  const handleProvision = async () => {
-    if (!videoRef.current) return;
-
+  const processProvisioning = useCallback(async (imageDataUrl: string) => {
     setViewMode('scanning');
+    setCapturedImage(imageDataUrl);
     setStatusText('Analyse OCR en cours...');
+
+    if (!workerRef.current) {
+        toast({ variant: 'destructive', title: 'Erreur OCR', description: "Le moteur d'analyse n'est pas prêt." });
+        setViewMode('idle');
+        return;
+    }
+    
+    // Tesseract worker can directly recognize a data URL
+    const { data: { text } } = await workerRef.current.recognize(imageDataUrl);
+    setOcrText(text || 'Aucun texte détecté.');
+    setViewMode('provisioning');
+  }, [toast]);
+
+  const handleIdentifyFromCamera = useCallback(async () => {
+    if (!videoRef.current) return;
+    
+    setStatusText('Capture en cours...');
     
     const canvas = document.createElement('canvas');
     canvas.width = videoRef.current.videoWidth;
@@ -371,18 +389,23 @@ export function CameraView() {
     if (!ctx) return;
     ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
     const imageDataUrl = canvas.toDataURL('image/jpeg', 0.9);
-    setCapturedImage(imageDataUrl);
-
-    if (!workerRef.current) {
-        toast({ variant: 'destructive', title: 'Erreur OCR', description: "Le moteur d'analyse n'est pas prêt." });
-        setViewMode('idle');
-        return;
-    }
     
-    const { data: { text } } = await workerRef.current.recognize(canvas);
-    setOcrText(text || 'Aucun texte détecté.');
-    setViewMode('provisioning');
-  };
+    await processIdentification(imageDataUrl);
+  }, [processIdentification]);
+
+  const handleProvisionFromCamera = useCallback(async () => {
+    if (!videoRef.current) return;
+
+    const canvas = document.createElement('canvas');
+    canvas.width = videoRef.current.videoWidth;
+    canvas.height = videoRef.current.videoHeight;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
+    const imageDataUrl = canvas.toDataURL('image/jpeg', 0.9);
+
+    await processProvisioning(imageDataUrl);
+  }, [processProvisioning]);
 
   const handleSaveProvision = async (component: NewComponentFormData) => {
     try {
@@ -406,6 +429,10 @@ export function CameraView() {
     setOcrText('');
     setProgress(0);
     setStatusText('Prêt à analyser.');
+    setUploadedImage(null);
+    if(fileInputRef.current) {
+        fileInputRef.current.value = '';
+    }
   };
 
   if (!isTauri) {
@@ -427,13 +454,40 @@ export function CameraView() {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2"><ScanSearch /> Analyse Visuelle</CardTitle>
-        <CardDescription>Identifiez un équipement en le scannant, ou provisionnez-en un nouveau.</CardDescription>
+        <CardDescription>Identifiez un équipement en le scannant, ou provisionnez-en un nouveau depuis la caméra ou un fichier.</CardDescription>
       </CardHeader>
       <CardContent>
         {viewMode === 'result' && scanResult ? (
             <ResultView result={scanResult} onReset={handleReset} />
         ) : viewMode === 'provisioning' ? (
             <ProvisioningForm imageData={capturedImage} ocrText={ocrText} onSave={handleSaveProvision} onCancel={handleReset} />
+        ) : uploadedImage ? (
+            <div className="space-y-4 text-center">
+                <div className="relative aspect-video w-full max-w-lg mx-auto overflow-hidden rounded-md border-2 border-dashed bg-muted">
+                    <Image src={uploadedImage} alt="Image téléversée" layout="fill" objectFit="contain" />
+                </div>
+                <p className="text-sm text-muted-foreground">Fichier prêt pour analyse.</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Button onClick={() => processIdentification(uploadedImage)} disabled={!isIdle} size="lg" className="h-16 text-lg">
+                        <ScanSearch className="mr-3 h-8 w-8"/>
+                        <div>
+                            <p className="font-bold">Identifier le Fichier</p>
+                            <p className="font-normal text-xs text-primary-foreground/80">Comparer avec la base de données</p>
+                        </div>
+                    </Button>
+                    <Button onClick={() => processProvisioning(uploadedImage)} disabled={!isIdle || !workerRef.current} size="lg" variant="secondary" className="h-16 text-lg">
+                        <PlusCircle className="mr-3 h-8 w-8"/>
+                         <div>
+                            <p className="font-bold">Provisionner le Fichier</p>
+                            <p className="font-normal text-xs text-secondary-foreground/80">Extraire les données via OCR</p>
+                        </div>
+                    </Button>
+                </div>
+                 <Button variant="ghost" onClick={handleReset}>
+                    <RefreshCcw className="mr-2 h-4 w-4"/>
+                    Utiliser la caméra ou choisir un autre fichier
+                </Button>
+            </div>
         ) : (
           <div className="space-y-4">
             <div className="relative aspect-video w-full overflow-hidden rounded-md border-2 border-dashed bg-muted">
@@ -463,21 +517,31 @@ export function CameraView() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Button onClick={handleIdentify} disabled={!isIdle || !hasCameraPermission} size="lg" className="h-16 text-lg">
+                <Button onClick={handleIdentifyFromCamera} disabled={!isIdle || !hasCameraPermission} size="lg" className="h-16 text-lg">
                     <ScanSearch className="mr-3 h-8 w-8"/>
                     <div>
-                        <p className="font-bold">Identifier l'Équipement</p>
+                        <p className="font-bold">Identifier (Caméra)</p>
                         <p className="font-normal text-xs text-primary-foreground/80">Comparer avec la base de données</p>
                     </div>
                 </Button>
-                <Button onClick={handleProvision} disabled={!isIdle || !hasCameraPermission || !workerRef.current} size="lg" variant="secondary" className="h-16 text-lg">
+                <Button onClick={handleProvisionFromCamera} disabled={!isIdle || !hasCameraPermission || !workerRef.current} size="lg" variant="secondary" className="h-16 text-lg">
                     <PlusCircle className="mr-3 h-8 w-8"/>
                      <div>
-                        <p className="font-bold">Provisionner un Équipement</p>
+                        <p className="font-bold">Provisionner (Caméra)</p>
                         <p className="font-normal text-xs text-secondary-foreground/80">Ajouter via OCR/QR Code</p>
                     </div>
                 </Button>
             </div>
+            <div className="relative flex items-center py-2">
+              <div className="flex-grow border-t border-border"></div>
+              <span className="flex-shrink mx-4 text-xs uppercase text-muted-foreground">Ou</span>
+              <div className="flex-grow border-t border-border"></div>
+            </div>
+            <Button onClick={() => fileInputRef.current?.click()} variant="outline" className="w-full h-12">
+              <Upload className="mr-2 h-4 w-4" />
+              Analyser une image depuis l'ordinateur
+            </Button>
+            <input type="file" ref={fileInputRef} onChange={handleFileSelect} accept="image/*" className="hidden" />
           </div>
         )}
       </CardContent>
