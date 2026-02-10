@@ -2,11 +2,11 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Camera } from 'lucide-react';
+import { ScanSearch } from 'lucide-react';
 
-const CameraView = dynamic(
+const VisualScanner = dynamic(
   () => import('@/components/camera-view').then((mod) => mod.CameraView),
   {
     ssr: false,
@@ -14,9 +14,10 @@ const CameraView = dynamic(
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Camera />
-            Vue Caméra & Provisionnement
+            <ScanSearch />
+            Analyse Visuelle
           </CardTitle>
+          <CardDescription>Chargement du scanner...</CardDescription>
         </CardHeader>
         <CardContent>
           <Skeleton className="aspect-video w-full" />
@@ -26,6 +27,6 @@ const CameraView = dynamic(
   }
 );
 
-export default function ProvisioningPage() {
-    return <CameraView />;
+export default function VisualScanPage() {
+    return <VisualScanner />;
 }

@@ -1,4 +1,4 @@
-
+// src/app/(main)/layout.tsx
 'use client';
 
 import {
@@ -6,7 +6,7 @@ import {
   BellRing,
   Book,
   Bot,
-  Camera,
+  ScanSearch,
   ClipboardCheck,
   Database,
   FlaskConical,
@@ -58,7 +58,7 @@ const pageTitles: { [key: string]: string } = {
     '/procedures': 'Procédures',
     '/equipments': 'Équipements',
     '/logbook': 'Journal de Bord',
-    '/provisioning': 'Provisionnement par Caméra',
+    '/provisioning': 'Analyse Visuelle',
     '/settings': 'Paramètres',
     '/test': 'Page de Test',
 };
@@ -170,10 +170,10 @@ export default function MainLayout({
                   </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                  <SidebarMenuButton asChild tooltip="Provisionnement" isActive={pathname === '/provisioning'}>
+                  <SidebarMenuButton asChild tooltip="Analyse Visuelle" isActive={pathname === '/provisioning'}>
                       <Link href="/provisioning">
-                          <Camera />
-                          Provisionnement
+                          <ScanSearch />
+                          Analyse Visuelle
                       </Link>
                   </SidebarMenuButton>
               </SidebarMenuItem>

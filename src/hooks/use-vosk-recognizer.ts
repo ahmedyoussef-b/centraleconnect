@@ -1,4 +1,4 @@
-
+// src/hooks/use-vosk-recognizer.ts
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
@@ -6,11 +6,11 @@ import { MicVAD } from '@ricky0123/vad-web';
 import type { WorkerMessage, WorkerResponse } from '@/workers/vosk.worker';
 
 export enum RecognizerState {
-    IDLE,
-    LOADING,
-    READY,
-    LISTENING,
-    ERROR,
+    IDLE = 'IDLE',
+    LOADING = 'LOADING',
+    READY = 'READY',
+    LISTENING = 'LISTENING',
+    ERROR = 'ERROR',
 }
 
 interface RecognizerOptions {
@@ -46,7 +46,6 @@ function resample(audioBuffer: Float32Array, fromSampleRate: number, toSampleRat
     return result;
 }
 
-
 export function useVoskRecognizer(options: RecognizerOptions) {
     const [recognizerState, setRecognizerState] = useState<RecognizerState>(RecognizerState.IDLE);
     const [transcript, setTranscript] = useState<Transcript>({ partial: '', final: '' });
@@ -61,7 +60,7 @@ export function useVoskRecognizer(options: RecognizerOptions) {
         setRecognizerState(RecognizerState.LOADING);
         
         // Initialize Web Worker
-        const worker = new Worker(new URL('@/workers/vosk.worker.ts', import.meta.url));
+        const worker = new Worker(new URL('@/workers/vosk.worker.ts', import.meta.url), { type: 'module' });
         worker.onmessage = (event: MessageEvent<WorkerResponse>) => {
             const { data } = event;
             if (data.type === 'ready') {
@@ -72,14 +71,14 @@ export function useVoskRecognizer(options: RecognizerOptions) {
             } else if (data.type === 'partial') {
                 setTranscript(prev => ({ ...prev, partial: data.text ?? '' }));
             } else if (data.type === 'result') {
-                 // Reset partial transcript and set final transcript
+                // Reset partial transcript and set final transcript
                 setTranscript({ partial: '', final: data.text ?? '' });
             }
         };
         workerRef.current = worker;
         
-        // Initialize VAD
-        MicVAD.new({
+        // Initialize VAD with proper typing
+        const vadOptions = {
             workletURL: '/models/vad.worklet.js',
             modelURL: '/models/silero_vad.onnx',
             ortWasmURL: '/models/onnx-runtime-web.wasm',
@@ -87,7 +86,8 @@ export function useVoskRecognizer(options: RecognizerOptions) {
             onSpeechStart: () => {
                 console.log('VAD: Speech started');
             },
-            onSpeechEnd: async (audio) => {
+            
+            onSpeechEnd: async (audio: Float32Array) => {
                 console.log('VAD: Speech ended');
                 if (!workerRef.current || !vadRef.current) return;
 
@@ -96,20 +96,23 @@ export function useVoskRecognizer(options: RecognizerOptions) {
                 try {
                     const resampledAudio = resample(audio, fromSampleRate, options.sampleRate);
                     const message: WorkerMessage = { type: 'audio', audio: resampledAudio };
-                    workerRef.current?.postMessage(message);
+                    workerRef.current?.postMessage(message, [resampledAudio.buffer]);
                 } catch (e) {
                     console.error('Failed to resample audio', e);
                 }
             },
-            onFrameProcessed(probs) {
+            
+            onFrameProcessed: (probs: { isSpeech: boolean; prob: number }) => {
                 // You can use probs.isSpeech for real-time feedback
             },
-        }).then(vad => {
+        };
+
+        MicVAD.new(vadOptions).then(vad => {
             vadRef.current = vad;
             // Now that VAD is ready, we can initialize the worker model
             const initMessage: WorkerMessage = { type: 'init', modelUrl: options.modelUrl };
             workerRef.current?.postMessage(initMessage);
-        }).catch(e => {
+        }).catch((e: unknown) => {
             console.error('Failed to initialize VAD', e);
             setRecognizerState(RecognizerState.ERROR);
         });
@@ -119,7 +122,7 @@ export function useVoskRecognizer(options: RecognizerOptions) {
             vadRef.current = null;
             workerRef.current?.terminate();
             workerRef.current = null;
-        }
+        };
     }, [options.modelUrl, options.sampleRate]);
 
     const start = useCallback(() => {
@@ -127,7 +130,7 @@ export function useVoskRecognizer(options: RecognizerOptions) {
             vadRef.current.start();
             setRecognizerState(RecognizerState.LISTENING);
             setTranscript({ partial: '', final: '' });
-             // Reset recognizer state in worker
+            // Reset recognizer state in worker
             workerRef.current?.postMessage({ type: 'reset' } as WorkerMessage);
         }
     }, [recognizerState]);

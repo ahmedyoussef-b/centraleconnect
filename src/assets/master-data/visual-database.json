@@ -1,0 +1,36 @@
+{
+  "images": [
+    {
+      "id": "tg1-side-panel",
+      "name": "Panneau de Contrôle TG1",
+      "description": "Panneau latéral de la turbine à gaz 1 avec manomètres et voyants d'état. Utilisé pour les diagnostics rapides sur site.",
+      "imageUrl": "https://picsum.photos/seed/tg1panel/800/600",
+      "perceptualHash": "e669c3c39999663c",
+      "tags": ["turbine", "manomètre", "contrôle"]
+    },
+    {
+      "id": "pump-feedwater-plate",
+      "name": "Plaque Signalétique Pompe Eau Alimentaire",
+      "description": "Plaque du fabricant KSB pour la pompe PUMP-FEEDWATER-01. Contient les informations de série et de capacité.",
+      "imageUrl": "https://picsum.photos/seed/pumpplate/800/600",
+      "perceptualHash": "c1f1f1e1c3c3c180",
+      "tags": ["pompe", "plaque", "ksb"]
+    },
+    {
+      "id": "valve-bypass-handle",
+      "name": "Poignée Vanne Bypass HRSG1",
+      "description": "Poignée de commande manuelle rouge de la vanne de bypass sur la chaudière 1. Essentielle pour les procédures d'isolement.",
+      "imageUrl": "https://picsum.photos/seed/valvehandle/800/600",
+      "perceptualHash": "ffc3c3c3c3c3c3ff",
+      "tags": ["vanne", "bypass", "sécurité"]
+    },
+    {
+      "id": "cr1-condenser-side",
+      "name": "Condenseur CR1 - Vue Latérale",
+      "description": "Vue latérale du condenseur CR1 montrant les tuyauteries d'eau de refroidissement et les points d'accès pour la maintenance.",
+      "imageUrl": "https://picsum.photos/seed/cr1condenser/800/600",
+      "perceptualHash": "8f8f87c3c3c38f8f",
+      "tags": ["condenseur", "tuyauterie", "cr1"]
+    }
+  ]
+}
