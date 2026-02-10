@@ -369,8 +369,6 @@ export function CameraView() {
     const isTauriEnv = !!window.__TAURI__;
     setIsTauri(isTauriEnv);
 
-    if (!isTauriEnv) return;
-
     const getCameraPermission = async () => {
        try {
         const stream = await navigator.mediaDevices.getUserMedia({ video: true });
@@ -399,7 +397,8 @@ export function CameraView() {
   }, [toast]);
 
   useEffect(() => {
-    if (!isTauri) return;
+    const isTauriEnv = !!window.__TAURI__;
+    if (!isTauriEnv) return;
 
     const initializeWorker = async () => {
       if (!workerRef.current) {
@@ -434,7 +433,7 @@ export function CameraView() {
       workerRef.current?.terminate();
       workerRef.current = null;
     };
-  }, [isTauri, toast]);
+  }, [toast]);
 
   const processIdentification = useCallback(async (imageDataUrl: string) => {
     setViewMode('scanning');
@@ -520,6 +519,10 @@ export function CameraView() {
   }, [processProvisioning]);
 
   const handleSaveProvision = async (component: NewComponentFormData) => {
+    if (!isTauri) {
+        toast({ title: 'Fonctionnalité non disponible', description: 'La sauvegarde est uniquement disponible dans l\'application de bureau.'});
+        return;
+    }
     try {
       const { addComponentAndDocument } = await import('@/lib/db-service');
       await addComponentAndDocument(
@@ -572,19 +575,6 @@ export function CameraView() {
         });
     }
   };
-
-  if (!isTauri) {
-    return (
-      <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2"><ScanSearch /> Analyse Visuelle</CardTitle>
-          </CardHeader>
-          <CardContent className="flex h-full items-center justify-center rounded-lg border-2 border-dashed border-border p-4 min-h-[300px]">
-            <p className="text-center text-muted-foreground">L'analyse visuelle n'est disponible que dans l'application de bureau.</p>
-          </CardContent>
-      </Card>
-    );
-  }
   
   const isIdle = viewMode === 'idle';
 
@@ -663,7 +653,7 @@ export function CameraView() {
                           <p className="font-normal text-xs text-primary-foreground/80">Comparer avec la base de données</p>
                       </div>
                   </Button>
-                  <Button onClick={handleProvisionFromCamera} disabled={!isIdle || !hasCameraPermission || !workerRef.current} size="lg" variant="secondary" className="h-16 text-lg">
+                  <Button onClick={handleProvisionFromCamera} disabled={!isIdle || !hasCameraPermission || (isTauri && !workerRef.current)} size="lg" variant="secondary" className="h-16 text-lg">
                       <PlusCircle className="mr-3 h-8 w-8"/>
                        <div>
                           <p className="font-bold">Provisionner (Caméra)</p>
@@ -710,4 +700,3 @@ export function CameraView() {
     </div>
   );
 }
-
