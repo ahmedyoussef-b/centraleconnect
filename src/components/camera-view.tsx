@@ -342,9 +342,15 @@ export function CameraView() {
             setStatusText('Synchronisation des données...');
             const { syncWithRemote } = await import('@/lib/db-service');
             const stats = await syncWithRemote();
+            
+            let toastDescription = `${stats.synced} enregistrements mis à jour depuis le serveur.`;
+            if (stats.cleaned) {
+                toastDescription += " La base de données distante a été nettoyée avec succès.";
+            }
+
             toast({
                 title: 'Synchronisation terminée',
-                description: `${stats.synced} enregistrements mis à jour depuis le serveur.`,
+                description: toastDescription,
             });
         }
 
@@ -411,9 +417,9 @@ export function CameraView() {
                 description: ocrResultText,
             });
         }
-    } else {
+    } else if (!isTauri) {
         setStatusText('Préparation du formulaire...');
-        ocrResultText = "Le provisionnement OCR est uniquement disponible dans l'application de bureau.";
+        ocrResultText = "Le provisionnement OCR est uniquement disponible dans l'application de bureau. Veuillez saisir les informations manuellement.";
     }
 
     setOcrText(ocrResultText);

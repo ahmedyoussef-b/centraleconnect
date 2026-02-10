@@ -542,10 +542,10 @@ export async function getLocalVisualDatabase(): Promise<any[]> {
     return results;
 }
 
-export async function syncWithRemote(): Promise<{ synced: number }> {
+export async function syncWithRemote(): Promise<{ synced: number; cleaned: boolean }> {
     if (typeof window === 'undefined' || !window.__TAURI__) {
         console.warn("Sync is only available in the Tauri environment.");
-        return { synced: 0 };
+        return { synced: 0, cleaned: false };
     }
 
     const response = await fetch('/api/sync/data');
@@ -555,17 +555,16 @@ export async function syncWithRemote(): Promise<{ synced: number }> {
     const data = await response.json();
     const db = await invoke('plugin:sql|load', { db: DB_NAME });
     
-    // Use transaction for atomic operations
-    const txId = await invoke('plugin:sql|begin', { db });
+    let totalSynced = 0;
     
+    // Step 1: Update local database within a transaction
+    const txId = await invoke('plugin:sql|begin', { db });
     try {
         const tableNames = ['documents', 'parameters', 'alarms', 'log_entries', 'procedures', 'synoptic_items', 'equipments'];
         for (const tableName of tableNames) {
             await invoke('plugin:sql|execute', { db, query: `DELETE FROM ${tableName};` });
         }
         
-        let totalSynced = 0;
-
         for (const equip of data.equipments || []) {
             await invoke('plugin:sql|execute', { db, query: 'INSERT INTO equipments (external_id, name, description, parent_id, type, subtype, system_code, sub_system, location, manufacturer, serial_number, document_ref, checksum) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)', values: [equip.externalId, equip.name, equip.description, equip.parentId, equip.type, equip.subtype, equip.systemCode, equip.subSystem, equip.location, equip.manufacturer, equip.serialNumber, equip.documentRef, equip.checksum] });
             totalSynced++;
@@ -596,19 +595,28 @@ export async function syncWithRemote(): Promise<{ synced: number }> {
         }
 
         await invoke('plugin:sql|commit', { db });
-        console.log('Local DB synced. Triggering remote DB cleanup...');
-        const cleanupResponse = await fetch('/api/sync/clear', { method: 'POST' });
-        if (!cleanupResponse.ok) {
-            throw new Error(`Failed to clear remote database: ${cleanupResponse.statusText}`);
-        }
-        console.log('Remote DB cleanup successful.');
-
-        return { synced: totalSynced };
     } catch (e) {
-        console.error("Transaction failed, rolling back:", e);
+        console.error("Local database transaction failed, rolling back:", e);
         await invoke('plugin:sql|rollback', { db });
         throw e;
     }
+
+    // Step 2: Clean up remote database
+    console.log('Local DB synced. Triggering remote DB cleanup...');
+    let cleaned = false;
+    try {
+        const cleanupResponse = await fetch('/api/sync/clear', { method: 'POST' });
+        if (!cleanupResponse.ok) {
+            console.error(`Failed to clear remote database: ${cleanupResponse.statusText}`);
+        } else {
+            console.log('Remote DB cleanup successful.');
+            cleaned = true;
+        }
+    } catch (e) {
+        console.error("Error during remote cleanup:", e);
+    }
+    
+    return { synced: totalSynced, cleaned };
 }
 
 
