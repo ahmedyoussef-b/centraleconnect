@@ -80,9 +80,10 @@ export function useVoskRecognizer(options: RecognizerOptions) {
         
         // Initialize VAD
         MicVAD.new({
-            workletPath: '/models/vad.worklet.js',
+            workletURL: '/models/vad.worklet.js',
             modelPath: '/models/silero_vad.onnx',
             ortWasmURL: '/models/onnx-runtime-web.wasm',
+            
             onSpeechStart: () => {
                 console.log('VAD: Speech started');
             },
