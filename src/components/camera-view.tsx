@@ -108,6 +108,7 @@ function ProvisioningForm({
     description: ocrText,
   });
   const [isSaving, setIsSaving] = useState(false);
+  const { toast } = useToast();
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -118,9 +119,26 @@ function ProvisioningForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Client-side validation
+    const externalIdPattern = /^[A-Z0-9][A-Z0-9.-]*$/;
+    if (!formData.id || !externalIdPattern.test(formData.id)) {
+        toast({
+            variant: 'destructive',
+            title: 'ID Externe Invalide',
+            description: "Format incorrect. Ex: 'B1.PUMP.01' ou 'TG1'. Pas d'espaces ni de caractères spéciaux au début.",
+        });
+        return;
+    }
+
     setIsSaving(true);
-    await onSave(formData);
-    setIsSaving(false);
+    try {
+      await onSave(formData);
+    } catch(e) {
+      // Error is already toasted in handleSaveProvision
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -132,13 +150,13 @@ function ProvisioningForm({
                 <div className="space-y-2">
                 <h4 className="font-medium">Nouveau composant</h4>
                 <div className="space-y-2">
-                    <Label htmlFor="id">ID Composant (Tag)</Label>
+                    <Label htmlFor="id">ID Externe (Tag)</Label>
                     <Input
                     id="id"
                     name="id"
                     value={formData.id}
                     onChange={handleChange}
-                    placeholder="ex: P-101A"
+                    placeholder="ex: B1.PUMP.01A"
                     required
                     />
                 </div>
@@ -480,15 +498,12 @@ export function CameraView() {
           externalId: componentData.id,
           name: componentData.name,
           type: componentData.type,
-          version: 1,
-          isImmutable: false,
         },
         document: {
           imageData: capturedImage,
           ocrText: ocrText,
           description: `Plaque signalétique pour ${componentData.id}`,
           perceptualHash,
-          createdAt: new Date().toISOString(),
         }
       };
       console.log('[PROVISION_FLOW] Assembled payload for API:', payload);
@@ -516,6 +531,7 @@ export function CameraView() {
     } catch (error: any) {
       console.error('[PROVISION_FLOW] Error saving provision:', error);
       toast({ variant: 'destructive', title: 'Erreur de sauvegarde', description: error.message || "Impossible d'enregistrer." });
+      throw error;
     }
   };
 

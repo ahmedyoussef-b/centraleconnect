@@ -1,3 +1,4 @@
+
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { createHash } from 'crypto';
@@ -28,17 +29,25 @@ export async function POST(request: Request) {
         const body = await request.json();
         const { component, document } = body;
         
-        console.log(`[PROVISION_API] Payload received for equipment ID: ${component?.id}`);
+        console.log(`[PROVISION_API] Payload received for equipment ID: ${component?.externalId}`);
 
-        if (!component || !document || !component.id || !document.imageData || !document.perceptualHash) {
+        if (!component || !document || !component.externalId || !document.imageData || !document.perceptualHash) {
             console.error('[PROVISION_API] Validation failed: Invalid data.', { component: !!component, document: !!document });
             return NextResponse.json({ error: 'Données invalides' }, { status: 400 });
+        }
+        
+        // Validation du format de l'ID externe
+        const externalIdPattern = /^[A-Z0-9][A-Z0-9.-]*$/;
+        if (!externalIdPattern.test(component.externalId)) {
+            const errorMsg = "Format d'ID externe invalide. L'ID doit commencer par une lettre ou un chiffre et ne peut contenir que des lettres, chiffres, points et tirets.";
+            console.error(`[PROVISION_API] Validation de l'ID externe échouée: ${errorMsg}`);
+            return NextResponse.json({ error: errorMsg }, { status: 400 });
         }
         
         console.log('[PROVISION_API] Data validation successful.');
 
         const newEquipmentData = {
-            externalId: component.id,
+            externalId: component.externalId,
             name: component.name,
             type: component.type,
             version: 1,
@@ -46,7 +55,7 @@ export async function POST(request: Request) {
         };
 
         const newDocumentData = {
-            equipmentId: component.id,
+            equipmentId: component.externalId,
             imageData: document.imageData,
             ocrText: document.ocrText,
             description: document.description,
@@ -58,30 +67,30 @@ export async function POST(request: Request) {
         const result = await prisma.$transaction(async (tx) => {
             // 1. Check if equipment already exists
             const existing = await tx.equipment.findUnique({
-                where: { externalId: component.id },
+                where: { externalId: component.externalId },
             });
             if (existing) {
                 // We throw an error to rollback the transaction
-                throw new Error(`L'équipement avec l'ID '${component.id}' existe déjà.`);
+                throw new Error(`L'équipement avec l'ID '${component.externalId}' existe déjà.`);
             }
 
             // 2. Create the new equipment
-            console.log(`[PROVISION_API] Creating equipment: ${component.id}`);
+            console.log(`[PROVISION_API] Creating equipment: ${component.externalId}`);
             const newEquipment = await tx.equipment.create({ data: newEquipmentData });
 
             // 3. Create the associated document
-            console.log(`[PROVISION_API] Creating document for equipment: ${component.id}`);
+            console.log(`[PROVISION_API] Creating document for equipment: ${component.externalId}`);
             const newDocument = await tx.document.create({ data: newDocumentData });
 
             // 4. Create a secure log entry
             console.log(`[PROVISION_API] Creating log entry for provisioning.`);
-            const logMessage = `Nouvel équipement '${component.id}' ajouté via provisionnement web.`;
+            const logMessage = `Nouvel équipement '${component.externalId}' ajouté via provisionnement web.`;
             const logEntryData: LogEntryData = {
                 timestamp: new Date(),
                 type: 'DOCUMENT_ADDED',
                 source: 'Provisioning Web', // Or get user from session
                 message: logMessage,
-                equipmentId: component.id,
+                equipmentId: component.externalId,
             };
 
             // Get the last signature for chaining
