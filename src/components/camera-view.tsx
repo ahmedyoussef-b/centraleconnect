@@ -36,6 +36,7 @@ function ProvisioningForm({
     id: '',
     name: '',
     type: '',
+    criticality: 'low',
     description: ocrText,
   });
   const [isSaving, setIsSaving] = useState(false);
@@ -277,11 +278,18 @@ export function CameraView() {
   const handleSave = async (component: NewComponentFormData) => {
     try {
       const { addComponentAndDocument } = await import('@/lib/db-service');
-      await addComponentAndDocument(component, {
-        imageData: capturedImage,
-        ocrText: analysisResult,
-        description: `Plaque signalétique pour ${component.id}`,
-      });
+      await addComponentAndDocument(
+        {
+          externalId: component.id,
+          name: component.name,
+          type: component.type,
+        },
+        {
+          imageData: capturedImage,
+          ocrText: analysisResult,
+          description: `Plaque signalétique pour ${component.id}`,
+        }
+      );
       toast({
         title: 'Succès',
         description: `La fiche pour le composant ${component.id} a été ajoutée.`,
