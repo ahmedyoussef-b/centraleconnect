@@ -3,7 +3,6 @@
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { Camera, CameraOff, RefreshCcw, ScanLine, Save, X, ScanSearch, Upload, FileUp } from 'lucide-react';
-import type Tesseract from 'tesseract.js';
 // Replace next/image with a standard img tag for better data URI handling
 // import Image from 'next/image';
 
@@ -384,9 +383,22 @@ export function CameraView() {
         handleReset();
         return;
     }
-    
-    const { data: { text } } = await workerRef.current.recognize(imageDataUrl);
-    setOcrText(text || 'Aucun texte détecté.');
+
+    let ocrResultText = 'Aucun texte détecté.';
+    try {
+        const { data: { text } } = await workerRef.current.recognize(imageDataUrl);
+        ocrResultText = text || 'Aucun texte détecté.';
+    } catch (error) {
+        console.error("OCR recognition failed:", error);
+        toast({
+            variant: "default",
+            title: 'OCR a échoué',
+            description: "La reconnaissance de texte a échoué, veuillez saisir les informations manuellement.",
+        });
+        ocrResultText = "L'OCR a échoué. Saisie manuelle requise.";
+    }
+
+    setOcrText(ocrResultText);
     setViewMode('provisioning');
   }, [toast, isTauri]);
   
