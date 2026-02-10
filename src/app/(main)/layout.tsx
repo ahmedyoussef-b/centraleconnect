@@ -138,14 +138,6 @@ export default function MainLayout({
                 </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                  <SidebarMenuButton asChild tooltip="Supervision SCADA" isActive={pathname === '/scada'}>
-                      <Link href="/scada">
-                          <Activity />
-                          Supervision SCADA
-                      </Link>
-                  </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
                   <SidebarMenuButton asChild tooltip="Alarmes" isActive={pathname === '/alarms'}>
                       <Link href="/alarms">
                           <BellRing />

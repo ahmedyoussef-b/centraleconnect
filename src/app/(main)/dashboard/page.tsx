@@ -5,23 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Skeleton } from '@/components/ui/skeleton';
 import { CcppDiagram } from '@/components/ccpp-diagram';
 
-const ScadaRealtime = dynamic(
-  () => import('@/components/scada-realtime').then((mod) => mod.ScadaRealtime),
-  {
-    ssr: false,
-    loading: () => (
-       <Card>
-        <CardHeader>
-          <CardTitle>Supervision Temps Réel (SCADA)</CardTitle>
-        </CardHeader>
-        <CardContent>
-           <Skeleton className="h-24 w-full" />
-        </CardContent>
-      </Card>
-    ),
-  }
-);
-
 const HistoryChart = dynamic(
   () => import('@/components/history-chart').then((mod) => mod.HistoryChart),
   {
@@ -44,7 +27,6 @@ export default function DashboardPage() {
   return (
     <>
       <CcppDiagram />
-      <ScadaRealtime />
       <HistoryChart />
     </>
   );
