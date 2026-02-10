@@ -2,97 +2,93 @@
 const fs = require('fs');
 const path = require('path');
 
-/**
- * Finds the root directory of an installed npm package.
- * @param {string} packageName - The name of the package.
- * @returns {string | null} The path to the package directory or null if not found.
- */
-function findPackagePath(packageName) {
+const ASSETS = [
+    {
+        pkg: '@ricky0123/vad-web',
+        // In older versions, files were in dist. In newer ones, they are in public.
+        // We check both for robustness.
+        paths: ['dist/silero_vad.onnx', 'public/silero_vad.onnx'], 
+        dest: 'silero_vad.onnx'
+    },
+    {
+        pkg: '@ricky0123/vad-web',
+        paths: ['dist/vad.worklet.js', 'public/vad.worklet.js'],
+        dest: 'vad.worklet.js'
+    },
+    {
+        pkg: 'onnxruntime-web',
+        // The SIMD-enabled WASM is generally preferred for performance
+        paths: ['dist/ort-wasm-simd.wasm', 'dist/ort-wasm.wasm'],
+        dest: 'onnx-runtime-web.wasm'
+    }
+];
+
+function findPackagePath(packageName, fromPath) {
     try {
-        const packageJsonPath = require.resolve(`${packageName}/package.json`);
+        const packageJsonPath = require.resolve(`${packageName}/package.json`, { paths: [fromPath] });
         return path.dirname(packageJsonPath);
     } catch (e) {
-        console.error(`Could not find package ${packageName}. Is it installed?`);
         return null;
     }
 }
 
-/**
- * This script copies the necessary assets for @ricky0123/vad-web and its
- * dependency onnxruntime-web from node_modules to the public/models directory.
- * This is required for Next.js to be able to serve these files to the browser.
- */
-function copyVADAssets() {
-    console.log('Copying VAD and ONNX assets for vocal assistant...');
-    const destDir = path.resolve(__dirname, '..', 'public', 'models');
+function copyAsset(asset, destDir, projectRoot) {
+    console.log(`\nProcessing asset for: ${asset.dest}`);
+    const pkgPath = findPackagePath(asset.pkg, projectRoot);
 
-    // Ensure the destination directory exists
-    if (!fs.existsSync(destDir)) {
-        fs.mkdirSync(destDir, { recursive: true });
-        console.log(`Created destination directory: ${destDir}`);
+    if (!pkgPath) {
+        console.error(`❌ Could not find package '${asset.pkg}'. Is it installed as a dependency?`);
+        return false;
     }
+    console.log(`  - Found package '${asset.pkg}' at: ${path.relative(projectRoot, pkgPath)}`);
 
-    // --- 1. Files from @ricky0123/vad-web ---
-    const vadPackagePath = findPackagePath('@ricky0123/vad-web');
-    if (vadPackagePath) {
-        const vadSrcDir = path.join(vadPackagePath, 'dist');
-        const vadFilesToCopy = [
-            'vad.worklet.js',
-            'silero_vad.onnx',
-        ];
-
-        vadFilesToCopy.forEach(file => {
-            const srcFile = path.join(vadSrcDir, file);
-            const destFile = path.join(destDir, file);
-            if (fs.existsSync(srcFile)) {
-                fs.copyFileSync(srcFile, destFile);
-                console.log(`✅ Copied ${file} from @ricky0123/vad-web`);
-            } else {
-                console.warn(`⚠️ Source file not found, skipping: ${srcFile}`);
+    for (const p of asset.paths) {
+        const srcPath = path.join(pkgPath, p);
+        if (fs.existsSync(srcPath)) {
+            const destPath = path.join(destDir, asset.dest);
+            try {
+                fs.copyFileSync(srcPath, destPath);
+                console.log(`  ✅ Copied '${path.relative(projectRoot, srcPath)}' to '${path.relative(projectRoot, destPath)}'`);
+                return true;
+            } catch (error) {
+                console.error(`  ❌ Error copying file: ${error}`);
+                return false;
             }
-        });
-    }
-
-    // --- 2. Files from onnxruntime-web ---
-    const onnxPackagePath = findPackagePath('onnxruntime-web');
-    if (onnxPackagePath) {
-        const onnxSrcDir = path.join(onnxPackagePath, 'dist');
-        
-        // This is the file name the hook `use-vosk-recognizer` expects.
-        const wasmDestName = 'onnx-runtime-web.wasm';
-        
-        // `ort-wasm-simd.wasm` is generally recommended for modern browsers.
-        const wasmSourceName = 'ort-wasm-simd.wasm';
-        
-        const srcFile = path.join(onnxSrcDir, wasmSourceName);
-        const destFile = path.join(destDir, wasmDestName);
-
-        if (fs.existsSync(srcFile)) {
-            fs.copyFileSync(srcFile, destFile);
-            console.log(`✅ Copied ${wasmSourceName} to public/models/${wasmDestName}`);
-        } else {
-             // Fallback to the non-simd version if simd is not found
-            const fallbackWasmSource = 'ort-wasm.wasm';
-            const fallbackSrcFile = path.join(onnxSrcDir, fallbackWasmSource);
-             if (fs.existsSync(fallbackSrcFile)) {
-                 fs.copyFileSync(fallbackSrcFile, destFile);
-                 console.log(`✅ Copied fallback ${fallbackWasmSource} to public/models/${wasmDestName}`);
-             } else {
-                console.warn(`⚠️ Could not find ${wasmSourceName} or ${fallbackWasmSource} in ${onnxSrcDir}. The VAD may not work.`);
-             }
         }
     }
 
-    console.log('VAD and ONNX assets copy process finished.');
+    console.warn(`  ⚠️ Could not find any of the source files for '${asset.dest}' in package '${asset.pkg}'. Checked paths: ${asset.paths.join(', ')}`);
+    return false;
 }
 
-try {
-    copyVADAssets();
-} catch (e) {
-    console.error('❌ Failed to copy VAD assets. The vocal assistant might not work correctly.');
-    if (e instanceof Error) {
-        console.error(e.message);
+function main() {
+    console.log('--- Copying VAD & ONNX assets for Vocal Assistant ---');
+
+    const projectRoot = path.resolve(__dirname, '..');
+    const destDir = path.join(projectRoot, 'public', 'models');
+
+    try {
+        if (!fs.existsSync(destDir)) {
+            fs.mkdirSync(destDir, { recursive: true });
+            console.log(`Created destination directory: ${path.relative(projectRoot, destDir)}`);
+        }
+    } catch (error) {
+        console.error(`❌ Failed to create destination directory: ${error}`);
+        process.exit(1);
+    }
+
+    let success = true;
+    for (const asset of ASSETS) {
+        if (!copyAsset(asset, destDir, projectRoot)) {
+            success = false;
+        }
+    }
+
+    if (success) {
+        console.log('\n--- ✅ All assets copied successfully! ---');
     } else {
-        console.error(e);
+        console.error('\n--- ⚠️ Some assets could not be copied. The vocal assistant might not work correctly. ---');
     }
 }
+
+main();
