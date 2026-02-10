@@ -1,138 +1,37 @@
 [
-    {
-      "external_id": "B0.CAA.HV183",
-      "path": "B0/CAA/HV183",
-      "level": 3,
-      "type": "EQUIPMENT",
-      "subtype": "COMPRESSOR",
-      "parent_id": "B0",
-      "label_fr": "Compresseur d'air service instrument",
-      "label_en": "Instrument air service compressor",
-      "tags": ["HV-183", "COMPRESSEUR_AIR", "100%_CAPACITY", "B1_B2"],
-      "parameters": [
-        { "name": "pression_sortie", "unit": "bar", "critical": true, "min": 6.0, "max": 8.5 },
-        { "name": "debit", "unit": "Nm³/h", "critical": true, "min": 1200, "max": 1800 },
-        { "name": "point_rosee", "unit": "°C", "critical": true, "max": -20 },
-        { "name": "puissance_moteur", "unit": "kW", "critical": false, "value": 160 }
-      ],
-      "approved_by": "ENG-SCADA-TEAM",
-      "approval_date": "2026-01-28",
-      "standard_refs": ["ISO_55001", "ISO_8573-1", "IEC_61511"]
-    },
-    {
-      "external_id": "B0.CAA.RCP",
-      "path": "B0/CAA/RCP",
-      "level": 3,
-      "type": "EQUIPMENT",
-      "subtype": "TANK",
-      "parent_id": "B0",
-      "label_fr": "Récepteur d'air comprimé tampon",
-      "label_en": "Instrument air receiver tank",
-      "tags": ["RECEPTEUR_AIR", "AIR_BUFFER", "B1_B2"],
-      "parameters": [
-        { "name": "volume", "unit": "m³", "critical": false, "value": 10.0 },
-        { "name": "pression_max", "unit": "bar", "critical": true, "value": 10.0 },
-        { "name": "pression_consigne", "unit": "bar", "critical": true, "min": 6.5, "max": 7.5 }
-      ],
-      "approved_by": "ENG-SCADA-TEAM",
-      "approval_date": "2026-01-28",
-      "standard_refs": ["ISO_55001", "PED_2014/68/EU", "ASME_VIII"]
-    },
-    {
-      "external_id": "B0.GGR.DRAINS",
-      "path": "B0/GGR/DRAINS",
-      "level": 3,
-      "type": "EQUIPMENT",
-      "subtype": "COLLECTOR",
-      "parent_id": "B0",
-      "label_fr": "Collecteur drains/purges système lubrification TA",
-      "label_en": "Lube oil system drain collector",
-      "tags": ["DRAINS_GGR", "PURGES_HUILE", "SOUB3MSGTH-SM460", "B1_B2"],
-      "parameters": [
-        { "name": "niveau_max", "unit": "%", "critical": true, "max": 80 },
-        { "name": "temp_condensat", "unit": "°C", "critical": false },
-        { "name": "debit_purge", "unit": "l/min", "critical": false }
-      ],
-      "approved_by": "ENG-SCADA-TEAM",
-      "approval_date": "2026-01-28",
-      "standard_refs": ["ISO_55001", "API_614"]
-    },
-    {
-      "external_id": "B0.SKD.PUMP",
-      "path": "B0/SKD/PUMP",
-      "level": 3,
-      "type": "EQUIPMENT",
-      "subtype": "PUMP",
-      "parent_id": "B0",
-      "label_fr": "Pompe eau de refroidissement auxiliaire SKD",
-      "label_en": "Auxiliary cooling water pump SKD",
-      "tags": ["HY-238", "SKD", "EAU_REFROIDISSEMENT", "B1_B2"],
-      "parameters": [
-        { "name": "debit", "unit": "m³/h", "critical": true, "min": 350, "max": 500 },
-        { "name": "hauteur_maniometrique", "unit": "mCE", "critical": true, "value": 45 },
-        { "name": "temp_max_admission", "unit": "°C", "critical": true, "max": 40 }
-      ],
-      "approved_by": "ENG-SCADA-TEAM",
-      "approval_date": "2026-01-28",
-      "standard_refs": ["ISO_55001", "ISO_13709", "EU_IED_2010/75/EC"]
-    },
-    {
-      "external_id": "B0.SKD.TANK",
-      "path": "B0/SKD/TANK",
-      "level": 3,
-      "type": "EQUIPMENT",
-      "subtype": "TANK",
-      "parent_id": "B0",
-      "label_fr": "Réservoir tampon eau refroidissement SKD",
-      "label_en": "Cooling water buffer tank SKD",
-      "tags": ["RESERVOIR_SKD", "SKD", "B1_B2"],
-      "parameters": [
-        { "name": "volume", "unit": "m³", "critical": false, "value": 250 },
-        { "name": "niveau_min", "unit": "%", "critical": true, "min": 30 },
-        { "name": "niveau_max", "unit": "%", "critical": true, "max": 90 }
-      ],
-      "approved_by": "ENG-SCADA-TEAM",
-      "approval_date": "2026-01-28",
-      "standard_refs": ["ISO_55001", "PED_2014/68/EU"]
-    },
-    {
-      "external_id": "B0.FILT.221TF2",
-      "path": "B0/FILT/221TF2",
-      "level": 3,
-      "type": "EQUIPMENT",
-      "subtype": "FILTRATION_SYSTEM",
-      "parent_id": "B0",
-      "label_fr": "Station de filtration eau process à flotteurs",
-      "label_en": "Float-type water process filtration station",
-      "tags": ["221TF2", "221TF23", "PERTE_CHARGE", "SOUB3MSCEL-SM435", "B1_B2"],
-      "parameters": [
-        { "name": "perte_charge_max", "unit": "bar", "critical": true, "max": 0.8 },
-        { "name": "debit_nominal", "unit": "m³/h", "critical": true, "min": 400, "max": 600 },
-        { "name": "granulometrie", "unit": "µm", "critical": true, "value": 100 }
-      ],
-      "approved_by": "ENG-SCADA-TEAM",
-      "approval_date": "2026-01-28",
-      "standard_refs": ["ISO_55001", "ISO_14644-1", "EU_IED_2010/75/EC"]
-    },
-    {
-      "external_id": "B0.FILT.GRILLES",
-      "path": "B0/FILT/GRILLES",
-      "level": 3,
-      "type": "EQUIPMENT",
-      "subtype": "SCREEN_FILTER",
-      "parent_id": "B0",
-      "label_fr": "Grilles filtrantes pour protection batardeaux",
-      "label_en": "Screen filters for stop-log protection",
-      "tags": ["GRILLE_FILTRANTE", "BATARDEAU", "PANIER", "B1_B2"],
-      "parameters": [
-        { "name": "perte_charge_max", "unit": "bar", "critical": true, "max": 0.2 },
-        { "name": "vitesse_passage_max", "unit": "m/s", "critical": true, "max": 2.0 },
-        { "name": "etat_encrassement", "unit": "%", "critical": true, "max": 75 }
-      ],
-      "approved_by": "ENG-SCADA-TEAM",
-      "approval_date": "2026-01-28",
-      "standard_refs": ["ISO_55001", "ISO_13709"]
-    }
-  ]
-
-    
+  { "external_id": "B0.CFI", "path": "B0/CFI", "level": 2, "type": "SYSTEM", "parent_id": "B0", "label_fr": "FILTRATION EAU DE REFRIGERATION" },
+  { "external_id": "B0.CRF", "path": "B0/CRF", "level": 2, "type": "SYSTEM", "parent_id": "B0", "label_fr": "CIRCUIT EAU DE REFRIGERATION" },
+  { "external_id": "B0.DVC", "path": "B0/DVC", "level": 2, "type": "SYSTEM", "parent_id": "B0", "label_fr": "CLIMATISATION DES BATIMENTS" },
+  { "external_id": "B0.GIS", "path": "B0/GIS", "level": 2, "type": "SYSTEM", "parent_id": "B0", "label_fr": "GIS : Distribution 125Vcc" },
+  { "external_id": "B0.KBS", "path": "B0/KBS", "level": 2, "type": "SYSTEM", "parent_id": "B0", "label_fr": "REGROUPEMENT ANALOGIQUE CMN SITE" },
+  { "external_id": "B0.KCZ", "path": "B0/KCZ", "level": 2, "type": "SYSTEM", "parent_id": "B0", "label_fr": "AUTOMATES LOGIQUES CMN DE BLOC" },
+  { "external_id": "B0.KIT", "path": "B0/KIT", "level": 2, "type": "SYSTEM", "parent_id": "B0", "label_fr": "CALCULATEUR DE SUPERVISION TCI" },
+  { "external_id": "B0.KRG", "path": "B0/KRG", "level": 2, "type": "SYSTEM", "parent_id": "B0", "label_fr": "REGULATION DE CHARGE DU BLOC" },
+  { "external_id": "B0.KSA", "path": "B0/KSA", "level": 2, "type": "SYSTEM", "parent_id": "B0", "label_fr": "TRAITEMENTS DES ALARMES DU BLOC" },
+  { "external_id": "B0.KSC", "path": "B0/KSC", "level": 2, "type": "SYSTEM", "parent_id": "B0", "label_fr": "ORDRE VAL PUPITRE" },
+  { "external_id": "B0.LBA", "path": "B0/LBA", "level": 2, "type": "SYSTEM", "parent_id": "B0", "label_fr": "PROD ET DISTR 125V CC BLOC" },
+  { "external_id": "B0.LBB", "path": "B0/LBB", "level": 2, "type": "SYSTEM", "parent_id": "B0", "label_fr": "PROD ET DISTR 125V CC BLOC" },
+  { "external_id": "B0.LCA", "path": "B0/LCA", "level": 2, "type": "SYSTEM", "parent_id": "B0", "label_fr": "PROD ET DISTR 48V CC BLOC" },
+  { "external_id": "B0.LCB", "path": "B0/LCB", "level": 2, "type": "SYSTEM", "parent_id": "B0", "label_fr": "PROD ET DISTR 48V CC BLOC" },
+  { "external_id": "B0.LGA", "path": "B0/LGA", "level": 2, "type": "SYSTEM", "parent_id": "B0", "label_fr": "DISTRIBUTION MT NORMALE BLOC" },
+  { "external_id": "B0.LJP", "path": "B0/LJP", "level": 2, "type": "SYSTEM", "parent_id": "B0", "label_fr": "POSTE EXTERIEUR" },
+  { "external_id": "B0.LKA", "path": "B0/LKA", "level": 2, "type": "SYSTEM", "parent_id": "B0", "label_fr": "DISTRIBUTION BT NORMALE BLOC" },
+  { "external_id": "B0.LKB", "path": "B0/LKB", "level": 2, "type": "SYSTEM", "parent_id": "B0", "label_fr": "DISTRIBUTION BT NORMALE BLOC" },
+  { "external_id": "B0.LKN", "path": "B0/LKN", "level": 2, "type": "SYSTEM", "parent_id": "B0", "label_fr": "DISTRIBUTION ECLAIRAGE NORMAL" },
+  { "external_id": "B0.LLA", "path": "B0/LLA", "level": 2, "type": "SYSTEM", "parent_id": "B0", "label_fr": "DISTRIBUTION BT SECOURS BLOC" },
+  { "external_id": "B0.LLB", "path": "B0/LLB", "level": 2, "type": "SYSTEM", "parent_id": "B0", "label_fr": "DISTRIBUTION BT SECOURS BLOC" },
+  { "external_id": "B0.LLN", "path": "B0/LLN", "level": 2, "type": "SYSTEM", "parent_id": "B0", "label_fr": "DISTRIBUTION ECLAIRAGE SECOURS" },
+  { "external_id": "B0.LLP", "path": "B0/LLP", "level": 2, "type": "SYSTEM", "parent_id": "B0", "label_fr": "PRODUCTION BT SECOURS BLOC" },
+  { "external_id": "B0.LNA", "path": "B0/LNA", "level": 2, "type": "SYSTEM", "parent_id": "B0", "label_fr": "PROD ET DISTR 220V SECOURU" },
+  { "external_id": "B0.LSI", "path": "B0/LSI", "level": 2, "type": "SYSTEM", "parent_id": "B0", "label_fr": "DISTRIBUTION ECLAIRAGE SECURITE" },
+  { "external_id": "B0.TEST_MODBUS", "path": "B0/TEST_MODBUS", "level": 2, "type": "SYSTEM", "parent_id": "B0", "label_fr": "Essais CSS-F Modbus" },
+  { "external_id": "B0.SAP", "path": "B0/SAP", "level": 2, "type": "SYSTEM", "parent_id": "B0", "label_fr": "PROD ET DISTR AIR DE TRAVAIL" },
+  { "external_id": "B0.SAR", "path": "B0/SAR", "level": 2, "type": "SYSTEM", "parent_id": "B0", "label_fr": "PROD ET DISTR AIR DE REGUL" },
+  { "external_id": "B0.SER", "path": "B0/SER", "level": 2, "type": "SYSTEM", "parent_id": "B0", "label_fr": "STOCKAGE ET DISTR EAU DEM" },
+  { "external_id": "B0.SIR", "path": "B0/SIR", "level": 2, "type": "SYSTEM", "parent_id": "B0", "label_fr": "CONDITIONNEMENT CHIMIQUE" },
+  { "external_id": "B0.SIT", "path": "B0/SIT", "level": 2, "type": "SYSTEM", "parent_id": "B0", "label_fr": "CTRL CHIM ET ECHANT CMN SITE" },
+  { "external_id": "B0.SKD", "path": "B0/SKD", "level": 2, "type": "SYSTEM", "parent_id": "B0", "label_fr": "STOCKAGE ET TRANSFERT DU FIOUL" },
+  { "external_id": "B0.TKG", "path": "B0/TKG", "level": 2, "type": "SYSTEM", "parent_id": "B0", "label_fr": "TRAITEMENTS COMBUSTIBLES GAZEUX" },
+  { "external_id": "B0.TPF", "path": "B0/TPF", "level": 2, "type": "SYSTEM", "parent_id": "B0", "label_fr": "ALIMENTATION EN FIOUL DU BLOC" },
+  { "external_id": "B0.TPG", "path": "B0/TPG", "level": 2, "type": "SYSTEM", "parent_id": "B0", "label_fr": "ALIMENTATION EN GAZ DU BLOC" }
+]

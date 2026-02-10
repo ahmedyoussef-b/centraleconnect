@@ -14,7 +14,8 @@ import b1Data from '../src/assets/master-data/B1.json';
 import b2Data from '../src/assets/master-data/B2.json';
 import b3Data from '../src/assets/master-data/B3.json';
 import proceduresData from '../src/assets/master-data/procedures.json';
-import tgData from '../src/assets/master-data/TG.json';
+import tg1Data from '../src/assets/master-data/TG1.json';
+import tg2Data from '../src/assets/master-data/TG2.json';
 
 const prisma = new PrismaClient();
 
@@ -43,7 +44,7 @@ async function main() {
     return createHash('sha256').update(JSON.stringify(data)).digest('hex');
   };
 
-  const detailedData = [...b0Data, ...b1Data, ...b2Data, ...b3Data, ...pidAssetsData.nodes, ...componentsData, ...tgData];
+  const detailedData = [...b0Data, ...b1Data, ...b2Data, ...b3Data, ...pidAssetsData.nodes, ...componentsData, ...tg1Data, ...tg2Data];
 
   for (const item of detailedData as any[]) {
     const id = item.externalId || item.tag;

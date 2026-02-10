@@ -1,0 +1,162 @@
+[
+    {
+      "external_id": "GRP.TCI",
+      "path": "Groupes/Synoptiques/ORDINATEUR DE SUPERVISION - TCI",
+      "level": 2,
+      "type": "FOLDER",
+      "label_fr": "ORDINATEUR DE SUPERVISION - TCI",
+      "children": [
+        { "id": "B0SY11", "label": "B0SY11 : " },
+        { "id": "B0SY21", "label": "B0SY21 : " },
+        { "id": "B0SY31", "label": "B0SY31 : " },
+        { "id": "B0SY32", "label": "B0SY32 : " }
+      ]
+    },
+    {
+      "external_id": "GRP.SUPERVISION_BLOC",
+      "path": "Groupes/Synoptiques/SUPERVISION DU BLOC",
+      "level": 2,
+      "type": "FOLDER",
+      "label_fr": "SUPERVISION DU BLOC",
+      "children": [
+        { "id": "B0GN02", "label": "B0GN02 : " },
+        { "id": "B0GN11", "label": "VUE GENERALE DU BLOC : " }
+      ]
+    },
+    {
+      "external_id": "GRP.TG1",
+      "path": "Groupes/Synoptiques/TURBINE GAZ 1",
+      "level": 2,
+      "type": "FOLDER",
+      "label_fr": "TURBINE GAZ 1",
+      "children": [
+        { "id": "B1TG11", "label": "VUE GENERALE TG 1 : " },
+        { "id": "B1TG21", "label": "LUBRIFICATION TG 1 : " },
+        { "id": "B1TG31", "label": "VIBRATION ET TEMPERATURE TG 1 : " },
+        { "id": "B1TG32", "label": "TEMPERATURE INTER-ROUES TG 1 : " },
+        { "id": "B1TG33", "label": "TEMPERATURE ECHAPPEMENT TG 1 : " }
+      ]
+    },
+    {
+      "external_id": "GRP.CR1",
+      "path": "Groupes/Synoptiques/CHAUDIERE DE RECUPERATION 1",
+      "level": 2,
+      "type": "FOLDER",
+      "label_fr": "CHAUDIERE DE RECUPERATION 1",
+      "children": [
+        { "id": "B1CR11", "label": "VUE GENERALE CR 1 : " },
+        { "id": "B1CR21", "label": "SYSTEME VAPEUR HP CR 1 : " },
+        { "id": "B1CR22", "label": "SYSTEME VAPEUR BP CR 1 : " },
+        { "id": "B1CR31", "label": "TEMPERATURE METAL CHAUDIERE 1 : " }
+      ]
+    },
+    {
+      "external_id": "GRP.TG2",
+      "path": "Groupes/Synoptiques/TURBINE GAZ 2",
+      "level": 2,
+      "type": "FOLDER",
+      "label_fr": "TURBINE GAZ 2",
+      "children": [
+        { "id": "B2TG11", "label": "VUE GENERALE TG 2 : " },
+        { "id": "B2TG21", "label": "LUBRIFICATION TG 2 : " },
+        { "id": "B2TG31", "label": "B2TG31 : " },
+        { "id": "B2TG32", "label": "B2TG32 : " },
+        { "id": "B2TG33", "label": "B2TG33 : " }
+      ]
+    },
+    {
+      "external_id": "GRP.CR2",
+      "path": "Groupes/Synoptiques/CHAUDIERE DE RECUPERATION 2",
+      "level": 2,
+      "type": "FOLDER",
+      "label_fr": "CHAUDIERE DE RECUPERATION 2",
+      "children": [
+        { "id": "B2CR11", "label": "VUE GENERALE CR 2 : " },
+        { "id": "B2CR21", "label": "SYSTEME VAPEUR HP CR 2 : " },
+        { "id": "B2CR22", "label": "SYSTEME VAPEUR BP CR 2 : " },
+        { "id": "B2CR31", "label": "TEMPERATURE METAL CHAUDIERE 2 : " }
+      ]
+    },
+    {
+      "external_id": "GRP.POSTE_EAU",
+      "path": "Groupes/Synoptiques/POSTE D'EAU",
+      "level": 2,
+      "type": "FOLDER",
+      "label_fr": "POSTE D'EAU",
+      "children": [
+        { "id": "B3PE11", "label": "VUE GENERALE DU POSTE D'EAU : " },
+        { "id": "B3PE20", "label": "Stockage d'eau déminée : " },
+        { "id": "B3PE21", "label": "SYSTEME EXTR EAU CONDENSEUR : " },
+        { "id": "B3PE22", "label": "SYSTEME EAU ALIMENTAIRE : " },
+        { "id": "B3PE23", "label": "VIDE ET APPOINT CONDENSEUR : " },
+        { "id": "B3PE24", "label": "SYSTEME EAU DE CIRCULATION : " },
+        { "id": "B3PE25", "label": "SYSTEME EAU DE REFRIGERATION : " },
+        { "id": "B3PE26", "label": "RECHAUFFAGE DES CONDENSATS : " }
+      ]
+    },
+    {
+      "external_id": "GRP.TV",
+      "path": "Groupes/Synoptiques/TURBINE VAPEUR",
+      "level": 2,
+      "type": "FOLDER",
+      "label_fr": "TURBINE VAPEUR",
+      "children": [
+        { "id": "B1TV21", "label": "CONTOURNEMENT HP CR 1 : " },
+        { "id": "B1TV22", "label": "CONTOURNEMENT BP CR 1 : " },
+        { "id": "B2TV21", "label": "CONTOURNEMENT HP CR 2 : " },
+        { "id": "B2TV22", "label": "CONTOURNEMENT BP CR 2 : " },
+        { "id": "B3TV11", "label": "VUE GENERALE TURBINE A VAPEUR : " },
+        { "id": "B3TV21", "label": "SYSTEME DE PURGES TV : " },
+        { "id": "B3TV23", "label": "SYSTEME HUILE DE REGULATION TV : " },
+        { "id": "B3TV24", "label": "LUBRIFICATION ET SOULEVEMENT TV : " },
+        { "id": "B3TV31", "label": "SURVEILLANCE LIGNE D'ARBRE TV : " }
+      ]
+    },
+    {
+      "external_id": "GRP.REGULATION",
+      "path": "Groupes/Synoptiques/REGULATION ET CALCULS",
+      "level": 2,
+      "type": "FOLDER",
+      "label_fr": "REGULATION ET CALCULS",
+      "children": [
+        { "id": "B0ASR1", "label": "B0ASR1 : " },
+        { "id": "B0GN31", "label": "CALCULS ECONOMIQUES 1/2 : " },
+        { "id": "B0GN32", "label": "CALCULS ECONOMIQUES 2/2 : " },
+        { "id": "B0GNR1", "label": "REGULATION DES AUXILIAIRES SITE : " },
+        { "id": "B1CRR1", "label": "REGULATION DU BLOC : " },
+        { "id": "B2CRR1", "label": "REGULATION DU BLOC : " },
+        { "id": "B3PER1", "label": "REGULATION POSTE D'EAU : " }
+      ]
+    },
+    {
+      "external_id": "GRP.ELEC",
+      "path": "Groupes/Synoptiques/DISTRIBUTION ELECTRIQUE",
+      "level": 2,
+      "type": "FOLDER",
+      "label_fr": "DISTRIBUTION ELECTRIQUE",
+      "children": [
+        { "id": "B0EL11", "label": "DISTRIBUTION ELECTRIQUE 15.5/6.6 : " },
+        { "id": "B0EL21", "label": "DISTRIBUTION B0LGA : " },
+        { "id": "B0EL22", "label": "Groupe électrogène : " },
+        { "id": "B1EL21", "label": "DISTRIBUTION B1LGA : " },
+        { "id": "B2EL21", "label": "DISTRIBUTION B2LGA : " },
+        { "id": "B3EL21", "label": "DISTRIBUTION B3LGA : " },
+        { "id": "B3EL22", "label": "Distribution courant continu : " }
+      ]
+    },
+    {
+      "external_id": "GRP.CONTROSTEAM",
+      "path": "Groupes/Synoptiques/CONTROSTEAM",
+      "level": 2,
+      "type": "FOLDER",
+      "label_fr": "CONTROSTEAM",
+      "children": [
+        { "id": "B3TV41", "label": "B3TV REGULATION : " },
+        { "id": "B3TV42", "label": "B3TV SECURITEES : " },
+        { "id": "B3TV43", "label": "B3TV CET : " },
+        { "id": "B3TV44", "label": "B3TV INSTRUMENTATION : " },
+        { "id": "B3TV45", "label": "B3TV TEST SECURITES FONDAMENTALES : " },
+        { "id": "B3TV46EXP", "label": "B3TV TESTS VANNES ARRET : " }
+      ]
+    }
+  ]

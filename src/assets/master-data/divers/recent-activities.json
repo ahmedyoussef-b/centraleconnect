@@ -1,0 +1,38 @@
+[
+    {
+      "id": "1",
+      "type": "ALARM",
+      "description": "ALM-TG1-OIL-PRESS-LOW: Pression d'huile basse détectée.",
+      "timestamp": "2024-07-30 14:32:10",
+      "criticality": "HIGH"
+    },
+    {
+      "id": "2",
+      "type": "MAINTENANCE",
+      "description": "Maintenance préventive CR2 effectuée par Opérateur 04.",
+      "timestamp": "2024-07-30 11:05:23",
+      "criticality": "LOW"
+    },
+    {
+      "id": "3",
+      "type": "PROCEDURE",
+      "description": "Procédure de démarrage à froid TG1 lancée.",
+      "timestamp": "2024-07-30 08:00:00",
+      "criticality": "MEDIUM"
+    },
+    {
+      "id": "4",
+      "type": "SYSTEM",
+      "description": "Journal de bord exporté pour audit réglementaire.",
+      "timestamp": "2024-07-29 17:45:01",
+      "criticality": "LOW"
+    },
+    {
+      "id": "5",
+      "type": "ALARM",
+      "description": "ALM-TV-VIB-HIGH: Vibration excessive sur la turbine à vapeur.",
+      "timestamp": "2024-07-29 16:20:15",
+      "criticality": "CRITICAL"
+    }
+  ]
+  

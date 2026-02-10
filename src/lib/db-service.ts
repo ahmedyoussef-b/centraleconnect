@@ -15,7 +15,8 @@ import equipmentB0Data from '@/assets/master-data/B0.json';
 import equipmentB1Data from '@/assets/master-data/B1.json';
 import equipmentB2Data from '@/assets/master-data/B2.json';
 import equipmentB3Data from '@/assets/master-data/B3.json';
-import equipmentTGData from '@/assets/master-data/TG.json';
+import equipmentTG1Data from '@/assets/master-data/TG1.json';
+import equipmentTG2Data from '@/assets/master-data/TG2.json';
 import allParameterData from '@/assets/master-data/parameters.json';
 
 
@@ -150,7 +151,7 @@ function getClientSideData() {
     }
 
     const allEquipmentsMap = new Map<string, any>();
-    const detailedData = [...equipmentB0Data, ...equipmentB1Data, ...equipmentB2Data, ...equipmentB3Data, ...equipmentPidAssetsData.nodes, ...equipmentComponentsData, ...equipmentTGData];
+    const detailedData = [...equipmentB0Data, ...equipmentB1Data, ...equipmentB2Data, ...equipmentB3Data, ...equipmentPidAssetsData.nodes, ...equipmentComponentsData, ...equipmentTG1Data, ...equipmentTG2Data];
 
     for (const item of detailedData as any[]) {
         const id = item.externalId || item.tag;

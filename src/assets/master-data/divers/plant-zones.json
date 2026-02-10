@@ -1,0 +1,45 @@
+[
+    {
+      "id": "A0",
+      "label": "Divers",
+      "description": "Zones diverses et équipements non spécifiques",
+      "equipment": []
+    },
+    {
+      "id": "B0",
+      "label": "Auxiliaires",
+      "description": "Systèmes auxiliaires de la centrale",
+      "equipment": []
+    },
+    {
+      "id": "B1",
+      "label": "CR1 pour TG1",
+      "description": "Zone de contrôle de la turbine à gaz 1",
+      "equipment": ["TG1", "Compresseur CR1", "Système de combustion"]
+    },
+    {
+      "id": "B2",
+      "label": "CR2 pour TG2",
+      "description": "Zone de contrôle de la turbine à gaz 2",
+      "equipment": ["TG2", "Compresseur CR2", "Système de combustion"]
+    },
+    {
+      "id": "B3",
+      "label": "TV",
+      "description": "Zone de la turbine vapeur et systèmes intégrés",
+      "equipment": ["TV", "Générateur de vapeur", "Système de refroidissement"]
+    },
+    {
+      "id": "TG1",
+      "label": "TG1",
+      "description": "Zone de la turbine gaz et systèmes intégrés",
+      "equipment": ["TG"]
+    },
+    {
+      "id": "TG2",
+      "label": "TG2",
+      "description": "Zone de la turbine gaz et systèmes intégrés",
+      "equipment": ["TG"]
+    }
+  ]
+  
