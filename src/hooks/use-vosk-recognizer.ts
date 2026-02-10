@@ -24,6 +24,15 @@ interface Transcript {
 }
 
 /**
+ * Vérifie si l'environnement supporte AudioWorklet
+ */
+function supportsAudioWorklet(): boolean {
+  return typeof window !== 'undefined' && 
+         typeof AudioContext !== 'undefined' && 
+         typeof AudioWorkletNode !== 'undefined';
+}
+
+/**
  * Simple linear interpolation resampler.
  */
 function resample(audioBuffer: Float32Array, fromSampleRate: number, toSampleRate: number): Float32Array {
@@ -55,6 +64,13 @@ export function useVoskRecognizer(options: RecognizerOptions) {
 
     // Initialize the worker and VAD
     useEffect(() => {
+        // ✅ Vérification préalable du support AudioWorklet
+        if (!supportsAudioWorklet()) {
+            console.warn('AudioWorklet not supported in this environment');
+            setRecognizerState(RecognizerState.ERROR);
+            return;
+        }
+
         if (workerRef.current) return; // Already initialized
 
         setRecognizerState(RecognizerState.LOADING);
