@@ -3,7 +3,6 @@
 import dynamic from 'next/dynamic';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { CcppDiagram } from '@/components/ccpp-diagram';
 
 const HistoryChart = dynamic(
   () => import('@/components/history-chart').then((mod) => mod.HistoryChart),
@@ -22,6 +21,24 @@ const HistoryChart = dynamic(
     ),
   }
 );
+
+const CcppDiagram = dynamic(
+  () => import('@/components/ccpp-diagram').then((mod) => mod.CcppDiagram),
+  {
+    ssr: false,
+    loading: () => (
+       <Card>
+        <CardHeader>
+            <CardTitle>Schéma Synoptique du Cycle Combiné</CardTitle>
+        </CardHeader>
+        <CardContent>
+            <Skeleton className="h-[400px]" />
+        </CardContent>
+      </Card>
+    ),
+  }
+);
+
 
 export default function DashboardPage() {
   return (
