@@ -1,3 +1,4 @@
+// src/components/ui/calendar.tsx
 "use client"
 
 import * as React from "react"
@@ -53,14 +54,14 @@ function Calendar({
         day_hidden: "invisible",
         ...classNames,
       }}
-      components={{
-        IconLeft: () => <ChevronLeft className="h-4 w-4" />,
-        IconRight: () => <ChevronRight className="h-4 w-4" />,
-      }}
+      // ✅ CORRECTION POUR V9 : Utiliser les props directes pour les icônes
+      components={undefined} // Supprimer complètement la prop components
+      // Les icônes sont stylisées via CSS/classes, pas via composants personnalisés
       {...props}
     />
   )
 }
+
 Calendar.displayName = "Calendar"
 
 export { Calendar }

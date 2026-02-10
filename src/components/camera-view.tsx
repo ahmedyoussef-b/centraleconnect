@@ -1,14 +1,15 @@
 
 'use client';
 
-import { useEffect, useRef, useState, useCallback } from 'react';
-import { Camera, CameraOff, RefreshCcw, ScanLine, Save, X, ScanSearch, PlusCircle, Upload } from 'lucide-react';
+import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
+import { Camera, CameraOff, RefreshCcw, ScanLine, Save, X, ScanSearch, PlusCircle, Upload, Plus, Image as ImageIcon, Trash2 } from 'lucide-react';
 import type Tesseract from 'tesseract.js';
 import Image from 'next/image';
 
 import { Alert, AlertDescription, AlertTitle } from './ui/alert';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from '@/components/ui/dialog';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Progress } from './ui/progress';
@@ -18,6 +19,7 @@ import type { Component } from '@/types/db';
 import { computePHash, compareHashes } from '@/lib/image-hashing';
 import visualDbData from '@/assets/master-data/visual-database.json';
 import { cn } from '@/lib/utils';
+import { ScrollArea } from './ui/scroll-area';
 
 type ViewMode = 'idle' | 'scanning' | 'provisioning' | 'result';
 
@@ -226,6 +228,124 @@ function ProvisioningForm({
   );
 }
 
+interface StagedImage {
+    file: File;
+    dataUrl: string;
+}
+
+// Placeholder for complex image analysis
+async function generateJsonForImage(image: StagedImage): Promise<any> {
+    console.log(`Generating stats for ${image.file.name}...`);
+    // Simulate async work
+    await new Promise(res => setTimeout(res, 50 + Math.random() * 100));
+    return {
+        filename: image.file.name,
+        size: image.file.size,
+        perceptual_hash: await computePHash(image.dataUrl),
+        histogram: Array(100).fill(0), // Placeholder 10x10 histogram
+        rgb_stats: {
+            mean: { r: 128, g: 128, b: 128 },
+            std_dev: { r: 50, g: 50, b: 50 },
+            min: { r: 0, g: 0, b: 0 },
+            max: { r: 255, g: 255, b: 255 },
+        }
+    };
+}
+
+
+function AddToDatabaseModal({ isOpen, onOpenChange, onProcess }: { isOpen: boolean, onOpenChange: (open: boolean) => void, onProcess: (images: StagedImage[]) => void }) {
+    const [stagedImages, setStagedImages] = useState<StagedImage[]>([]);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const files = event.target.files;
+        if (files) {
+            const newImages: StagedImage[] = [];
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    newImages.push({ file, dataUrl: e.target?.result as string });
+                    if (newImages.length === files.length) {
+                        setStagedImages(prev => [...prev, ...newImages]);
+                    }
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+    };
+    
+    const handleRemoveImage = (index: number) => {
+        setStagedImages(prev => prev.filter((_, i) => i !== index));
+    };
+
+    const handleProcess = () => {
+        onProcess(stagedImages);
+        setStagedImages([]);
+        onOpenChange(false);
+    };
+
+    return (
+        <Dialog open={isOpen} onOpenChange={onOpenChange}>
+            <DialogContent className="max-w-4xl">
+                <DialogHeader>
+                    <DialogTitle>Ajouter à la base de données visuelle</DialogTitle>
+                    <CardDescription>Sélectionnez une ou plusieurs images à analyser et à ajouter.</CardDescription>
+                </DialogHeader>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-4">
+                    <div 
+                        className="flex flex-col items-center justify-center p-6 border-2 border-dashed rounded-lg cursor-pointer hover:bg-muted"
+                        onClick={() => fileInputRef.current?.click()}
+                    >
+                        <Upload className="w-12 h-12 text-muted-foreground" />
+                        <p className="mt-2 text-sm text-muted-foreground">Cliquez ou glissez-déposez des fichiers ici</p>
+                        <input
+                            ref={fileInputRef}
+                            type="file"
+                            multiple
+                            accept="image/*"
+                            className="hidden"
+                            onChange={handleFileChange}
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label>Images en attente ({stagedImages.length})</Label>
+                        {stagedImages.length > 0 ? (
+                        <ScrollArea className="h-48 border rounded-md p-2">
+                            <div className="grid grid-cols-2 gap-2">
+                                {stagedImages.map((image, index) => (
+                                    <div key={index} className="relative group">
+                                        <Image src={image.dataUrl} alt={image.file.name} width={150} height={100} className="rounded-md object-cover w-full aspect-[3/2]" />
+                                        <Button 
+                                            variant="destructive" 
+                                            size="icon" 
+                                            className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100"
+                                            onClick={() => handleRemoveImage(index)}
+                                        >
+                                            <Trash2 className="h-4 w-4" />
+                                        </Button>
+                                    </div>
+                                ))}
+                            </div>
+                        </ScrollArea>
+                         ) : (
+                            <div className="flex items-center justify-center h-48 border-2 border-dashed rounded-lg">
+                                <ImageIcon className="w-10 h-10 text-muted-foreground" />
+                            </div>
+                         )}
+                    </div>
+                </div>
+                <DialogFooter>
+                    <DialogClose asChild><Button variant="outline">Annuler</Button></DialogClose>
+                    <Button onClick={handleProcess} disabled={stagedImages.length === 0}>
+                        <PlusCircle className="mr-2"/>
+                        Traiter {stagedImages.length} image(s)
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    );
+}
+
 // Main Component
 export function CameraView() {
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
@@ -242,14 +362,15 @@ export function CameraView() {
   const [scanResult, setScanResult] = useState<ScanResult | null>(null);
 
   const [isTauri, setIsTauri] = useState(false);
-  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isDbModalOpen, setIsDbModalOpen] = useState(false);
+  const [stagedForProcessing, setStagedForProcessing] = useState<StagedImage[]>([]);
 
   useEffect(() => {
-    setIsTauri(!!window.__TAURI__);
-  }, []);
+    const isTauriEnv = !!window.__TAURI__;
+    setIsTauri(isTauriEnv);
 
-  useEffect(() => {
+    if (!isTauriEnv) return;
+
     const getCameraPermission = async () => {
        try {
         const stream = await navigator.mediaDevices.getUserMedia({ video: true });
@@ -278,8 +399,10 @@ export function CameraView() {
   }, [toast]);
 
   useEffect(() => {
+    if (!isTauri) return;
+
     const initializeWorker = async () => {
-      if (isTauri && !workerRef.current) {
+      if (!workerRef.current) {
         setStatusText('Initialisation du moteur OCR...');
         try {
           const TesseractModule = await import('tesseract.js');
@@ -312,17 +435,6 @@ export function CameraView() {
       workerRef.current = null;
     };
   }, [isTauri, toast]);
-
-  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setUploadedImage(e.target?.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
 
   const processIdentification = useCallback(async (imageDataUrl: string) => {
     setViewMode('scanning');
@@ -429,9 +541,35 @@ export function CameraView() {
     setOcrText('');
     setProgress(0);
     setStatusText('Prêt à analyser.');
-    setUploadedImage(null);
-    if(fileInputRef.current) {
-        fileInputRef.current.value = '';
+    setStagedForProcessing([]);
+  };
+
+  const handleBatchProcessForDb = async (images: StagedImage[]) => {
+    console.log("Processing images to add to DB:", images);
+    toast({
+        title: "Traitement par lots démarré",
+        description: `Génération des métadonnées pour ${images.length} images.`
+    });
+    
+    try {
+        const promises = images.map(img => generateJsonForImage(img));
+        const results = await Promise.all(promises);
+        
+        console.log("Generated JSON for DB:", results);
+        
+        // Here you would typically send this to a server or store in localStorage
+        // For now, we just show a success message
+        toast({
+            title: "Traitement terminé",
+            description: "Les données JSON ont été générées et sont prêtes pour la sauvegarde. (Simulation)"
+        });
+    } catch (error) {
+        console.error("Batch processing failed:", error);
+        toast({
+            variant: "destructive",
+            title: "Erreur de traitement",
+            description: "La génération des métadonnées a échoué."
+        });
     }
   };
 
@@ -451,100 +589,125 @@ export function CameraView() {
   const isIdle = viewMode === 'idle';
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2"><ScanSearch /> Analyse Visuelle</CardTitle>
-        <CardDescription>Identifiez un équipement en le scannant, ou provisionnez-en un nouveau depuis la caméra ou un fichier.</CardDescription>
-      </CardHeader>
-      <CardContent>
-        {viewMode === 'result' && scanResult ? (
-            <ResultView result={scanResult} onReset={handleReset} />
-        ) : viewMode === 'provisioning' ? (
-            <ProvisioningForm imageData={capturedImage} ocrText={ocrText} onSave={handleSaveProvision} onCancel={handleReset} />
-        ) : uploadedImage ? (
-            <div className="space-y-4 text-center">
-                <div className="relative aspect-video w-full max-w-lg mx-auto overflow-hidden rounded-md border-2 border-dashed bg-muted">
-                    <Image src={uploadedImage} alt="Image téléversée" layout="fill" objectFit="contain" />
-                </div>
-                <p className="text-sm text-muted-foreground">Fichier prêt pour analyse.</p>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <Button onClick={() => processIdentification(uploadedImage)} disabled={!isIdle} size="lg" className="h-16 text-lg">
-                        <ScanSearch className="mr-3 h-8 w-8"/>
-                        <div>
-                            <p className="font-bold">Identifier le Fichier</p>
-                            <p className="font-normal text-xs text-primary-foreground/80">Comparer avec la base de données</p>
-                        </div>
-                    </Button>
-                    <Button onClick={() => processProvisioning(uploadedImage)} disabled={!isIdle || !workerRef.current} size="lg" variant="secondary" className="h-16 text-lg">
-                        <PlusCircle className="mr-3 h-8 w-8"/>
-                         <div>
-                            <p className="font-bold">Provisionner le Fichier</p>
-                            <p className="font-normal text-xs text-secondary-foreground/80">Extraire les données via OCR</p>
-                        </div>
-                    </Button>
-                </div>
-                 <Button variant="ghost" onClick={handleReset}>
-                    <RefreshCcw className="mr-2 h-4 w-4"/>
-                    Utiliser la caméra ou choisir un autre fichier
-                </Button>
-            </div>
-        ) : (
-          <div className="space-y-4">
-            <div className="relative aspect-video w-full overflow-hidden rounded-md border-2 border-dashed bg-muted">
-              <video
-                ref={videoRef}
-                className={cn("h-full w-full object-cover transition-opacity", viewMode === 'scanning' && 'opacity-30')}
-                autoPlay
-                muted
-                playsInline
-              />
-               {viewMode === 'scanning' && (
-                 <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 text-primary">
-                    <ScanLine className="h-24 w-24 animate-pulse" />
-                    <p className="font-semibold">{statusText}</p>
-                    <Progress value={progress} className="w-1/2" />
-                 </div>
-               )}
-              {hasCameraPermission === false && (
-                <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/80 p-4">
-                  <CameraOff className="h-12 w-12 text-destructive" />
-                  <Alert variant="destructive" className="mt-4">
-                    <AlertTitle>Accès Caméra Requis</AlertTitle>
-                    <AlertDescription>Veuillez autoriser l'accès à la caméra.</AlertDescription>
-                  </Alert>
-                </div>
-              )}
-            </div>
+    <div className="relative">
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2"><ScanSearch /> Analyse Visuelle</CardTitle>
+          <CardDescription>Identifiez un équipement en le scannant, ou provisionnez-en un nouveau depuis la caméra ou un fichier.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {viewMode === 'result' && scanResult ? (
+              <ResultView result={scanResult} onReset={handleReset} />
+          ) : viewMode === 'provisioning' ? (
+              <ProvisioningForm imageData={capturedImage} ocrText={ocrText} onSave={handleSaveProvision} onCancel={handleReset} />
+          ) : stagedForProcessing.length > 0 ? (
+              <div className="space-y-4 text-center">
+                  <div className="relative aspect-video w-full max-w-lg mx-auto overflow-hidden rounded-md border-2 border-dashed bg-muted">
+                      <Image src={stagedForProcessing[0].dataUrl} alt="Image à analyser" layout="fill" objectFit="contain" />
+                  </div>
+                  <p className="text-sm text-muted-foreground">{stagedForProcessing[0].file.name}</p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <Button onClick={() => processIdentification(stagedForProcessing[0].dataUrl)} disabled={!isIdle} size="lg" className="h-16 text-lg">
+                          <ScanSearch className="mr-3 h-8 w-8"/>
+                          <div>
+                              <p className="font-bold">Identifier le Fichier</p>
+                              <p className="font-normal text-xs text-primary-foreground/80">Comparer avec la base de données</p>
+                          </div>
+                      </Button>
+                      <Button onClick={() => processProvisioning(stagedForProcessing[0].dataUrl)} disabled={!isIdle || !workerRef.current} size="lg" variant="secondary" className="h-16 text-lg">
+                          <PlusCircle className="mr-3 h-8 w-8"/>
+                           <div>
+                              <p className="font-bold">Provisionner le Fichier</p>
+                              <p className="font-normal text-xs text-secondary-foreground/80">Extraire les données via OCR</p>
+                          </div>
+                      </Button>
+                  </div>
+                   <Button variant="ghost" onClick={handleReset}>
+                      <RefreshCcw className="mr-2 h-4 w-4"/>
+                      Utiliser la caméra ou choisir un autre fichier
+                  </Button>
+              </div>
+          ) : (
+            <div className="space-y-4">
+              <div className="relative aspect-video w-full overflow-hidden rounded-md border-2 border-dashed bg-muted">
+                <video
+                  ref={videoRef}
+                  className={cn("h-full w-full object-cover transition-opacity", viewMode === 'scanning' && 'opacity-30')}
+                  autoPlay
+                  muted
+                  playsInline
+                />
+                 {viewMode === 'scanning' && (
+                   <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 text-primary">
+                      <ScanLine className="h-24 w-24 animate-pulse" />
+                      <p className="font-semibold">{statusText}</p>
+                      <Progress value={progress} className="w-1/2" />
+                   </div>
+                 )}
+                {hasCameraPermission === false && (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/80 p-4">
+                    <CameraOff className="h-12 w-12 text-destructive" />
+                    <Alert variant="destructive" className="mt-4">
+                      <AlertTitle>Accès Caméra Requis</AlertTitle>
+                      <AlertDescription>Veuillez autoriser l'accès à la caméra.</AlertDescription>
+                    </Alert>
+                  </div>
+                )}
+              </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Button onClick={handleIdentifyFromCamera} disabled={!isIdle || !hasCameraPermission} size="lg" className="h-16 text-lg">
-                    <ScanSearch className="mr-3 h-8 w-8"/>
-                    <div>
-                        <p className="font-bold">Identifier (Caméra)</p>
-                        <p className="font-normal text-xs text-primary-foreground/80">Comparer avec la base de données</p>
-                    </div>
-                </Button>
-                <Button onClick={handleProvisionFromCamera} disabled={!isIdle || !hasCameraPermission || !workerRef.current} size="lg" variant="secondary" className="h-16 text-lg">
-                    <PlusCircle className="mr-3 h-8 w-8"/>
-                     <div>
-                        <p className="font-bold">Provisionner (Caméra)</p>
-                        <p className="font-normal text-xs text-secondary-foreground/80">Ajouter via OCR/QR Code</p>
-                    </div>
-                </Button>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Button onClick={handleIdentifyFromCamera} disabled={!isIdle || !hasCameraPermission} size="lg" className="h-16 text-lg">
+                      <ScanSearch className="mr-3 h-8 w-8"/>
+                      <div>
+                          <p className="font-bold">Identifier (Caméra)</p>
+                          <p className="font-normal text-xs text-primary-foreground/80">Comparer avec la base de données</p>
+                      </div>
+                  </Button>
+                  <Button onClick={handleProvisionFromCamera} disabled={!isIdle || !hasCameraPermission || !workerRef.current} size="lg" variant="secondary" className="h-16 text-lg">
+                      <PlusCircle className="mr-3 h-8 w-8"/>
+                       <div>
+                          <p className="font-bold">Provisionner (Caméra)</p>
+                          <p className="font-normal text-xs text-secondary-foreground/80">Ajouter via OCR/QR Code</p>
+                      </div>
+                  </Button>
+              </div>
+              <div className="relative flex items-center py-2">
+                <div className="flex-grow border-t border-border"></div>
+                <span className="flex-shrink mx-4 text-xs uppercase text-muted-foreground">Ou</span>
+                <div className="flex-grow border-t border-border"></div>
+              </div>
+              <Button onClick={() => setIsDbModalOpen(true)} variant="outline" className="w-full h-12">
+                <Upload className="mr-2 h-4 w-4" />
+                Analyser une image depuis l'ordinateur
+              </Button>
             </div>
-            <div className="relative flex items-center py-2">
-              <div className="flex-grow border-t border-border"></div>
-              <span className="flex-shrink mx-4 text-xs uppercase text-muted-foreground">Ou</span>
-              <div className="flex-grow border-t border-border"></div>
-            </div>
-            <Button onClick={() => fileInputRef.current?.click()} variant="outline" className="w-full h-12">
-              <Upload className="mr-2 h-4 w-4" />
-              Analyser une image depuis l'ordinateur
-            </Button>
-            <input type="file" ref={fileInputRef} onChange={handleFileSelect} accept="image/*" className="hidden" />
-          </div>
-        )}
-      </CardContent>
-    </Card>
+          )}
+        </CardContent>
+      </Card>
+      
+      <div className="fixed bottom-6 right-6">
+        <Button size="icon" className="h-14 w-14 rounded-full shadow-lg" onClick={() => setIsDbModalOpen(true)}>
+          <Plus className="h-8 w-8" />
+          <span className="sr-only">Ajouter à la base de données</span>
+        </Button>
+      </div>
+
+      <AddToDatabaseModal 
+        isOpen={isDbModalOpen} 
+        onOpenChange={(open) => {
+            if (!open) {
+                setStagedForProcessing([]);
+            }
+            setIsDbModalOpen(open);
+        }} 
+        onProcess={(images) => {
+          if(images.length > 0) {
+            handleReset(); // Reset the main view
+            setStagedForProcessing(images);
+          }
+        }}
+      />
+    </div>
   );
 }
+

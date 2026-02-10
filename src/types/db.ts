@@ -1,6 +1,28 @@
 // src/types/db.ts
 export type LogEntryType = 'AUTO' | 'MANUAL' | 'DOCUMENT_ADDED';
-
+export interface FunctionalNode {
+  id: string;                              // Identifiant unique
+  external_id: string;                     // Format: B2.LUB.TPF
+  name: string;                            // Nom lisible
+  type: string;                            // Type: 'pump', 'valve', 'sensor', etc.
+  description?: string;                    // Description optionnelle
+  parentId?: string;                       // Nœud parent hiérarchique
+  coordinates?: {                          // Position dans le schéma
+    x: number;
+    y: number;
+    width?: number;
+    height?: number;
+  };
+  parameters?: string[];                   // Paramètres SCADA associés
+  equipmentId?: string;                    // Lien vers l'équipement
+  criticality?: 'critical' | 'high' | 'medium' | 'low';
+  status?: 'normal' | 'warning' | 'critical' | 'maintenance';
+  ui?: {                                   // Propriétés d'affichage
+    color?: string;
+    icon?: string;
+    shape?: 'circle' | 'rectangle' | 'triangle' | 'custom';
+  };
+}
 export interface Component {
   id: string;
   name: string;
