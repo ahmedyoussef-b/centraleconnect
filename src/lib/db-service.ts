@@ -1,3 +1,4 @@
+
 import { invoke } from '@tauri-apps/api/tauri';
 import type { 
   Equipment,
@@ -577,9 +578,31 @@ export async function syncWithRemote(): Promise<{ synced: number }> {
              await invoke('plugin:sql|execute', { db, query: 'INSERT INTO log_entries (id, timestamp, type, source, message, equipment_id, signature) VALUES ($1, $2, $3, $4, $5, $6, $7)', values: [log.id, log.timestamp, log.type, log.source, log.message, log.equipmentId, log.signature] });
              totalSynced++;
         }
-        // ... Add inserts for other tables if necessary
+        for (const param of data.parameters || []) {
+            await invoke('plugin:sql|execute', { db, query: 'INSERT INTO parameters (id, name, unit, nominal_value, min_safe, max_safe, alarm_high, alarm_low, standard_ref, equipment_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)', values: [param.id, param.name, param.unit, param.nominalValue, param.minSafe, param.maxSafe, param.alarmHigh, param.alarmLow, param.standardRef, param.equipmentId] });
+            totalSynced++;
+        }
+        for (const alarm of data.alarms || []) {
+            await invoke('plugin:sql|execute', { db, query: 'INSERT INTO alarms (code, severity, description, parameter, reset_procedure, standard_ref, equipment_id) VALUES ($1, $2, $3, $4, $5, $6, $7)', values: [alarm.code, alarm.severity, alarm.description, alarm.parameter, alarm.resetProcedure, alarm.standardRef, alarm.equipmentId] });
+            totalSynced++;
+        }
+        for (const proc of data.procedures || []) {
+            await invoke('plugin:sql|execute', { db, query: 'INSERT INTO procedures (id, name, description, version, steps) VALUES ($1, $2, $3, $4, $5)', values: [proc.id, proc.name, proc.description, proc.version, proc.steps] });
+            totalSynced++;
+        }
+        for (const item of data.synopticItems || []) {
+            await invoke('plugin:sql|execute', { db, query: 'INSERT INTO synoptic_items (external_id, name, type, parent_id, group_path, element_id, level, approved_by, approval_date) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)', values: [item.externalId, item.name, item.type, item.parentId, item.groupPath, item.elementId, item.level, item.approvedBy, item.approvalDate] });
+            totalSynced++;
+        }
 
         await invoke('plugin:sql|commit', { db });
+        console.log('Local DB synced. Triggering remote DB cleanup...');
+        const cleanupResponse = await fetch('/api/sync/clear', { method: 'POST' });
+        if (!cleanupResponse.ok) {
+            throw new Error(`Failed to clear remote database: ${cleanupResponse.statusText}`);
+        }
+        console.log('Remote DB cleanup successful.');
+
         return { synced: totalSynced };
     } catch (e) {
         console.error("Transaction failed, rolling back:", e);
