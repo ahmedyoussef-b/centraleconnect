@@ -1,4 +1,11 @@
 // src/lib/database.ts
+
+/*
+// La fonction ci-dessous est commentée car elle semble être un placeholder
+// et n'est pas utilisée dans l'application. Elle provoque une erreur
+// TypeScript car `hasPermission` et `prisma` ne sont pas définis dans ce contexte.
+// La logique d'accès aux données est actuellement gérée par `db-service.ts` et `component-service.ts`.
+
 export async function getComponentById(id: string) {
     // 🔒 Validation des permissions avant accès
     if (!hasPermission('component:read')) {
@@ -21,3 +28,4 @@ export async function getComponentById(id: string) {
   
     return component;
   }
+*/
