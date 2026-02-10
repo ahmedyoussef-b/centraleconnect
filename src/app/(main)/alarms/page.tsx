@@ -49,7 +49,7 @@ function AlarmList({ alarms }: { alarms: AlarmWithRef[] }) {
                             </div>
                             <div className="font-mono text-xs">{alarm.code}</div>
                             <div>{alarm.description}</div>
-                            <div className="text-xs text-muted-foreground">{alarm.component_id}</div>
+                            <div className="text-xs text-muted-foreground">{alarm.equipmentId}</div>
                         </div>
                         <ChevronDown className="ml-4 h-4 w-4 shrink-0 transition-transform duration-200 group-data-[state=open]:rotate-180" />
                     </CollapsibleTrigger>
@@ -77,18 +77,18 @@ function AlarmList({ alarms }: { alarms: AlarmWithRef[] }) {
                                     )}
                                 </div>
                                 <div className="md:col-span-2 space-y-4">
-                                     {alarm.reset_procedure && (
+                                     {alarm.resetProcedure && (
                                         <div className="flex items-start gap-3 bg-background/50 p-3 rounded-md border border-blue-500/20">
                                             <Shield className="h-5 w-5 text-blue-500 mt-0.5 flex-shrink-0" />
                                             <div>
                                                 <h4 className="font-semibold">Procédure de Réarmement</h4>
-                                                <p className="text-muted-foreground">{alarm.reset_procedure}</p>
+                                                <p className="text-muted-foreground">{alarm.resetProcedure}</p>
                                             </div>
                                         </div>
                                     )}
-                                     {alarm.component_id && (
+                                     {alarm.equipmentId && (
                                          <Button asChild variant="outline" size="sm">
-                                            <Link href={`/equipments/${encodeURIComponent(alarm.component_id)}`}>
+                                            <Link href={`/equipments/${encodeURIComponent(alarm.equipmentId)}`}>
                                                 Voir l'équipement
                                                 <ArrowRight className="ml-2 h-4 w-4" />
                                             </Link>
@@ -116,10 +116,10 @@ export default function AlarmsPage() {
     const alarms = getAlarms();
 
     const groupedAlarms = {
-        tg: alarms.filter(a => a.component_id.startsWith('TG')),
-        tv: alarms.filter(a => a.component_id.startsWith('TV')),
-        elec: alarms.filter(a => a.component_id.startsWith('ELEC')), // Assuming a convention
-        aux: alarms.filter(a => !a.component_id.startsWith('TG') && !a.component_id.startsWith('TV') && !a.component_id.startsWith('ELEC')),
+        tg: alarms.filter(a => a.equipmentId.startsWith('TG')),
+        tv: alarms.filter(a => a.equipmentId.startsWith('TV')),
+        elec: alarms.filter(a => a.equipmentId.startsWith('ELEC')), // Assuming a convention
+        aux: alarms.filter(a => !a.equipmentId.startsWith('TG') && !a.equipmentId.startsWith('TV') && !a.equipmentId.startsWith('ELEC')),
     };
 
     const categories: AlarmCategory[] = [
@@ -163,7 +163,7 @@ export default function AlarmsPage() {
                                         <span>Sévérité</span>
                                         <span>Code Alarme</span>
                                         <span>Description</span>
-                                        <span>Composant</span>
+                                        <span>Équipement</span>
                                     </div>
                                     <AlarmList alarms={category.alarms} />
                                 </CardContent>

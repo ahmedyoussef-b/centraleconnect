@@ -103,11 +103,17 @@ export default function TestPage() {
                     <p className="text-muted-foreground mb-4">
                         Les hotspots sont surlignés si une valeur simulée dépasse son seuil d'avertissement. Cliquez sur un élément pour simuler la navigation vers sa page de détails.
                     </p>
-                    <PidViewer
+                    {/* TODO: Le composant PidViewer a été remplacé par SynopticViewer. Cette démo doit être adaptée pour utiliser un composant capable d'afficher des schémas P&ID individuels. */}
+                    <div className="flex h-[400px] items-center justify-center rounded-lg border-2 border-dashed border-border p-4">
+                        <p className="text-center text-muted-foreground">
+                            Visualiseur P&ID désactivé temporairement.
+                        </p>
+                    </div>
+                    {/* <PidViewer
                         externalId={TEST_NODE_ID}
                         highlightParameters={highlightParameters}
                         onHotspotClick={handleHotspotClick}
-                    />
+                    /> */}
                 </CardContent>
             </Card>
         </div>

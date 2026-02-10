@@ -89,7 +89,13 @@ export function EquipmentDetailView({ node, parameters, alarms, logEntries, docu
                     <Card>
                         <CardHeader><CardTitle>Schéma P&ID Associé</CardTitle></CardHeader>
                         <CardContent>
-                            <PidViewer externalId={node.externalId} />
+                            {/* TODO: Le composant PidViewer actuel est pour la vue synoptique globale. Il faut un composant capable d'afficher un P&ID spécifique pour un `externalId`. */}
+                            <div className="flex h-[400px] items-center justify-center rounded-lg border-2 border-dashed border-border p-4">
+                                <p className="text-center text-muted-foreground">
+                                    Visualiseur P&ID non disponible pour cet affichage.
+                                </p>
+                            </div>
+                            {/* <PidViewer externalId={node.externalId} /> */}
                         </CardContent>
                     </Card>
                 </TabsContent>
