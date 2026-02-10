@@ -41,6 +41,8 @@ export async function POST(request: Request) {
             externalId: component.id,
             name: component.name,
             type: component.type,
+            version: 1,
+            isImmutable: false,
         };
 
         const newDocumentData = {
