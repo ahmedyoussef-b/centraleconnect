@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
@@ -79,8 +80,8 @@ export function useVoskRecognizer(options: RecognizerOptions) {
         
         // Initialize VAD
         MicVAD.new({
-            workletURL: '/models/vad.worklet.js',
-            model: '/models/silero_vad.onnx',
+            workletPath: '/models/vad.worklet.js',
+            modelPath: '/models/silero_vad.onnx',
             ortWasmURL: '/models/onnx-runtime-web.wasm',
             onSpeechStart: () => {
                 console.log('VAD: Speech started');
