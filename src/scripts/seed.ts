@@ -4,19 +4,19 @@ import { PrismaClient } from '@prisma/client';
 import { createHash } from 'crypto';
 
 // Import JSON data
-import componentsData from '../src/assets/master-data/components.json';
-import parameterData from '../src/assets/master-data/parameters.json';
-import alarmData from '../src/assets/master-data/alarms.json';
-import pidAssetsData from '../src/assets/master-data/pid-assets.json';
-import groupsData from '../src/assets/master-data/groups.json';
-import b0Data from '../src/assets/master-data/B0.json';
-import b1Data from '../src/assets/master-data/B1.json';
-import b2Data from '../src/assets/master-data/B2.json';
-import b3Data from '../src/assets/master-data/B3.json';
-import c0Data from '../src/assets/master-data/C0.json';
-import proceduresData from '../src/assets/master-data/procedures.json';
-import tg1Data from '../src/assets/master-data/TG1.json';
-import tg2Data from '../src/assets/master-data/TG2.json';
+import componentsData from '../assets/master-data/components.json' assert { type: 'json' };
+import parameterData from '../assets/master-data/parameters.json' assert { type: 'json' };
+import alarmData from '../assets/master-data/alarms.json' assert { type: 'json' };
+import pidAssetsData from '../assets/master-data/pid-assets.json' assert { type: 'json' };
+import groupsData from '../assets/master-data/groups.json' assert { type: 'json' };
+import b0Data from '../assets/master-data/B0.json' assert { type: 'json' };
+import b1Data from '../assets/master-data/B1.json' assert { type: 'json' };
+import b2Data from '../assets/master-data/B2.json' assert { type: 'json' };
+import b3Data from '../assets/master-data/B3.json' assert { type: 'json' };
+import c0Data from '../assets/master-data/C0.json' assert { type: 'json' };
+import proceduresData from '../assets/master-data/procedures.json' assert { type: 'json' };
+import tg1Data from '../assets/master-data/TG1.json' assert { type: 'json' };
+import tg2Data from '../assets/master-data/TG2.json' assert { type: 'json' };
 
 const prisma = new PrismaClient();
 

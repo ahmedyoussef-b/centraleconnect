@@ -4,7 +4,6 @@ import { PrismaClient } from '@prisma/client';
 import { createHash } from 'crypto';
 
 // Import JSON data
-import componentsData from '../src/assets/master-data/components.json';
 import parameterData from '../src/assets/master-data/parameters.json';
 import alarmData from '../src/assets/master-data/alarms.json';
 import pidAssetsData from '../src/assets/master-data/pid-assets.json';
