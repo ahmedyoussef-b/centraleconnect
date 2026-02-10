@@ -1,177 +1,139 @@
-// This file is the single source of truth for your database schema.
-// Keeping it in sync with `src/lib/db-service.ts` is crucial for the hybrid (Tauri/web) architecture.
-// ACTION REQUIRED: Any change to this file MUST be manually reflected in the SQL schema in `src/lib/db-service.ts`.
-// See `src/docs/PRISMA_WORKFLOW.md` for more details.
+// prisma/schema.prisma
+
+datasource db {
+  provider     = "postgresql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
+}
 
 generator client {
   provider = "prisma-client-js"
 }
 
-datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-}
-
-// -------------------------------------
-// Central Equipment and Master Data
-// -------------------------------------
-
 model Equipment {
-  externalId       String        @id @map("external_id")
-  name             String
-  description      String?
-  parentId         String?       @map("parent_id")
-  type             String?
-  subtype          String?
-  systemCode       String?       @map("system_code")
-  subSystem        String?       @map("sub_system")
-  location         String?
-  manufacturer     String?
-  serialNumber     String?       @map("serial_number")
-  documentRef      String?       @map("document_ref")
-  coordinates      String?
-  svgLayer         String?       @map("svg_layer")
-  fireZone         String?       @map("fire_zone")
-  linkedParameters String?
-  status           String?
-  version          Int           @default(1)
-  isImmutable      Boolean       @default(false) @map("is_immutable")
-  approvedBy       String?       @map("approved_by")
-  approvedAt       DateTime?     @map("approved_at")
-  checksum         String?       @unique
-  nominalData      Json?         @map("nominal_data")
+  externalId      String        @id @map("external_id")
+  name            String
+  description     String?
+  parentId        String?       @map("parent_id")
+  type            String?
+  subtype         String?
+  systemCode      String?       @map("system_code")
+  subSystem       String?       @map("sub_system")
+  location        String?
+  manufacturer    String?
+  serialNumber    String?       @map("serial_number")
+  documentRef     String?       @map("document_ref")
+  coordinates     String?
+  svgLayer        String?       @map("svg_layer")
+  fireZone        String?       @map("fire_zone")
+  linkedParameters String?      @map("linked_parameters")
+  status          String?
+  version         Int           @default(1)
+  isImmutable     Boolean       @default(false) @map("is_immutable")
+  approvedBy      String?       @map("approved_by")
+  approvedAt      DateTime?     @map("approved_at")
+  checksum        String?       @unique
 
-  // Relations
-  parameters    Parameter[]
-  alarms        Alarm[]
-  logEntries    LogEntry[]
-  annotations   Annotation[]
-  documents     Document[]
-  synopticItems SynopticItem?
-  scadaData     ScadaData[] // FIX: Added missing back-relation
-
-  @@map("equipments")
+  parameters      Parameter[]
+  alarms          Alarm[]
+  documents       Document[]
+  logEntries      LogEntry[]
+  annotations     Annotation[]
+  scadaData       ScadaData[]
 }
 
 model Parameter {
-  id           Int     @id @default(autoincrement())
-  equipmentId  String  @map("equipment_id")
+  id           Int        @id @default(autoincrement())
+  equipmentId  String     @map("equipment_id")
   name         String
   unit         String?
-  nominalValue Float?  @map("nominal_value")
-  minSafe      Float?  @map("min_safe")
-  maxSafe      Float?  @map("max_safe")
-  alarmHigh    Float?  @map("alarm_high")
-  alarmLow     Float?  @map("alarm_low")
-  standardRef  String? @map("standard_ref")
-  equipment    Equipment @relation(fields: [equipmentId], references: [externalId], onDelete: Cascade)
-
-  @@map("parameters")
+  nominalValue Float?     @map("nominal_value")
+  minSafe      Float?     @map("min_safe")
+  maxSafe      Float?     @map("max_safe")
+  alarmHigh    Float?     @map("alarm_high")
+  alarmLow     Float?     @map("alarm_low")
+  standardRef  String?    @map("standard_ref")
+  equipment    Equipment  @relation(fields: [equipmentId], references: [externalId], onDelete: Cascade)
 }
 
 model Alarm {
-  code           String      @id
-  equipmentId    String      @map("equipment_id")
-  severity       String
-  description    String
-  parameter      String?
-  resetProcedure String?     @map("reset_procedure")
-  standardRef    String?     @map("standard_ref")
-  equipment      Equipment   @relation(fields: [equipmentId], references: [externalId], onDelete: Cascade)
-  events         AlarmEvent[]
-
-  @@map("alarms")
+  code            String      @id
+  equipmentId     String      @map("equipment_id")
+  severity        String
+  description     String
+  parameter       String?
+  resetProcedure  String?     @map("reset_procedure")
+  standardRef     String?     @map("standard_ref")
+  equipment       Equipment   @relation(fields: [equipmentId], references: [externalId], onDelete: Cascade)
+  events          AlarmEvent[]
 }
-
-// -------------------------------------
-// Dynamic and Log Data
-// -------------------------------------
 
 model LogEntry {
   id          Int       @id @default(autoincrement())
-  timestamp   DateTime  @map("timestamp")
+  timestamp   DateTime  @db.Timestamp(6)
   type        String
   source      String
   message     String
   signature   String    @unique
   equipmentId String?   @map("equipment_id")
   equipment   Equipment? @relation(fields: [equipmentId], references: [externalId], onDelete: Cascade)
-
-  @@map("log_entries")
 }
 
 model AlarmEvent {
-  id        Int      @id @default(autoincrement())
-  timestamp DateTime @map("timestamp")
-  isActive  Boolean  @map("is_active")
-  details   String?
-  alarmCode String   @map("alarm_code")
-  alarm     Alarm    @relation(fields: [alarmCode], references: [code], onDelete: Cascade)
-
-  @@map("alarm_events")
+  id         Int      @id @default(autoincrement())
+  timestamp  DateTime @db.Timestamp(6)
+  isActive   Boolean  @map("is_active")
+  details    String?
+  alarmCode  String   @map("alarm_code")
+  alarm      Alarm    @relation(fields: [alarmCode], references: [code], onDelete: Cascade)
 }
 
 model ScadaData {
-  id          Int       @id @default(autoincrement())
-  timestamp   DateTime  @map("timestamp")
+  id          Int      @id @default(autoincrement())
+  timestamp   DateTime @db.Timestamp(6)
   value       Float
-  equipmentId String    @map("equipment_id")
+  equipmentId String   @map("equipment_id")
   equipment   Equipment @relation(fields: [equipmentId], references: [externalId], onDelete: Cascade)
-
-  @@map("scada_data")
 }
 
 model Annotation {
   id          Int      @id @default(autoincrement())
-  timestamp   DateTime @map("timestamp")
+  timestamp   DateTime @db.Timestamp(6)
   text        String
   operator    String
   xPos        Float    @map("x_pos")
   yPos        Float    @map("y_pos")
   equipmentId String   @map("equipment_id")
   equipment   Equipment @relation(fields: [equipmentId], references: [externalId], onDelete: Cascade)
-
-  @@map("annotations")
 }
 
 model Document {
-  id             Int       @id @default(autoincrement())
-  equipmentId    String    @map("equipment_id")
-  imageData      String    @map("image_data") @db.Text
-  ocrText        String?   @map("ocr_text")
-  description    String?
-  createdAt      DateTime  @map("created_at") @default(now())
-  perceptualHash String?   @map("perceptual_hash")
-  equipment      Equipment @relation(fields: [equipmentId], references: [externalId], onDelete: Cascade)
-
-  @@map("documents")
+  id              Int       @id @default(autoincrement())
+  equipmentId     String    @map("equipment_id")
+  imageData       String    @map("image_data")
+  ocrText         String?   @map("ocr_text")
+  description     String?
+  createdAt       DateTime  @default(now()) @map("created_at")
+  perceptualHash  String?   @unique @map("perceptual_hash")
+  equipment       Equipment @relation(fields: [equipmentId], references: [externalId], onDelete: Cascade)
 }
-
-// -------------------------------------
-// Static Configuration Data
-// -------------------------------------
 
 model Procedure {
   id          String  @id
   name        String
   description String?
   version     String?
-  steps       String // JSON stored as string
-
-  @@map("procedures")
+  steps       String? // JSON stored as string
 }
 
 model SynopticItem {
-  externalId    String     @id @map("external_id")
+  externalId    String  @id @map("external_id")
   name          String?
   type          String?
-  parentId      String?    @map("parent_id")
-  groupPath     String?    @map("group_path")
-  elementId     String?    @unique @map("element_id")
+  parentId      String? @map("parent_id")
+  groupPath     String? @map("group_path")
+  elementId     String? @map("element_id")
   level         Int?
-  approvedBy    String?    @map("approved_by")
-  approvalDate  String?    @map("approval_date")
-  element       Equipment? @relation(fields: [elementId], references: [externalId])
-
-  @@map("synoptic_items")
+  approvedBy    String? @map("approved_by")
+  approvalDate  String? @map("approval_date")
 }
