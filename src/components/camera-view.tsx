@@ -361,17 +361,15 @@ export function CameraView() {
         }
 
         setStatusText('Récupération de la base de données visuelle locale...');
-        console.log('[IDENTIFY_FLOW] Querying local visual database.');
         const { getLocalVisualDatabase } = await import('@/lib/db-service');
         const localVisualDb = await getLocalVisualDatabase();
         
         if (localVisualDb.length === 0) {
-            console.warn('[IDENTIFY_FLOW] Local visual DB is empty.');
+            console.warn('[IDENTIFY_FLOW] Local visual DB is empty. Identification cannot proceed.');
             toast({ variant: 'destructive', title: 'Base locale vide', description: 'Aucune donnée visuelle à comparer. Veuillez provisionner des équipements.' });
             handleReset();
             return;
         }
-        console.log(`[IDENTIFY_FLOW] Found ${localVisualDb.length} items in local visual DB.`);
 
         setStatusText('Calcul du hachage perceptuel...');
         console.log('[IDENTIFY_FLOW] Computing perceptual hash for captured image.');
@@ -398,10 +396,13 @@ export function CameraView() {
 
         if (similarity > 75) { // Similarity threshold
              setScanResult({ capturedImage: imageDataUrl, match: bestMatch, similarity });
+             console.log(`[IDENTIFY_FLOW] Match found and confirmed with similarity > 75%.`);
         } else {
              setScanResult({ capturedImage: imageDataUrl, match: null, similarity });
+             console.log(`[IDENTIFY_FLOW] No match found with sufficient similarity (< 75%).`);
         }
         setViewMode('result');
+        console.log('[IDENTIFY_FLOW] Displaying results view.');
 
     } catch (error: any) {
         console.error("[IDENTIFY_FLOW] Visual identification failed:", error);
@@ -440,6 +441,7 @@ export function CameraView() {
     }
 
     setOcrText(ocrResultText);
+    console.log('[PROVISION_FLOW] Moving to provisioning form view.');
     setViewMode('provisioning');
   }, [toast, isTauri]);
   
@@ -486,9 +488,10 @@ export function CameraView() {
           ocrText: ocrText,
           description: `Plaque signalétique pour ${componentData.id}`,
           perceptualHash,
-          createdAt: new Date().toISOString(),
+          createdAt: new Date(),
         }
       };
+      console.log('[PROVISION_FLOW] Assembled payload for API:', payload);
 
       setStatusText('Sauvegarde sur le serveur distant...');
       console.log('[PROVISION_FLOW] Sending payload to /api/provision.');
@@ -502,11 +505,12 @@ export function CameraView() {
 
       if (!response.ok) {
         const errorData = await response.json();
+        console.error('[PROVISION_FLOW] Server returned an error:', { status: response.status, error: errorData });
         throw new Error(errorData.error || `Erreur HTTP: ${response.status}`);
       }
 
       const responseData = await response.json();
-      console.log('[PROVISION_FLOW] Server responded with success.', responseData);
+      console.log('[PROVISION_FLOW] Server responded with success. Provisioning complete.', responseData);
       toast({ title: 'Succès', description: `La fiche pour le composant ${componentData.id} a été ajoutée au serveur.` });
       handleReset();
     } catch (error: any) {
