@@ -55,12 +55,7 @@ const nextConfig: NextConfig = {
 
     if (isServer) {
       // Exclude problematic client-side libraries from server-side compilation
-      config.externals.push('vosk-browser', '@ricky0123/vad-web', 'onnxruntime-web');
-    }
-
-    if (!isServer) {
-      // This prevents webpack from trying to parse a library that uses dynamic requires.
-      config.module.noParse = /ort\.min\.js/;
+      config.externals.push('vosk-browser');
     }
     
     return config;

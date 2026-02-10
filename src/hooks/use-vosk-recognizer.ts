@@ -2,7 +2,6 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { MicVAD } from '@ricky0123/vad-web';
 import type { WorkerMessage, WorkerResponse } from '@/workers/vosk.worker';
 
 export enum RecognizerState {
@@ -21,15 +20,6 @@ interface RecognizerOptions {
 interface Transcript {
     partial: string;
     final: string;
-}
-
-/**
- * Vérifie si l'environnement supporte AudioWorklet
- */
-function supportsAudioWorklet(): boolean {
-  return typeof window !== 'undefined' && 
-         typeof AudioContext !== 'undefined' && 
-         typeof AudioWorkletNode !== 'undefined';
 }
 
 /**
@@ -60,22 +50,17 @@ export function useVoskRecognizer(options: RecognizerOptions) {
     const [transcript, setTranscript] = useState<Transcript>({ partial: '', final: '' });
     
     const workerRef = useRef<Worker | null>(null);
-    const vadRef = useRef<MicVAD | null>(null);
+    const audioContextRef = useRef<AudioContext | null>(null);
+    const streamRef = useRef<MediaStream | null>(null);
+    const scriptProcessorRef = useRef<ScriptProcessorNode | null>(null);
+    const audioChunksRef = useRef<Float32Array[]>([]);
 
-    // Initialize the worker and VAD
+    // Initialize the worker
     useEffect(() => {
-        // ✅ Vérification préalable du support AudioWorklet
-        if (!supportsAudioWorklet()) {
-            console.warn('AudioWorklet not supported in this environment');
-            setRecognizerState(RecognizerState.ERROR);
-            return;
-        }
-
-        if (workerRef.current) return; // Already initialized
+        if (workerRef.current) return;
 
         setRecognizerState(RecognizerState.LOADING);
         
-        // Initialize Web Worker
         const worker = new Worker(new URL('@/workers/vosk.worker.ts', import.meta.url), { type: 'module' });
         worker.onmessage = (event: MessageEvent<WorkerResponse>) => {
             const { data } = event;
@@ -87,76 +72,112 @@ export function useVoskRecognizer(options: RecognizerOptions) {
             } else if (data.type === 'partial') {
                 setTranscript(prev => ({ ...prev, partial: data.text ?? '' }));
             } else if (data.type === 'result') {
-                // Reset partial transcript and set final transcript
                 setTranscript({ partial: '', final: data.text ?? '' });
             }
         };
         workerRef.current = worker;
         
-        // Initialize VAD with proper typing
-        const vadOptions = {
-            workletURL: '/models/vad.worklet.js',
-            modelURL: '/models/silero_vad.onnx',
-            ortWasmURL: '/models/onnx-runtime-web.wasm',
-            
-            onSpeechStart: () => {
-                console.log('VAD: Speech started');
-            },
-            
-            onSpeechEnd: async (audio: Float32Array) => {
-                console.log('VAD: Speech ended');
-                if (!workerRef.current || !vadRef.current) return;
-
-                const fromSampleRate = vadRef.current.audioContext.sampleRate;
-                
-                try {
-                    const resampledAudio = resample(audio, fromSampleRate, options.sampleRate);
-                    const message: WorkerMessage = { type: 'audio', audio: resampledAudio };
-                    workerRef.current?.postMessage(message, [resampledAudio.buffer]);
-                } catch (e) {
-                    console.error('Failed to resample audio', e);
-                }
-            },
-            
-            onFrameProcessed: (probs: { isSpeech: boolean; prob: number }) => {
-                // You can use probs.isSpeech for real-time feedback
-            },
-        };
-
-        MicVAD.new(vadOptions).then(vad => {
-            vadRef.current = vad;
-            // Now that VAD is ready, we can initialize the worker model
-            const initMessage: WorkerMessage = { type: 'init', modelUrl: options.modelUrl };
-            workerRef.current?.postMessage(initMessage);
-        }).catch((e: unknown) => {
-            console.error('Failed to initialize VAD', e);
-            setRecognizerState(RecognizerState.ERROR);
-        });
+        const initMessage: WorkerMessage = { type: 'init', modelUrl: options.modelUrl };
+        worker.postMessage(initMessage);
 
         return () => {
-            vadRef.current?.pause();
-            vadRef.current = null;
             workerRef.current?.terminate();
             workerRef.current = null;
         };
-    }, [options.modelUrl, options.sampleRate]);
+    }, [options.modelUrl]);
 
-    const start = useCallback(() => {
-        if (vadRef.current && recognizerState === RecognizerState.READY) {
-            vadRef.current.start();
-            setRecognizerState(RecognizerState.LISTENING);
-            setTranscript({ partial: '', final: '' });
-            // Reset recognizer state in worker
-            workerRef.current?.postMessage({ type: 'reset' } as WorkerMessage);
+    const processAudio = useCallback(async () => {
+        if (audioChunksRef.current.length === 0 || !workerRef.current) return;
+
+        const totalLength = audioChunksRef.current.reduce((acc, chunk) => acc + chunk.length, 0);
+        const concatenated = new Float32Array(totalLength);
+        let offset = 0;
+        for (const chunk of audioChunksRef.current) {
+            concatenated.set(chunk, offset);
+            offset += chunk.length;
         }
-    }, [recognizerState]);
+        audioChunksRef.current = [];
+
+        if (!audioContextRef.current) return;
+        const fromSampleRate = audioContextRef.current.sampleRate;
+        
+        try {
+            const resampledAudio = resample(concatenated, fromSampleRate, options.sampleRate);
+            const message: WorkerMessage = { type: 'audio', audio: resampledAudio };
+            workerRef.current.postMessage(message, [resampledAudio.buffer]);
+        } catch (e) {
+            console.error('Failed to resample and process audio', e);
+        }
+    }, [options.sampleRate]);
+
+    const stopListening = useCallback(() => {
+        if (streamRef.current) {
+            streamRef.current.getTracks().forEach(track => track.stop());
+            streamRef.current = null;
+        }
+        if (scriptProcessorRef.current) {
+            scriptProcessorRef.current.disconnect();
+            scriptProcessorRef.current = null;
+        }
+        if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
+            audioContextRef.current.close().catch(console.error);
+            audioContextRef.current = null;
+        }
+        setRecognizerState(RecognizerState.READY);
+    }, []);
+
+    const start = useCallback(async () => {
+        if (recognizerState !== RecognizerState.READY) return;
+
+        setRecognizerState(RecognizerState.LISTENING);
+        setTranscript({ partial: '', final: '' });
+        workerRef.current?.postMessage({ type: 'reset' } as WorkerMessage);
+
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            streamRef.current = stream;
+            
+            const context = new (window.AudioContext || (window as any).webkitAudioContext)();
+            audioContextRef.current = context;
+
+            const source = context.createMediaStreamSource(stream);
+            
+            const bufferSize = 4096;
+            const processor = context.createScriptProcessor(bufferSize, 1, 1);
+            scriptProcessorRef.current = processor;
+
+            processor.onaudioprocess = (e) => {
+                const inputData = e.inputBuffer.getChannelData(0);
+                audioChunksRef.current.push(new Float32Array(inputData));
+            };
+
+            source.connect(processor);
+            processor.connect(context.destination);
+
+        } catch (e) {
+            console.error('Failed to start microphone:', e);
+            setRecognizerState(RecognizerState.ERROR);
+            stopListening();
+        }
+    }, [recognizerState, stopListening]);
 
     const stop = useCallback(() => {
-        if (vadRef.current && recognizerState === RecognizerState.LISTENING) {
-            vadRef.current.pause();
-            setRecognizerState(RecognizerState.READY);
+        if (recognizerState !== RecognizerState.LISTENING) return;
+        
+        stopListening();
+        // Give a moment for the last audio chunks to be processed before sending
+        setTimeout(() => {
+            processAudio();
+        }, 100);
+
+    }, [recognizerState, stopListening, processAudio]);
+
+    // Cleanup on unmount
+    useEffect(() => {
+        return () => {
+            stopListening();
         }
-    }, [recognizerState]);
+    }, [stopListening]);
 
     return { recognizerState, transcript, start, stop };
 }
