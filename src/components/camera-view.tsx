@@ -2,9 +2,8 @@
 'use client';
 
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { Camera, CameraOff, RefreshCcw, ScanLine, Save, X, ScanSearch, Upload, FileUp } from 'lucide-react';
-// Replace next/image with a standard img tag for better data URI handling
-// import Image from 'next/image';
+import { Camera, CameraOff, RefreshCcw, ScanLine, Save, X, ScanSearch, Upload, FileUp, Plus } from 'lucide-react';
+import Image from 'next/image';
 
 import { Alert, AlertDescription, AlertTitle } from './ui/alert';
 import { Button } from './ui/button';
@@ -19,7 +18,16 @@ import { computePHash, compareHashes } from '@/lib/image-hashing';
 import visualDbData from '@/assets/master-data/visual-database.json';
 import { cn } from '@/lib/utils';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  DialogTrigger,
+  DialogClose,
+} from '@/components/ui/dialog';
 
 type ViewMode = 'idle' | 'scanning' | 'provisioning' | 'result';
 type AnalysisMode = 'camera' | 'file';
@@ -66,11 +74,11 @@ function ResultView({ result, onReset }: { result: ScanResult; onReset: () => vo
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
                             <div className="space-y-2">
                                 <Label>Image Capturée</Label>
-                                <img src={capturedImage} alt="Capture" width={400} height={300} className="rounded-md border-2 border-dashed aspect-video object-contain" />
+                                <Image src={capturedImage} alt="Capture" width={400} height={300} className="rounded-md border-2 border-dashed aspect-video object-contain" />
                             </div>
                             <div className="space-y-2">
                                 <Label>Meilleure Correspondance</Label>
-                                <img src={match.imageUrl} alt={match.name} width={400} height={300} className="rounded-md border-2 border-primary aspect-video object-contain" />
+                                <Image src={match.imageUrl} alt={match.name} width={400} height={300} className="rounded-md border-2 border-primary aspect-video object-contain" />
                             </div>
                         </div>
                         <Card className="bg-muted/50">
@@ -179,7 +187,7 @@ function ProvisioningForm({
                 <div className="space-y-2">
                 <Label>Image Capturée</Label>
                 <div className="overflow-hidden rounded-md border">
-                    <img
+                    <Image
                     src={imageData}
                     alt="Capture de composant"
                     width={300}
@@ -227,6 +235,167 @@ function ProvisioningForm({
         </CardContent>
     </Card>
   );
+}
+interface UploadedFile {
+    id: string;
+    file: File;
+    previewUrl: string;
+}
+function DatabaseManagementModal() {
+    const [selectedFiles, setSelectedFiles] = useState<UploadedFile[]>([]);
+    const [isProcessing, setIsProcessing] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const files = Array.from(event.target.files || []);
+        const newUploadedFiles: UploadedFile[] = files.map(file => ({
+            id: `${file.name}-${file.lastModified}`,
+            file,
+            previewUrl: URL.createObjectURL(file),
+        }));
+        setSelectedFiles(prev => [...prev, ...newUploadedFiles]);
+    };
+
+    const removeFile = (id: string) => {
+        setSelectedFiles(prev => prev.filter(f => f.id !== id));
+    };
+
+    const generateJsonForFile = async (file: File): Promise<any> => {
+        // Simulate detailed analysis
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        if (!ctx) throw new Error("Canvas not supported");
+
+        const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = e => {
+                const image = new window.Image();
+                image.onload = () => resolve(image);
+                image.onerror = reject;
+                image.src = e.target?.result as string;
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // Simplified histogram
+        const histSize = 10;
+        canvas.width = histSize;
+        canvas.height = histSize;
+        ctx.drawImage(img, 0, 0, histSize, histSize);
+        const histData = ctx.getImageData(0, 0, histSize, histSize).data;
+        const histogram = Array.from(histData).reduce((acc, val, i) => {
+            const channel = i % 4; // 0=R, 1=G, 2=B, 3=A
+            if (channel < 3) acc[channel] = (acc[channel] || 0) + val;
+            return acc;
+        }, [] as number[]);
+
+        return {
+            fileName: file.name,
+            size: file.size,
+            type: file.type,
+            lastModified: file.lastModified,
+            histogram: {
+                r: Math.round(histogram[0] / (histSize * histSize)),
+                g: Math.round(histogram[1] / (histSize * histSize)),
+                b: Math.round(histogram[2] / (histSize * histSize)),
+            },
+        };
+    };
+
+    const handleBatchProcess = async () => {
+        setIsProcessing(true);
+        const allStats = [];
+        for (const uploadedFile of selectedFiles) {
+            const stats = await generateJsonForFile(uploadedFile.file);
+            allStats.push(stats);
+        }
+        
+        // Simulate saving to DB / downloading JSON
+        const jsonString = JSON.stringify({ images: allStats }, null, 2);
+        const blob = new Blob([jsonString], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'visual-database-export.json';
+        a.click();
+        URL.revokeObjectURL(url);
+        
+        setIsProcessing(false);
+        setSelectedFiles([]);
+    };
+
+    return (
+        <Dialog>
+            <DialogTrigger asChild>
+                <Button className="fixed bottom-6 right-6 h-16 w-16 rounded-full shadow-lg" size="icon">
+                    <Plus className="h-8 w-8" />
+                </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[800px]">
+                <DialogHeader>
+                    <DialogTitle>Gérer la Base de Données Visuelle</DialogTitle>
+                    <DialogDescription>
+                        Importez de nouvelles images pour enrichir la base de données de reconnaissance visuelle.
+                    </DialogDescription>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                    <div 
+                        className="flex flex-col items-center justify-center p-6 border-2 border-dashed rounded-lg cursor-pointer hover:bg-muted/50"
+                        onClick={() => fileInputRef.current?.click()}
+                    >
+                        <Upload className="w-12 h-12 text-muted-foreground" />
+                        <p className="mt-2 text-sm text-muted-foreground">Cliquez ou glissez-déposez pour importer des images</p>
+                        <input
+                            ref={fileInputRef}
+                            type="file"
+                            multiple
+                            accept="image/*"
+                            className="hidden"
+                            onChange={handleFileSelect}
+                        />
+                    </div>
+                    {selectedFiles.length > 0 && (
+                        <div className="space-y-4">
+                            <h4 className="font-medium">Images à importer ({selectedFiles.length})</h4>
+                            <div className="max-h-[300px] overflow-y-auto pr-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                                {selectedFiles.map(uploadedFile => (
+                                    <div key={uploadedFile.id} className="relative group">
+                                        <Image
+                                            src={uploadedFile.previewUrl}
+                                            alt={uploadedFile.file.name}
+                                            width={150}
+                                            height={150}
+                                            className="w-full h-32 object-cover rounded-md"
+                                        />
+                                        <Button
+                                            variant="destructive"
+                                            size="icon"
+                                            className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100"
+                                            onClick={() => removeFile(uploadedFile.id)}
+                                        >
+                                            <X className="h-4 w-4" />
+                                        </Button>
+                                        <p className="text-xs truncate text-muted-foreground mt-1">{uploadedFile.file.name}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                </div>
+                <DialogFooter>
+                    <DialogClose asChild>
+                        <Button variant="outline">Annuler</Button>
+                    </DialogClose>
+                    <Button
+                        onClick={handleBatchProcess}
+                        disabled={selectedFiles.length === 0 || isProcessing}
+                    >
+                        {isProcessing ? "Traitement en cours..." : `Générer et télécharger JSON pour ${selectedFiles.length} image(s)`}
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
+    );
 }
 
 // Main Component
@@ -320,7 +489,7 @@ export function CameraView() {
     };
   }, [toast, isTauri]);
   
-  const handleReset = () => {
+  const handleReset = useCallback(() => {
     setViewMode('idle');
     setFileImage(null);
     setScanResult(null);
@@ -331,7 +500,7 @@ export function CameraView() {
      if(fileInputRef.current) {
       fileInputRef.current.value = '';
     }
-  };
+  }, []);
 
   const processIdentification = useCallback(async (imageDataUrl: string) => {
     setViewMode('scanning');
@@ -367,40 +536,41 @@ export function CameraView() {
         toast({ variant: 'destructive', title: 'Erreur d\'analyse', description: 'La comparaison visuelle a échoué.' });
         handleReset();
     }
-  }, [toast]);
+  }, [toast, handleReset]);
 
   const processProvisioning = useCallback(async (imageDataUrl: string) => {
-    if (!isTauri) {
-        toast({ title: 'Fonctionnalité non disponible', description: 'Le provisionnement OCR est uniquement disponible dans l\'application de bureau.'});
-        return;
-    }
     setViewMode('scanning');
     setCapturedImage(imageDataUrl);
-    setStatusText('Analyse OCR en cours...');
 
-    if (!workerRef.current) {
-        toast({ variant: 'destructive', title: 'Erreur OCR', description: "Le moteur d'analyse n'est pas prêt." });
-        handleReset();
-        return;
-    }
+    let ocrResultText = 'Saisie manuelle requise.';
 
-    let ocrResultText = 'Aucun texte détecté.';
-    try {
-        const { data: { text } } = await workerRef.current.recognize(imageDataUrl);
-        ocrResultText = text || 'Aucun texte détecté.';
-    } catch (error) {
-        console.error("OCR recognition failed:", error);
-        toast({
-            variant: "default",
-            title: 'OCR a échoué',
-            description: "La reconnaissance de texte a échoué, veuillez saisir les informations manuellement.",
-        });
-        ocrResultText = "L'OCR a échoué. Saisie manuelle requise.";
+    if (isTauri) {
+        setStatusText('Analyse OCR en cours...');
+        if (!workerRef.current) {
+            toast({ variant: 'destructive', title: 'Erreur OCR', description: "Le moteur d'analyse n'est pas prêt." });
+            handleReset();
+            return;
+        }
+        try {
+            const { data: { text } } = await workerRef.current.recognize(imageDataUrl);
+            ocrResultText = text || 'Aucun texte détecté.';
+        } catch (error) {
+            console.error("OCR recognition failed:", error);
+            toast({
+                variant: "default",
+                title: 'OCR a échoué',
+                description: "La reconnaissance de texte a échoué, veuillez saisir les informations manuellement.",
+            });
+            ocrResultText = "L'OCR a échoué. Saisie manuelle requise.";
+        }
+    } else {
+        setStatusText('Préparation du formulaire...');
+        ocrResultText = "L'OCR est indisponible en mode web. Veuillez saisir les informations manuellement.";
     }
 
     setOcrText(ocrResultText);
     setViewMode('provisioning');
-  }, [toast, isTauri]);
+  }, [toast, isTauri, handleReset]);
   
   const captureFromVideo = useCallback(() => {
     if (!videoRef.current) return null;
@@ -497,7 +667,7 @@ export function CameraView() {
                                     <p className="font-normal text-xs text-primary-foreground/80">Comparer avec la BDD</p>
                                 </div>
                             </Button>
-                            <Button onClick={() => { const img = captureFromVideo(); if (img) processProvisioning(img); }} disabled={!isIdle || hasCameraPermission === false || (isTauri && !workerRef.current)} size="lg" variant="secondary" className="h-16 text-lg">
+                            <Button onClick={() => { const img = captureFromVideo(); if (img) processProvisioning(img); }} disabled={!isIdle || hasCameraPermission === false} size="lg" variant="secondary" className="h-16 text-lg">
                                 <FileUp className="mr-3 h-8 w-8"/>
                                 <div>
                                     <p className="font-bold">Provisionner</p>
@@ -537,7 +707,7 @@ export function CameraView() {
                                     <p className="font-normal text-xs text-primary-foreground/80">Comparer avec la BDD</p>
                                 </div>
                             </Button>
-                            <Button onClick={() => fileImage && processProvisioning(fileImage)} disabled={!isIdle || !fileImage || (isTauri && !workerRef.current)} size="lg" variant="secondary" className="h-16 text-lg">
+                            <Button onClick={() => fileImage && processProvisioning(fileImage)} disabled={!isIdle || !fileImage} size="lg" variant="secondary" className="h-16 text-lg">
                                 <FileUp className="mr-3 h-8 w-8"/>
                                 <div>
                                     <p className="font-bold">Provisionner</p>
