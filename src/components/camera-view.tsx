@@ -78,7 +78,7 @@ function ResultView({ result, onReset }: { result: ScanResult; onReset: () => vo
                             </div>
                             <div className="space-y-2">
                                 <Label>Meilleure Correspondance</Label>
-                                <Image src={match.imageUrl} alt={match.name} width={400} height={300} className="rounded-md border-2 border-primary aspect-video object-contain" />
+                                <img src={match.imageUrl} alt={match.name} width={400} height={300} className="rounded-md border-2 border-primary aspect-video object-contain" />
                             </div>
                         </div>
                         <Card className="bg-muted/50">
@@ -187,12 +187,12 @@ function ProvisioningForm({
                 <div className="space-y-2">
                 <Label>Image Capturée</Label>
                 <div className="overflow-hidden rounded-md border">
-                    <Image
+                    <img
                     src={imageData}
                     alt="Capture de composant"
                     width={300}
                     height={225}
-                    className="h-auto w-full"
+                    className="h-auto w-full object-contain"
                     />
                 </div>
                 </div>
@@ -419,7 +419,8 @@ export function CameraView() {
   const [isTauri, setIsTauri] = useState(false);
 
   useEffect(() => {
-    setIsTauri(!!window.__TAURI__);
+    const isTauriEnv = !!window.__TAURI__;
+    setIsTauri(isTauriEnv);
 
     if (analysisMode === 'camera') {
         const getCameraPermission = async () => {
@@ -560,12 +561,12 @@ export function CameraView() {
         }
     } else {
         setStatusText('Préparation du formulaire...');
-        ocrResultText = "L'OCR est indisponible en mode web. Veuillez saisir les informations manuellement.";
+        ocrResultText = "Le provisionnement OCR est indisponible en mode web. Veuillez saisir les informations manuellement.";
     }
 
     setOcrText(ocrResultText);
     setViewMode('provisioning');
-  }, [toast, isTauri, handleReset]);
+  }, [toast, isTauri]);
   
   const captureFromVideo = useCallback(() => {
     if (!videoRef.current) return null;
@@ -589,14 +590,35 @@ export function CameraView() {
     }
   };
 
-  const handleSaveProvision = async (component: NewComponentFormData) => {
+  const handleSaveProvision = async (componentData: NewComponentFormData) => {
     try {
-      const { addComponentAndDocument } = await import('@/lib/db-service');
-      await addComponentAndDocument(
-        { externalId: component.id, name: component.name, type: component.type },
-        { imageData: capturedImage, ocrText: ocrText, description: `Plaque signalétique pour ${component.id}` }
-      );
-      toast({ title: 'Succès', description: `La fiche pour le composant ${component.id} a été ajoutée.` });
+      const payload = {
+        component: {
+          id: componentData.id,
+          name: componentData.name,
+          type: componentData.type,
+        },
+        document: {
+          imageData: capturedImage,
+          ocrText: ocrText,
+          description: `Plaque signalétique pour ${componentData.id}`,
+        }
+      };
+
+      const response = await fetch('/api/provision', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || `Erreur HTTP: ${response.status}`);
+      }
+
+      toast({ title: 'Succès', description: `La fiche pour le composant ${componentData.id} a été ajoutée.` });
       handleReset();
     } catch (error: any) {
       console.error(error);
