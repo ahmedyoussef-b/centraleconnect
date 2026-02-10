@@ -544,24 +544,19 @@ export function CameraView() {
 
     let ocrResultText = 'Saisie manuelle requise.';
 
-    if (isTauri) {
+    if (isTauri && workerRef.current) {
         setStatusText('Analyse OCR en cours...');
-        if (!workerRef.current) {
-            toast({ variant: 'destructive', title: 'Erreur OCR', description: "Le moteur d'analyse n'est pas prêt." });
-            handleReset();
-            return;
-        }
         try {
             const { data: { text } } = await workerRef.current.recognize(imageDataUrl);
             ocrResultText = text || 'Aucun texte détecté.';
         } catch (error) {
             console.error("OCR recognition failed:", error);
+            ocrResultText = "L'OCR a échoué. Veuillez saisir les informations manuellement.";
             toast({
                 variant: "default",
                 title: 'OCR a échoué',
-                description: "La reconnaissance de texte a échoué, veuillez saisir les informations manuellement.",
+                description: ocrResultText,
             });
-            ocrResultText = "L'OCR a échoué. Saisie manuelle requise.";
         }
     } else {
         setStatusText('Préparation du formulaire...');
@@ -595,10 +590,6 @@ export function CameraView() {
   };
 
   const handleSaveProvision = async (component: NewComponentFormData) => {
-    if (!isTauri) {
-        toast({ title: 'Fonctionnalité non disponible', description: 'La sauvegarde est uniquement disponible dans l\'application de bureau.'});
-        return;
-    }
     try {
       const { addComponentAndDocument } = await import('@/lib/db-service');
       await addComponentAndDocument(
