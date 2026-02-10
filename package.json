@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
+    "check:all": "npm run lint && npm run typecheck",
     "postinstall": "prisma generate",
     "db:seed": "prisma db push && tsx scripts/seed.ts",
     "generate:scada-map": "tsx scripts/generate-scada-mapping.ts",
