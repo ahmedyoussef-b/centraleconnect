@@ -4,17 +4,19 @@ import { PrismaClient } from '@prisma/client';
 import { createHash } from 'crypto';
 
 // Import JSON data
-import parameterData from '../src/assets/master-data/parameters.json';
-import alarmData from '../src/assets/master-data/alarms.json';
-import pidAssetsData from '../src/assets/master-data/pid-assets.json';
-import groupsData from '../src/assets/master-data/groups.json';
-import b0Data from '../src/assets/master-data/B0.json';
-import b1Data from '../src/assets/master-data/B1.json';
-import b2Data from '../src/assets/master-data/B2.json';
-import b3Data from '../src/assets/master-data/B3.json';
-import proceduresData from '../src/assets/master-data/procedures.json';
-import tg1Data from '../src/assets/master-data/TG1.json';
-import tg2Data from '../src/assets/master-data/TG2.json';
+import componentsData from '../src/assets/master-data/components.json' assert { type: 'json' };
+import parameterData from '../src/assets/master-data/parameters.json' assert { type: 'json' };
+import alarmData from '../src/assets/master-data/alarms.json' assert { type: 'json' };
+import pidAssetsData from '../src/assets/master-data/pid-assets.json' assert { type: 'json' };
+import groupsData from '../src/assets/master-data/groups.json' assert { type: 'json' };
+import b0Data from '../src/assets/master-data/B0.json' assert { type: 'json' };
+import b1Data from '../src/assets/master-data/B1.json' assert { type: 'json' };
+import b2Data from '../src/assets/master-data/B2.json' assert { type: 'json' };
+import b3Data from '../src/assets/master-data/B3.json' assert { type: 'json' };
+import c0Data from '../src/assets/master-data/C0.json' assert { type: 'json' };
+import proceduresData from '../src/assets/master-data/procedures.json' assert { type: 'json' };
+import tg1Data from '../src/assets/master-data/TG1.json' assert { type: 'json' };
+import tg2Data from '../src/assets/master-data/TG2.json' assert { type: 'json' };
 
 const prisma = new PrismaClient();
 
@@ -43,7 +45,7 @@ async function main() {
     return createHash('sha256').update(JSON.stringify(data)).digest('hex');
   };
 
-  const detailedData = [...b0Data, ...b1Data, ...b2Data, ...b3Data, ...pidAssetsData.nodes, ...componentsData, ...tg1Data, ...tg2Data];
+  const detailedData = [...c0Data, ...b0Data, ...b1Data, ...b2Data, ...b3Data, ...pidAssetsData.nodes, ...componentsData, ...tg1Data, ...tg2Data];
 
   for (const item of detailedData as any[]) {
     const id = item.externalId || item.tag;
