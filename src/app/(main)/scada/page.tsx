@@ -1,10 +1,8 @@
-
 'use client';
 
 import dynamic from 'next/dynamic';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import { HistoryChart } from '@/components/history-chart';
 
 const ScadaRealtime = dynamic(
   () => import('@/components/scada-realtime').then((mod) => mod.ScadaRealtime),
@@ -20,6 +18,23 @@ const ScadaRealtime = dynamic(
         </CardContent>
       </Card>
     ),
+  }
+);
+
+const HistoryChart = dynamic(
+  () => import('@/components/history-chart').then((mod) => mod.HistoryChart),
+  {
+    ssr: false,
+    loading: () => (
+      <Card>
+        <CardHeader>
+          <CardTitle>Historique de Puissance (24h)</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Skeleton className="h-[300px]" />
+        </CardContent>
+      </Card>
+    )
   }
 );
 
