@@ -40,5 +40,11 @@
       "name": "Bloc B - Niveau 3",
       "description": "Niveau de distribution et contrôle (poste d'eau, régulation)",
       "level": 3
+    },
+    {
+      "code": "C0",
+      "name": "Salle de Contrôle",
+      "description": "Pupitre de contrôle et synoptiques principaux",
+      "level": 0
     }
   ]

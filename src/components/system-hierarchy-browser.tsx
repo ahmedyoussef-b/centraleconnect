@@ -8,7 +8,7 @@ import type { Equipment } from '@/types/db';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Folder, Cog, Database, ChevronRight, Home, Search, X, Package, Wind, Droplets } from 'lucide-react';
+import { Folder, Cog, Database, ChevronRight, Home, Search, X, Package, Wind, Droplets, Monitor } from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -110,6 +110,7 @@ export function SystemHierarchyBrowser() {
             { id: 'B1', name: 'Cycle Eau-Vapeur CR1 (B1)', data: nodes.filter(n => n.systemCode === 'B1'), icon: Droplets, type: 'grid', count: nodes.filter(n => n.systemCode === 'B1').length },
             { id: 'B2', name: 'Cycle Eau-Vapeur CR2 (B2)', data: nodes.filter(n => n.systemCode === 'B2'), icon: Droplets, type: 'grid', count: nodes.filter(n => n.systemCode === 'B2').length },
             { id: 'B3', name: 'Cycle Eau-Vapeur TV (B3)', data: nodes.filter(n => n.systemCode === 'B3'), icon: Wind, type: 'grid', count: nodes.filter(n => n.systemCode === 'B3').length },
+            { id: 'C0', name: 'Salle de Contrôle (C0)', data: nodes.filter(n => n.systemCode === 'C0'), icon: Monitor, type: 'grid', count: nodes.filter(n => n.systemCode === 'C0').length },
         ].filter(c => c.count > 0);
     }, [nodes]);
 

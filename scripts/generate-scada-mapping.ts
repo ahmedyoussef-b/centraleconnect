@@ -7,10 +7,12 @@ const OUTPUT_FILE = path.resolve(__dirname, '../../public/scada-mapping.json');
 const FILES_TO_PROCESS = [
   'components.json',
   'pid-assets.json',
+  'A0.json',
   'B0.json',
   'B1.json',
   'B2.json',
   'B3.json',
+  'C0.json',
 ];
 
 interface MappingEntry {

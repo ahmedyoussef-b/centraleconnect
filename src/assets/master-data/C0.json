@@ -1,0 +1,6 @@
+[
+  { "external_id": "C0.OP.STATION.1", "system": "C0", "type": "WORKSTATION", "parent_id": "C0", "name": "Poste Opérateur Principal", "description": "Station de travail principale pour la conduite du cycle combiné." },
+  { "external_id": "C0.WALL.SCREEN.1", "system": "C0", "type": "DISPLAY", "parent_id": "C0", "name": "Mur d'écrans Synoptiques", "description": "Affichage mural des vues générales de la centrale (P&ID, électrique)." },
+  { "external_id": "C0.ALARM.PANEL", "system": "C0", "type": "PANEL", "parent_id": "C0", "name": "Panneau d'Alarmes Physiques", "description": "Tableau de voyants pour les alarmes matérielles critiques." },
+  { "external_id": "C0.EMERGENCY.STOP", "system": "C0", "type": "BUTTON", "parent_id": "C0", "name": "Bouton d'Arrêt d'Urgence Général", "description": "Commande d'arrêt d'urgence pour l'ensemble de l'installation." }
+]
