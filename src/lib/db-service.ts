@@ -64,7 +64,7 @@ CREATE TABLE IF NOT EXISTS parameters (
     alarm_low REAL,
     standard_ref TEXT,
     equipment_id TEXT NOT NULL,
-    FOREIGN KEY (equipment_id) REFERENCES equipments(external_id)
+    FOREIGN KEY (equipment_id) REFERENCES equipments(external_id) ON DELETE CASCADE
 );
 CREATE TABLE IF NOT EXISTS alarms (
     code TEXT PRIMARY KEY NOT NULL,
@@ -74,7 +74,7 @@ CREATE TABLE IF NOT EXISTS alarms (
     reset_procedure TEXT,
     standard_ref TEXT,
     equipment_id TEXT NOT NULL,
-    FOREIGN KEY (equipment_id) REFERENCES equipments(external_id)
+    FOREIGN KEY (equipment_id) REFERENCES equipments(external_id) ON DELETE CASCADE
 );
 CREATE TABLE IF NOT EXISTS log_entries (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -84,7 +84,7 @@ CREATE TABLE IF NOT EXISTS log_entries (
     message TEXT NOT NULL,
     signature TEXT UNIQUE NOT NULL,
     equipment_id TEXT,
-    FOREIGN KEY (equipment_id) REFERENCES equipments(external_id)
+    FOREIGN KEY (equipment_id) REFERENCES equipments(external_id) ON DELETE CASCADE
 );
 CREATE TABLE IF NOT EXISTS alarm_events (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -92,14 +92,14 @@ CREATE TABLE IF NOT EXISTS alarm_events (
   is_active BOOLEAN NOT NULL,
   details TEXT,
   alarm_code TEXT NOT NULL,
-  FOREIGN KEY (alarm_code) REFERENCES alarms(code)
+  FOREIGN KEY (alarm_code) REFERENCES alarms(code) ON DELETE CASCADE
 );
 CREATE TABLE IF NOT EXISTS scada_data (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   timestamp TEXT NOT NULL,
   value REAL NOT NULL,
   equipment_id TEXT NOT NULL,
-  FOREIGN KEY (equipment_id) REFERENCES equipments(external_id)
+  FOREIGN KEY (equipment_id) REFERENCES equipments(external_id) ON DELETE CASCADE
 );
 CREATE TABLE IF NOT EXISTS annotations (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -109,7 +109,7 @@ CREATE TABLE IF NOT EXISTS annotations (
     x_pos REAL NOT NULL,
     y_pos REAL NOT NULL,
     equipment_id TEXT NOT NULL,
-    FOREIGN KEY (equipment_id) REFERENCES equipments(external_id)
+    FOREIGN KEY (equipment_id) REFERENCES equipments(external_id) ON DELETE CASCADE
 );
 CREATE TABLE IF NOT EXISTS documents (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -117,8 +117,9 @@ CREATE TABLE IF NOT EXISTS documents (
     ocr_text TEXT,
     description TEXT,
     created_at TEXT NOT NULL,
+    perceptual_hash TEXT,
     equipment_id TEXT NOT NULL,
-    FOREIGN KEY (equipment_id) REFERENCES equipments(external_id)
+    FOREIGN KEY (equipment_id) REFERENCES equipments(external_id) ON DELETE CASCADE
 );
 CREATE TABLE IF NOT EXISTS procedures (
   id TEXT PRIMARY KEY NOT NULL,
@@ -252,6 +253,7 @@ export async function initializeDatabase(): Promise<void> {
 
   console.log('🚀 Initializing database connection...');
   const db = await invoke('plugin:sql|load', { db: DB_NAME });
+  await invoke('plugin:sql|execute', { db, query: 'PRAGMA foreign_keys = ON;' });
   await invoke('plugin:sql|execute', { db, query: CREATE_TABLES_SQL });
   
   const logResult: { count: number }[] = await invoke('plugin:sql|select', { db, query: 'SELECT count(*) as count FROM log_entries' });
@@ -518,6 +520,74 @@ export async function getDocumentsForComponent(equipmentId: string): Promise<Doc
     createdAt: d.created_at,
   }));
 }
+
+export async function getLocalVisualDatabase(): Promise<any[]> {
+    if (typeof window === 'undefined' || !window.__TAURI__) return Promise.resolve([]);
+    await initializeDatabase();
+    const db = await invoke('plugin:sql|load', { db: DB_NAME });
+    const query = `
+        SELECT
+            d.id as documentId,
+            d.image_data as imageData,
+            d.description as description,
+            d.perceptual_hash as perceptualHash,
+            e.external_id as equipmentId,
+            e.name as equipmentName
+        FROM documents d
+        JOIN equipments e ON d.equipment_id = e.external_id
+        WHERE d.perceptual_hash IS NOT NULL
+    `;
+    const results: any[] = await invoke('plugin:sql|select', { db, query });
+    return results;
+}
+
+export async function syncWithRemote(): Promise<{ synced: number }> {
+    if (typeof window === 'undefined' || !window.__TAURI__) {
+        console.warn("Sync is only available in the Tauri environment.");
+        return { synced: 0 };
+    }
+
+    const response = await fetch('/api/sync/data');
+    if (!response.ok) {
+        throw new Error(`Échec de la récupération des données de synchronisation: ${response.statusText}`);
+    }
+    const data = await response.json();
+    const db = await invoke('plugin:sql|load', { db: DB_NAME });
+    
+    // Use transaction for atomic operations
+    const txId = await invoke('plugin:sql|begin', { db });
+    
+    try {
+        const tableNames = ['documents', 'parameters', 'alarms', 'log_entries', 'procedures', 'synoptic_items', 'equipments'];
+        for (const tableName of tableNames) {
+            await invoke('plugin:sql|execute', { db, query: `DELETE FROM ${tableName};` });
+        }
+        
+        let totalSynced = 0;
+
+        for (const equip of data.equipments || []) {
+            await invoke('plugin:sql|execute', { db, query: 'INSERT INTO equipments (external_id, name, description, parent_id, type, subtype, system_code, sub_system, location, manufacturer, serial_number, document_ref, checksum) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)', values: [equip.externalId, equip.name, equip.description, equip.parentId, equip.type, equip.subtype, equip.systemCode, equip.subSystem, equip.location, equip.manufacturer, equip.serialNumber, equip.documentRef, equip.checksum] });
+            totalSynced++;
+        }
+        for (const doc of data.documents || []) {
+            await invoke('plugin:sql|execute', { db, query: 'INSERT INTO documents (id, equipment_id, image_data, ocr_text, description, created_at, perceptual_hash) VALUES ($1, $2, $3, $4, $5, $6, $7)', values: [doc.id, doc.equipmentId, doc.imageData, doc.ocrText, doc.description, doc.createdAt, doc.perceptualHash] });
+            totalSynced++;
+        }
+        for (const log of data.logEntries || []) {
+             await invoke('plugin:sql|execute', { db, query: 'INSERT INTO log_entries (id, timestamp, type, source, message, equipment_id, signature) VALUES ($1, $2, $3, $4, $5, $6, $7)', values: [log.id, log.timestamp, log.type, log.source, log.message, log.equipmentId, log.signature] });
+             totalSynced++;
+        }
+        // ... Add inserts for other tables if necessary
+
+        await invoke('plugin:sql|commit', { db });
+        return { synced: totalSynced };
+    } catch (e) {
+        console.error("Transaction failed, rolling back:", e);
+        await invoke('plugin:sql|rollback', { db });
+        throw e;
+    }
+}
+
 
 // Ensure database is initialized on load
 if (typeof window !== 'undefined' && window.__TAURI__) {

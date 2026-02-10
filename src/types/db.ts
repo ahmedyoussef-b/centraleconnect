@@ -146,9 +146,10 @@ export interface Document {
   id: number;
   equipmentId: string;
   imageData: string;
-  ocrText: string;
-  description: string;
+  ocrText?: string;
+  description?: string;
   createdAt: string;
+  perceptualHash?: string | null;
 }
 
 export interface SynopticItem {

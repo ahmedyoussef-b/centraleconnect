@@ -2,7 +2,7 @@
 'use client';
 
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { Camera, CameraOff, RefreshCcw, ScanLine, Save, X, ScanSearch, Upload, FileUp, Plus } from 'lucide-react';
+import { Camera, CameraOff, RefreshCcw, ScanLine, Save, X, ScanSearch, Upload, FileUp, Plus, Server, Cloud } from 'lucide-react';
 import Image from 'next/image';
 
 import { Alert, AlertDescription, AlertTitle } from './ui/alert';
@@ -15,7 +15,6 @@ import { Textarea } from './ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import type { Component } from '@/types/db';
 import { computePHash, compareHashes } from '@/lib/image-hashing';
-import visualDbData from '@/assets/master-data/visual-database.json';
 import { cn } from '@/lib/utils';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
@@ -32,19 +31,18 @@ import {
 type ViewMode = 'idle' | 'scanning' | 'provisioning' | 'result';
 type AnalysisMode = 'camera' | 'file';
 
-// Simplified type for our visual DB
-interface VisualDbEntry {
-  id: string;
-  name: string;
-  description: string;
-  imageUrl: string;
+interface LocalVisualDbEntry {
+  documentId: number;
+  equipmentId: string;
+  equipmentName: string;
+  description?: string | null;
+  imageData: string;
   perceptualHash: string;
-  tags: string[];
 }
 
 interface ScanResult {
   capturedImage: string;
-  match: VisualDbEntry | null;
+  match: LocalVisualDbEntry | null;
   similarity: number;
 }
 
@@ -78,21 +76,14 @@ function ResultView({ result, onReset }: { result: ScanResult; onReset: () => vo
                             </div>
                             <div className="space-y-2">
                                 <Label>Meilleure Correspondance</Label>
-                                <img src={match.imageUrl} alt={match.name} width={400} height={300} className="rounded-md border-2 border-primary aspect-video object-contain" />
+                                <img src={match.imageData} alt={match.equipmentName} width={400} height={300} className="rounded-md border-2 border-primary aspect-video object-contain" />
                             </div>
                         </div>
                         <Card className="bg-muted/50">
                             <CardHeader>
-                                <CardTitle className="text-xl">{match.name}</CardTitle>
+                                <CardTitle className="text-xl">{match.equipmentName}</CardTitle>
                                 <CardDescription>{match.description}</CardDescription>
                             </CardHeader>
-                            <CardContent>
-                                {match.tags && match.tags.length > 0 && (
-                                    <div className="flex flex-wrap gap-2">
-                                        {match.tags.map(tag => <code key={tag} className="px-2 py-1 text-xs rounded bg-secondary text-secondary-foreground">{tag}</code>)}
-                                    </div>
-                                )}
-                            </CardContent>
                         </Card>
                     </>
                 ) : (
@@ -236,167 +227,6 @@ function ProvisioningForm({
     </Card>
   );
 }
-interface UploadedFile {
-    id: string;
-    file: File;
-    previewUrl: string;
-}
-function DatabaseManagementModal() {
-    const [selectedFiles, setSelectedFiles] = useState<UploadedFile[]>([]);
-    const [isProcessing, setIsProcessing] = useState(false);
-    const fileInputRef = useRef<HTMLInputElement>(null);
-
-    const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const files = Array.from(event.target.files || []);
-        const newUploadedFiles: UploadedFile[] = files.map(file => ({
-            id: `${file.name}-${file.lastModified}`,
-            file,
-            previewUrl: URL.createObjectURL(file),
-        }));
-        setSelectedFiles(prev => [...prev, ...newUploadedFiles]);
-    };
-
-    const removeFile = (id: string) => {
-        setSelectedFiles(prev => prev.filter(f => f.id !== id));
-    };
-
-    const generateJsonForFile = async (file: File): Promise<any> => {
-        // Simulate detailed analysis
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        if (!ctx) throw new Error("Canvas not supported");
-
-        const img = await new Promise<HTMLImageElement>((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = e => {
-                const image = new window.Image();
-                image.onload = () => resolve(image);
-                image.onerror = reject;
-                image.src = e.target?.result as string;
-            };
-            reader.readAsDataURL(file);
-        });
-
-        // Simplified histogram
-        const histSize = 10;
-        canvas.width = histSize;
-        canvas.height = histSize;
-        ctx.drawImage(img, 0, 0, histSize, histSize);
-        const histData = ctx.getImageData(0, 0, histSize, histSize).data;
-        const histogram = Array.from(histData).reduce((acc, val, i) => {
-            const channel = i % 4; // 0=R, 1=G, 2=B, 3=A
-            if (channel < 3) acc[channel] = (acc[channel] || 0) + val;
-            return acc;
-        }, [] as number[]);
-
-        return {
-            fileName: file.name,
-            size: file.size,
-            type: file.type,
-            lastModified: file.lastModified,
-            histogram: {
-                r: Math.round(histogram[0] / (histSize * histSize)),
-                g: Math.round(histogram[1] / (histSize * histSize)),
-                b: Math.round(histogram[2] / (histSize * histSize)),
-            },
-        };
-    };
-
-    const handleBatchProcess = async () => {
-        setIsProcessing(true);
-        const allStats = [];
-        for (const uploadedFile of selectedFiles) {
-            const stats = await generateJsonForFile(uploadedFile.file);
-            allStats.push(stats);
-        }
-        
-        // Simulate saving to DB / downloading JSON
-        const jsonString = JSON.stringify({ images: allStats }, null, 2);
-        const blob = new Blob([jsonString], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'visual-database-export.json';
-        a.click();
-        URL.revokeObjectURL(url);
-        
-        setIsProcessing(false);
-        setSelectedFiles([]);
-    };
-
-    return (
-        <Dialog>
-            <DialogTrigger asChild>
-                <Button className="fixed bottom-6 right-6 h-16 w-16 rounded-full shadow-lg" size="icon">
-                    <Plus className="h-8 w-8" />
-                </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[800px]">
-                <DialogHeader>
-                    <DialogTitle>Gérer la Base de Données Visuelle</DialogTitle>
-                    <DialogDescription>
-                        Importez de nouvelles images pour enrichir la base de données de reconnaissance visuelle.
-                    </DialogDescription>
-                </DialogHeader>
-                <div className="grid gap-4 py-4">
-                    <div 
-                        className="flex flex-col items-center justify-center p-6 border-2 border-dashed rounded-lg cursor-pointer hover:bg-muted/50"
-                        onClick={() => fileInputRef.current?.click()}
-                    >
-                        <Upload className="w-12 h-12 text-muted-foreground" />
-                        <p className="mt-2 text-sm text-muted-foreground">Cliquez ou glissez-déposez pour importer des images</p>
-                        <input
-                            ref={fileInputRef}
-                            type="file"
-                            multiple
-                            accept="image/*"
-                            className="hidden"
-                            onChange={handleFileSelect}
-                        />
-                    </div>
-                    {selectedFiles.length > 0 && (
-                        <div className="space-y-4">
-                            <h4 className="font-medium">Images à importer ({selectedFiles.length})</h4>
-                            <div className="max-h-[300px] overflow-y-auto pr-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                                {selectedFiles.map(uploadedFile => (
-                                    <div key={uploadedFile.id} className="relative group">
-                                        <Image
-                                            src={uploadedFile.previewUrl}
-                                            alt={uploadedFile.file.name}
-                                            width={150}
-                                            height={150}
-                                            className="w-full h-32 object-cover rounded-md"
-                                        />
-                                        <Button
-                                            variant="destructive"
-                                            size="icon"
-                                            className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100"
-                                            onClick={() => removeFile(uploadedFile.id)}
-                                        >
-                                            <X className="h-4 w-4" />
-                                        </Button>
-                                        <p className="text-xs truncate text-muted-foreground mt-1">{uploadedFile.file.name}</p>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-                </div>
-                <DialogFooter>
-                    <DialogClose asChild>
-                        <Button variant="outline">Annuler</Button>
-                    </DialogClose>
-                    <Button
-                        onClick={handleBatchProcess}
-                        disabled={selectedFiles.length === 0 || isProcessing}
-                    >
-                        {isProcessing ? "Traitement en cours..." : `Générer et télécharger JSON pour ${selectedFiles.length} image(s)`}
-                    </Button>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
-    );
-}
 
 // Main Component
 export function CameraView() {
@@ -452,7 +282,7 @@ export function CameraView() {
   }, [toast, analysisMode]);
 
   useEffect(() => {
-    // Only run in tauri environment
+    // OCR is only available in Tauri
     if (!isTauri) return;
 
     const initializeWorker = async () => {
@@ -508,18 +338,40 @@ export function CameraView() {
     setCapturedImage(imageDataUrl);
 
     try {
+        if (isTauri) {
+            setStatusText('Synchronisation des données...');
+            const { syncWithRemote } = await import('@/lib/db-service');
+            const stats = await syncWithRemote();
+            toast({
+                title: 'Synchronisation terminée',
+                description: `${stats.synced} enregistrements mis à jour depuis le serveur.`,
+            });
+        }
+
+        setStatusText('Récupération de la base de données visuelle...');
+        const { getLocalVisualDatabase } = await import('@/lib/db-service');
+        const localVisualDb = await getLocalVisualDatabase();
+        
+        if (localVisualDb.length === 0) {
+            toast({ variant: 'destructive', title: 'Base locale vide', description: 'Aucune donnée visuelle à comparer. Veuillez provisionner des équipements.' });
+            handleReset();
+            return;
+        }
+
         setStatusText('Calcul du hachage perceptuel...');
         const capturedHash = await computePHash(imageDataUrl);
 
-        setStatusText('Comparaison avec la base de données...');
-        let bestMatch: VisualDbEntry | null = null;
+        setStatusText('Comparaison avec la base de données locale...');
+        let bestMatch: LocalVisualDbEntry | null = null;
         let minDistance = Infinity;
 
-        for (const item of visualDbData.images) {
-            const distance = compareHashes(capturedHash, item.perceptualHash);
-            if (distance < minDistance) {
-                minDistance = distance;
-                bestMatch = item;
+        for (const item of localVisualDb) {
+            if (item.perceptualHash) {
+                const distance = compareHashes(capturedHash, item.perceptualHash);
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    bestMatch = item;
+                }
             }
         }
         
@@ -532,12 +384,12 @@ export function CameraView() {
         }
         setViewMode('result');
 
-    } catch (error) {
+    } catch (error: any) {
         console.error("Visual identification failed:", error);
-        toast({ variant: 'destructive', title: 'Erreur d\'analyse', description: 'La comparaison visuelle a échoué.' });
+        toast({ variant: 'destructive', title: 'Erreur d\'analyse', description: error.message || 'La comparaison visuelle a échoué.' });
         handleReset();
     }
-  }, [toast, handleReset]);
+  }, [toast, handleReset, isTauri]);
 
   const processProvisioning = useCallback(async (imageDataUrl: string) => {
     setViewMode('scanning');
@@ -561,7 +413,7 @@ export function CameraView() {
         }
     } else {
         setStatusText('Préparation du formulaire...');
-        ocrResultText = "Le provisionnement OCR est indisponible en mode web. Veuillez saisir les informations manuellement.";
+        ocrResultText = "Le provisionnement OCR est uniquement disponible dans l'application de bureau.";
     }
 
     setOcrText(ocrResultText);
@@ -592,6 +444,9 @@ export function CameraView() {
 
   const handleSaveProvision = async (componentData: NewComponentFormData) => {
     try {
+      setStatusText('Calcul du hachage...');
+      const perceptualHash = await computePHash(capturedImage);
+      
       const payload = {
         component: {
           id: componentData.id,
@@ -602,9 +457,11 @@ export function CameraView() {
           imageData: capturedImage,
           ocrText: ocrText,
           description: `Plaque signalétique pour ${componentData.id}`,
+          perceptualHash,
         }
       };
 
+      setStatusText('Sauvegarde sur le serveur...');
       const response = await fetch('/api/provision', {
         method: 'POST',
         headers: {
@@ -618,7 +475,7 @@ export function CameraView() {
         throw new Error(errorData.error || `Erreur HTTP: ${response.status}`);
       }
 
-      toast({ title: 'Succès', description: `La fiche pour le composant ${componentData.id} a été ajoutée.` });
+      toast({ title: 'Succès', description: `La fiche pour le composant ${componentData.id} a été ajoutée au serveur.` });
       handleReset();
     } catch (error: any) {
       console.error(error);
@@ -674,17 +531,21 @@ export function CameraView() {
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <Button onClick={() => { const img = captureFromVideo(); if (img) processIdentification(img); }} disabled={!isIdle || hasCameraPermission === false} size="lg" className="h-16 text-lg">
-                                <ScanSearch className="mr-3 h-8 w-8"/>
-                                <div>
-                                    <p className="font-bold">Identifier</p>
-                                    <p className="font-normal text-xs text-primary-foreground/80">Comparer avec la BDD</p>
+                                <div className="flex items-center gap-3">
+                                  {isTauri ? <Server className="h-8 w-8"/> : <Cloud className="h-8 w-8"/>}
+                                  <div>
+                                      <p className="font-bold">Identifier</p>
+                                      <p className="font-normal text-xs text-primary-foreground/80">{isTauri ? 'Sync & Compare (Local)' : 'Compare (Remote)'}</p>
+                                  </div>
                                 </div>
                             </Button>
                             <Button onClick={() => { const img = captureFromVideo(); if (img) processProvisioning(img); }} disabled={!isIdle || hasCameraPermission === false} size="lg" variant="secondary" className="h-16 text-lg">
-                                <FileUp className="mr-3 h-8 w-8"/>
+                                <div className="flex items-center gap-3">
+                                <FileUp className="h-8 w-8"/>
                                 <div>
                                     <p className="font-bold">Provisionner</p>
                                     <p className="font-normal text-xs text-secondary-foreground/80">Ajouter via OCR</p>
+                                </div>
                                 </div>
                             </Button>
                         </div>
@@ -714,17 +575,21 @@ export function CameraView() {
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                            <Button onClick={() => fileImage && processIdentification(fileImage)} disabled={!isIdle || !fileImage} size="lg" className="h-16 text-lg">
-                                <ScanSearch className="mr-3 h-8 w-8"/>
-                                <div>
-                                    <p className="font-bold">Identifier</p>
-                                    <p className="font-normal text-xs text-primary-foreground/80">Comparer avec la BDD</p>
+                                <div className="flex items-center gap-3">
+                                  {isTauri ? <Server className="h-8 w-8"/> : <Cloud className="h-8 w-8"/>}
+                                  <div>
+                                      <p className="font-bold">Identifier</p>
+                                      <p className="font-normal text-xs text-primary-foreground/80">{isTauri ? 'Sync & Compare (Local)' : 'Compare (Remote)'}</p>
+                                  </div>
                                 </div>
                             </Button>
                             <Button onClick={() => fileImage && processProvisioning(fileImage)} disabled={!isIdle || !fileImage} size="lg" variant="secondary" className="h-16 text-lg">
-                                <FileUp className="mr-3 h-8 w-8"/>
-                                <div>
-                                    <p className="font-bold">Provisionner</p>
-                                    <p className="font-normal text-xs text-secondary-foreground/80">Ajouter via OCR</p>
+                                <div className="flex items-center gap-3">
+                                  <FileUp className="h-8 w-8"/>
+                                  <div>
+                                      <p className="font-bold">Provisionner</p>
+                                      <p className="font-normal text-xs text-secondary-foreground/80">Ajouter via OCR</p>
+                                  </div>
                                 </div>
                             </Button>
                         </div>

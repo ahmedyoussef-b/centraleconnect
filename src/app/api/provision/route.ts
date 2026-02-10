@@ -42,6 +42,7 @@ export async function POST(request: Request) {
             imageData: document.imageData,
             ocrText: document.ocrText,
             description: document.description,
+            perceptualHash: document.perceptualHash, // Accept hash from client
         };
         
         // Use a transaction to ensure all or nothing is written
