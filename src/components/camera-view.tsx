@@ -1,15 +1,13 @@
-
 'use client';
 
-import { useEffect, useRef, useState, useCallback, useMemo } from 'react';
-import { Camera, CameraOff, RefreshCcw, ScanLine, Save, X, ScanSearch, PlusCircle, Upload, Plus, Image as ImageIcon, Trash2 } from 'lucide-react';
+import { useEffect, useRef, useState, useCallback } from 'react';
+import { Camera, CameraOff, RefreshCcw, ScanLine, Save, X, ScanSearch, Upload, Image as ImageIcon, FileUp } from 'lucide-react';
 import type Tesseract from 'tesseract.js';
 import Image from 'next/image';
 
 import { Alert, AlertDescription, AlertTitle } from './ui/alert';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from '@/components/ui/dialog';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Progress } from './ui/progress';
@@ -19,9 +17,11 @@ import type { Component } from '@/types/db';
 import { computePHash, compareHashes } from '@/lib/image-hashing';
 import visualDbData from '@/assets/master-data/visual-database.json';
 import { cn } from '@/lib/utils';
-import { ScrollArea } from './ui/scroll-area';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+
 
 type ViewMode = 'idle' | 'scanning' | 'provisioning' | 'result';
+type AnalysisMode = 'camera' | 'file';
 
 // Simplified type for our visual DB
 interface VisualDbEntry {
@@ -228,146 +228,28 @@ function ProvisioningForm({
   );
 }
 
-interface StagedImage {
-    file: File;
-    dataUrl: string;
-}
-
-// Placeholder for complex image analysis
-async function generateJsonForImage(image: StagedImage): Promise<any> {
-    console.log(`Generating stats for ${image.file.name}...`);
-    // Simulate async work
-    await new Promise(res => setTimeout(res, 50 + Math.random() * 100));
-    return {
-        filename: image.file.name,
-        size: image.file.size,
-        perceptual_hash: await computePHash(image.dataUrl),
-        histogram: Array(100).fill(0), // Placeholder 10x10 histogram
-        rgb_stats: {
-            mean: { r: 128, g: 128, b: 128 },
-            std_dev: { r: 50, g: 50, b: 50 },
-            min: { r: 0, g: 0, b: 0 },
-            max: { r: 255, g: 255, b: 255 },
-        }
-    };
-}
-
-
-function AddToDatabaseModal({ isOpen, onOpenChange, onProcess }: { isOpen: boolean, onOpenChange: (open: boolean) => void, onProcess: (images: StagedImage[]) => void }) {
-    const [stagedImages, setStagedImages] = useState<StagedImage[]>([]);
-    const fileInputRef = useRef<HTMLInputElement>(null);
-
-    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const files = event.target.files;
-        if (files) {
-            const newImages: StagedImage[] = [];
-            Array.from(files).forEach(file => {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    newImages.push({ file, dataUrl: e.target?.result as string });
-                    if (newImages.length === files.length) {
-                        setStagedImages(prev => [...prev, ...newImages]);
-                    }
-                };
-                reader.readAsDataURL(file);
-            });
-        }
-    };
-    
-    const handleRemoveImage = (index: number) => {
-        setStagedImages(prev => prev.filter((_, i) => i !== index));
-    };
-
-    const handleProcess = () => {
-        onProcess(stagedImages);
-        setStagedImages([]);
-        onOpenChange(false);
-    };
-
-    return (
-        <Dialog open={isOpen} onOpenChange={onOpenChange}>
-            <DialogContent className="max-w-4xl">
-                <DialogHeader>
-                    <DialogTitle>Ajouter à la base de données visuelle</DialogTitle>
-                    <CardDescription>Sélectionnez une ou plusieurs images à analyser et à ajouter.</CardDescription>
-                </DialogHeader>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-4">
-                    <div 
-                        className="flex flex-col items-center justify-center p-6 border-2 border-dashed rounded-lg cursor-pointer hover:bg-muted"
-                        onClick={() => fileInputRef.current?.click()}
-                    >
-                        <Upload className="w-12 h-12 text-muted-foreground" />
-                        <p className="mt-2 text-sm text-muted-foreground">Cliquez ou glissez-déposez des fichiers ici</p>
-                        <input
-                            ref={fileInputRef}
-                            type="file"
-                            multiple
-                            accept="image/*"
-                            className="hidden"
-                            onChange={handleFileChange}
-                        />
-                    </div>
-                    <div className="space-y-2">
-                        <Label>Images en attente ({stagedImages.length})</Label>
-                        {stagedImages.length > 0 ? (
-                        <ScrollArea className="h-48 border rounded-md p-2">
-                            <div className="grid grid-cols-2 gap-2">
-                                {stagedImages.map((image, index) => (
-                                    <div key={index} className="relative group">
-                                        <Image src={image.dataUrl} alt={image.file.name} width={150} height={100} className="rounded-md object-cover w-full aspect-[3/2]" />
-                                        <Button 
-                                            variant="destructive" 
-                                            size="icon" 
-                                            className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100"
-                                            onClick={() => handleRemoveImage(index)}
-                                        >
-                                            <Trash2 className="h-4 w-4" />
-                                        </Button>
-                                    </div>
-                                ))}
-                            </div>
-                        </ScrollArea>
-                         ) : (
-                            <div className="flex items-center justify-center h-48 border-2 border-dashed rounded-lg">
-                                <ImageIcon className="w-10 h-10 text-muted-foreground" />
-                            </div>
-                         )}
-                    </div>
-                </div>
-                <DialogFooter>
-                    <DialogClose asChild><Button variant="outline">Annuler</Button></DialogClose>
-                    <Button onClick={handleProcess} disabled={stagedImages.length === 0}>
-                        <PlusCircle className="mr-2"/>
-                        Traiter {stagedImages.length} image(s)
-                    </Button>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
-    );
-}
-
 // Main Component
 export function CameraView() {
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
   const workerRef = useRef<Tesseract.Worker | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>('idle');
+  const [analysisMode, setAnalysisMode] = useState<AnalysisMode>('camera');
   const [progress, setProgress] = useState(0);
   const [statusText, setStatusText] = useState('En attente...');
   
   const [capturedImage, setCapturedImage] = useState('');
+  const [fileImage, setFileImage] = useState<string | null>(null);
   const [ocrText, setOcrText] = useState('');
   const [scanResult, setScanResult] = useState<ScanResult | null>(null);
 
   const [isTauri, setIsTauri] = useState(false);
-  const [isDbModalOpen, setIsDbModalOpen] = useState(false);
-  const [stagedForProcessing, setStagedForProcessing] = useState<StagedImage[]>([]);
 
   useEffect(() => {
-    const isTauriEnv = !!window.__TAURI__;
-    setIsTauri(isTauriEnv);
+    setIsTauri(!!window.__TAURI__);
 
     const getCameraPermission = async () => {
        try {
@@ -397,8 +279,7 @@ export function CameraView() {
   }, [toast]);
 
   useEffect(() => {
-    const isTauriEnv = !!window.__TAURI__;
-    if (!isTauriEnv) return;
+    if (!isTauri) return;
 
     const initializeWorker = async () => {
       if (!workerRef.current) {
@@ -433,7 +314,20 @@ export function CameraView() {
       workerRef.current?.terminate();
       workerRef.current = null;
     };
-  }, [toast]);
+  }, [toast, isTauri]);
+  
+  const handleReset = () => {
+    setViewMode('idle');
+    setFileImage(null);
+    setScanResult(null);
+    setCapturedImage('');
+    setOcrText('');
+    setProgress(0);
+    setStatusText('Prêt à analyser.');
+     if(fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
 
   const processIdentification = useCallback(async (imageDataUrl: string) => {
     setViewMode('scanning');
@@ -467,56 +361,51 @@ export function CameraView() {
     } catch (error) {
         console.error("Visual identification failed:", error);
         toast({ variant: 'destructive', title: 'Erreur d\'analyse', description: 'La comparaison visuelle a échoué.' });
-        setViewMode('idle');
+        handleReset();
     }
   }, [toast]);
 
   const processProvisioning = useCallback(async (imageDataUrl: string) => {
+    if (!isTauri) {
+        toast({ title: 'Fonctionnalité non disponible', description: 'Le provisionnement OCR est uniquement disponible dans l\'application de bureau.'});
+        return;
+    }
     setViewMode('scanning');
     setCapturedImage(imageDataUrl);
     setStatusText('Analyse OCR en cours...');
 
     if (!workerRef.current) {
         toast({ variant: 'destructive', title: 'Erreur OCR', description: "Le moteur d'analyse n'est pas prêt." });
-        setViewMode('idle');
+        handleReset();
         return;
     }
     
-    // Tesseract worker can directly recognize a data URL
     const { data: { text } } = await workerRef.current.recognize(imageDataUrl);
     setOcrText(text || 'Aucun texte détecté.');
     setViewMode('provisioning');
-  }, [toast]);
-
-  const handleIdentifyFromCamera = useCallback(async () => {
-    if (!videoRef.current) return;
-    
-    setStatusText('Capture en cours...');
-    
+  }, [toast, isTauri]);
+  
+  const captureFromVideo = useCallback(() => {
+    if (!videoRef.current) return null;
     const canvas = document.createElement('canvas');
     canvas.width = videoRef.current.videoWidth;
     canvas.height = videoRef.current.videoHeight;
     const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    if (!ctx) return null;
     ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
-    const imageDataUrl = canvas.toDataURL('image/jpeg', 0.9);
-    
-    await processIdentification(imageDataUrl);
-  }, [processIdentification]);
+    return canvas.toDataURL('image/jpeg', 0.9);
+  }, []);
 
-  const handleProvisionFromCamera = useCallback(async () => {
-    if (!videoRef.current) return;
-
-    const canvas = document.createElement('canvas');
-    canvas.width = videoRef.current.videoWidth;
-    canvas.height = videoRef.current.videoHeight;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    ctx.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
-    const imageDataUrl = canvas.toDataURL('image/jpeg', 0.9);
-
-    await processProvisioning(imageDataUrl);
-  }, [processProvisioning]);
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setFileImage(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const handleSaveProvision = async (component: NewComponentFormData) => {
     if (!isTauri) {
@@ -537,166 +426,112 @@ export function CameraView() {
     }
   };
 
-  const handleReset = () => {
-    setViewMode('idle');
-    setScanResult(null);
-    setCapturedImage('');
-    setOcrText('');
-    setProgress(0);
-    setStatusText('Prêt à analyser.');
-    setStagedForProcessing([]);
-  };
-
-  const handleBatchProcessForDb = async (images: StagedImage[]) => {
-    console.log("Processing images to add to DB:", images);
-    toast({
-        title: "Traitement par lots démarré",
-        description: `Génération des métadonnées pour ${images.length} images.`
-    });
-    
-    try {
-        const promises = images.map(img => generateJsonForImage(img));
-        const results = await Promise.all(promises);
-        
-        console.log("Generated JSON for DB:", results);
-        
-        // Here you would typically send this to a server or store in localStorage
-        // For now, we just show a success message
-        toast({
-            title: "Traitement terminé",
-            description: "Les données JSON ont été générées et sont prêtes pour la sauvegarde. (Simulation)"
-        });
-    } catch (error) {
-        console.error("Batch processing failed:", error);
-        toast({
-            variant: "destructive",
-            title: "Erreur de traitement",
-            description: "La génération des métadonnées a échoué."
-        });
-    }
-  };
-  
   const isIdle = viewMode === 'idle';
 
   return (
-    <div className="relative">
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2"><ScanSearch /> Analyse Visuelle</CardTitle>
           <CardDescription>Identifiez un équipement en le scannant, ou provisionnez-en un nouveau depuis la caméra ou un fichier.</CardDescription>
         </CardHeader>
         <CardContent>
-          {viewMode === 'result' && scanResult ? (
+            {viewMode === 'result' && scanResult ? (
               <ResultView result={scanResult} onReset={handleReset} />
-          ) : viewMode === 'provisioning' ? (
-              <ProvisioningForm imageData={capturedImage} ocrText={ocrText} onSave={handleSaveProvision} onCancel={handleReset} />
-          ) : stagedForProcessing.length > 0 ? (
-              <div className="space-y-4 text-center">
-                  <div className="relative aspect-video w-full max-w-lg mx-auto overflow-hidden rounded-md border-2 border-dashed bg-muted">
-                      <Image src={stagedForProcessing[0].dataUrl} alt="Image à analyser" layout="fill" objectFit="contain" />
-                  </div>
-                  <p className="text-sm text-muted-foreground">{stagedForProcessing[0].file.name}</p>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <Button onClick={() => processIdentification(stagedForProcessing[0].dataUrl)} disabled={!isIdle} size="lg" className="h-16 text-lg">
-                          <ScanSearch className="mr-3 h-8 w-8"/>
-                          <div>
-                              <p className="font-bold">Identifier le Fichier</p>
-                              <p className="font-normal text-xs text-primary-foreground/80">Comparer avec la base de données</p>
-                          </div>
-                      </Button>
-                      <Button onClick={() => processProvisioning(stagedForProcessing[0].dataUrl)} disabled={!isIdle || !workerRef.current} size="lg" variant="secondary" className="h-16 text-lg">
-                          <PlusCircle className="mr-3 h-8 w-8"/>
-                           <div>
-                              <p className="font-bold">Provisionner le Fichier</p>
-                              <p className="font-normal text-xs text-secondary-foreground/80">Extraire les données via OCR</p>
-                          </div>
-                      </Button>
-                  </div>
-                   <Button variant="ghost" onClick={handleReset}>
-                      <RefreshCcw className="mr-2 h-4 w-4"/>
-                      Utiliser la caméra ou choisir un autre fichier
-                  </Button>
-              </div>
-          ) : (
-            <div className="space-y-4">
-              <div className="relative aspect-video w-full overflow-hidden rounded-md border-2 border-dashed bg-muted">
-                <video
-                  ref={videoRef}
-                  className={cn("h-full w-full object-cover transition-opacity", viewMode === 'scanning' && 'opacity-30')}
-                  autoPlay
-                  muted
-                  playsInline
-                />
-                 {viewMode === 'scanning' && (
-                   <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 text-primary">
-                      <ScanLine className="h-24 w-24 animate-pulse" />
-                      <p className="font-semibold">{statusText}</p>
-                      <Progress value={progress} className="w-1/2" />
-                   </div>
-                 )}
-                {hasCameraPermission === false && (
-                  <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/80 p-4">
-                    <CameraOff className="h-12 w-12 text-destructive" />
-                    <Alert variant="destructive" className="mt-4">
-                      <AlertTitle>Accès Caméra Requis</AlertTitle>
-                      <AlertDescription>Veuillez autoriser l'accès à la caméra.</AlertDescription>
-                    </Alert>
-                  </div>
-                )}
-              </div>
+            ) : viewMode === 'provisioning' ? (
+                <ProvisioningForm imageData={capturedImage} ocrText={ocrText} onSave={handleSaveProvision} onCancel={handleReset} />
+            ) : (
+                <Tabs value={analysisMode} onValueChange={(value) => { setAnalysisMode(value as AnalysisMode); handleReset(); }} className="w-full">
+                    <TabsList className="grid w-full grid-cols-2">
+                        <TabsTrigger value="camera"><Camera className="mr-2"/>Analyse par Caméra</TabsTrigger>
+                        <TabsTrigger value="file"><Upload className="mr-2"/>Analyse par Fichier</TabsTrigger>
+                    </TabsList>
+                    
+                    <TabsContent value="camera" className="mt-4 space-y-4">
+                        <div className="relative aspect-video w-full overflow-hidden rounded-md border-2 border-dashed bg-muted">
+                            <video
+                                ref={videoRef}
+                                className={cn("h-full w-full object-cover transition-opacity", !isIdle && 'opacity-30')}
+                                autoPlay
+                                muted
+                                playsInline
+                            />
+                            {!isIdle && (
+                                <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 text-primary bg-background/80">
+                                    <ScanLine className="h-24 w-24 animate-pulse" />
+                                    <p className="font-semibold">{statusText}</p>
+                                    <Progress value={progress} className="w-1/2" />
+                                </div>
+                            )}
+                            {hasCameraPermission === false && (
+                                <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/80 p-4">
+                                    <CameraOff className="h-12 w-12 text-destructive" />
+                                    <Alert variant="destructive" className="mt-4">
+                                    <AlertTitle>Accès Caméra Requis</AlertTitle>
+                                    <AlertDescription>Veuillez autoriser l'accès à la caméra.</AlertDescription>
+                                    </Alert>
+                                </div>
+                            )}
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <Button onClick={() => { const img = captureFromVideo(); if (img) processIdentification(img); }} disabled={!isIdle || !hasCameraPermission} size="lg" className="h-16 text-lg">
+                                <ScanSearch className="mr-3 h-8 w-8"/>
+                                <div>
+                                    <p className="font-bold">Identifier</p>
+                                    <p className="font-normal text-xs text-primary-foreground/80">Comparer avec la BDD</p>
+                                </div>
+                            </Button>
+                            <Button onClick={() => { const img = captureFromVideo(); if (img) processProvisioning(img); }} disabled={!isIdle || !hasCameraPermission || (isTauri && !workerRef.current)} size="lg" variant="secondary" className="h-16 text-lg">
+                                <FileUp className="mr-3 h-8 w-8"/>
+                                <div>
+                                    <p className="font-bold">Provisionner</p>
+                                    <p className="font-normal text-xs text-secondary-foreground/80">Ajouter via OCR</p>
+                                </div>
+                            </Button>
+                        </div>
+                    </TabsContent>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Button onClick={handleIdentifyFromCamera} disabled={!isIdle || !hasCameraPermission} size="lg" className="h-16 text-lg">
-                      <ScanSearch className="mr-3 h-8 w-8"/>
-                      <div>
-                          <p className="font-bold">Identifier (Caméra)</p>
-                          <p className="font-normal text-xs text-primary-foreground/80">Comparer avec la base de données</p>
-                      </div>
-                  </Button>
-                  <Button onClick={handleProvisionFromCamera} disabled={!isIdle || !hasCameraPermission || (isTauri && !workerRef.current)} size="lg" variant="secondary" className="h-16 text-lg">
-                      <PlusCircle className="mr-3 h-8 w-8"/>
-                       <div>
-                          <p className="font-bold">Provisionner (Caméra)</p>
-                          <p className="font-normal text-xs text-secondary-foreground/80">Ajouter via OCR/QR Code</p>
-                      </div>
-                  </Button>
-              </div>
-              <div className="relative flex items-center py-2">
-                <div className="flex-grow border-t border-border"></div>
-                <span className="flex-shrink mx-4 text-xs uppercase text-muted-foreground">Ou</span>
-                <div className="flex-grow border-t border-border"></div>
-              </div>
-              <Button onClick={() => setIsDbModalOpen(true)} variant="outline" className="w-full h-12">
-                <Upload className="mr-2 h-4 w-4" />
-                Analyser une image depuis l'ordinateur
-              </Button>
-            </div>
-          )}
+                    <TabsContent value="file" className="mt-4 space-y-4">
+                        <div className="relative aspect-video w-full overflow-hidden rounded-md border-2 border-dashed bg-muted">
+                           {fileImage ? (
+                                <Image src={fileImage} alt="Fichier sélectionné" layout="fill" objectFit="contain" />
+                           ) : (
+                                <div 
+                                    className="flex flex-col items-center justify-center h-full cursor-pointer hover:bg-muted/50"
+                                    onClick={() => fileInputRef.current?.click()}
+                                >
+                                    <Upload className="w-12 h-12 text-muted-foreground" />
+                                    <p className="mt-2 text-sm text-muted-foreground">Cliquez pour sélectionner un fichier</p>
+                                </div>
+                           )}
+                           <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileSelect} />
+                           {!isIdle && (
+                                <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 text-primary bg-background/80">
+                                    <ScanLine className="h-24 w-24 animate-pulse" />
+                                    <p className="font-semibold">{statusText}</p>
+                                    <Progress value={progress} className="w-1/2" />
+                                </div>
+                            )}
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                           <Button onClick={() => fileImage && processIdentification(fileImage)} disabled={!isIdle || !fileImage} size="lg" className="h-16 text-lg">
+                                <ScanSearch className="mr-3 h-8 w-8"/>
+                                <div>
+                                    <p className="font-bold">Identifier</p>
+                                    <p className="font-normal text-xs text-primary-foreground/80">Comparer avec la BDD</p>
+                                </div>
+                            </Button>
+                            <Button onClick={() => fileImage && processProvisioning(fileImage)} disabled={!isIdle || !fileImage || (isTauri && !workerRef.current)} size="lg" variant="secondary" className="h-16 text-lg">
+                                <FileUp className="mr-3 h-8 w-8"/>
+                                <div>
+                                    <p className="font-bold">Provisionner</p>
+                                    <p className="font-normal text-xs text-secondary-foreground/80">Ajouter via OCR</p>
+                                </div>
+                            </Button>
+                        </div>
+                    </TabsContent>
+                </Tabs>
+            )}
         </CardContent>
       </Card>
-      
-      <div className="fixed bottom-6 right-6">
-        <Button size="icon" className="h-14 w-14 rounded-full shadow-lg" onClick={() => setIsDbModalOpen(true)}>
-          <Plus className="h-8 w-8" />
-          <span className="sr-only">Ajouter à la base de données</span>
-        </Button>
-      </div>
-
-      <AddToDatabaseModal 
-        isOpen={isDbModalOpen} 
-        onOpenChange={(open) => {
-            if (!open) {
-                setStagedForProcessing([]);
-            }
-            setIsDbModalOpen(open);
-        }} 
-        onProcess={(images) => {
-          if(images.length > 0) {
-            handleReset(); // Reset the main view
-            setStagedForProcessing(images);
-          }
-        }}
-      />
-    </div>
   );
 }
