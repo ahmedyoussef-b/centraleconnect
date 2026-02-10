@@ -10,6 +10,7 @@ const HASH_HEIGHT = 8;
  * @returns A promise that resolves to a 16-character hex string representing the hash.
  */
 export function computePHash(imageSrc: string): Promise<string> {
+  console.log('[HASHING] Starting p-hash computation...');
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.crossOrigin = "Anonymous";
@@ -41,9 +42,13 @@ export function computePHash(imageSrc: string): Promise<string> {
         hexHash += hexChunk;
       }
       
+      console.log(`[HASHING] p-hash computation complete: ${hexHash}`);
       resolve(hexHash);
     };
-    img.onerror = (err) => reject(`Image load error: ${err}`);
+    img.onerror = (err) => {
+      console.error('[HASHING] Image load error for hashing.', err);
+      reject(`Image load error: ${err}`);
+    }
     img.src = imageSrc;
   });
 }
@@ -80,6 +85,7 @@ function getGrayscale(ctx: CanvasRenderingContext2D): Promise<number[]> {
  */
 export function compareHashes(hash1: string, hash2: string): number {
   if (hash1.length !== hash2.length) {
+    console.warn(`[HASHING] Hash length mismatch: ${hash1.length} vs ${hash2.length}`);
     return Infinity;
   }
   

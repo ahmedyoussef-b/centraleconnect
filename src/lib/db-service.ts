@@ -538,7 +538,9 @@ export async function getLocalVisualDatabase(): Promise<any[]> {
         JOIN equipments e ON d.equipment_id = e.external_id
         WHERE d.perceptual_hash IS NOT NULL
     `;
+    console.log('[DB_SERVICE] Querying local visual database.');
     const results: any[] = await invoke('plugin:sql|select', { db, query });
+    console.log(`[DB_SERVICE] Found ${results.length} entries in local visual DB.`);
     return results;
 }
 
@@ -547,17 +549,21 @@ export async function syncWithRemote(): Promise<{ synced: number; cleaned: boole
         console.warn("Sync is only available in the Tauri environment.");
         return { synced: 0, cleaned: false };
     }
+    
+    console.log('[SYNC_FLOW] Starting remote-to-local synchronization.');
 
     const response = await fetch('/api/sync/data');
     if (!response.ok) {
         throw new Error(`Échec de la récupération des données de synchronisation: ${response.statusText}`);
     }
     const data = await response.json();
+    console.log('[SYNC_FLOW] Fetched data from remote server.', { recordCounts: { equipments: data.equipments?.length, documents: data.documents?.length, logs: data.logEntries?.length } });
+    
     const db = await invoke('plugin:sql|load', { db: DB_NAME });
     
     let totalSynced = 0;
     
-    // Step 1: Update local database within a transaction
+    console.log('[SYNC_FLOW] Starting local database transaction.');
     const txId = await invoke('plugin:sql|begin', { db });
     try {
         for (const equip of data.equipments || []) {
@@ -590,6 +596,7 @@ export async function syncWithRemote(): Promise<{ synced: number; cleaned: boole
         }
 
         await invoke('plugin:sql|commit', { db });
+        console.log(`[SYNC_FLOW] Local transaction committed. ${totalSynced} records considered for sync.`);
     } catch (e) {
         console.error("Local database transaction failed, rolling back:", e);
         await invoke('plugin:sql|rollback', { db });
@@ -597,18 +604,18 @@ export async function syncWithRemote(): Promise<{ synced: number; cleaned: boole
     }
 
     // Step 2: Clean up remote database
-    console.log('Local DB synced. Triggering remote DB cleanup...');
+    console.log('[SYNC_FLOW] Triggering remote DB cleanup...');
     let cleaned = false;
     try {
         const cleanupResponse = await fetch('/api/sync/clear', { method: 'POST' });
         if (!cleanupResponse.ok) {
-            console.error(`Failed to clear remote database: ${cleanupResponse.statusText}`);
+            console.error(`[SYNC_FLOW] Failed to clear remote database: ${cleanupResponse.statusText}`);
         } else {
-            console.log('Remote DB cleanup successful.');
+            console.log('[SYNC_FLOW] Remote DB cleanup successful.');
             cleaned = true;
         }
     } catch (e) {
-        console.error("Error during remote cleanup:", e);
+        console.error("[SYNC_FLOW] Error during remote cleanup:", e);
     }
     
     return { synced: totalSynced, cleaned };

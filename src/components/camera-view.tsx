@@ -2,7 +2,7 @@
 'use client';
 
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { Camera, CameraOff, RefreshCcw, ScanLine, Save, X, ScanSearch, Upload, FileUp, Plus, Server, Cloud } from 'lucide-react';
+import { Camera, CameraOff, RefreshCcw, ScanLine, Save, X, ScanSearch, Upload, FileUp, Server, Cloud } from 'lucide-react';
 import Image from 'next/image';
 
 import { Alert, AlertDescription, AlertTitle } from './ui/alert';
@@ -17,16 +17,6 @@ import type { Component } from '@/types/db';
 import { computePHash, compareHashes } from '@/lib/image-hashing';
 import { cn } from '@/lib/utils';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-  DialogTrigger,
-  DialogClose,
-} from '@/components/ui/dialog';
 
 type ViewMode = 'idle' | 'scanning' | 'provisioning' | 'result';
 type AnalysisMode = 'camera' | 'file';
@@ -334,14 +324,17 @@ export function CameraView() {
   }, []);
 
   const processIdentification = useCallback(async (imageDataUrl: string) => {
+    console.log('[IDENTIFY_FLOW] Starting identification process.');
     setViewMode('scanning');
     setCapturedImage(imageDataUrl);
 
     try {
         if (isTauri) {
             setStatusText('Synchronisation des données...');
+            console.log('[IDENTIFY_FLOW] Triggering remote-to-local DB sync.');
             const { syncWithRemote } = await import('@/lib/db-service');
             const stats = await syncWithRemote();
+            console.log('[IDENTIFY_FLOW] Sync complete.', stats);
             
             let toastDescription = `${stats.synced} enregistrements mis à jour depuis le serveur.`;
             if (stats.cleaned) {
@@ -354,20 +347,26 @@ export function CameraView() {
             });
         }
 
-        setStatusText('Récupération de la base de données visuelle...');
+        setStatusText('Récupération de la base de données visuelle locale...');
+        console.log('[IDENTIFY_FLOW] Querying local visual database.');
         const { getLocalVisualDatabase } = await import('@/lib/db-service');
         const localVisualDb = await getLocalVisualDatabase();
         
         if (localVisualDb.length === 0) {
+            console.warn('[IDENTIFY_FLOW] Local visual DB is empty.');
             toast({ variant: 'destructive', title: 'Base locale vide', description: 'Aucune donnée visuelle à comparer. Veuillez provisionner des équipements.' });
             handleReset();
             return;
         }
+        console.log(`[IDENTIFY_FLOW] Found ${localVisualDb.length} items in local visual DB.`);
 
         setStatusText('Calcul du hachage perceptuel...');
+        console.log('[IDENTIFY_FLOW] Computing perceptual hash for captured image.');
         const capturedHash = await computePHash(imageDataUrl);
+        console.log(`[IDENTIFY_FLOW] Captured image hash: ${capturedHash}`);
 
         setStatusText('Comparaison avec la base de données locale...');
+        console.log('[IDENTIFY_FLOW] Starting comparison loop.');
         let bestMatch: LocalVisualDbEntry | null = null;
         let minDistance = Infinity;
 
@@ -382,6 +381,7 @@ export function CameraView() {
         }
         
         const similarity = Math.max(0, 100 - (minDistance / 64) * 100 * 1.5); // Amplify difference
+        console.log(`[IDENTIFY_FLOW] Comparison finished. Best match: ${bestMatch?.equipmentId}, Similarity: ${similarity.toFixed(2)}%, Distance: ${minDistance}`);
 
         if (similarity > 75) { // Similarity threshold
              setScanResult({ capturedImage: imageDataUrl, match: bestMatch, similarity });
@@ -391,13 +391,14 @@ export function CameraView() {
         setViewMode('result');
 
     } catch (error: any) {
-        console.error("Visual identification failed:", error);
+        console.error("[IDENTIFY_FLOW] Visual identification failed:", error);
         toast({ variant: 'destructive', title: 'Erreur d\'analyse', description: error.message || 'La comparaison visuelle a échoué.' });
         handleReset();
     }
   }, [toast, handleReset, isTauri]);
 
   const processProvisioning = useCallback(async (imageDataUrl: string) => {
+    console.log('[PROVISION_FLOW] Starting provisioning process.');
     setViewMode('scanning');
     setCapturedImage(imageDataUrl);
 
@@ -405,9 +406,11 @@ export function CameraView() {
 
     if (isTauri && workerRef.current) {
         setStatusText('Analyse OCR en cours...');
+        console.log('[PROVISION_FLOW] Starting OCR recognition.');
         try {
             const { data: { text } } = await workerRef.current.recognize(imageDataUrl);
             ocrResultText = text || 'Aucun texte détecté.';
+            console.log('[PROVISION_FLOW] OCR Result:', ocrResultText);
         } catch (error) {
             console.error("OCR recognition failed:", error);
             ocrResultText = "L'OCR a échoué. Veuillez saisir les informations manuellement.";
@@ -419,6 +422,7 @@ export function CameraView() {
         }
     } else if (!isTauri) {
         setStatusText('Préparation du formulaire...');
+        console.log('[PROVISION_FLOW] Web mode: skipping OCR.');
         ocrResultText = "Le provisionnement OCR est uniquement disponible dans l'application de bureau. Veuillez saisir les informations manuellement.";
     }
 
@@ -449,9 +453,12 @@ export function CameraView() {
   };
 
   const handleSaveProvision = async (componentData: NewComponentFormData) => {
+    console.log('[PROVISION_FLOW] Starting save provision process for component:', componentData.id);
     try {
       setStatusText('Calcul du hachage...');
+      console.log('[PROVISION_FLOW] Computing perceptual hash for new image.');
       const perceptualHash = await computePHash(capturedImage);
+      console.log(`[PROVISION_FLOW] Image hash: ${perceptualHash}`);
       
       const payload = {
         component: {
@@ -467,7 +474,8 @@ export function CameraView() {
         }
       };
 
-      setStatusText('Sauvegarde sur le serveur...');
+      setStatusText('Sauvegarde sur le serveur distant...');
+      console.log('[PROVISION_FLOW] Sending payload to /api/provision.');
       const response = await fetch('/api/provision', {
         method: 'POST',
         headers: {
@@ -481,10 +489,12 @@ export function CameraView() {
         throw new Error(errorData.error || `Erreur HTTP: ${response.status}`);
       }
 
+      const responseData = await response.json();
+      console.log('[PROVISION_FLOW] Server responded with success.', responseData);
       toast({ title: 'Succès', description: `La fiche pour le composant ${componentData.id} a été ajoutée au serveur.` });
       handleReset();
     } catch (error: any) {
-      console.error(error);
+      console.error('[PROVISION_FLOW] Error saving provision:', error);
       toast({ variant: 'destructive', title: 'Erreur de sauvegarde', description: error.message || "Impossible d'enregistrer." });
     }
   };

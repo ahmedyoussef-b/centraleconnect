@@ -4,6 +4,7 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 export async function GET() {
+  console.log("[SYNC_DATA_API] Received request to fetch remote data for synchronization.");
   try {
     const [equipments, documents, parameters, alarms, logEntries, procedures, synopticItems] = await Promise.all([
       prisma.equipment.findMany(),
@@ -15,7 +16,7 @@ export async function GET() {
       prisma.synopticItem.findMany(),
     ]);
     
-    return NextResponse.json({
+    const dataPayload = {
       equipments,
       documents,
       parameters,
@@ -23,10 +24,13 @@ export async function GET() {
       logEntries,
       procedures,
       synopticItems
-    });
+    };
+    
+    console.log(`[SYNC_DATA_API] Sending data payload: ${equipments.length} equipments, ${documents.length} documents, ${logEntries.length} log entries.`);
+    return NextResponse.json(dataPayload);
 
   } catch (error) {
-    console.error("API Sync Error:", error);
+    console.error("[SYNC_DATA_API] API Sync Error:", error);
     return NextResponse.json(
       { error: 'Failed to fetch data for synchronization' },
       { status: 500 }

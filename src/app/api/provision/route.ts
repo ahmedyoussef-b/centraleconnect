@@ -23,13 +23,19 @@ async function createEntrySignature(
 }
 
 export async function POST(request: Request) {
+    console.log('[PROVISION_API] Received POST request.');
     try {
         const body = await request.json();
         const { component, document } = body;
+        
+        console.log(`[PROVISION_API] Payload received for equipment ID: ${component?.id}`);
 
-        if (!component || !document || !component.id || !document.imageData) {
+        if (!component || !document || !component.id || !document.imageData || !document.perceptualHash) {
+            console.error('[PROVISION_API] Validation failed: Invalid data.', { component: !!component, document: !!document });
             return NextResponse.json({ error: 'Données invalides' }, { status: 400 });
         }
+        
+        console.log('[PROVISION_API] Data validation successful.');
 
         const newEquipmentData = {
             externalId: component.id,
@@ -42,11 +48,11 @@ export async function POST(request: Request) {
             imageData: document.imageData,
             ocrText: document.ocrText,
             description: document.description,
-            perceptualHash: document.perceptualHash, // Accept hash from client
+            perceptualHash: document.perceptualHash,
             createdAt: new Date(),
         };
         
-        // Use a transaction to ensure all or nothing is written
+        console.log('[PROVISION_API] Starting database transaction.');
         const result = await prisma.$transaction(async (tx) => {
             // 1. Check if equipment already exists
             const existing = await tx.equipment.findUnique({
@@ -58,12 +64,15 @@ export async function POST(request: Request) {
             }
 
             // 2. Create the new equipment
+            console.log(`[PROVISION_API] Creating equipment: ${component.id}`);
             const newEquipment = await tx.equipment.create({ data: newEquipmentData });
 
             // 3. Create the associated document
+            console.log(`[PROVISION_API] Creating document for equipment: ${component.id}`);
             const newDocument = await tx.document.create({ data: newDocumentData });
 
             // 4. Create a secure log entry
+            console.log(`[PROVISION_API] Creating log entry for provisioning.`);
             const logMessage = `Nouvel équipement '${component.id}' ajouté via provisionnement web.`;
             const logEntryData: LogEntryData = {
                 timestamp: new Date(),
@@ -78,8 +87,10 @@ export async function POST(request: Request) {
                 orderBy: { timestamp: 'desc' },
             });
             const previousSignature = lastLog?.signature ?? 'GENESIS';
+            console.log(`[PROVISION_API] Previous log signature: ${previousSignature.substring(0, 10)}...`);
 
             const signature = await createEntrySignature(logEntryData, previousSignature);
+            console.log(`[PROVISION_API] New log signature: ${signature.substring(0, 10)}...`);
             
             const newLogEntry = await tx.logEntry.create({
                 data: {
@@ -88,13 +99,14 @@ export async function POST(request: Request) {
                 },
             });
 
+            console.log('[PROVISION_API] Transaction successful.');
             return { newEquipment, newDocument, newLogEntry };
         });
 
         return NextResponse.json(result, { status: 201 });
 
     } catch (error: any) {
-        console.error('API Provisioning Error:', error);
+        console.error('[PROVISION_API] Error during provisioning:', error);
         // Check for our custom transaction error
         if (error.message.includes('existe déjà')) {
              return NextResponse.json({ error: error.message }, { status: 409 }); // 409 Conflict
