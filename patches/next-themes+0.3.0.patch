@@ -1,0 +1,13 @@
+--- a/node_modules/next-themes/package.json
++++ b/node_modules/next-themes/package.json
+@@ -32,8 +32,8 @@
+     "themes"
+   ],
+   "peerDependencies": {
+-    "react": "^16.8 || ^17 || ^18",
+-    "react-dom": "^16.8 || ^17 || ^18"
++    "react": "^16.8 || ^17 || ^18 || ^19",
++    "react-dom": "^16.8 || ^17 || ^18 || ^19"
+   },
+   "devDependencies": {
+     "@testing-library/jest-dom": "^6.4.2",
