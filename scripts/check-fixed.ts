@@ -27,12 +27,12 @@ async function checkFixed() {
       console.log(`   ${i + 1}. ${t.name}`)
     })
     
-    // 3. Vérifier les tables critiques
+    // 3. Vérifier les tables critiques (basé sur le nouveau schéma)
     console.log('\n3. ✅ Tables critiques...')
     const criticalTables = [
-      'functional_nodes', 'parameters', 'alarms', 'alarm_events',
+      'equipments', 'parameters', 'alarms', 'alarm_events',
       'documents', 'log_entries', 'annotations', 'procedures',
-      'procedure_steps', 'scada_data'
+      'synoptic_items', 'scada_data'
     ]
     
     const tableNames = tables.map(t => t.name)
@@ -50,35 +50,32 @@ async function checkFixed() {
       // 4. Tester un insert
       console.log('\n4. 🧪 Test d\'insertion...')
       try {
-        const testNode = await prisma.functionalNode.create({
+        const testEquipment = await prisma.equipment.create({
           data: {
-            externalId: 'TG1',
-            name: 'Turbine Gaz 1',
-            type: 'TURBINE',
-            category: 'MECHANICAL',
-            systemCode: 'B1',
-            subSystem: 'POWER'
+            externalId: 'TEST-EQUIP-001',
+            name: 'Équipement de Test',
+            type: 'TEST_DEVICE',
+            systemCode: 'TEST',
+            subSystem: 'INTEGRITY'
           }
         })
-        console.log(`   ✅ Nœud créé: ${testNode.externalId}`)
+        console.log(`   ✅ Équipement créé: ${testEquipment.externalId}`)
         
         // Tester une relation
         const param = await prisma.parameter.create({
           data: {
-            nodeId: testNode.id,
-            name: 'Température',
+            equipmentId: testEquipment.externalId,
+            name: 'Température de test',
             unit: '°C',
-            dataType: 'DOUBLE',
-            nominalValue: 650,
-            warningHigh: 700,
-            alarmHigh: 750
+            dataType: 'NUMERIC',
+            nominalValue: 100,
           }
         })
         console.log(`   ✅ Paramètre créé: ${param.name}`)
         
         // Nettoyer
         await prisma.parameter.delete({ where: { id: param.id } })
-        await prisma.functionalNode.delete({ where: { id: testNode.id } })
+        await prisma.equipment.delete({ where: { externalId: testEquipment.externalId } })
         console.log('   ✅ Tests nettoyés')
         
       } catch (error: any) {

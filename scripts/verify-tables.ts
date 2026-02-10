@@ -51,13 +51,13 @@ async function verifyDatabase() {
     // 3. Vérifier les tables critiques
     console.log('3. 🎯 Tables critiques (doivent exister)...')
     const criticalTables = [
-      'functional_nodes',
+      'equipments',
       'parameters', 
       'alarms',
       'log_entries',
       'annotations',
       'procedures',
-      'procedure_steps',
+      'synoptic_items',
       'scada_data',
       'alarm_events',
       'documents'

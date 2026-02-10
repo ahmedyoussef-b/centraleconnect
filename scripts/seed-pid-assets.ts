@@ -1,7 +1,7 @@
 #!/usr/bin/env tsx
 /**
  * Script corrigé pour l'injection des données Master Data
- * Compatible avec le modèle Prisma FunctionalNode
+ * Compatible avec le modèle Prisma Equipment
  */
 
 import { PrismaClient } from '@prisma/client';
@@ -152,13 +152,9 @@ async function main() {
   console.log('🚀 [SEED] Démarrage de l\'injection des données de référence (Master Data)...');
   
   try {
-    // Nettoyage des tables existantes
-    console.log('🗑️  Nettoyage des tables existantes...');
-    await prisma.$transaction([
-      prisma.functionalNode.deleteMany(),
-      // Ajoutez d'autres deleteMany si nécessaire
-    ]);
-    console.log('✅ Tables nettoyées.');
+    // Le script de seed principal (seed.ts) est responsable du nettoyage complet.
+    // L'instruction deleteMany est commentée pour éviter toute suppression accidentelle.
+    // await prisma.equipment.deleteMany();
 
     // Injection des composants
     console.log('🌱 Injection des Composants...');
@@ -169,38 +165,34 @@ async function main() {
         .update(JSON.stringify(component))
         .digest('hex');
       
-      await prisma.functionalNode.create({
-        data: {
-          // ⚠️ CORRECTION 1 : Ne PAS fournir 'id' (auto-incrémenté)
-          // id: component.externalId, // ← SUPPRIMÉ
-          
-          // ⚠️ CORRECTION 2 : Fournir externalId comme chaîne
-          externalId: component.externalId,
-          
-          // ⚠️ CORRECTION 3 : Convertir les objets en JSON string
-          coordinates: JSON.stringify({}), // ← Objet vide converti en chaîne
-          nominalData: JSON.stringify({}), // ← Objet vide converti en chaîne
-          
-          // Champs standards
+      await prisma.equipment.upsert({
+        where: { externalId: component.externalId },
+        update: {
           name: component.name,
           type: component.type,
-          category: "MECHANICAL", // Valeur par défaut
-          systemCode: "LEGACY", // Système par défaut
-          subSystem: component.type, // Utiliser le type comme sous-système
-          tagNumber: component.externalId, // Stocker externalId aussi dans tagNumber
+          subtype: component.subtype,
           manufacturer: component.manufacturer || null,
           serialNumber: component.serialNumber || null,
           location: component.location || null,
-          createdAt: new Date(),
-          updatedAt: new Date(),
+          checksum: checksum,
+        },
+        create: {
+          externalId: component.externalId,
+          name: component.name,
+          type: component.type,
+          subtype: component.subtype,
+          systemCode: "LEGACY", // Système par défaut
+          manufacturer: component.manufacturer || null,
+          serialNumber: component.serialNumber || null,
+          location: component.location || null,
           version: 1,
           isImmutable: false,
-          checksum: checksum
+          checksum: checksum,
         }
       });
     }
     
-    console.log(`✅ ${COMPONENTS_DATA.length} composants injectés avec succès.`);
+    console.log(`✅ ${COMPONENTS_DATA.length} composants injectés/mis à jour avec succès.`);
     console.log('🎉 Seeding terminé avec succès !');
 
   } catch (error) {
