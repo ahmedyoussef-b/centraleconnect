@@ -53,7 +53,7 @@ CREATE TABLE IF NOT EXISTS equipments (
     nominal_data TEXT
 );
 CREATE TABLE IF NOT EXISTS parameters (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id INTEGER PRIMARY KEY,
     name TEXT NOT NULL,
     unit TEXT,
     data_type TEXT NOT NULL DEFAULT 'TEXT',
@@ -78,7 +78,7 @@ CREATE TABLE IF NOT EXISTS alarms (
     FOREIGN KEY (equipment_id) REFERENCES equipments(external_id) ON DELETE CASCADE
 );
 CREATE TABLE IF NOT EXISTS log_entries (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id INTEGER PRIMARY KEY,
     timestamp TEXT NOT NULL,
     type TEXT CHECK(type IN ('AUTO', 'MANUAL', 'DOCUMENT_ADDED')) NOT NULL,
     source TEXT NOT NULL,
@@ -113,7 +113,7 @@ CREATE TABLE IF NOT EXISTS annotations (
     FOREIGN KEY (equipment_id) REFERENCES equipments(external_id) ON DELETE CASCADE
 );
 CREATE TABLE IF NOT EXISTS documents (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id INTEGER PRIMARY KEY,
     image_data TEXT NOT NULL,
     ocr_text TEXT,
     description TEXT,
@@ -560,37 +560,32 @@ export async function syncWithRemote(): Promise<{ synced: number; cleaned: boole
     // Step 1: Update local database within a transaction
     const txId = await invoke('plugin:sql|begin', { db });
     try {
-        const tableNames = ['documents', 'parameters', 'alarms', 'log_entries', 'procedures', 'synoptic_items', 'equipments'];
-        for (const tableName of tableNames) {
-            await invoke('plugin:sql|execute', { db, query: `DELETE FROM ${tableName};` });
-        }
-        
         for (const equip of data.equipments || []) {
-            await invoke('plugin:sql|execute', { db, query: 'INSERT INTO equipments (external_id, name, description, parent_id, type, subtype, system_code, sub_system, location, manufacturer, serial_number, document_ref, checksum) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)', values: [equip.externalId, equip.name, equip.description, equip.parentId, equip.type, equip.subtype, equip.systemCode, equip.subSystem, equip.location, equip.manufacturer, equip.serialNumber, equip.documentRef, equip.checksum] });
+            await invoke('plugin:sql|execute', { db, query: 'INSERT OR IGNORE INTO equipments (external_id, name, description, parent_id, type, subtype, system_code, sub_system, location, manufacturer, serial_number, document_ref, checksum) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)', values: [equip.externalId, equip.name, equip.description, equip.parentId, equip.type, equip.subtype, equip.systemCode, equip.subSystem, equip.location, equip.manufacturer, equip.serialNumber, equip.documentRef, equip.checksum] });
             totalSynced++;
         }
         for (const doc of data.documents || []) {
-            await invoke('plugin:sql|execute', { db, query: 'INSERT INTO documents (id, equipment_id, image_data, ocr_text, description, created_at, perceptual_hash) VALUES ($1, $2, $3, $4, $5, $6, $7)', values: [doc.id, doc.equipmentId, doc.imageData, doc.ocrText, doc.description, doc.createdAt, doc.perceptualHash] });
+            await invoke('plugin:sql|execute', { db, query: 'INSERT OR IGNORE INTO documents (id, equipment_id, image_data, ocr_text, description, created_at, perceptual_hash) VALUES ($1, $2, $3, $4, $5, $6, $7)', values: [doc.id, doc.equipmentId, doc.imageData, doc.ocrText, doc.description, doc.createdAt, doc.perceptualHash] });
             totalSynced++;
         }
         for (const log of data.logEntries || []) {
-             await invoke('plugin:sql|execute', { db, query: 'INSERT INTO log_entries (id, timestamp, type, source, message, equipment_id, signature) VALUES ($1, $2, $3, $4, $5, $6, $7)', values: [log.id, log.timestamp, log.type, log.source, log.message, log.equipmentId, log.signature] });
+             await invoke('plugin:sql|execute', { db, query: 'INSERT OR IGNORE INTO log_entries (id, timestamp, type, source, message, equipment_id, signature) VALUES ($1, $2, $3, $4, $5, $6, $7)', values: [log.id, log.timestamp, log.type, log.source, log.message, log.equipmentId, log.signature] });
              totalSynced++;
         }
         for (const param of data.parameters || []) {
-            await invoke('plugin:sql|execute', { db, query: 'INSERT INTO parameters (id, name, unit, nominal_value, min_safe, max_safe, alarm_high, alarm_low, standard_ref, equipment_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)', values: [param.id, param.name, param.unit, param.nominalValue, param.minSafe, param.maxSafe, param.alarmHigh, param.alarmLow, param.standardRef, param.equipmentId] });
+            await invoke('plugin:sql|execute', { db, query: 'INSERT OR IGNORE INTO parameters (id, name, unit, nominal_value, min_safe, max_safe, alarm_high, alarm_low, standard_ref, equipment_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)', values: [param.id, param.name, param.unit, param.nominalValue, param.minSafe, param.maxSafe, param.alarmHigh, param.alarmLow, param.standardRef, param.equipmentId] });
             totalSynced++;
         }
         for (const alarm of data.alarms || []) {
-            await invoke('plugin:sql|execute', { db, query: 'INSERT INTO alarms (code, severity, description, parameter, reset_procedure, standard_ref, equipment_id) VALUES ($1, $2, $3, $4, $5, $6, $7)', values: [alarm.code, alarm.severity, alarm.description, alarm.parameter, alarm.resetProcedure, alarm.standardRef, alarm.equipmentId] });
+            await invoke('plugin:sql|execute', { db, query: 'INSERT OR IGNORE INTO alarms (code, severity, description, parameter, reset_procedure, standard_ref, equipment_id) VALUES ($1, $2, $3, $4, $5, $6, $7)', values: [alarm.code, alarm.severity, alarm.description, alarm.parameter, alarm.resetProcedure, alarm.standardRef, alarm.equipmentId] });
             totalSynced++;
         }
         for (const proc of data.procedures || []) {
-            await invoke('plugin:sql|execute', { db, query: 'INSERT INTO procedures (id, name, description, version, steps) VALUES ($1, $2, $3, $4, $5)', values: [proc.id, proc.name, proc.description, proc.version, proc.steps] });
+            await invoke('plugin:sql|execute', { db, query: 'INSERT OR IGNORE INTO procedures (id, name, description, version, steps) VALUES ($1, $2, $3, $4, $5)', values: [proc.id, proc.name, proc.description, proc.version, proc.steps] });
             totalSynced++;
         }
         for (const item of data.synopticItems || []) {
-            await invoke('plugin:sql|execute', { db, query: 'INSERT INTO synoptic_items (external_id, name, type, parent_id, group_path, element_id, level, approved_by, approval_date) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)', values: [item.externalId, item.name, item.type, item.parentId, item.groupPath, item.elementId, item.level, item.approvedBy, item.approvalDate] });
+            await invoke('plugin:sql|execute', { db, query: 'INSERT OR IGNORE INTO synoptic_items (external_id, name, type, parent_id, group_path, element_id, level, approved_by, approval_date) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)', values: [item.externalId, item.name, item.type, item.parentId, item.groupPath, item.elementId, item.level, item.approvedBy, item.approvalDate] });
             totalSynced++;
         }
 
