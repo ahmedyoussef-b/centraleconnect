@@ -1,23 +1,22 @@
 // public/models/vad.worklet.js
-class VadProcessor extends AudioWorkletProcessor {
-    constructor() {
-      super();
-      this.port.onmessage = (event) => {
-        // Handle messages from main thread if needed
-      };
-    }
-  
-    process(inputs, outputs, parameters) {
-      const input = inputs[0];
-      const output = outputs[0];
-      
-      // Copy input to output (passthrough)
-      for (let channel = 0; channel < output.length; channel++) {
-        output[channel].set(input[channel]);
+class VadHelperWorklet extends AudioWorkletProcessor {
+  constructor() {
+    super();
+    this.buffer = [];
+    this.port.onmessage = (event) => {
+      if (event.data.action === 'process') {
+        this.buffer.push(...event.data.audio);
+        while (this.buffer.length >= 480) {
+          const chunk = this.buffer.splice(0, 480);
+          this.port.postMessage({ audio: chunk });
+        }
       }
-      
-      return true; // Keep processor alive
-    }
+    };
   }
-  
-  registerProcessor('vad-processor', VadProcessor);
+
+  process(inputs, outputs) {
+    return true;
+  }
+}
+
+registerProcessor('vad-helper-worklet', VadHelperWorklet);
