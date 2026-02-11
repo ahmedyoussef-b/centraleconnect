@@ -3,7 +3,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { FileUp, Search, LoaderCircle, AlertTriangle } from 'lucide-react';
+import { FileUp, Search, LoaderCircle, AlertTriangle, FileDown } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -20,6 +20,7 @@ import { ParameterExtractor, type Parameter } from '@/lib/ocr/parameter-extracto
 import { SafetyLabelDetector, type SafetyLabel } from '@/lib/ocr/safety-label-detector';
 import { SignatureExtractor, type Signature } from '@/lib/ocr/signature-extractor';
 import { EnvironmentAnalyzer, type EnvironmentAnalysis } from '@/lib/vision/environment-analyzer';
+import { SimpleShapeDetector, type Detection as ShapeDetection } from '@/lib/vision/simple-detector';
 
 
 interface AnalysisResults {
@@ -33,9 +34,10 @@ interface AnalysisResults {
   safetyLabels: SafetyLabel[];
   signatures: Signature[];
   environment: EnvironmentAnalysis | null;
+  shapes: ShapeDetection[];
 }
 
-export default function TestLecturePage() {
+export default function DiagnosticVisuelPage() {
   const [fileImage, setFileImage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [results, setResults] = useState<AnalysisResults | null>(null);
@@ -52,6 +54,7 @@ export default function TestLecturePage() {
   const parameterExtractorRef = useRef<ParameterExtractor | null>(null);
   const safetyLabelDetectorRef = useRef<SafetyLabelDetector | null>(null);
   const signatureExtractorRef = useRef<SignatureExtractor | null>(null);
+  const shapeDetectorRef = useRef<SimpleShapeDetector | null>(null);
 
   useEffect(() => {
     detectorRef.current = new EquipmentDetector();
@@ -76,6 +79,7 @@ export default function TestLecturePage() {
     parameterExtractorRef.current = new ParameterExtractor();
     safetyLabelDetectorRef.current = new SafetyLabelDetector();
     signatureExtractorRef.current = new SignatureExtractor();
+    shapeDetectorRef.current = new SimpleShapeDetector();
   }, [toast]);
 
 
@@ -116,24 +120,30 @@ export default function TestLecturePage() {
       const ctx = canvas.getContext('2d');
       if (!ctx) throw new Error('Could not get canvas context');
       ctx.drawImage(imageBitmap, 0, 0);
-      const imageDataForCodes = ctx.getImageData(0, 0, imageBitmap.width, imageBitmap.height);
+      const imageDataForAnalysis = ctx.getImageData(0, 0, imageBitmap.width, imageBitmap.height);
 
-      const [metadata, ocr, codes, detections, pid, faults, parameters, safetyLabels, signatures] = await Promise.all([
+      const [metadata, ocr, codes, detections, pid, faults, parameters, safetyLabels, signatures, shapes] = await Promise.all([
         extractIndustrialMetadata(imageBlob),
         performIndustrialOCR(fileImage, { zone: 'B1' }),
-        detectIndustrialCodes(imageDataForCodes),
+        detectIndustrialCodes(imageDataForAnalysis),
         detectorRef.current ? detectorRef.current.detect(imageRef.current) : Promise.resolve([]),
-        pidAnalyzerRef.current ? pidAnalyzerRef.current.analyze(imageDataForCodes) : Promise.resolve(null),
+        pidAnalyzerRef.current ? pidAnalyzerRef.current.analyze(imageDataForAnalysis) : Promise.resolve(null),
         faultDetectorRef.current ? faultDetectorRef.current.detect(imageRef.current) : Promise.resolve([]),
         parameterExtractorRef.current ? parameterExtractorRef.current.extract(imageRef.current) : Promise.resolve([]),
         safetyLabelDetectorRef.current ? safetyLabelDetectorRef.current.detect(imageRef.current) : Promise.resolve([]),
         signatureExtractorRef.current ? signatureExtractorRef.current.extract(imageRef.current) : Promise.resolve([]),
+        shapeDetectorRef.current ? Promise.all([
+            shapeDetectorRef.current.detectCircles(imageDataForAnalysis),
+            shapeDetectorRef.current.detectRectangles(imageDataForAnalysis),
+            shapeDetectorRef.current.detectTriangles(imageDataForAnalysis),
+            shapeDetectorRef.current.detectLines(imageDataForAnalysis)
+        ]).then(results => results.flat()) : Promise.resolve([]),
       ]);
       
       const environmentAnalyzer = new EnvironmentAnalyzer();
       const environment = environmentAnalyzer.analyze(detections);
 
-      setResults({ metadata, ocr, codes, detections, pid, faults, parameters, safetyLabels, signatures, environment });
+      setResults({ metadata, ocr, codes, detections, pid, faults, parameters, safetyLabels, signatures, environment, shapes });
 
     } catch (e: any) {
       console.error("Analysis failed:", e);
@@ -148,14 +158,33 @@ export default function TestLecturePage() {
     }
   };
 
+  const handleExport = () => {
+    if (!results) return;
+    const jsonString = `data:text/json;charset=utf-8,${encodeURIComponent(
+      JSON.stringify(results, null, 2)
+    )}`;
+    const link = document.createElement("a");
+    link.href = jsonString;
+    link.download = `diagnostic-results-${new Date().toISOString()}.json`;
+    link.click();
+  };
+
   return (
     <div className="space-y-4">
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Search />
-            Diagnostic Visuel
-          </CardTitle>
+          <div className="flex justify-between items-center">
+            <CardTitle className="flex items-center gap-2">
+              <Search />
+              Diagnostic Visuel
+            </CardTitle>
+            {results && (
+              <Button onClick={handleExport} variant="outline" size="sm">
+                <FileDown className="mr-2 h-4 w-4" />
+                Exporter en JSON
+              </Button>
+            )}
+          </div>
         </CardHeader>
         <CardContent className="space-y-4">
           <div 
@@ -250,6 +279,17 @@ export default function TestLecturePage() {
                     ) : <p className="text-muted-foreground">Aucun code détecté.</p>}
                 </CardContent>
             </Card>
+
+           {results.shapes.length > 0 && (
+            <Card>
+                <CardHeader><CardTitle>Détection de Formes Géométriques</CardTitle></CardHeader>
+                <CardContent>
+                    <pre className="text-xs bg-muted p-4 rounded-md overflow-x-auto">
+                    {JSON.stringify(results.shapes, null, 2)}
+                    </pre>
+                </CardContent>
+            </Card>
+          )}
 
           <Card>
             <CardHeader><CardTitle>Métadonnées EXIF</CardTitle></CardHeader>
