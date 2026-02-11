@@ -13,12 +13,22 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // ✅ SUPPRESSION DE LA LOGIQUE INUTILE
-  // La gestion conditionnelle des layouts est déjà faite par les Route Groups
   
   return (
     <html lang="fr" className="dark" suppressHydrationWarning>
       <head>
+        {/* Optimisation TensorFlow.js pour forcer l'accélération GPU */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              if (typeof window !== 'undefined') {
+                window['tf'] = window['tf'] || {};
+                window['tf']['forceWebGL'] = true;
+                window['tf']['WEBGL_VERSION'] = 2;
+              }
+            `,
+          }}
+        />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link 
           rel="preconnect" 
