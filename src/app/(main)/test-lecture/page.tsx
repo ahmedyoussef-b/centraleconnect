@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
@@ -16,6 +17,7 @@ import { PIDAnalyzer, type PIDAnalysis } from '@/lib/vision/pid-analyzer';
 import { FaultDetector, type Fault } from '@/lib/vision/fault-detector';
 import { ParameterExtractor, type Parameter } from '@/lib/ocr/parameter-extractor';
 import { SafetyLabelDetector, type SafetyLabel } from '@/lib/ocr/safety-label-detector';
+import { SignatureExtractor, type Signature } from '@/lib/ocr/signature-extractor';
 
 
 interface AnalysisResults {
@@ -27,6 +29,7 @@ interface AnalysisResults {
   faults: Fault[];
   parameters: Parameter[];
   safetyLabels: SafetyLabel[];
+  signatures: Signature[];
 }
 
 export default function TestLecturePage() {
@@ -44,6 +47,7 @@ export default function TestLecturePage() {
   const faultDetectorRef = useRef<FaultDetector | null>(null);
   const parameterExtractorRef = useRef<ParameterExtractor | null>(null);
   const safetyLabelDetectorRef = useRef<SafetyLabelDetector | null>(null);
+  const signatureExtractorRef = useRef<SignatureExtractor | null>(null);
 
   useEffect(() => {
     detectorRef.current = new EquipmentDetector();
@@ -67,6 +71,7 @@ export default function TestLecturePage() {
     });
     parameterExtractorRef.current = new ParameterExtractor();
     safetyLabelDetectorRef.current = new SafetyLabelDetector();
+    signatureExtractorRef.current = new SignatureExtractor();
   }, [toast]);
 
 
@@ -109,7 +114,7 @@ export default function TestLecturePage() {
       ctx.drawImage(imageBitmap, 0, 0);
       const imageDataForCodes = ctx.getImageData(0, 0, imageBitmap.width, imageBitmap.height);
 
-      const [metadata, ocr, codes, detections, pid, faults, parameters, safetyLabels] = await Promise.all([
+      const [metadata, ocr, codes, detections, pid, faults, parameters, safetyLabels, signatures] = await Promise.all([
         extractIndustrialMetadata(imageBlob),
         performIndustrialOCR(fileImage, { zone: 'B1' }),
         detectIndustrialCodes(imageDataForCodes),
@@ -118,9 +123,10 @@ export default function TestLecturePage() {
         faultDetectorRef.current ? faultDetectorRef.current.detect(imageRef.current) : Promise.resolve([]),
         parameterExtractorRef.current ? parameterExtractorRef.current.extract(imageRef.current) : Promise.resolve([]),
         safetyLabelDetectorRef.current ? safetyLabelDetectorRef.current.detect(imageRef.current) : Promise.resolve([]),
+        signatureExtractorRef.current ? signatureExtractorRef.current.extract(imageRef.current) : Promise.resolve([]),
       ]);
       
-      setResults({ metadata, ocr, codes, detections, pid, faults, parameters, safetyLabels });
+      setResults({ metadata, ocr, codes, detections, pid, faults, parameters, safetyLabels, signatures });
 
     } catch (e: any) {
       console.error("Analysis failed:", e);
@@ -248,6 +254,17 @@ export default function TestLecturePage() {
                 <CardContent>
                     <pre className="text-xs bg-muted p-4 rounded-md overflow-x-auto">
                     {JSON.stringify(results.pid, null, 2)}
+                    </pre>
+                </CardContent>
+            </Card>
+          )}
+
+          {results.signatures.length > 0 && (
+            <Card>
+                <CardHeader><CardTitle>9. Signatures Manuscrites</CardTitle></CardHeader>
+                <CardContent>
+                    <pre className="text-xs bg-muted p-4 rounded-md overflow-x-auto">
+                    {JSON.stringify(results.signatures, null, 2)}
                     </pre>
                 </CardContent>
             </Card>

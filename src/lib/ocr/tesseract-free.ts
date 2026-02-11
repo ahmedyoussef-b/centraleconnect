@@ -1,3 +1,4 @@
+
 // src/lib/ocr/tesseract-free.ts
 
 // This is a placeholder for a real Tesseract.js wrapper.
@@ -26,6 +27,8 @@ export class FreeOCREngine {
       VIBRATION: 2.1 mm/s
       ATTENTION: HAUTE TENSION
       DANGER: RISQUE D'EXPLOSION
+
+      Validé par: Jean Dupont (11/02/2026)
     `;
     
     return {
