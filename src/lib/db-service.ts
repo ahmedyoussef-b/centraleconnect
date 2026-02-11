@@ -16,6 +16,7 @@ import equipmentB0Data from '@/assets/master-data/B0.json';
 import equipmentB1Data from '@/assets/master-data/B1.json';
 import equipmentB2Data from '@/assets/master-data/B2.json';
 import equipmentB3Data from '@/assets/master-data/B3.json';
+import equipmentC0Data from '@/assets/master-data/C0.json';
 import equipmentTG1Data from '@/assets/master-data/TG1.json';
 import equipmentTG2Data from '@/assets/master-data/TG2.json';
 import allParameterData from '@/assets/master-data/parameters.json';
@@ -49,6 +50,7 @@ CREATE TABLE IF NOT EXISTS equipments (
     is_immutable BOOLEAN NOT NULL DEFAULT 0,
     approved_by TEXT,
     approved_at TEXT,
+    commissioning_date TEXT,
     checksum TEXT UNIQUE,
     nominal_data TEXT
 );
@@ -56,11 +58,9 @@ CREATE TABLE IF NOT EXISTS parameters (
     id INTEGER PRIMARY KEY,
     name TEXT NOT NULL,
     unit TEXT,
-    data_type TEXT NOT NULL DEFAULT 'TEXT',
     nominal_value REAL,
     min_safe REAL,
     max_safe REAL,
-    warning_high REAL,
     alarm_high REAL,
     alarm_low REAL,
     standard_ref TEXT,
@@ -153,7 +153,7 @@ function getClientSideData() {
     }
 
     const allEquipmentsMap = new Map<string, any>();
-    const detailedData = [...equipmentB0Data, ...equipmentB1Data, ...equipmentB2Data, ...equipmentB3Data, ...equipmentPidAssetsData.nodes, ...equipmentComponentsData, ...equipmentTG1Data, ...equipmentTG2Data];
+    const detailedData = [...equipmentC0Data, ...equipmentB0Data, ...equipmentB1Data, ...equipmentB2Data, ...equipmentB3Data, ...equipmentPidAssetsData.nodes, equipmentComponentsData, ...equipmentTG1Data, ...equipmentTG2Data];
 
     for (const item of detailedData as any[]) {
         const id = item.externalId || item.tag;
@@ -425,34 +425,44 @@ export async function addComponentAndDocument(
 ): Promise<void> {
     const isTauri = typeof window !== 'undefined' && window.__TAURI__;
     
+    // --- Handle optional fields (for both local and remote) ---
+    const finalExternalId = component.externalId?.trim() || `PROV-${Date.now()}`;
+    const finalName = component.name?.trim() || `Équipement non spécifié - ${finalExternalId}`;
+    const finalType = component.type?.trim() || `INCONNU`;
+
+    const finalComponent = { externalId: finalExternalId, name: finalName, type: finalType };
+    
     if (isTauri) {
-        console.log('[PROVISION_FLOW] Saving to local Tauri database.');
+        console.log('[PROVISION_FLOW_LOCAL] Saving to local Tauri database with data:', { component: finalComponent, document: {...document, imageData: '...omitted...'} });
         await initializeDatabase();
         const db = await invoke('plugin:sql|load', { db: DB_NAME });
 
-        const existing: any[] = await invoke('plugin:sql|select', { db, query: 'SELECT 1 FROM equipments WHERE external_id = $1', values: [component.externalId]});
+        console.log(`[PROVISION_FLOW_LOCAL] Checking for existing equipment with ID: ${finalComponent.externalId}`);
+        const existing: any[] = await invoke('plugin:sql|select', { db, query: 'SELECT 1 FROM equipments WHERE external_id = $1', values: [finalComponent.externalId]});
         if (existing.length > 0) {
-            throw new Error(`L'équipement avec l'ID '${component.externalId}' existe déjà.`);
+            console.error(`[PROVISION_FLOW_LOCAL] Conflict: Equipment ID '${finalComponent.externalId}' already exists.`);
+            throw new Error(`L'équipement avec l'ID '${finalComponent.externalId}' existe déjà.`);
         }
 
         // Transaction
         const txId = await invoke('plugin:sql|begin', { db });
+        console.log(`[PROVISION_FLOW_LOCAL] Started transaction.`);
         try {
             // 1. Insert equipment
             await invoke('plugin:sql|execute', {
                 db,
                 query: 'INSERT INTO equipments (external_id, name, type, version, is_immutable) VALUES ($1, $2, $3, 1, 0)',
-                values: [component.externalId, component.name, component.type]
+                values: [finalComponent.externalId, finalComponent.name, finalComponent.type]
             });
-            console.log(`[PROVISION_FLOW-LOCAL] Inserted equipment: ${component.externalId}`);
+            console.log(`[PROVISION_FLOW_LOCAL_TX] Inserted equipment: ${finalComponent.externalId}`);
 
             // 2. Insert document
             await invoke('plugin:sql|execute', {
                 db,
                 query: 'INSERT INTO documents (equipment_id, image_data, ocr_text, description, created_at, perceptual_hash) VALUES ($1, $2, $3, $4, $5, $6)',
-                values: [component.externalId, document.imageData, document.ocrText, document.description, new Date().toISOString(), document.perceptualHash]
+                values: [finalComponent.externalId, document.imageData, document.ocrText, document.description, new Date().toISOString(), document.perceptualHash]
             });
-            console.log(`[PROVISION_FLOW-LOCAL] Inserted document for ${component.externalId}`);
+            console.log(`[PROVISION_FLOW_LOCAL_TX] Inserted document for ${finalComponent.externalId}`);
 
 
             // 3. Insert log entry
@@ -462,31 +472,31 @@ export async function addComponentAndDocument(
             });
             const previousSignature = lastEntry[0]?.signature ?? 'GENESIS';
             const timestamp = new Date().toISOString().replace('T', ' ').slice(0, 19);
-            const logMessage = `Nouvel équipement '${component.externalId}' ajouté via provisionnement local.`;
-            const newEntryData = { type: 'DOCUMENT_ADDED', source: 'Provisioning Local', message: logMessage, equipmentId: component.externalId, timestamp };
+            const logMessage = `Nouvel équipement '${finalComponent.externalId}' ajouté via provisionnement local.`;
+            const newEntryData = { type: 'DOCUMENT_ADDED', source: 'Provisioning Local', message: logMessage, equipmentId: finalComponent.externalId, timestamp };
             const signature = await createEntrySignature(newEntryData, previousSignature);
 
             await invoke('plugin:sql|execute', {
                 db,
                 query: 'INSERT INTO log_entries (timestamp, type, source, message, equipment_id, signature) VALUES ($1, $2, $3, $4, $5, $6)',
-                values: [timestamp, 'DOCUMENT_ADDED', 'Provisioning Local', logMessage, component.externalId, signature],
+                values: [timestamp, 'DOCUMENT_ADDED', 'Provisioning Local', logMessage, finalComponent.externalId, signature],
             });
-            console.log(`[PROVISION_FLOW-LOCAL] Inserted log entry for ${component.externalId}`);
+            console.log(`[PROVISION_FLOW_LOCAL_TX] Inserted log entry for ${finalComponent.externalId}`);
 
             await invoke('plugin:sql|commit', { db });
-            console.log(`[PROVISION_FLOW-LOCAL] Transaction committed.`);
+            console.log(`[PROVISION_FLOW_LOCAL] Transaction committed successfully.`);
 
         } catch (e) {
             await invoke('plugin:sql|rollback', { db });
-            console.error("[PROVISION_FLOW-LOCAL] Transaction failed:", e);
+            console.error("[PROVISION_FLOW_LOCAL] Transaction failed, rolling back:", e);
             if (e instanceof Error) {
                 throw new Error(`Erreur de base de données locale: ${e.message}`);
             }
             throw new Error("Une erreur inconnue est survenue lors de la sauvegarde locale.");
         }
     } else {
-        console.log('[PROVISION_FLOW] Saving to remote server via API.');
-        const payload = { component, document };
+        console.log('[PROVISION_FLOW_REMOTE] Saving to remote server via API with data:', { component: finalComponent, document: {...document, imageData: '...omitted...'} });
+        const payload = { component: finalComponent, document };
         const response = await fetch('/api/provision', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },

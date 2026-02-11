@@ -28,34 +28,37 @@ export async function POST(request: Request) {
     try {
         const body = await request.json();
         const { component, document } = body;
-        
-        console.log(`[PROVISION_API] Payload received for equipment ID: ${component?.externalId}`);
+        console.log('[PROVISION_API] Parsed request body:', { component, document: { ...document, imageData: '...omitted...' }});
 
-        if (!component || !document || !component.externalId || !document.imageData || !document.perceptualHash) {
-            console.error('[PROVISION_API] Validation failed: Invalid data.', { component: !!component, document: !!document });
-            return NextResponse.json({ error: 'Données invalides' }, { status: 400 });
+        if (!component || !document || !document.imageData || !document.perceptualHash) {
+            console.error('[PROVISION_API] Validation failed: Component or document data is missing.', { hasComponent: !!component, hasDocument: !!document });
+            return NextResponse.json({ error: 'Données invalides : composant ou document manquant.' }, { status: 400 });
         }
         
-        // Validation du format de l'ID externe
-        const externalIdPattern = /^[A-Z0-9][A-Z0-9.-]*$/;
-        if (!externalIdPattern.test(component.externalId)) {
-            const errorMsg = "Format d'ID externe invalide. L'ID doit commencer par une lettre ou un chiffre et ne peut contenir que des lettres, chiffres, points et tirets.";
-            console.error(`[PROVISION_API] Validation de l'ID externe échouée: ${errorMsg}`);
-            return NextResponse.json({ error: errorMsg }, { status: 400 });
-        }
-        
-        console.log('[PROVISION_API] Data validation successful.');
+        // --- Handle optional fields ---
+        const finalExternalId = component.externalId?.trim() || `PROV-${Date.now()}`;
+        const finalName = component.name?.trim() || `Équipement non spécifié - ${finalExternalId}`;
+        const finalType = component.type?.trim() || `INCONNU`;
+
+        console.log('[PROVISION_API] Processed input data:', {
+            originalId: component.externalId,
+            finalId: finalExternalId,
+            originalName: component.name,
+            finalName: finalName,
+            originalType: component.type,
+            finalType: finalType,
+        });
 
         const newEquipmentData = {
-            externalId: component.externalId,
-            name: component.name,
-            type: component.type,
+            externalId: finalExternalId,
+            name: finalName,
+            type: finalType,
             version: 1,
             isImmutable: false,
         };
 
         const newDocumentData = {
-            equipmentId: component.externalId,
+            equipmentId: finalExternalId, // Use the final ID
             imageData: document.imageData,
             ocrText: document.ocrText,
             description: document.description,
@@ -66,31 +69,33 @@ export async function POST(request: Request) {
         console.log('[PROVISION_API] Starting database transaction.');
         const result = await prisma.$transaction(async (tx) => {
             // 1. Check if equipment already exists
+            console.log(`[PROVISION_API_TX] Checking for existing equipment with ID: ${finalExternalId}`);
             const existing = await tx.equipment.findUnique({
-                where: { externalId: component.externalId },
+                where: { externalId: finalExternalId },
             });
             if (existing) {
+                console.error(`[PROVISION_API_TX] Conflict: Equipment with ID '${finalExternalId}' already exists.`);
                 // We throw an error to rollback the transaction
-                throw new Error(`L'équipement avec l'ID '${component.externalId}' existe déjà.`);
+                throw new Error(`L'équipement avec l'ID '${finalExternalId}' existe déjà.`);
             }
 
             // 2. Create the new equipment
-            console.log(`[PROVISION_API] Creating equipment: ${component.externalId}`);
+            console.log(`[PROVISION_API_TX] Creating equipment:`, newEquipmentData);
             const newEquipment = await tx.equipment.create({ data: newEquipmentData });
 
             // 3. Create the associated document
-            console.log(`[PROVISION_API] Creating document for equipment: ${component.externalId}`);
+            console.log(`[PROVISION_API_TX] Creating document for equipment: ${finalExternalId}`);
             const newDocument = await tx.document.create({ data: newDocumentData });
 
             // 4. Create a secure log entry
-            console.log(`[PROVISION_API] Creating log entry for provisioning.`);
-            const logMessage = `Nouvel équipement '${component.externalId}' ajouté via provisionnement web.`;
+            console.log(`[PROVISION_API_TX] Creating log entry for provisioning.`);
+            const logMessage = `Nouvel équipement '${finalExternalId}' ajouté via provisionnement web.`;
             const logEntryData: LogEntryData = {
                 timestamp: new Date(),
                 type: 'DOCUMENT_ADDED',
                 source: 'Provisioning Web', // Or get user from session
                 message: logMessage,
-                equipmentId: component.externalId,
+                equipmentId: finalExternalId,
             };
 
             // Get the last signature for chaining
@@ -98,10 +103,10 @@ export async function POST(request: Request) {
                 orderBy: { timestamp: 'desc' },
             });
             const previousSignature = lastLog?.signature ?? 'GENESIS';
-            console.log(`[PROVISION_API] Previous log signature: ${previousSignature.substring(0, 10)}...`);
+            console.log(`[PROVISION_API_TX] Previous log signature found: ${previousSignature.substring(0, 10)}...`);
 
             const signature = await createEntrySignature(logEntryData, previousSignature);
-            console.log(`[PROVISION_API] New log signature: ${signature.substring(0, 10)}...`);
+            console.log(`[PROVISION_API_TX] New log signature calculated: ${signature.substring(0, 10)}...`);
             
             const newLogEntry = await tx.logEntry.create({
                 data: {
@@ -109,6 +114,7 @@ export async function POST(request: Request) {
                     signature,
                 },
             });
+            console.log(`[PROVISION_API_TX] Log entry created.`);
 
             console.log('[PROVISION_API] Transaction successful.');
             return { newEquipment, newDocument, newLogEntry };

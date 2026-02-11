@@ -108,7 +108,6 @@ function ProvisioningForm({
     description: ocrText,
   });
   const [isSaving, setIsSaving] = useState(false);
-  const { toast } = useToast();
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -119,20 +118,9 @@ function ProvisioningForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Client-side validation
-    const externalIdPattern = /^[A-Z0-9][A-Z0-9.-]*$/;
-    if (!formData.id || !externalIdPattern.test(formData.id)) {
-        toast({
-            variant: 'destructive',
-            title: 'ID Externe Invalide',
-            description: "Format incorrect. Ex: 'B1.PUMP.01' ou 'TG1'. Pas d'espaces ni de caractères spéciaux au début.",
-        });
-        return;
-    }
-
     setIsSaving(true);
     try {
+      console.log('[PROVISION_FORM] User submitted form with data:', formData);
       await onSave(formData);
     } catch(e) {
       // Error is already toasted in handleSaveProvision
@@ -156,8 +144,7 @@ function ProvisioningForm({
                     name="id"
                     value={formData.id}
                     onChange={handleChange}
-                    placeholder="ex: B1.PUMP.01A"
-                    required
+                    placeholder="ex: B1.PUMP.01A (Optionnel)"
                     />
                 </div>
                 <div className="space-y-2">
@@ -167,8 +154,7 @@ function ProvisioningForm({
                     name="name"
                     value={formData.name}
                     onChange={handleChange}
-                    placeholder="ex: Pompe de circulation"
-                    required
+                    placeholder="ex: Pompe de circulation (Optionnel)"
                     />
                 </div>
                 <div className="space-y-2">
@@ -178,8 +164,7 @@ function ProvisioningForm({
                     name="type"
                     value={formData.type}
                     onChange={handleChange}
-                    placeholder="ex: PUMP"
-                    required
+                    placeholder="ex: PUMP (Optionnel)"
                     />
                 </div>
                 </div>
@@ -219,7 +204,7 @@ function ProvisioningForm({
                 <X className="mr-2" />
                 Annuler
                 </Button>
-                <Button type="submit" disabled={!formData.id || isSaving}>
+                <Button type="submit" disabled={isSaving}>
                 {isSaving ? (
                     'Sauvegarde...'
                 ) : (
@@ -366,7 +351,7 @@ export function CameraView() {
         
         if (localVisualDb.length === 0) {
             console.warn('[IDENTIFY_FLOW] Local visual DB is empty. Identification cannot proceed.');
-            toast({ variant: 'destructive', title: 'Base locale vide', description: 'Aucune donnée visuelle à comparer. Veuillez provisionner des équipements.' });
+            toast({ variant: 'default', title: 'Base de données locale vide', description: 'Aucune donnée visuelle à comparer. Veuillez provisionner des équipements pour activer l\'identification.' });
             handleReset();
             return;
         }
@@ -468,7 +453,7 @@ export function CameraView() {
   };
 
   const handleSaveProvision = async (componentData: NewComponentFormData) => {
-    console.log('[PROVISION_FLOW] Starting save provision process for component:', componentData.id);
+    console.log('[PROVISION_FLOW] Starting save provision process for component:', componentData);
     try {
         const { addComponentAndDocument } = await import('@/lib/db-service');
 
@@ -486,16 +471,20 @@ export function CameraView() {
         const documentPayload = {
             imageData: capturedImage,
             ocrText: ocrText,
-            description: `Plaque signalétique pour ${componentData.id}`,
+            description: `Photo-provisionnement - ${new Date().toISOString()}`,
             perceptualHash,
         };
         
-        setStatusText('Sauvegarde...');
-        console.log('[PROVISION_FLOW] Saving component and document...');
+        const payloadForApi = { component: componentPayload, document: documentPayload };
+        console.log('[PROVISION_FLOW] Assembled payload for saving:', payloadForApi);
+
+        setStatusText('Sauvegarde en cours...');
+        console.log('[PROVISION_FLOW] Calling addComponentAndDocument...');
+        
         await addComponentAndDocument(componentPayload, documentPayload);
         
         console.log('[PROVISION_FLOW] Save complete.');
-        toast({ title: 'Succès', description: `La fiche pour le composant ${componentData.id} a été ajoutée.` });
+        toast({ title: 'Succès', description: `L'équipement a été provisionné.` });
         handleReset();
 
     } catch (error: any) {
