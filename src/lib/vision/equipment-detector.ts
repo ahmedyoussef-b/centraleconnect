@@ -178,24 +178,26 @@ export class EquipmentDetector {
     // Si le modèle n'a pas pu être chargé, utiliser la simulation
     if (!this.model) {
       console.warn('[EQUIPMENT_DETECTOR] Exécution en mode simulation.');
-      return Promise.resolve([
-          { equipmentType: 'TURBINE', originalClass: 'motor', confidence: 95, criticality: 'HIGH', icon: '⚙️', boundingBox: { x: 50, y: 50, width: 100, height: 100 }, rawScore: 0.95 },
-          { equipmentType: 'PUMP', originalClass: 'pump', confidence: 88, criticality: 'MEDIUM', icon: '💧', boundingBox: { x: 180, y: 120, width: 50, height: 70 }, rawScore: 0.88 },
-      ]);
+      return [
+        { equipmentType: 'TURBINE', originalClass: 'motor', confidence: 95, criticality: 'HIGH', icon: '⚙️', boundingBox: { x: 50, y: 50, width: 100, height: 100 }, rawScore: 0.95 },
+        { equipmentType: 'PUMP', originalClass: 'pump', confidence: 88, criticality: 'MEDIUM', icon: '💧', boundingBox: { x: 180, y: 120, width: 50, height: 70 }, rawScore: 0.88 },
+      ];
     }
 
     try {
-      // tf.tidy pour le nettoyage de la mémoire GPU
-      const predictions = await tf.tidy(async () => {
-        const tensor = tf.browser.fromPixels(image);
-        const result = await this.model!.detect(tensor, maxDetections);
-        tensor.dispose(); // Manually dispose tensor
-        return result;
-      });
-        
+      // Créer le tensor
+      const tensor = tf.browser.fromPixels(image);
+      
+      // Faire la détection
+      const predictions = await this.model.detect(tensor, maxDetections);
+      
+      // Nettoyer le tensor manuellement
+      tensor.dispose();
+      
+      // Filtrer et mapper les résultats
       const detections = predictions
-          .filter(pred => pred.score >= minConfidence)
-          .map(pred => this.mapToIndustrialDetection(pred));
+        .filter((pred: cocoSsd.DetectedObject) => pred.score >= minConfidence)
+        .map((pred: cocoSsd.DetectedObject) => this.mapToIndustrialDetection(pred));
 
       console.log(`[EQUIPMENT_DETECTOR] ${detections.length} détections trouvées via le modèle.`);
       return detections;
@@ -206,11 +208,10 @@ export class EquipmentDetector {
     }
   }
 
-
   /**
    * Mapper une détection COCO vers format industriel
    */
-  private mapToIndustrialDetection(pred: Detection): EquipmentDetection {
+  private mapToIndustrialDetection(pred: cocoSsd.DetectedObject): EquipmentDetection {
     const industrialInfo = INDUSTRIAL_MAPPING[pred.class] || {
       type: pred.class.toUpperCase().replace(' ', '_'),
       criticality: 'LOW' as const,

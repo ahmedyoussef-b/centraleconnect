@@ -174,7 +174,22 @@ function BoundingBox({
   const width = (box.width / imageWidth) * 100;
   const height = (box.height / imageHeight) * 100;
 
-  const color = detection.type === 'CIRCLE' ? 'border-blue-500' : 'border-green-500';
+  const colorMap: Record<Detection['type'], string> = {
+    CIRCLE: 'border-blue-500',
+    RECTANGLE: 'border-green-500',
+    TRIANGLE: 'border-purple-500',
+    LINE: 'border-yellow-500'
+  };
+
+  const bgColorMap: Record<Detection['type'], string> = {
+    CIRCLE: 'bg-blue-500',
+    RECTANGLE: 'bg-green-500',
+    TRIANGLE: 'bg-purple-500',
+    LINE: 'bg-yellow-500'
+  };
+
+  const color = colorMap[detection.type] || 'border-gray-500';
+  const bgColor = bgColorMap[detection.type] || 'bg-gray-500';
 
   return (
     <div 
@@ -186,7 +201,7 @@ function BoundingBox({
         height: `${height}%`
       }}
     >
-      <div className={`absolute -top-6 left-0 bg-${color.split('-')[1]}-500 text-white text-xs font-bold px-2 py-1 rounded`}>
+      <div className={`absolute -top-6 left-0 ${bgColor} text-white text-xs font-bold px-2 py-1 rounded`}>
         {detection.type} ({detection.confidence.toFixed(2)})
       </div>
     </div>
@@ -194,20 +209,29 @@ function BoundingBox({
 }
 
 function DetectionCard({ detection }: { detection: Detection }) {
-  const typeColor = {
+  const colorMap: Record<Detection['type'], string> = {
     CIRCLE: 'bg-blue-900 text-blue-300 border-blue-500',
     RECTANGLE: 'bg-green-900 text-green-300 border-green-500',
-    TRIANGLE: 'bg-purple-900 text-purple-300 border-purple-500'
+    TRIANGLE: 'bg-purple-900 text-purple-300 border-purple-500',
+    LINE: 'bg-yellow-900 text-yellow-300 border-yellow-500'
   };
 
+  const emojiMap: Record<Detection['type'], string> = {
+    CIRCLE: '⭕',
+    RECTANGLE: '□',
+    TRIANGLE: '△',
+    LINE: '─'
+  };
+
+  const colorClass = colorMap[detection.type] || 'bg-gray-900 text-gray-300 border-gray-500';
+  const emoji = emojiMap[detection.type] || '?';
+
   return (
-    <div className={`bg-gray-700 border-l-4 ${typeColor[detection.type]} p-4 rounded`}>
+    <div className={`bg-gray-700 border-l-4 ${colorClass} p-4 rounded`}>
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center space-x-3">
-          <div className={`w-12 h-12 ${typeColor[detection.type].split(' ')[0]} rounded-full flex items-center justify-center`}>
-            <span className="text-2xl">
-              {detection.type === 'CIRCLE' ? '⭕' : detection.type === 'RECTANGLE' ? '□' : '△'}
-            </span>
+          <div className={`w-12 h-12 ${colorClass.split(' ')[0]} rounded-full flex items-center justify-center`}>
+            <span className="text-2xl">{emoji}</span>
           </div>
           <div>
             <div className="font-bold text-lg">{detection.type}</div>
@@ -217,7 +241,7 @@ function DetectionCard({ detection }: { detection: Detection }) {
             </div>
           </div>
         </div>
-        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${typeColor[detection.type]}`}>
+        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${colorClass}`}>
           {detection.confidence.toFixed(2)}
         </span>
       </div>
