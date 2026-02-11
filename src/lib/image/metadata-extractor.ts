@@ -1,5 +1,5 @@
 // src/lib/image/metadata-extractor.ts
-import { exifr } from 'exifr';
+import exifr from 'exifr';
 
 export interface IndustrialImageMetadata {
   captureTimestamp: Date;          // Horodatage fiable (ISO 8601)
