@@ -28,4 +28,10 @@ export class FreeOpenCVService {
         { from: { x: 160, y: 105 }, to: { x: 200, y: 180 } }
       ]
   }
+
+  compareImages(imageA: ImageData, imageB: ImageData): number {
+      console.log('[OpenCVService] NOTE: compareImages is a placeholder, returning a random difference.');
+      // Return a mock difference score between 0 and 1
+      return Math.random();
+  }
 }
