@@ -12,6 +12,7 @@ import { extractIndustrialMetadata, type IndustrialImageMetadata } from '@/lib/i
 import { performIndustrialOCR, type OCRExtractionResult } from '@/lib/ocr/industrial-ocr';
 import { detectIndustrialCodes, type IndustrialCode } from '@/lib/vision/code-detector';
 import { EquipmentDetector, type EquipmentDetection } from '@/lib/vision/equipment-detector';
+import { PIDAnalyzer, type PIDAnalysis } from '@/lib/vision/pid-analyzer';
 
 
 interface AnalysisResults {
@@ -19,6 +20,7 @@ interface AnalysisResults {
   ocr: OCRExtractionResult;
   codes: IndustrialCode[];
   detections: EquipmentDetection[];
+  pid: PIDAnalysis | null;
 }
 
 export default function TestLecturePage() {
@@ -30,8 +32,10 @@ export default function TestLecturePage() {
   const imageRef = useRef<HTMLImageElement>(null);
   const { toast } = useToast();
   
-  // Initialiser le détecteur d'équipement
+  // Initialiser les détecteurs
   const detectorRef = useRef<EquipmentDetector | null>(null);
+  const pidAnalyzerRef = useRef<PIDAnalyzer | null>(null);
+
   useEffect(() => {
     detectorRef.current = new EquipmentDetector();
     detectorRef.current.initialize().catch(err => {
@@ -42,6 +46,7 @@ export default function TestLecturePage() {
             description: "Impossible de charger le modèle de détection d'objets.",
         });
     });
+    pidAnalyzerRef.current = new PIDAnalyzer();
   }, [toast]);
 
 
@@ -84,14 +89,15 @@ export default function TestLecturePage() {
       ctx.drawImage(imageBitmap, 0, 0);
       const imageDataForCodes = ctx.getImageData(0, 0, imageBitmap.width, imageBitmap.height);
 
-      const [metadata, ocr, codes, detections] = await Promise.all([
+      const [metadata, ocr, codes, detections, pid] = await Promise.all([
         extractIndustrialMetadata(imageBlob),
         performIndustrialOCR(fileImage, { zone: 'B1' }),
         detectIndustrialCodes(imageDataForCodes),
         detectorRef.current ? detectorRef.current.detect(imageRef.current) : Promise.resolve([]),
+        pidAnalyzerRef.current ? pidAnalyzerRef.current.analyze(imageDataForCodes) : Promise.resolve(null),
       ]);
       
-      setResults({ metadata, ocr, codes, detections });
+      setResults({ metadata, ocr, codes, detections, pid });
 
     } catch (e: any) {
       console.error("Analysis failed:", e);
@@ -181,6 +187,17 @@ export default function TestLecturePage() {
               </pre>
             </CardContent>
           </Card>
+
+          {results.pid && (
+            <Card>
+                <CardHeader><CardTitle>5. Analyse P&amp;ID (Simulation CV)</CardTitle></CardHeader>
+                <CardContent>
+                    <pre className="text-xs bg-muted p-4 rounded-md overflow-x-auto">
+                    {JSON.stringify(results.pid, null, 2)}
+                    </pre>
+                </CardContent>
+            </Card>
+          )}
         </div>
       )}
     </div>
