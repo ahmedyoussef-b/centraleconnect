@@ -1,5 +1,5 @@
 // src/lib/ocr/industrial-ocr.ts
-import Tesseract from 'tesseract.js';
+import Tesseract, { PSM } from 'tesseract.js';
 import { EquipmentTagParser, type EquipmentTag, type ParameterValue, type SafetyLabel } from './tag-parser';
 
 export interface OCRExtractionResult {
@@ -20,10 +20,11 @@ export const performIndustrialOCR = async (
     cacheMethod: 'none', // Désactiver cache pour données critiques
   });
 
+  // ✅ CORRECTION : Utiliser l'enum PSM au lieu d'une chaîne
   await worker.setParameters({
     tessedit_char_whitelist: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_.:/°%barMPakg', // Caractères industriels
     preserve_interword_spaces: '1',
-    tessedit_pageseg_mode: 6 as const,
+    tessedit_pageseg_mode: PSM.SINGLE_BLOCK, // ✅ Utilisation de l'enum PSM (valeur 6)
   });
 
   const { data: { text, confidence } } = await worker.recognize(imageData);
