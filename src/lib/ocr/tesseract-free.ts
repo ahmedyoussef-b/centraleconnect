@@ -24,6 +24,8 @@ export class FreeOCREngine {
       TEMP = 585 °C
       FLOW: 418.2 m3/h
       VIBRATION: 2.1 mm/s
+      ATTENTION: HAUTE TENSION
+      DANGER: RISQUE D'EXPLOSION
     `;
     
     return {

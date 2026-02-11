@@ -15,6 +15,8 @@ import { EquipmentDetector, type EquipmentDetection } from '@/lib/vision/equipme
 import { PIDAnalyzer, type PIDAnalysis } from '@/lib/vision/pid-analyzer';
 import { FaultDetector, type Fault } from '@/lib/vision/fault-detector';
 import { ParameterExtractor, type Parameter } from '@/lib/ocr/parameter-extractor';
+import { SafetyLabelDetector, type SafetyLabel } from '@/lib/ocr/safety-label-detector';
+
 
 interface AnalysisResults {
   metadata: IndustrialImageMetadata;
@@ -24,6 +26,7 @@ interface AnalysisResults {
   pid: PIDAnalysis | null;
   faults: Fault[];
   parameters: Parameter[];
+  safetyLabels: SafetyLabel[];
 }
 
 export default function TestLecturePage() {
@@ -40,6 +43,7 @@ export default function TestLecturePage() {
   const pidAnalyzerRef = useRef<PIDAnalyzer | null>(null);
   const faultDetectorRef = useRef<FaultDetector | null>(null);
   const parameterExtractorRef = useRef<ParameterExtractor | null>(null);
+  const safetyLabelDetectorRef = useRef<SafetyLabelDetector | null>(null);
 
   useEffect(() => {
     detectorRef.current = new EquipmentDetector();
@@ -62,6 +66,7 @@ export default function TestLecturePage() {
         });
     });
     parameterExtractorRef.current = new ParameterExtractor();
+    safetyLabelDetectorRef.current = new SafetyLabelDetector();
   }, [toast]);
 
 
@@ -104,7 +109,7 @@ export default function TestLecturePage() {
       ctx.drawImage(imageBitmap, 0, 0);
       const imageDataForCodes = ctx.getImageData(0, 0, imageBitmap.width, imageBitmap.height);
 
-      const [metadata, ocr, codes, detections, pid, faults, parameters] = await Promise.all([
+      const [metadata, ocr, codes, detections, pid, faults, parameters, safetyLabels] = await Promise.all([
         extractIndustrialMetadata(imageBlob),
         performIndustrialOCR(fileImage, { zone: 'B1' }),
         detectIndustrialCodes(imageDataForCodes),
@@ -112,9 +117,10 @@ export default function TestLecturePage() {
         pidAnalyzerRef.current ? pidAnalyzerRef.current.analyze(imageDataForCodes) : Promise.resolve(null),
         faultDetectorRef.current ? faultDetectorRef.current.detect(imageRef.current) : Promise.resolve([]),
         parameterExtractorRef.current ? parameterExtractorRef.current.extract(imageRef.current) : Promise.resolve([]),
+        safetyLabelDetectorRef.current ? safetyLabelDetectorRef.current.detect(imageRef.current) : Promise.resolve([]),
       ]);
       
-      setResults({ metadata, ocr, codes, detections, pid, faults, parameters });
+      setResults({ metadata, ocr, codes, detections, pid, faults, parameters, safetyLabels });
 
     } catch (e: any) {
       console.error("Analysis failed:", e);
@@ -175,8 +181,18 @@ export default function TestLecturePage() {
               </CardContent>
             </Card>
           )}
+          {results.safetyLabels.length > 0 && (
+            <Card>
+                <CardHeader><CardTitle>2. Détection d'Étiquettes de Sécurité</CardTitle></CardHeader>
+                <CardContent>
+                    <pre className="text-xs bg-muted p-4 rounded-md overflow-x-auto">
+                    {JSON.stringify(results.safetyLabels, null, 2)}
+                    </pre>
+                </CardContent>
+            </Card>
+          )}
            <Card>
-            <CardHeader><CardTitle>2. Détection d'Équipements (IA)</CardTitle></CardHeader>
+            <CardHeader><CardTitle>3. Détection d'Équipements (IA)</CardTitle></CardHeader>
             <CardContent>
               <pre className="text-xs bg-muted p-4 rounded-md overflow-x-auto">
                 {JSON.stringify(results.detections, null, 2)}
@@ -184,7 +200,7 @@ export default function TestLecturePage() {
             </CardContent>
           </Card>
           <Card>
-            <CardHeader><CardTitle>3. Métadonnées EXIF</CardTitle></CardHeader>
+            <CardHeader><CardTitle>4. Métadonnées EXIF</CardTitle></CardHeader>
             <CardContent>
               <pre className="text-xs bg-muted p-4 rounded-md overflow-x-auto">
                 {JSON.stringify(results.metadata, (key, value) => {
@@ -198,7 +214,7 @@ export default function TestLecturePage() {
           </Card>
           
           <Card>
-            <CardHeader><CardTitle>4. OCR (Reconnaissance de Texte)</CardTitle></CardHeader>
+            <CardHeader><CardTitle>5. OCR (Reconnaissance de Texte)</CardTitle></CardHeader>
             <CardContent>
               <pre className="text-xs bg-muted p-4 rounded-md overflow-x-auto">
                 {JSON.stringify(results.ocr, null, 2)}
@@ -207,7 +223,7 @@ export default function TestLecturePage() {
           </Card>
 
           <Card>
-            <CardHeader><CardTitle>5. Détection de Codes (QR & Barcodes)</CardTitle></CardHeader>
+            <CardHeader><CardTitle>6. Détection de Codes (QR & Barcodes)</CardTitle></CardHeader>
             <CardContent>
               <pre className="text-xs bg-muted p-4 rounded-md overflow-x-auto">
                 {JSON.stringify(results.codes, null, 2)}
@@ -217,7 +233,7 @@ export default function TestLecturePage() {
 
           {results.parameters.length > 0 && (
             <Card>
-                <CardHeader><CardTitle>6. Paramètres de Performance (OCR)</CardTitle></CardHeader>
+                <CardHeader><CardTitle>7. Paramètres de Performance (OCR)</CardTitle></CardHeader>
                 <CardContent>
                     <pre className="text-xs bg-muted p-4 rounded-md overflow-x-auto">
                     {JSON.stringify(results.parameters, null, 2)}
@@ -228,7 +244,7 @@ export default function TestLecturePage() {
 
           {results.pid && (
             <Card>
-                <CardHeader><CardTitle>7. Analyse P&amp;ID (Simulation CV)</CardTitle></CardHeader>
+                <CardHeader><CardTitle>8. Analyse P&amp;ID (Simulation CV)</CardTitle></CardHeader>
                 <CardContent>
                     <pre className="text-xs bg-muted p-4 rounded-md overflow-x-auto">
                     {JSON.stringify(results.pid, null, 2)}
