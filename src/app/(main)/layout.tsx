@@ -64,7 +64,7 @@ const pageTitles: { [key: string]: string } = {
     '/provisioning': 'Analyse Visuelle',
     '/sync': 'Synchronisation',
     '/test': 'Page de Test',
-    '/test-lecture': 'Test de Lecture',
+    '/test-lecture': 'Diagnostic Visuel',
 };
 
 function PidModal() {
@@ -203,10 +203,10 @@ function MainLayoutContent({ children }: { children: React.ReactNode }) {
                   </SidebarMenuButton>
               </SidebarMenuItem>
                <SidebarMenuItem>
-                  <SidebarMenuButton asChild tooltip="Test Lecture" isActive={pathname === '/test-lecture'}>
+                  <SidebarMenuButton asChild tooltip="Diagnostic Visuel" isActive={pathname === '/test-lecture'}>
                       <Link href="/test-lecture">
                           <Search />
-                          Test Lecture
+                          Diagnostic Visuel
                       </Link>
                   </SidebarMenuButton>
               </SidebarMenuItem>

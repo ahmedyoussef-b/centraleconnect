@@ -2,7 +2,8 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { FileUp, Search, LoaderCircle } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { FileUp, Search, LoaderCircle, AlertTriangle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -42,6 +43,7 @@ export default function TestLecturePage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
   const { toast } = useToast();
+  const router = useRouter();
   
   // Initialiser les détecteurs
   const detectorRef = useRef<EquipmentDetector | null>(null);
@@ -152,7 +154,7 @@ export default function TestLecturePage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Search />
-            Test de Lecture d'Image
+            Diagnostic Visuel
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -183,18 +185,24 @@ export default function TestLecturePage() {
       {results && (
         <div className="space-y-4">
           {results.faults.length > 0 && (
-            <Card>
-              <CardHeader><CardTitle>1. Détection de Défauts (Anomalies)</CardTitle></CardHeader>
-              <CardContent>
-                <pre className="text-xs bg-muted p-4 rounded-md overflow-x-auto">
-                  {JSON.stringify(results.faults, null, 2)}
-                </pre>
-              </CardContent>
-            </Card>
+             <Alert variant="destructive">
+                <AlertTriangle className="h-4 w-4" />
+                <AlertTitle>Anomalies Détectées !</AlertTitle>
+                <AlertDescription>
+                    <ul className="list-disc pl-5 mt-2 space-y-1">
+                        {results.faults.map((fault, index) => (
+                            <li key={index}>
+                                <strong>{fault.faultType}</strong> détecté avec une confiance de {fault.confidence.toFixed(0)}% (Sévérité: {fault.severity}).
+                            </li>
+                        ))}
+                    </ul>
+                </AlertDescription>
+            </Alert>
           )}
+
           {results.safetyLabels.length > 0 && (
             <Card>
-                <CardHeader><CardTitle>2. Détection d'Étiquettes de Sécurité</CardTitle></CardHeader>
+                <CardHeader><CardTitle>Étiquettes de Sécurité</CardTitle></CardHeader>
                 <CardContent>
                     <pre className="text-xs bg-muted p-4 rounded-md overflow-x-auto">
                     {JSON.stringify(results.safetyLabels, null, 2)}
@@ -202,16 +210,49 @@ export default function TestLecturePage() {
                 </CardContent>
             </Card>
           )}
+
            <Card>
-            <CardHeader><CardTitle>3. Détection d'Équipements (IA)</CardTitle></CardHeader>
-            <CardContent>
-              <pre className="text-xs bg-muted p-4 rounded-md overflow-x-auto">
-                {JSON.stringify(results.detections, null, 2)}
-              </pre>
-            </CardContent>
-          </Card>
+                <CardHeader><CardTitle>Détection d'Équipements (IA)</CardTitle></CardHeader>
+                <CardContent>
+                    {results.detections.length > 0 ? (
+                    <div className="space-y-2">
+                        {results.detections.map((detection, index) => (
+                        <div key={index} className="flex items-center justify-between p-2 rounded-md bg-muted">
+                            <div>
+                            <span className="font-semibold">{detection.equipmentType}</span>
+                            <span className="text-sm text-muted-foreground ml-2">({detection.confidence.toFixed(0)}%)</span>
+                            </div>
+                            <Button size="sm" variant="outline" onClick={() => router.push(`/equipments/${detection.equipmentType}`)}>Voir détails</Button>
+                        </div>
+                        ))}
+                    </div>
+                    ) : <p className="text-muted-foreground">Aucun équipement détecté.</p>}
+                </CardContent>
+            </Card>
+
+            <Card>
+                <CardHeader><CardTitle>Détection de Codes (QR & Barcodes)</CardTitle></CardHeader>
+                <CardContent>
+                    {results.codes.length > 0 ? (
+                    <div className="space-y-2">
+                        {results.codes.map((code, index) => (
+                        <div key={index} className="flex items-center justify-between p-2 rounded-md bg-muted">
+                            <div>
+                            <span className="font-semibold">{code.type}</span>
+                            <p className="text-sm text-muted-foreground font-mono">{code.content}</p>
+                            </div>
+                            {code.equipmentId && (
+                            <Button size="sm" variant="outline" onClick={() => router.push(`/equipments/${encodeURIComponent(code.equipmentId!)}`)}>Voir {code.equipmentId}</Button>
+                            )}
+                        </div>
+                        ))}
+                    </div>
+                    ) : <p className="text-muted-foreground">Aucun code détecté.</p>}
+                </CardContent>
+            </Card>
+
           <Card>
-            <CardHeader><CardTitle>4. Métadonnées EXIF</CardTitle></CardHeader>
+            <CardHeader><CardTitle>Métadonnées EXIF</CardTitle></CardHeader>
             <CardContent>
               <pre className="text-xs bg-muted p-4 rounded-md overflow-x-auto">
                 {JSON.stringify(results.metadata, (key, value) => {
@@ -225,7 +266,7 @@ export default function TestLecturePage() {
           </Card>
           
           <Card>
-            <CardHeader><CardTitle>5. OCR (Reconnaissance de Texte)</CardTitle></CardHeader>
+            <CardHeader><CardTitle>OCR (Reconnaissance de Texte)</CardTitle></CardHeader>
             <CardContent>
               <pre className="text-xs bg-muted p-4 rounded-md overflow-x-auto">
                 {JSON.stringify(results.ocr, null, 2)}
@@ -233,18 +274,9 @@ export default function TestLecturePage() {
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader><CardTitle>6. Détection de Codes (QR & Barcodes)</CardTitle></CardHeader>
-            <CardContent>
-              <pre className="text-xs bg-muted p-4 rounded-md overflow-x-auto">
-                {JSON.stringify(results.codes, null, 2)}
-              </pre>
-            </CardContent>
-          </Card>
-
           {results.parameters.length > 0 && (
             <Card>
-                <CardHeader><CardTitle>7. Paramètres de Performance (OCR)</CardTitle></CardHeader>
+                <CardHeader><CardTitle>Paramètres de Performance (OCR)</CardTitle></CardHeader>
                 <CardContent>
                     <pre className="text-xs bg-muted p-4 rounded-md overflow-x-auto">
                     {JSON.stringify(results.parameters, null, 2)}
@@ -255,7 +287,7 @@ export default function TestLecturePage() {
 
           {results.environment && (
             <Card>
-                <CardHeader><CardTitle>8. Analyse de l'Environnement (Zone)</CardTitle></CardHeader>
+                <CardHeader><CardTitle>Analyse de l'Environnement (Zone)</CardTitle></CardHeader>
                 <CardContent>
                     <pre className="text-xs bg-muted p-4 rounded-md overflow-x-auto">
                     {JSON.stringify(results.environment, null, 2)}
@@ -266,7 +298,7 @@ export default function TestLecturePage() {
           
           {results.pid && (
             <Card>
-                <CardHeader><CardTitle>9. Analyse P&amp;ID (Simulation CV)</CardTitle></CardHeader>
+                <CardHeader><CardTitle>Analyse P&amp;ID (Simulation CV)</CardTitle></CardHeader>
                 <CardContent>
                     <pre className="text-xs bg-muted p-4 rounded-md overflow-x-auto">
                     {JSON.stringify(results.pid, null, 2)}
@@ -277,7 +309,7 @@ export default function TestLecturePage() {
 
           {results.signatures.length > 0 && (
             <Card>
-                <CardHeader><CardTitle>10. Signatures Manuscrites</CardTitle></CardHeader>
+                <CardHeader><CardTitle>Signatures Manuscrites</CardTitle></CardHeader>
                 <CardContent>
                     <pre className="text-xs bg-muted p-4 rounded-md overflow-x-auto">
                     {JSON.stringify(results.signatures, null, 2)}
