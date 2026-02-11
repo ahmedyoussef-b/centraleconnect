@@ -163,3 +163,18 @@ export interface SynopticItem {
   approvedBy?: string;
   approvalDate?: string;
 }
+
+export interface AlarmEvent {
+  id: number;
+  timestamp: string;
+  isActive: boolean;
+  details?: string | null;
+  alarmCode: string;
+}
+
+export interface ScadaData {
+  id: number;
+  timestamp: string;
+  value: number;
+  equipmentId: string;
+}

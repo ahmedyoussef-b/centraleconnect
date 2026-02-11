@@ -6,7 +6,9 @@ import type {
   LogEntryType, 
   Parameter, 
   Annotation,
-  Document
+  Document,
+  AlarmEvent,
+  ScadaData
 } from '@/types/db';
 
 // Client-side data imports
@@ -88,7 +90,7 @@ CREATE TABLE IF NOT EXISTS log_entries (
     FOREIGN KEY (equipment_id) REFERENCES equipments(external_id) ON DELETE CASCADE
 );
 CREATE TABLE IF NOT EXISTS alarm_events (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  id INTEGER PRIMARY KEY,
   timestamp TEXT NOT NULL,
   is_active BOOLEAN NOT NULL,
   details TEXT,
@@ -96,14 +98,14 @@ CREATE TABLE IF NOT EXISTS alarm_events (
   FOREIGN KEY (alarm_code) REFERENCES alarms(code) ON DELETE CASCADE
 );
 CREATE TABLE IF NOT EXISTS scada_data (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  id INTEGER PRIMARY KEY,
   timestamp TEXT NOT NULL,
   value REAL NOT NULL,
   equipment_id TEXT NOT NULL,
   FOREIGN KEY (equipment_id) REFERENCES equipments(external_id) ON DELETE CASCADE
 );
 CREATE TABLE IF NOT EXISTS annotations (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id INTEGER PRIMARY KEY,
     timestamp TEXT NOT NULL,
     text TEXT NOT NULL,
     operator TEXT NOT NULL,
@@ -655,6 +657,30 @@ export async function syncWithRemote(): Promise<{ synced: number; cleaned: boole
             console.log(`[SYNC_FLOW] Syncing ${data.synopticItems.length} synoptic items...`);
             for (const item of data.synopticItems) {
                 await invoke('plugin:sql|execute', { db, query: 'INSERT OR IGNORE INTO synoptic_items (external_id, name, type, parent_id, group_path, element_id, level, approved_by, approval_date) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)', values: [item.externalId, item.name, item.type, item.parentId, item.groupPath, item.elementId, item.level, item.approvedBy, item.approvalDate] });
+                totalSynced++;
+            }
+        }
+
+        if (data.annotations?.length > 0) {
+            console.log(`[SYNC_FLOW] Syncing ${data.annotations.length} annotations...`);
+            for (const item of data.annotations as Annotation[]) {
+                await invoke('plugin:sql|execute', { db, query: 'INSERT OR IGNORE INTO annotations (id, timestamp, text, operator, x_pos, y_pos, equipment_id) VALUES ($1, $2, $3, $4, $5, $6, $7)', values: [item.id, item.timestamp, item.text, item.operator, item.xPos, item.yPos, item.equipmentId] });
+                totalSynced++;
+            }
+        }
+
+        if (data.alarmEvents?.length > 0) {
+            console.log(`[SYNC_FLOW] Syncing ${data.alarmEvents.length} alarm events...`);
+            for (const item of data.alarmEvents as AlarmEvent[]) {
+                await invoke('plugin:sql|execute', { db, query: 'INSERT OR IGNORE INTO alarm_events (id, timestamp, is_active, details, alarm_code) VALUES ($1, $2, $3, $4, $5)', values: [item.id, item.timestamp, item.isActive, item.details, item.alarmCode] });
+                totalSynced++;
+            }
+        }
+
+        if (data.scadaData?.length > 0) {
+            console.log(`[SYNC_FLOW] Syncing ${data.scadaData.length} SCADA data points...`);
+            for (const item of data.scadaData as ScadaData[]) {
+                await invoke('plugin:sql|execute', { db, query: 'INSERT OR IGNORE INTO scada_data (id, timestamp, value, equipment_id) VALUES ($1, $2, $3, $4)', values: [item.id, item.timestamp, item.value, item.equipmentId] });
                 totalSynced++;
             }
         }

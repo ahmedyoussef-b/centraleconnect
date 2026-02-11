@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 export async function GET() {
   console.log("[SYNC_DATA_API] Received request to fetch remote data for synchronization.");
   try {
-    const [equipments, documents, parameters, alarms, logEntries, procedures, synopticItems] = await Promise.all([
+    const [equipments, documents, parameters, alarms, logEntries, procedures, synopticItems, annotations, alarmEvents, scadaData] = await Promise.all([
       prisma.equipment.findMany(),
       prisma.document.findMany(),
       prisma.parameter.findMany(),
@@ -14,6 +14,9 @@ export async function GET() {
       prisma.logEntry.findMany({ orderBy: { timestamp: 'asc' } }), // Important to get them in order for signature chaining
       prisma.procedure.findMany(),
       prisma.synopticItem.findMany(),
+      prisma.annotation.findMany(),
+      prisma.alarmEvent.findMany(),
+      prisma.scadaData.findMany(),
     ]);
     
     const dataPayload = {
@@ -23,7 +26,10 @@ export async function GET() {
       alarms,
       logEntries,
       procedures,
-      synopticItems
+      synopticItems,
+      annotations,
+      alarmEvents,
+      scadaData,
     };
     
     console.log(`[SYNC_DATA_API] Sending data payload: ${equipments.length} equipments, ${documents.length} documents, ${logEntries.length} log entries.`);

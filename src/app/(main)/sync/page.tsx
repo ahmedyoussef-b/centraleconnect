@@ -11,13 +11,16 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { useToast } from '@/hooks/use-toast';
 import { useSync } from '@/contexts/sync-context';
 import { syncWithRemote } from '@/lib/db-service';
-import type { Equipment, Document, LogEntry } from '@/types/db';
+import type { Equipment, Document, LogEntry, Annotation, AlarmEvent, ScadaData } from '@/types/db';
+
 
 interface RemoteData {
     equipments: Equipment[];
     documents: Document[];
     logEntries: LogEntry[];
-    // Add other tables as needed
+    annotations: Annotation[];
+    alarmEvents: AlarmEvent[];
+    scadaData: ScadaData[];
 }
 
 
@@ -42,7 +45,12 @@ export default function SyncPage() {
             }
             const data: RemoteData = await response.json();
             
-            const totalCount = (data.equipments?.length || 0) + (data.documents?.length || 0) + (data.logEntries?.length || 0);
+            const totalCount = (data.equipments?.length || 0) + 
+                               (data.documents?.length || 0) + 
+                               (data.logEntries?.length || 0) +
+                               (data.annotations?.length || 0) +
+                               (data.alarmEvents?.length || 0) +
+                               (data.scadaData?.length || 0);
             
             setRemoteData(data);
             setFilteredEquipments(data.equipments || []);
