@@ -425,87 +425,70 @@ export async function addComponentAndDocument(
 ): Promise<void> {
     const isTauri = typeof window !== 'undefined' && window.__TAURI__;
     
-    // --- Handle optional fields (for both local and remote) ---
-    const finalExternalId = component.externalId?.trim() || `PROV-${Date.now()}`;
-    const finalName = component.name?.trim() || `Équipement non spécifié - ${finalExternalId}`;
-    const finalType = component.type?.trim() || `INCONNU`;
-
-    const finalComponent = { externalId: finalExternalId, name: finalName, type: finalType };
+    if (!isTauri) {
+        throw new Error("addComponentAndDocument is only available in the Tauri environment for direct local database access.");
+    }
     
-    if (isTauri) {
-        console.log('[PROVISION_FLOW_LOCAL] Saving to local Tauri database with data:', { component: finalComponent, document: {...document, imageData: '...omitted...'} });
-        await initializeDatabase();
-        const db = await invoke('plugin:sql|load', { db: DB_NAME });
+    console.log('[PROVISION_FLOW_LOCAL] Saving to local Tauri database with data:', { component, document: {...document, imageData: '...omitted...'} });
+    await initializeDatabase();
+    const db = await invoke('plugin:sql|load', { db: DB_NAME });
 
-        console.log(`[PROVISION_FLOW_LOCAL] Checking for existing equipment with ID: ${finalComponent.externalId}`);
-        const existing: any[] = await invoke('plugin:sql|select', { db, query: 'SELECT 1 FROM equipments WHERE external_id = $1', values: [finalComponent.externalId]});
-        if (existing.length > 0) {
-            console.error(`[PROVISION_FLOW_LOCAL] Conflict: Equipment ID '${finalComponent.externalId}' already exists.`);
-            throw new Error(`L'équipement avec l'ID '${finalComponent.externalId}' existe déjà.`);
-        }
+    console.log(`[PROVISION_FLOW_LOCAL] Checking for existing equipment with ID: ${component.externalId}`);
+    const existing: any[] = await invoke('plugin:sql|select', { db, query: 'SELECT 1 FROM equipments WHERE external_id = $1', values: [component.externalId]});
+    if (existing.length > 0) {
+        console.error(`[PROVISION_FLOW_LOCAL] Conflict: Equipment ID '${component.externalId}' already exists.`);
+        throw new Error(`L'équipement avec l'ID '${component.externalId}' existe déjà.`);
+    }
 
-        // Transaction
-        const txId = await invoke('plugin:sql|begin', { db });
-        console.log(`[PROVISION_FLOW_LOCAL] Started transaction.`);
-        try {
-            // 1. Insert equipment
-            await invoke('plugin:sql|execute', {
-                db,
-                query: 'INSERT INTO equipments (external_id, name, type, version, is_immutable) VALUES ($1, $2, $3, 1, 0)',
-                values: [finalComponent.externalId, finalComponent.name, finalComponent.type]
-            });
-            console.log(`[PROVISION_FLOW_LOCAL_TX] Inserted equipment: ${finalComponent.externalId}`);
-
-            // 2. Insert document
-            await invoke('plugin:sql|execute', {
-                db,
-                query: 'INSERT INTO documents (equipment_id, image_data, ocr_text, description, created_at, perceptual_hash) VALUES ($1, $2, $3, $4, $5, $6)',
-                values: [finalComponent.externalId, document.imageData, document.ocrText, document.description, new Date().toISOString(), document.perceptualHash]
-            });
-            console.log(`[PROVISION_FLOW_LOCAL_TX] Inserted document for ${finalComponent.externalId}`);
-
-
-            // 3. Insert log entry
-            const lastEntry: { signature: string }[] = await invoke('plugin:sql|select', {
-                db,
-                query: 'SELECT signature FROM log_entries ORDER BY timestamp DESC LIMIT 1'
-            });
-            const previousSignature = lastEntry[0]?.signature ?? 'GENESIS';
-            const timestamp = new Date().toISOString().replace('T', ' ').slice(0, 19);
-            const logMessage = `Nouvel équipement '${finalComponent.externalId}' ajouté via provisionnement local.`;
-            const newEntryData = { type: 'DOCUMENT_ADDED', source: 'Provisioning Local', message: logMessage, equipmentId: finalComponent.externalId, timestamp };
-            const signature = await createEntrySignature(newEntryData, previousSignature);
-
-            await invoke('plugin:sql|execute', {
-                db,
-                query: 'INSERT INTO log_entries (timestamp, type, source, message, equipment_id, signature) VALUES ($1, $2, $3, $4, $5, $6)',
-                values: [timestamp, 'DOCUMENT_ADDED', 'Provisioning Local', logMessage, finalComponent.externalId, signature],
-            });
-            console.log(`[PROVISION_FLOW_LOCAL_TX] Inserted log entry for ${finalComponent.externalId}`);
-
-            await invoke('plugin:sql|commit', { db });
-            console.log(`[PROVISION_FLOW_LOCAL] Transaction committed successfully.`);
-
-        } catch (e) {
-            await invoke('plugin:sql|rollback', { db });
-            console.error("[PROVISION_FLOW_LOCAL] Transaction failed, rolling back:", e);
-            if (e instanceof Error) {
-                throw new Error(`Erreur de base de données locale: ${e.message}`);
-            }
-            throw new Error("Une erreur inconnue est survenue lors de la sauvegarde locale.");
-        }
-    } else {
-        console.log('[PROVISION_FLOW_REMOTE] Saving to remote server via API with data:', { component: finalComponent, document: {...document, imageData: '...omitted...'} });
-        const payload = { component: finalComponent, document };
-        const response = await fetch('/api/provision', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
+    // Transaction
+    const txId = await invoke('plugin:sql|begin', { db });
+    console.log(`[PROVISION_FLOW_LOCAL] Started transaction.`);
+    try {
+        // 1. Insert equipment
+        await invoke('plugin:sql|execute', {
+            db,
+            query: 'INSERT INTO equipments (external_id, name, type, version, is_immutable) VALUES ($1, $2, $3, 1, 0)',
+            values: [component.externalId, component.name, component.type]
         });
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || `Erreur HTTP: ${response.status}`);
+        console.log(`[PROVISION_FLOW_LOCAL_TX] Inserted equipment: ${component.externalId}`);
+
+        // 2. Insert document
+        await invoke('plugin:sql|execute', {
+            db,
+            query: 'INSERT INTO documents (equipment_id, image_data, ocr_text, description, created_at, perceptual_hash) VALUES ($1, $2, $3, $4, $5, $6)',
+            values: [component.externalId, document.imageData, document.ocrText, document.description, new Date().toISOString(), document.perceptualHash]
+        });
+        console.log(`[PROVISION_FLOW_LOCAL_TX] Inserted document for ${component.externalId}`);
+
+
+        // 3. Insert log entry
+        const lastEntry: { signature: string }[] = await invoke('plugin:sql|select', {
+            db,
+            query: 'SELECT signature FROM log_entries ORDER BY timestamp DESC LIMIT 1'
+        });
+        const previousSignature = lastEntry[0]?.signature ?? 'GENESIS';
+        const timestamp = new Date().toISOString().replace('T', ' ').slice(0, 19);
+        const logMessage = `Nouvel équipement '${component.externalId}' ajouté via provisionnement local.`;
+        const newEntryData = { type: 'DOCUMENT_ADDED', source: 'Provisioning Local', message: logMessage, equipmentId: component.externalId, timestamp };
+        const signature = await createEntrySignature(newEntryData, previousSignature);
+
+        await invoke('plugin:sql|execute', {
+            db,
+            query: 'INSERT INTO log_entries (timestamp, type, source, message, equipment_id, signature) VALUES ($1, $2, $3, $4, $5, $6)',
+            values: [timestamp, 'DOCUMENT_ADDED', 'Provisioning Local', logMessage, component.externalId, signature],
+        });
+        console.log(`[PROVISION_FLOW_LOCAL_TX] Inserted log entry for ${component.externalId}`);
+
+        await invoke('plugin:sql|commit', { db });
+        console.log(`[PROVISION_FLOW_LOCAL] Transaction committed successfully.`);
+
+    } catch (e) {
+        await invoke('plugin:sql|rollback', { db });
+        console.error("[PROVISION_FLOW_LOCAL] Transaction failed, rolling back:", e);
+        if (e instanceof Error) {
+            throw new Error(`Erreur de base de données locale: ${e.message}`);
         }
+        throw new Error("Une erreur inconnue est survenue lors de la sauvegarde locale.");
     }
 }
 

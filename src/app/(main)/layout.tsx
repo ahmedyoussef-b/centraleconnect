@@ -13,6 +13,7 @@ import {
   LayoutDashboard,
   LayoutGrid,
   Settings,
+  RefreshCw,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -36,6 +37,8 @@ import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { PidViewerProvider, usePidViewer } from '@/contexts/pid-viewer-context';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import PidViewer from '@/components/PidViewer';
+import { SyncProvider, useSync } from '@/contexts/sync-context';
+import { Badge } from '@/components/ui/badge';
 
 const VocalAssistant = dynamic(
   () =>
@@ -53,13 +56,12 @@ const VocalAssistant = dynamic(
 const pageTitles: { [key: string]: string } = {
     '/dashboard': 'Tableau de Bord',
     '/synoptic': 'Synoptique Interactif',
-    '/scada': 'Supervision SCADA',
     '/alarms': 'Liste des Alarmes',
     '/procedures': 'Procédures',
     '/equipments': 'Équipements',
     '/logbook': 'Journal de Bord',
     '/provisioning': 'Analyse Visuelle',
-    '/settings': 'Paramètres',
+    '/sync': 'Synchronisation',
     '/test': 'Page de Test',
 };
 
@@ -84,25 +86,25 @@ function PidModal() {
     );
 }
 
-export default function MainLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const pathname = usePathname();
-  const userAvatar = PlaceHolderImages.find((p) => p.id === 'user-avatar');
+
+function MainLayoutContent({ children }: { children: React.ReactNode }) {
+    const pathname = usePathname();
+    const userAvatar = PlaceHolderImages.find((p) => p.id === 'user-avatar');
+    const { pendingSyncCount } = useSync();
   
-  let title: string;
-  if (pathname.startsWith('/equipments/')) {
-    title = 'Détail Équipement';
-  } else if (pathname.startsWith('/procedures/')) {
-    title = 'Exécution Procédure';
-  } else {
-    title = pageTitles[pathname] ?? 'CCPP Monitor';
-  }
+    let title: string;
+    if (pathname.startsWith('/equipments/')) {
+        title = 'Détail Équipement';
+    } else if (pathname.startsWith('/procedures/')) {
+        title = 'Exécution Procédure';
+    } else if (pathname.startsWith('/sync')) {
+        title = 'Synchronisation';
+    }
+    else {
+        title = pageTitles[pathname] ?? 'CCPP Monitor';
+    }
 
-
-  return (
+    return (
     <PidViewerProvider>
       <SidebarProvider>
         <Sidebar>
@@ -178,6 +180,19 @@ export default function MainLayout({
                   </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
+                <SidebarMenuButton asChild tooltip="Synchronisation" isActive={pathname === '/sync'}>
+                    <Link href="/sync">
+                        <RefreshCw />
+                        <span>Synchronisation</span>
+                        {pendingSyncCount > 0 && (
+                            <Badge variant="destructive" className="ml-auto group-data-[collapsible=icon]:hidden">
+                            {pendingSyncCount}
+                            </Badge>
+                        )}
+                    </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
                   <SidebarMenuButton asChild tooltip="Test" isActive={pathname === '/test'}>
                       <Link href="/test">
                           <FlaskConical />
@@ -238,5 +253,14 @@ export default function MainLayout({
         <PidModal />
       </SidebarProvider>
     </PidViewerProvider>
-  );
+    );
+}
+
+
+export default function MainLayout({ children }: { children: React.ReactNode; }) {
+    return (
+        <SyncProvider>
+            <MainLayoutContent>{children}</MainLayoutContent>
+        </SyncProvider>
+    );
 }

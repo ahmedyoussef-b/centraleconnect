@@ -17,6 +17,7 @@ import type { Component } from '@/types/db';
 import { computePHash, compareHashes } from '@/lib/image-hashing';
 import { cn } from '@/lib/utils';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useSync } from '@/contexts/sync-context';
 
 type ViewMode = 'idle' | 'scanning' | 'provisioning' | 'result';
 type AnalysisMode = 'camera' | 'file';
@@ -36,7 +37,8 @@ interface ScanResult {
   similarity: number;
 }
 
-type NewComponentFormData = Omit<Component, 'description'> & {
+type NewComponentFormData = Omit<Component, 'description' | 'id'> & {
+  id?: string;
   description?: string;
 };
 
@@ -228,6 +230,7 @@ export function CameraView() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+  const { incrementPendingSyncCount } = useSync();
 
   const workerRef = useRef<Tesseract.Worker | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>('idle');
@@ -455,17 +458,19 @@ export function CameraView() {
   const handleSaveProvision = async (componentData: NewComponentFormData) => {
     console.log('[PROVISION_FLOW] Starting save provision process for component:', componentData);
     try {
-        const { addComponentAndDocument } = await import('@/lib/db-service');
-
         setStatusText('Calcul du hachage...');
         console.log('[PROVISION_FLOW] Computing perceptual hash for new image.');
         const perceptualHash = await computePHash(capturedImage);
         console.log(`[PROVISION_FLOW] Image hash: ${perceptualHash}`);
+        
+        const finalExternalId = componentData.id?.trim() || `PROV-${Date.now()}`;
+        const finalName = componentData.name?.trim() || `Équipement non spécifié - ${finalExternalId}`;
+        const finalType = componentData.type?.trim() || `INCONNU`;
 
         const componentPayload = {
-            externalId: componentData.id,
-            name: componentData.name,
-            type: componentData.type,
+            externalId: finalExternalId,
+            name: finalName,
+            type: finalType,
         };
 
         const documentPayload = {
@@ -475,16 +480,36 @@ export function CameraView() {
             perceptualHash,
         };
         
-        const payloadForApi = { component: componentPayload, document: documentPayload };
-        console.log('[PROVISION_FLOW] Assembled payload for saving:', payloadForApi);
-
         setStatusText('Sauvegarde en cours...');
-        console.log('[PROVISION_FLOW] Calling addComponentAndDocument...');
         
-        await addComponentAndDocument(componentPayload, documentPayload);
+        if (isTauri) {
+            console.log('[PROVISION_FLOW] Calling local save (Tauri)...');
+            const { addComponentAndDocument } = await import('@/lib/db-service');
+            await addComponentAndDocument(componentPayload, documentPayload);
+            toast({ title: 'Succès', description: `L'équipement a été provisionné localement.` });
+        } else {
+            console.log('[PROVISION_FLOW] Calling remote save (Web)...');
+            const payloadForApi = { component: componentPayload, document: documentPayload };
+            console.log('[PROVISION_FLOW] Assembled payload for API:', payloadForApi);
+
+            const response = await fetch('/api/provision', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payloadForApi)
+            });
+            
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || `Erreur HTTP: ${response.status}`);
+            }
+
+            const result = await response.json();
+            console.log('[PROVISION_FLOW] Server responded with success.', result);
+            incrementPendingSyncCount();
+            toast({ title: 'Succès', description: `L'équipement a été provisionné sur le serveur distant. Synchronisation requise.` });
+        }
         
         console.log('[PROVISION_FLOW] Save complete.');
-        toast({ title: 'Succès', description: `L'équipement a été provisionné.` });
         handleReset();
 
     } catch (error: any) {
