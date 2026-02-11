@@ -15,6 +15,7 @@ import {
   Settings,
   RefreshCw,
   Search,
+  Shapes,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -65,6 +66,7 @@ const pageTitles: { [key: string]: string } = {
     '/sync': 'Synchronisation',
     '/test': 'Page de Test',
     '/test-lecture': 'Diagnostic Visuel',
+    '/test-shapes': 'Test de Formes',
 };
 
 function PidModal() {
@@ -207,6 +209,14 @@ function MainLayoutContent({ children }: { children: React.ReactNode }) {
                       <Link href="/test-lecture">
                           <Search />
                           Diagnostic Visuel
+                      </Link>
+                  </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                  <SidebarMenuButton asChild tooltip="Test de Formes" isActive={pathname === '/test-shapes'}>
+                      <Link href="/test-shapes">
+                          <Shapes />
+                          Test de Formes
                       </Link>
                   </SidebarMenuButton>
               </SidebarMenuItem>
