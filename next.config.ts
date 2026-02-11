@@ -53,8 +53,24 @@ const nextConfig: NextConfig = {
       // Exclude problematic client-side libraries from server-side compilation
       config.externals.push('vosk-browser');
     }
+
+    config.module.rules.push({
+      test: /\.bin$/,
+      type: 'asset/resource',
+    });
     
     return config;
+  },
+  async headers() {
+    return [
+      {
+        source: '/models/:path*',
+        headers: [
+          { key: 'Cross-Origin-Embedder-Policy', value: 'require-corp' },
+          { key: 'Cross-Origin-Opener-Policy', value: 'same-origin' },
+        ],
+      },
+    ];
   },
 };
 
