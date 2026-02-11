@@ -71,28 +71,29 @@ Voici une analyse de l'état d'avancement du projet par rapport aux 8 fonctionna
 **1. Architecture Hybride (Desktop + Web) - 100%**
 *   ✅ **Fait :** Application hybride fonctionnelle avec Next.js 14 + Tauri.
 *   ✅ **Fait :** Stockage local hors-ligne via une base de données SQLite dans l'application de bureau.
-*   ⏳ **À faire :** Synchronisation des données avec un backend cloud.
+*   ✅ **Fait :** Synchronisation unidirectionnelle (serveur vers client) implémentée via une API dédiée (`/api/sync`), permettant de mettre à jour la base locale.
 
 **2. Base de Données Statique Locale (Master Data) - 100%**
 *   ✅ **Fait :** Structure de la base de données (équipements, paramètres, alarmes, journal, documents, P&ID) implémentée via `prisma/schema.prisma` et initialisée au démarrage.
-*   ✅ **Fait :** Les tables sont relationnelles et les données sont chargées depuis des fichiers JSON/CSV versionnés et validés par checksum.
+*   ✅ **Fait :** Les tables sont relationnelles et les données sont chargées depuis des fichiers JSON/CSV versionnés et validés.
 
-**3. Auto-Provisionnement Multimédia Intelligent - 60%**
-*   ✅ **Fait :** "Mode Peuplement" implémenté, permettant de capturer une image, d'extraire des données via OCR/QR code, et de valider/enregistrer un nouvel équipement dans la base de données.
-*   ⏳ **À faire :** "Mode Contrôle" pour la reconnaissance en temps réel.
-*   ⏳ **À faire :** Intégration d'un modèle de reconnaissance d'objets (TensorFlow Lite).
+**3. Auto-Provisionnement Multimédia Intelligent - 90%**
+*   ✅ **Fait :** "Mode Peuplement" robuste : capture (caméra/fichier), provisionnement dans la base de données locale (Tauri) ou distante (Web), avec gestion des champs optionnels.
+*   ✅ **Fait :** "Mode Contrôle" (Identification) implémenté : utilise une technique de hachage perceptuel (`p-hash`) pour comparer une image capturée à une base de données visuelle locale et trouver des correspondances.
+*   ⏳ **À faire :** Intégration d'un modèle de reconnaissance d'objets (TensorFlow Lite) pour des analyses plus complexes.
 
 **4. Assistant Vocal Industriel (Voice Q&A) - 100%**
-*   ✅ **Fait :** Interface de l'assistant intégrée avec historique de conversation.
+*   ✅ **Fait :** Interface de l'assistant intégrée avec historique de conversation et contrôle manuel de l'enregistrement (start/stop).
 *   ✅ **Fait :** Reconnaissance vocale **hors-ligne** (STT offline avec Vosk) et synthèse vocale (TTS) fonctionnelles.
-*   ✅ **Fait :** L'assistant est connecté à la base de données locale pour des réponses contextuelles (ex: "Quelle est la puissance nominale de TG1 ?") et peut afficher des schémas P&ID.
+*   ✅ **Fait :** L'assistant est connecté à la base de données locale pour des réponses contextuelles et peut afficher des schémas P&ID.
+*   ✅ **Fait :** L'architecture a été simplifiée en supprimant la détection d'activité vocale (VAD) complexe au profit d'une interaction manuelle plus fiable.
 
-**5. Supervision Temps Réel SCADA - 90%**
-*   ✅ **Fait :** Widget de supervision affichant des données simulées en temps réel via Ably.
-*   ✅ **Fait :** Schéma P&ID simplifié et interactif (`CcppDiagram`).
-*   ✅ **Fait :** Graphique affichant l'historique de puissance sur 24h (données simulées).
-*   ✅ **Fait :** Détection d'anomalies en comparant les données temps réel aux seuils de la base locale, avec journalisation automatique dans le journal de bord.
-*   ⏳ **À faire :** Connexion à une source de données réelle (OPC UA/MQTT).
+**5. Supervision Temps Réel SCADA - 60%**
+*   ✅ **Fait :** Composants d'interface (widgets) en place pour la supervision (`CcppDiagram`) et l'analyse historique (`HistoryChart`).
+*   ✅ **Fait :** Les widgets affichent des données **simulées localement** pour démontrer les capacités de visualisation.
+*   ✅ **Fait :** Détection d'anomalies (démontrée sur la page de test `test/page.tsx`) en comparant les données simulées aux seuils, avec surlignage sur P&ID.
+*   ❌ **Régression :** La connexion temps réel via Ably a été retirée pour simplifier l'architecture.
+*   ⏳ **À faire :** Connexion à une source de données réelle (OPC UA/MQTT) en suivant le plan `docs/SCADA_INTEGRATION_PLAN.md`.
 
 **6. Procédures Guidées Interactives - 100%**
 *   ✅ **Fait :** L'opérateur peut sélectionner une procédure et être guidé pas à pas.
@@ -100,11 +101,12 @@ Voici une analyse de l'état d'avancement du projet par rapport aux 8 fonctionna
 *   ⏳ **À faire :** Validation automatique de certaines étapes en se basant sur les données SCADA temps réel.
 
 **7. Collaboration en Temps Réel - 20%**
-*   ✅ **Fait :** Ajout d'annotations sur les schémas P&ID, consultables par tous les opérateurs.
+*   ✅ **Fait :** L'infrastructure de la base de données (`annotations` table) et les services (`addAnnotation`, `getAnnotationsForNode`) pour gérer les annotations sont en place.
+*   ❌ **Non implémenté :** Le composant UI pour ajouter et visualiser les annotations directement sur les schémas P&ID n'est pas encore intégré.
 *   ❌ **Non implémenté :** Chat contextualisé par équipement, partage de vue caméra.
 
 **8. Journal de Bord Numérique & Traçabilité Réglementaire - 100%**
-*   ✅ **Fait :** Journal de bord fonctionnel avec enregistrement des événements automatiques (démarrage, anomalie SCADA, ajout de document) et manuels.
+*   ✅ **Fait :** Journal de bord fonctionnel avec enregistrement des événements automatiques et manuels.
 *   ✅ **Fait :** Chaque entrée est horodatée et liée à une source.
 *   ✅ **Fait :** Fonctionnalité d'export "Imprimer en PDF".
 *   ✅ **Fait :** Mécanismes d'infalsifiabilité via une chaîne de signatures cryptographiques (intégrité vérifiable par l'opérateur).
@@ -117,35 +119,34 @@ Voici une analyse de l'état d'avancement du projet par rapport aux 8 fonctionna
 
 Voici un plan de progression logique pour faire évoluer ce MVP robuste vers une solution encore plus complète.
 
-**1. Créer des Vues Détaillées par Équipement :**
-*   **Objectif :** Permettre à l'opérateur de consulter une "fiche d'identité" complète pour chaque équipement. C'est l'étape la plus prioritaire pour valoriser les données P&ID.
-*   **Étapes clés :**
-    1.  **Navigation :** Rendre les éléments dans la page `/equipments` cliquables.
-    2.  **Page de Détail :** Créer une nouvelle page dynamique (ex: `/equipments/[id]`). Cette page agrégera toutes les informations relatives à un composant :
-        *   Ses paramètres nominaux (depuis la base de données).
-        *   Les alarmes spécifiques qui lui sont associées.
-        *   Tous les documents et photos (issus du provisionnement).
-        *   Un historique filtré des entrées du journal de bord le concernant.
-        *   Le schéma P&ID associé via le `PidViewer`.
-
-**2. Intégrer la Maintenance Prédictive (Phase 1) :**
-*   **Objectif :** Utiliser l'ébauche `src/lib/predictive/maintenance.ts` pour afficher une première notion de "score de santé" sur les nouvelles pages de détail d'équipement.
-*   **Étapes clés :**
-    1.  **UI sur la page de détail :** Ajouter un widget "Santé de l'équipement" qui affiche une probabilité de défaillance (simulée pour l'instant) et des actions recommandées.
-    2.  **Connexion au service :** Appeler la méthode `predictFailure` depuis la page de détail pour alimenter le widget.
-
-**3. Mettre en Place la Collaboration en Temps Réel (Phase 2) :**
-*   **Objectif :** Initier les fonctionnalités collaboratives, en commençant par un chat contextualisé.
-*   **Étapes clés :**
-    1.  **Chat Contextuel :** Sur la nouvelle page de détail d'un équipement, ajouter un widget de chat simple.
-    2.  **Canaux Ably :** Utiliser des canaux Ably dédiés (ex: `chat:equipment:TG1`) pour que les messages soient pertinents au contexte de travail de l'opérateur.
-
-**4. Finaliser l'Intégration SCADA (en cours) :**
-*   **Objectif :** Remplacer les données simulées par une connexion à une source de données réelle via OPC UA.
+**1. Finaliser l'Intégration SCADA (Priorité Haute) :**
+*   **Objectif :** Remplacer les données simulées par une connexion à une source de données réelle via OPC UA. C'est l'étape la plus critique pour rendre l'application pleinement opérationnelle.
 *   **État d'avancement : 60%** - Préparation terminée.
 *   **Étapes clés :**
-    1.  **Préparation du Mapping (FAIT ✅) :** Un script `npm run generate:scada-map` a été créé pour générer une première version du fichier de mapping (`public/scada-mapping.json`) entre les `external_id` de l'application et les tags SCADA.
-    2.  **Validation du Mapping (À FAIRE ⏳) :** Le fichier `scada-mapping.json` doit être validé et complété manuellement par un ingénieur système pour garantir la correspondance exacte avec les tags du serveur OPC UA.
-    3.  **Implémentation du Connecteur OPC UA (À FAIRE ⏳) :** Développer le service (côté Rust/Tauri) qui se connecte au serveur OPC UA en utilisant le mapping validé.
-    4.  **Publication des Données (À FAIRE ⏳) :** Le connecteur publiera les données temps réel sur le canal Ably `scada:data`.
+    1.  **Préparation du Mapping (FAIT ✅) :** Un script `npm run generate:scada-map` a été créé pour générer une première version du fichier de mapping (`public/scada-mapping.json`).
+    2.  **Validation du Mapping (À FAIRE ⏳) :** Le fichier `scada-mapping.json` doit être validé et complété manuellement par un ingénieur système.
+    3.  **Implémentation du Connecteur OPC UA (À FAIRE ⏳) :** Développer le service (côté Rust/Tauri) qui se connecte au serveur OPC UA.
+    4.  **Publication des Données (À FAIRE ⏳) :** Le connecteur publiera les données temps réel sur un canal interne (remplaçant Ably).
 *   **Documentation :** Un plan d'intégration détaillé est disponible dans `docs/SCADA_INTEGRATION_PLAN.md`.
+
+**2. Intégrer la Visualisation P&ID dans les Vues Détaillées :**
+*   **Objectif :** Actuellement, la vue détaillée d'un équipement (`/equipments/[id]`) est très complète mais ne contient pas encore le schéma P&ID interactif. Il faut intégrer le visualiseur.
+*   **Étapes clés :**
+    1.  Adapter le composant `PidViewer` (ou en créer un nouveau, `SinglePidViewer`) pour afficher un seul schéma SVG basé sur un `externalId`.
+    2.  Intégrer ce visualiseur dans la page `equipments/[id]/page.tsx`.
+    3.  Connecter le surlignage des composants en fonction des alarmes et des paramètres liés à cet équipement spécifique.
+
+**3. Activer la Collaboration en Temps Réel (Annotations) :**
+*   **Objectif :** Activer la fonctionnalité d'annotation sur les schémas P&ID.
+*   **Étapes clés :**
+    1.  Intégrer la logique de `addAnnotation` et `getAnnotationsForNode` dans le composant de visualisation P&ID.
+    2.  Créer une interface utilisateur pour ajouter et afficher les annotations (ex: au clic droit sur le schéma).
+    3.  Mettre en place un mécanisme de rafraîchissement pour synchroniser les annotations entre les clients.
+
+**4. Mettre en Place la Comparaison de Versions P&ID :**
+*   **Objectif** : Permettre l'audit et la validation des modifications apportées aux schémas P&ID.
+*   **État Actuel** : Le fichier `src/lib/pid/version-compare.ts` a été créé comme une ébauche conceptuelle.
+*   **Étapes Futures** :
+        1.  Mettre en place un système de versioning pour les fichiers SVG (ex: `lubrication-filtration_v1.0.svg`, `lubrication-filtration_v1.1.svg`).
+        2.  Implémenter un moteur de "diff" SVG capable de parser et de comparer structurellement deux schémas pour identifier les ajouts, suppressions et modifications d'éléments.
+        3.  Créer une interface utilisateur pour visualiser ces différences de manière claire.
