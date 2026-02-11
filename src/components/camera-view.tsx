@@ -2,6 +2,7 @@
 'use client';
 
 import { useEffect, useRef, useState, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { Camera, CameraOff, RefreshCcw, ScanLine, Save, X, ScanSearch, Upload, FileUp, Server, Cloud, LoaderCircle } from 'lucide-react';
 import Image from 'next/image';
 
@@ -121,19 +122,9 @@ function ProvisioningForm({
         setFormData((prev) => ({ ...prev, [name]: value }));
     };
 
-    const validateExternalId = (id: string): boolean => {
-        if (!id) return true; // Optional field
-        const pattern = /^[A-Z0-9-._]+$/; // Allow letters, numbers, dot, dash, underscore
-        return pattern.test(id);
-    };
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (formData.externalId && !validateExternalId(formData.externalId)) {
-            alert('Format de l\'ID Externe invalide. Utilisez uniquement des lettres majuscules, des chiffres, des points, des tirets et des underscores.');
-            return;
-        }
-
+        
         setIsSaving(true);
         try {
             console.log('[PROVISION_FORM] User submitted form with data:', formData);
@@ -239,6 +230,7 @@ function ProvisioningForm({
 
 // Main Component
 export function CameraView() {
+    const router = useRouter();
     const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
     const [isCameraActive, setIsCameraActive] = useState(false);
     const videoRef = useRef<HTMLVideoElement>(null);
@@ -403,9 +395,12 @@ export function CameraView() {
             console.log(`[IDENTIFY_FLOW] Comparison finished. Best match: ${bestMatch?.equipmentId}, Similarity: ${similarity.toFixed(2)}%, Distance: ${minDistance}`);
 
             if (similarity > 75 && bestMatch) {
-                 setScanResult({ capturedImage: imageDataUrl, match: bestMatch, similarity });
-                 setViewMode('result');
-                 console.log(`[IDENTIFY_FLOW] Match found and confirmed with similarity > 75%.`);
+                 console.log(`[IDENTIFY_FLOW] Match found: ${bestMatch.equipmentId}. Navigating to details page.`);
+                 toast({
+                     title: 'Équipement Identifié',
+                     description: `Redirection vers la fiche de ${bestMatch.equipmentName}...`,
+                 });
+                 router.push(`/equipments/${encodeURIComponent(bestMatch.equipmentId)}`);
             } else {
                  if (isTauri && !isRetry) {
                     console.log('[IDENTIFY_FLOW] No local match. Prompting for sync.');
@@ -421,7 +416,7 @@ export function CameraView() {
             toast({ variant: 'destructive', title: 'Erreur d\'analyse', description: error.message || 'La comparaison visuelle a échoué.' });
             handleReset();
         }
-    }, [toast, handleReset, isTauri]);
+    }, [toast, handleReset, isTauri, router]);
 
 
     const handleSyncAndRetry = async () => {
@@ -653,7 +648,7 @@ export function CameraView() {
                             </Button>
                             <Button onClick={() => { const img = captureFromVideo(); if (img) processProvisioning(img); }} disabled={!isIdle || !isCameraActive} size="lg" variant="secondary" className="h-16 text-lg">
                                 <div className="flex items-center gap-3">
-                                <FileUp className="h-8 w-8"/>
+                                  <FileUp className="h-8 w-8"/>
                                 <div>
                                     <p className="font-bold">Provisionner</p>
                                     <p className="font-normal text-xs text-secondary-foreground/80">Ajouter via OCR</p>
