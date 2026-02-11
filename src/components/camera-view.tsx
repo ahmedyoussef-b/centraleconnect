@@ -2,7 +2,7 @@
 'use client';
 
 import { useEffect, useRef, useState, useCallback } from 'react';
-import { Camera, CameraOff, RefreshCcw, ScanLine, Save, X, ScanSearch, Upload, FileUp, Server, Cloud } from 'lucide-react';
+import { Camera, CameraOff, RefreshCcw, ScanLine, Save, X, ScanSearch, Upload, FileUp, Server, Cloud, LoaderCircle } from 'lucide-react';
 import Image from 'next/image';
 
 import { Alert, AlertDescription, AlertTitle } from './ui/alert';
@@ -18,6 +18,8 @@ import { computePHash, compareHashes } from '@/lib/image-hashing';
 import { cn } from '@/lib/utils';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useSync } from '@/contexts/sync-context';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from './ui/alert-dialog';
+import { syncWithRemote } from '@/lib/db-service';
 
 type ViewMode = 'idle' | 'scanning' | 'provisioning' | 'result';
 type AnalysisMode = 'camera' | 'file';
@@ -37,8 +39,10 @@ interface ScanResult {
   similarity: number;
 }
 
-type NewComponentFormData = Omit<Component, 'description' | 'id'> & {
-  id?: string;
+type NewComponentFormData = Partial<Omit<Component, 'description' | 'id'>> & {
+  externalId?: string;
+  name?: string;
+  type?: string;
   description?: string;
 };
 
@@ -102,34 +106,44 @@ function ProvisioningForm({
   onSave: (component: NewComponentFormData) => Promise<void>;
   onCancel: () => void;
 }) {
-  const [formData, setFormData] = useState<NewComponentFormData>({
-    id: '',
-    name: '',
-    type: '',
-    criticality: 'low',
-    description: ocrText,
-  });
-  const [isSaving, setIsSaving] = useState(false);
+    const [formData, setFormData] = useState<NewComponentFormData>({
+        externalId: '',
+        name: '',
+        type: '',
+        description: ocrText,
+    });
+    const [isSaving, setIsSaving] = useState(false);
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
+    const handleChange = (
+        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    ) => {
+        const { name, value } = e.target;
+        setFormData((prev) => ({ ...prev, [name]: value }));
+    };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSaving(true);
-    try {
-      console.log('[PROVISION_FORM] User submitted form with data:', formData);
-      await onSave(formData);
-    } catch(e) {
-      // Error is already toasted in handleSaveProvision
-    } finally {
-      setIsSaving(false);
-    }
-  };
+    const validateExternalId = (id: string): boolean => {
+        if (!id) return true; // Optional field
+        const pattern = /^[A-Z0-9-._]+$/; // Allow letters, numbers, dot, dash, underscore
+        return pattern.test(id);
+    };
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (formData.externalId && !validateExternalId(formData.externalId)) {
+            alert('Format de l\'ID Externe invalide. Utilisez uniquement des lettres majuscules, des chiffres, des points, des tirets et des underscores.');
+            return;
+        }
+
+        setIsSaving(true);
+        try {
+            console.log('[PROVISION_FORM] User submitted form with data:', formData);
+            await onSave(formData);
+        } catch(e) {
+            // Error is already toasted in handleSaveProvision
+        } finally {
+            setIsSaving(false);
+        }
+    };
 
   return (
     <Card className="border-accent/50">
@@ -140,11 +154,11 @@ function ProvisioningForm({
                 <div className="space-y-2">
                 <h4 className="font-medium">Nouveau composant</h4>
                 <div className="space-y-2">
-                    <Label htmlFor="id">ID Externe (Tag)</Label>
+                    <Label htmlFor="externalId">ID Externe (Tag)</Label>
                     <Input
-                    id="id"
-                    name="id"
-                    value={formData.id}
+                    id="externalId"
+                    name="externalId"
+                    value={formData.externalId}
                     onChange={handleChange}
                     placeholder="ex: B1.PUMP.01A (Optionnel)"
                     />
@@ -225,25 +239,28 @@ function ProvisioningForm({
 
 // Main Component
 export function CameraView() {
-  const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
-  const [isCameraActive, setIsCameraActive] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const { toast } = useToast();
-  const { incrementPendingSyncCount } = useSync();
+    const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
+    const [isCameraActive, setIsCameraActive] = useState(false);
+    const videoRef = useRef<HTMLVideoElement>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const { toast } = useToast();
+    const { incrementPendingSyncCount, clearPendingSyncCount } = useSync();
 
-  const workerRef = useRef<Tesseract.Worker | null>(null);
-  const [viewMode, setViewMode] = useState<ViewMode>('idle');
-  const [analysisMode, setAnalysisMode] = useState<AnalysisMode>('camera');
-  const [progress, setProgress] = useState(0);
-  const [statusText, setStatusText] = useState('En attente...');
-  
-  const [capturedImage, setCapturedImage] = useState('');
-  const [fileImage, setFileImage] = useState<string | null>(null);
-  const [ocrText, setOcrText] = useState('');
-  const [scanResult, setScanResult] = useState<ScanResult | null>(null);
+    const workerRef = useRef<Tesseract.Worker | null>(null);
+    const [viewMode, setViewMode] = useState<ViewMode>('idle');
+    const [analysisMode, setAnalysisMode] = useState<AnalysisMode>('camera');
+    const [progress, setProgress] = useState(0);
+    const [statusText, setStatusText] = useState('En attente...');
+    
+    const [capturedImage, setCapturedImage] = useState('');
+    const [fileImage, setFileImage] = useState<string | null>(null);
+    const [ocrText, setOcrText] = useState('');
+    const [scanResult, setScanResult] = useState<ScanResult | null>(null);
 
-  const [isTauri, setIsTauri] = useState(false);
+    const [isTauri, setIsTauri] = useState(false);
+
+    const [showSyncPrompt, setShowSyncPrompt] = useState(false);
+    const [isSyncing, setIsSyncing] = useState(false);
 
   const activateCamera = async () => {
     if (videoRef.current && !videoRef.current.srcObject) {
@@ -342,62 +359,103 @@ export function CameraView() {
     handleReset();
   }
 
-  const processIdentification = useCallback(async (imageDataUrl: string) => {
-    console.log('[IDENTIFY_FLOW] Starting identification process.');
-    setViewMode('scanning');
-    setCapturedImage(imageDataUrl);
+    const processIdentification = useCallback(async (imageDataUrl: string, isRetry = false) => {
+        console.log('[IDENTIFY_FLOW] Starting identification process.');
+        setViewMode('scanning');
+        setCapturedImage(imageDataUrl);
 
-    try {
-        setStatusText('Récupération de la base de données visuelle locale...');
-        const { getLocalVisualDatabase } = await import('@/lib/db-service');
-        const localVisualDb = await getLocalVisualDatabase();
-        
-        if (localVisualDb.length === 0) {
-            console.warn('[IDENTIFY_FLOW] Local visual DB is empty. Identification cannot proceed.');
-            toast({ variant: 'default', title: 'Base de données locale vide', description: 'Aucune donnée visuelle à comparer. Veuillez provisionner des équipements pour activer l\'identification.' });
-            handleReset();
-            return;
-        }
+        try {
+            setStatusText('Récupération de la base de données visuelle locale...');
+            const { getLocalVisualDatabase } = await import('@/lib/db-service');
+            const localVisualDb = await getLocalVisualDatabase();
+            
+            if (localVisualDb.length === 0 && !isRetry) {
+                console.warn('[IDENTIFY_FLOW] Local visual DB is empty. Identification cannot proceed without sync.');
+                if(isTauri) {
+                    setShowSyncPrompt(true); // Directly ask to sync if DB is empty
+                } else {
+                     toast({ variant: 'default', title: 'Base de données vide', description: 'Aucune donnée visuelle à comparer. Provisionnez des équipements d\'abord.' });
+                     handleReset();
+                }
+                return;
+            }
 
-        setStatusText('Calcul du hachage perceptuel...');
-        console.log('[IDENTIFY_FLOW] Computing perceptual hash for captured image.');
-        const capturedHash = await computePHash(imageDataUrl);
-        console.log(`[IDENTIFY_FLOW] Captured image hash: ${capturedHash}`);
+            setStatusText('Calcul du hachage perceptuel...');
+            const capturedHash = await computePHash(imageDataUrl);
+            console.log(`[IDENTIFY_FLOW] Captured image hash: ${capturedHash}`);
 
-        setStatusText('Comparaison avec la base de données locale...');
-        console.log('[IDENTIFY_FLOW] Starting comparison loop.');
-        let bestMatch: LocalVisualDbEntry | null = null;
-        let minDistance = Infinity;
+            setStatusText('Comparaison avec la base de données locale...');
+            console.log('[IDENTIFY_FLOW] Starting comparison loop.');
+            let bestMatch: LocalVisualDbEntry | null = null;
+            let minDistance = Infinity;
 
-        for (const item of localVisualDb) {
-            if (item.perceptualHash) {
-                const distance = compareHashes(capturedHash, item.perceptualHash);
-                if (distance < minDistance) {
-                    minDistance = distance;
-                    bestMatch = item;
+            for (const item of localVisualDb) {
+                if (item.perceptualHash) {
+                    const distance = compareHashes(capturedHash, item.perceptualHash);
+                    if (distance < minDistance) {
+                        minDistance = distance;
+                        bestMatch = item;
+                    }
                 }
             }
-        }
-        
-        const similarity = Math.max(0, 100 - (minDistance / 64) * 100 * 1.5); // Amplify difference
-        console.log(`[IDENTIFY_FLOW] Comparison finished. Best match: ${bestMatch?.equipmentId}, Similarity: ${similarity.toFixed(2)}%, Distance: ${minDistance}`);
+            
+            const similarity = Math.max(0, 100 - (minDistance / 64) * 100 * 1.5); // Amplify difference
+            console.log(`[IDENTIFY_FLOW] Comparison finished. Best match: ${bestMatch?.equipmentId}, Similarity: ${similarity.toFixed(2)}%, Distance: ${minDistance}`);
 
-        if (similarity > 75) { // Similarity threshold
-             setScanResult({ capturedImage: imageDataUrl, match: bestMatch, similarity });
-             console.log(`[IDENTIFY_FLOW] Match found and confirmed with similarity > 75%.`);
-        } else {
-             setScanResult({ capturedImage: imageDataUrl, match: null, similarity });
-             console.log(`[IDENTIFY_FLOW] No match found with sufficient similarity (< 75%).`);
+            if (similarity > 75 && bestMatch) {
+                 setScanResult({ capturedImage: imageDataUrl, match: bestMatch, similarity });
+                 setViewMode('result');
+                 console.log(`[IDENTIFY_FLOW] Match found and confirmed with similarity > 75%.`);
+            } else {
+                 if (isTauri && !isRetry) {
+                    console.log('[IDENTIFY_FLOW] No local match. Prompting for sync.');
+                    setShowSyncPrompt(true);
+                 } else {
+                    setScanResult({ capturedImage: imageDataUrl, match: null, similarity });
+                    setViewMode('result');
+                    console.log(`[IDENTIFY_FLOW] No match found after checking local DB (and possibly after retry).`);
+                 }
+            }
+        } catch (error: any) {
+            console.error("[IDENTIFY_FLOW] Visual identification failed:", error);
+            toast({ variant: 'destructive', title: 'Erreur d\'analyse', description: error.message || 'La comparaison visuelle a échoué.' });
+            handleReset();
         }
-        setViewMode('result');
-        console.log('[IDENTIFY_FLOW] Displaying results view.');
+    }, [toast, handleReset, isTauri]);
 
-    } catch (error: any) {
-        console.error("[IDENTIFY_FLOW] Visual identification failed:", error);
-        toast({ variant: 'destructive', title: 'Erreur d\'analyse', description: error.message || 'La comparaison visuelle a échoué.' });
-        handleReset();
-    }
-  }, [toast, handleReset]);
+
+    const handleSyncAndRetry = async () => {
+        setIsSyncing(true);
+        setShowSyncPrompt(false);
+        setViewMode('scanning'); 
+        setStatusText('Synchronisation avec le serveur distant...');
+    
+        try {
+            const { synced, cleaned } = await syncWithRemote();
+            toast({
+                title: 'Synchronisation terminée',
+                description: `${synced > 0 ? `${synced} enregistrements rapatriés.` : 'Aucune nouvelle donnée à synchroniser.'}`
+            });
+            if (cleaned) {
+                clearPendingSyncCount();
+            }
+    
+            setStatusText('Nouvelle tentative d\'identification...');
+            await processIdentification(capturedImage, true);
+    
+        } catch (error: any) {
+            console.error("Sync and retry failed:", error);
+            toast({
+                variant: 'destructive',
+                title: 'Erreur de synchronisation',
+                description: error.message,
+            });
+            handleReset();
+        } finally {
+            setIsSyncing(false);
+        }
+    };
+
 
   const processProvisioning = useCallback(async (imageDataUrl: string) => {
     console.log('[PROVISION_FLOW] Starting provisioning process.');
@@ -455,69 +513,71 @@ export function CameraView() {
     }
   };
 
-  const handleSaveProvision = async (componentData: NewComponentFormData) => {
-    console.log('[PROVISION_FLOW] Starting save provision process for component:', componentData);
-    try {
-        setStatusText('Calcul du hachage...');
-        console.log('[PROVISION_FLOW] Computing perceptual hash for new image.');
-        const perceptualHash = await computePHash(capturedImage);
-        console.log(`[PROVISION_FLOW] Image hash: ${perceptualHash}`);
-        
-        const finalExternalId = componentData.id?.trim() || `PROV-${Date.now()}`;
-        const finalName = componentData.name?.trim() || `Équipement non spécifié - ${finalExternalId}`;
-        const finalType = componentData.type?.trim() || `INCONNU`;
-
-        const componentPayload = {
-            externalId: finalExternalId,
-            name: finalName,
-            type: finalType,
-        };
-
-        const documentPayload = {
-            imageData: capturedImage,
-            ocrText: ocrText,
-            description: `Photo-provisionnement - ${new Date().toISOString()}`,
-            perceptualHash,
-        };
-        
-        setStatusText('Sauvegarde en cours...');
-        
-        if (isTauri) {
-            console.log('[PROVISION_FLOW] Calling local save (Tauri)...');
-            const { addComponentAndDocument } = await import('@/lib/db-service');
-            await addComponentAndDocument(componentPayload, documentPayload);
-            toast({ title: 'Succès', description: `L'équipement a été provisionné localement.` });
-        } else {
-            console.log('[PROVISION_FLOW] Calling remote save (Web)...');
-            const payloadForApi = { component: componentPayload, document: documentPayload };
-            console.log('[PROVISION_FLOW] Assembled payload for API:', payloadForApi);
-
-            const response = await fetch('/api/provision', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payloadForApi)
-            });
+    const handleSaveProvision = async (componentData: NewComponentFormData) => {
+        console.log('[PROVISION_FLOW] Starting save provision process for component:', componentData);
+        try {
+            setStatusText('Calcul du hachage...');
+            console.log('[PROVISION_FLOW] Computing perceptual hash for new image.');
+            const perceptualHash = await computePHash(capturedImage);
+            console.log(`[PROVISION_FLOW] Image hash: ${perceptualHash}`);
             
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || `Erreur HTTP: ${response.status}`);
+            const finalExternalId = componentData.externalId?.trim() || `PROV-${Date.now()}`;
+            const finalName = componentData.name?.trim() || `Équipement non spécifié - ${finalExternalId}`;
+            const finalType = componentData.type?.trim() || `INCONNU`;
+
+            const componentPayload = {
+                externalId: finalExternalId,
+                name: finalName,
+                type: finalType,
+            };
+
+            const documentPayload = {
+                imageData: capturedImage,
+                ocrText: ocrText,
+                description: `Photo-provisionnement - ${new Date().toISOString()}`,
+                perceptualHash,
+            };
+            
+            setStatusText('Sauvegarde en cours...');
+            
+            if (isTauri) {
+                console.log('[PROVISION_FLOW] Calling local save (Tauri)...');
+                const { addComponentAndDocument } = await import('@/lib/db-service');
+                await addComponentAndDocument(componentPayload, documentPayload);
+                toast({ title: 'Succès', description: `L'équipement a été provisionné localement.` });
+            } else {
+                console.log('[PROVISION_FLOW] Calling remote save (Web)...');
+                const payloadForApi = { component: componentPayload, document: documentPayload };
+                console.log('[PROVISION_FLOW] Assembled payload for API:', payloadForApi);
+                console.log('[PROVISION_FLOW] Sending payload to /api/provision.');
+
+                const response = await fetch('/api/provision', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payloadForApi)
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || `Erreur HTTP: ${response.status}`);
+                }
+
+                const result = await response.json();
+                console.log('[PROVISION_FLOW] Server responded with success. Provisioning complete.', result);
+                incrementPendingSyncCount();
+                toast({ title: 'Succès', description: `L'équipement a été provisionné sur le serveur distant. Synchronisation requise.` });
             }
+            
+            console.log('[PROVISION_FLOW] Save complete.');
+            handleReset();
 
-            const result = await response.json();
-            console.log('[PROVISION_FLOW] Server responded with success.', result);
-            incrementPendingSyncCount();
-            toast({ title: 'Succès', description: `L'équipement a été provisionné sur le serveur distant. Synchronisation requise.` });
+        } catch (error: any) {
+          console.error('[PROVISION_FLOW] Error saving provision:', error);
+          toast({ variant: 'destructive', title: 'Erreur de sauvegarde', description: error.message || "Impossible d'enregistrer." });
+          throw error;
         }
-        
-        console.log('[PROVISION_FLOW] Save complete.');
-        handleReset();
+    };
 
-    } catch (error: any) {
-      console.error('[PROVISION_FLOW] Error saving provision:', error);
-      toast({ variant: 'destructive', title: 'Erreur de sauvegarde', description: error.message || "Impossible d'enregistrer." });
-      throw error;
-    }
-  };
 
   const isIdle = viewMode === 'idle';
 
@@ -584,10 +644,10 @@ export function CameraView() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <Button onClick={() => { const img = captureFromVideo(); if (img) processIdentification(img); }} disabled={!isIdle || !isCameraActive} size="lg" className="h-16 text-lg">
                                 <div className="flex items-center gap-3">
-                                  {isTauri ? <Server className="h-8 w-8"/> : <Cloud className="h-8 w-8"/>}
+                                  <ScanSearch className="h-8 w-8"/>
                                   <div>
                                       <p className="font-bold">Identifier</p>
-                                      <p className="font-normal text-xs text-primary-foreground/80">{isTauri ? 'Comparer (Local)' : 'Comparer (Distant)'}</p>
+                                      <p className="font-normal text-xs text-primary-foreground/80">Comparer à la base</p>
                                   </div>
                                 </div>
                             </Button>
@@ -628,10 +688,10 @@ export function CameraView() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                            <Button onClick={() => fileImage && processIdentification(fileImage)} disabled={!isIdle || !fileImage} size="lg" className="h-16 text-lg">
                                 <div className="flex items-center gap-3">
-                                  {isTauri ? <Server className="h-8 w-8"/> : <Cloud className="h-8 w-8"/>}
+                                  <ScanSearch className="h-8 w-8"/>
                                   <div>
                                       <p className="font-bold">Identifier</p>
-                                      <p className="font-normal text-xs text-primary-foreground/80">{isTauri ? 'Comparer (Local)' : 'Comparer (Distant)'}</p>
+                                      <p className="font-normal text-xs text-primary-foreground/80">Comparer à la base</p>
                                   </div>
                                 </div>
                             </Button>
@@ -648,6 +708,25 @@ export function CameraView() {
                     </TabsContent>
                 </Tabs>
             )}
+            <AlertDialog open={showSyncPrompt} onOpenChange={setShowSyncPrompt}>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Aucune correspondance locale</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            L'équipement n'a pas été trouvé dans la base de données locale. De nouveaux équipements sont peut-être en attente sur le serveur distant.
+                            <br/><br/>
+                            Voulez-vous synchroniser pour mettre à jour la base locale et réessayer l'identification ?
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel onClick={handleReset}>Annuler</AlertDialogCancel>
+                        <AlertDialogAction onClick={handleSyncAndRetry} disabled={isSyncing}>
+                            {isSyncing ? <LoaderCircle className="mr-2 h-4 w-4 animate-spin" /> : <RefreshCcw className="mr-2 h-4 w-4" />}
+                            Synchroniser et Réessayer
+                        </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </CardContent>
       </Card>
   );
