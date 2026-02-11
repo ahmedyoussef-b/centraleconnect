@@ -36,6 +36,6 @@ export const performIndustrialOCR = async (
     equipmentTags: parser.extractEquipmentTags(text),
     parameterValues: parser.extractParameters(text),
     safetyLabels: parser.extractSafetyLabels(text),
-    confidence: confidence
+    confidence: confidence,
   };
 };

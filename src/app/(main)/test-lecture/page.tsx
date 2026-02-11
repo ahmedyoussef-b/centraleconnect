@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { FileUp, Search, LoaderCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -11,11 +11,14 @@ import { useToast } from '@/hooks/use-toast';
 import { extractIndustrialMetadata, type IndustrialImageMetadata } from '@/lib/image/metadata-extractor';
 import { performIndustrialOCR, type OCRExtractionResult } from '@/lib/ocr/industrial-ocr';
 import { detectIndustrialCodes, type IndustrialCode } from '@/lib/vision/code-detector';
+import { EquipmentDetector, type EquipmentDetection } from '@/lib/vision/equipment-detector';
+
 
 interface AnalysisResults {
   metadata: IndustrialImageMetadata;
   ocr: OCRExtractionResult;
   codes: IndustrialCode[];
+  detections: EquipmentDetection[];
 }
 
 export default function TestLecturePage() {
@@ -24,7 +27,23 @@ export default function TestLecturePage() {
   const [results, setResults] = useState<AnalysisResults | null>(null);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const imageRef = useRef<HTMLImageElement>(null);
   const { toast } = useToast();
+  
+  // Initialiser le détecteur d'équipement
+  const detectorRef = useRef<EquipmentDetector | null>(null);
+  useEffect(() => {
+    detectorRef.current = new EquipmentDetector();
+    detectorRef.current.initialize().catch(err => {
+        console.error(err);
+        toast({
+            variant: 'destructive',
+            title: 'Erreur Modèle IA',
+            description: "Impossible de charger le modèle de détection d'objets.",
+        });
+    });
+  }, [toast]);
+
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -40,7 +59,7 @@ export default function TestLecturePage() {
   };
 
   const handleAnalyze = async () => {
-    if (!fileImage) {
+    if (!fileImage || !imageRef.current) {
       toast({
         variant: 'destructive',
         title: 'Aucune image',
@@ -65,13 +84,14 @@ export default function TestLecturePage() {
       ctx.drawImage(imageBitmap, 0, 0);
       const imageDataForCodes = ctx.getImageData(0, 0, imageBitmap.width, imageBitmap.height);
 
-      const [metadata, ocr, codes] = await Promise.all([
+      const [metadata, ocr, codes, detections] = await Promise.all([
         extractIndustrialMetadata(imageBlob),
-        performIndustrialOCR(fileImage, { zone: 'B1' }), // Mock context
+        performIndustrialOCR(fileImage, { zone: 'B1' }),
         detectIndustrialCodes(imageDataForCodes),
+        detectorRef.current ? detectorRef.current.detect(imageRef.current) : Promise.resolve([]),
       ]);
       
-      setResults({ metadata, ocr, codes });
+      setResults({ metadata, ocr, codes, detections });
 
     } catch (e: any) {
       console.error("Analysis failed:", e);
@@ -101,7 +121,7 @@ export default function TestLecturePage() {
             onClick={() => fileInputRef.current?.click()}
           >
             {fileImage ? (
-              <img src={fileImage} alt="Image sélectionnée" className="h-full w-full object-contain p-2" />
+              <img ref={imageRef} src={fileImage} alt="Image sélectionnée" className="h-full w-full object-contain p-2" />
             ) : (
               <>
                 <FileUp className="w-12 h-12 text-muted-foreground" />
@@ -122,8 +142,16 @@ export default function TestLecturePage() {
       
       {results && (
         <div className="space-y-4">
+           <Card>
+            <CardHeader><CardTitle>1. Détection d'Équipements (IA)</CardTitle></CardHeader>
+            <CardContent>
+              <pre className="text-xs bg-muted p-4 rounded-md overflow-x-auto">
+                {JSON.stringify(results.detections, null, 2)}
+              </pre>
+            </CardContent>
+          </Card>
           <Card>
-            <CardHeader><CardTitle>1. Métadonnées EXIF</CardTitle></CardHeader>
+            <CardHeader><CardTitle>2. Métadonnées EXIF</CardTitle></CardHeader>
             <CardContent>
               <pre className="text-xs bg-muted p-4 rounded-md overflow-x-auto">
                 {JSON.stringify(results.metadata, (key, value) => {
@@ -137,7 +165,7 @@ export default function TestLecturePage() {
           </Card>
           
           <Card>
-            <CardHeader><CardTitle>2. OCR (Reconnaissance de Texte)</CardTitle></CardHeader>
+            <CardHeader><CardTitle>3. OCR (Reconnaissance de Texte)</CardTitle></CardHeader>
             <CardContent>
               <pre className="text-xs bg-muted p-4 rounded-md overflow-x-auto">
                 {JSON.stringify(results.ocr, null, 2)}
@@ -146,7 +174,7 @@ export default function TestLecturePage() {
           </Card>
 
           <Card>
-            <CardHeader><CardTitle>3. Détection de Codes (QR & Barcodes)</CardTitle></CardHeader>
+            <CardHeader><CardTitle>4. Détection de Codes (QR & Barcodes)</CardTitle></CardHeader>
             <CardContent>
               <pre className="text-xs bg-muted p-4 rounded-md overflow-x-auto">
                 {JSON.stringify(results.codes, null, 2)}
