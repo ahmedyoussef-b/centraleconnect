@@ -1,0 +1,36 @@
+# Ce workflow déploie votre application Next.js sur Firebase App Hosting.
+# https://firebase.google.com/docs/hosting/app-hosting/github-actions
+
+name: Deploy to Firebase App Hosting
+
+on:
+  push:
+    branches:
+      - main # Le déploiement se déclenche sur un push vers la branche 'main'
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write # Nécessaire pour l'authentification sécurisée avec Firebase
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # IMPORTANT : L'authentification est OBLIGATOIRE pour le déploiement.
+      # Vous devez créer ces secrets dans les paramètres de votre dépôt GitHub.
+      # Sans eux, GitHub n'a pas l'autorisation de déployer sur votre projet Firebase.
+      #
+      # 1. Allez dans votre dépôt GitHub > Settings > Secrets and variables > Actions.
+      # 2. Créez un secret nommé `FIREBASE_PROJECT_ID` avec l'ID de votre projet Firebase.
+      # 3. Créez un secret nommé `FIREBASE_SERVICE_ACCOUNT` avec le contenu JSON de votre clé de compte de service.
+      #    Pour l'obtenir : Console Firebase > Paramètres du projet > Comptes de service > Générer une nouvelle clé privée.
+      - name: Deploy to Firebase App Hosting
+        uses: firebase-actions/deploy-app-hosting@main
+        with:
+          projectId: ${{ secrets.FIREBASE_PROJECT_ID }}
+          serviceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          # L'ID de votre backend App Hosting (optionnel si vous n'en avez qu'un).
+          # appId: your-app-id
