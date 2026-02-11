@@ -18,6 +18,7 @@ import { FaultDetector, type Fault } from '@/lib/vision/fault-detector';
 import { ParameterExtractor, type Parameter } from '@/lib/ocr/parameter-extractor';
 import { SafetyLabelDetector, type SafetyLabel } from '@/lib/ocr/safety-label-detector';
 import { SignatureExtractor, type Signature } from '@/lib/ocr/signature-extractor';
+import { EnvironmentAnalyzer, type EnvironmentAnalysis } from '@/lib/vision/environment-analyzer';
 
 
 interface AnalysisResults {
@@ -30,6 +31,7 @@ interface AnalysisResults {
   parameters: Parameter[];
   safetyLabels: SafetyLabel[];
   signatures: Signature[];
+  environment: EnvironmentAnalysis | null;
 }
 
 export default function TestLecturePage() {
@@ -126,7 +128,10 @@ export default function TestLecturePage() {
         signatureExtractorRef.current ? signatureExtractorRef.current.extract(imageRef.current) : Promise.resolve([]),
       ]);
       
-      setResults({ metadata, ocr, codes, detections, pid, faults, parameters, safetyLabels, signatures });
+      const environmentAnalyzer = new EnvironmentAnalyzer();
+      const environment = environmentAnalyzer.analyze(detections);
+
+      setResults({ metadata, ocr, codes, detections, pid, faults, parameters, safetyLabels, signatures, environment });
 
     } catch (e: any) {
       console.error("Analysis failed:", e);
@@ -248,9 +253,20 @@ export default function TestLecturePage() {
             </Card>
           )}
 
+          {results.environment && (
+            <Card>
+                <CardHeader><CardTitle>8. Analyse de l'Environnement (Zone)</CardTitle></CardHeader>
+                <CardContent>
+                    <pre className="text-xs bg-muted p-4 rounded-md overflow-x-auto">
+                    {JSON.stringify(results.environment, null, 2)}
+                    </pre>
+                </CardContent>
+            </Card>
+          )}
+          
           {results.pid && (
             <Card>
-                <CardHeader><CardTitle>8. Analyse P&amp;ID (Simulation CV)</CardTitle></CardHeader>
+                <CardHeader><CardTitle>9. Analyse P&amp;ID (Simulation CV)</CardTitle></CardHeader>
                 <CardContent>
                     <pre className="text-xs bg-muted p-4 rounded-md overflow-x-auto">
                     {JSON.stringify(results.pid, null, 2)}
@@ -261,7 +277,7 @@ export default function TestLecturePage() {
 
           {results.signatures.length > 0 && (
             <Card>
-                <CardHeader><CardTitle>9. Signatures Manuscrites</CardTitle></CardHeader>
+                <CardHeader><CardTitle>10. Signatures Manuscrites</CardTitle></CardHeader>
                 <CardContent>
                     <pre className="text-xs bg-muted p-4 rounded-md overflow-x-auto">
                     {JSON.stringify(results.signatures, null, 2)}
