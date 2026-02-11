@@ -120,9 +120,12 @@ export default function SyncPage() {
                 </CardHeader>
                 <CardContent>
                     <Alert>
-                        <AlertTitle>Fonctionnalité en attente</AlertTitle>
+                        <Server className="h-4 w-4" />
+                        <AlertTitle>Synchronisation via l'Application de Bureau</AlertTitle>
                         <AlertDescription>
-                            Vous avez <strong>{pendingSyncCount}</strong> enregistrement(s) en attente de synchronisation. Veuillez ouvrir l'application de bureau pour synchroniser vos données.
+                            La synchronisation des données s'effectue uniquement sur l'application de bureau (Tauri).
+                            <br />
+                            Vous avez <strong>{pendingSyncCount}</strong> enregistrement(s) en attente sur le serveur.
                         </AlertDescription>
                     </Alert>
                 </CardContent>
