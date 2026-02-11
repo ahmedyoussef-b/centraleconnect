@@ -23,7 +23,7 @@ export const performIndustrialOCR = async (
   await worker.setParameters({
     tessedit_char_whitelist: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_.:/°%barMPakg', // Caractères industriels
     preserve_interword_spaces: '1',
-    tessedit_pageseg_mode: Tesseract.PSM.SINGLE_BLOCK, // Uniform block of text (plaques signalétiques)
+    tessedit_pageseg_mode: '6', // Uniform block of text (plaques signalétiques)
   });
 
   const { data: { text, confidence } } = await worker.recognize(imageData);

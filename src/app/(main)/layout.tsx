@@ -14,6 +14,7 @@ import {
   LayoutGrid,
   Settings,
   RefreshCw,
+  Search,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -63,6 +64,7 @@ const pageTitles: { [key: string]: string } = {
     '/provisioning': 'Analyse Visuelle',
     '/sync': 'Synchronisation',
     '/test': 'Page de Test',
+    '/test-lecture': 'Test de Lecture',
 };
 
 function PidModal() {
@@ -197,6 +199,14 @@ function MainLayoutContent({ children }: { children: React.ReactNode }) {
                       <Link href="/test">
                           <FlaskConical />
                           Test
+                      </Link>
+                  </SidebarMenuButton>
+              </SidebarMenuItem>
+               <SidebarMenuItem>
+                  <SidebarMenuButton asChild tooltip="Test Lecture" isActive={pathname === '/test-lecture'}>
+                      <Link href="/test-lecture">
+                          <Search />
+                          Test Lecture
                       </Link>
                   </SidebarMenuButton>
               </SidebarMenuItem>
