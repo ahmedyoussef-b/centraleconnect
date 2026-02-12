@@ -184,6 +184,7 @@ async function main() {
         description: proc.description,
         version: proc.version,
         steps: proc.steps, // Pass the JSON object directly
+        category: proc.category,
       }
     });
   }

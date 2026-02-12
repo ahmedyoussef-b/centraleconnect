@@ -224,8 +224,7 @@ pub async fn get_alarms(app_handle: tauri::AppHandle) -> Result<Vec<Alarm>, Stri
 #[command]
 pub async fn get_procedures(app_handle: tauri::AppHandle) -> Result<Vec<Procedure>, String> {
     let db = get_db(&app_handle).await?;
-    // Note: The 'category' is not in the db schema, it's inferred in the frontend
-    db.select("SELECT id, name, description, version, steps FROM procedures", &[]).await.map_err(|e| e.to_string())
+    db.select("SELECT id, name, description, version, steps, category FROM procedures", &[]).await.map_err(|e| e.to_string())
 }
 
 #[command]

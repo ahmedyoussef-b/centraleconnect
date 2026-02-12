@@ -1,8 +1,4 @@
 
-
-
-
-
 import { invoke } from '@tauri-apps/api/tauri';
 import type { 
   Equipment,
@@ -133,7 +129,8 @@ CREATE TABLE IF NOT EXISTS procedures (
   name TEXT NOT NULL,
   description TEXT,
   version TEXT,
-  steps TEXT
+  steps TEXT,
+  category TEXT
 );
 CREATE TABLE IF NOT EXISTS synoptic_items (
     external_id TEXT PRIMARY KEY NOT NULL,
@@ -545,7 +542,9 @@ export async function syncWithRemote(): Promise<{ synced: number; cleaned: boole
         if (data.procedures?.length > 0) {
             console.log(`[SYNC_FLOW] Syncing ${data.procedures.length} procedures...`);
             for (const proc of data.procedures) {
-                await invoke('plugin:sql|execute', { db, query: 'INSERT OR IGNORE INTO procedures (id, name, description, version, steps) VALUES ($1, $2, $3, $4, $5)', values: [proc.id, proc.name, proc.description, proc.version, proc.steps] });
+                // Ensure proc.steps is stringified for SQLite
+                const stepsValue = typeof proc.steps === 'object' ? JSON.stringify(proc.steps) : proc.steps;
+                await invoke('plugin:sql|execute', { db, query: 'INSERT OR IGNORE INTO procedures (id, name, description, version, steps, category) VALUES ($1, $2, $3, $4, $5, $6)', values: [proc.id, proc.name, proc.description, proc.version, stepsValue, proc.category] });
                 totalSynced++;
             }
         }

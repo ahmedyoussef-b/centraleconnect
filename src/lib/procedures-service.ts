@@ -22,19 +22,12 @@ async function fetchProcedures(): Promise<Procedure[]> {
         rawProcedures = await response.json();
     }
     
-    // The `steps` are stored as a JSON string in the DB. We need to parse them.
-    // Also, 'category' is not in the db, we infer it from the json for now.
-    const proceduresData = (await import('@/assets/master-data/procedures.json')).default;
-    const categoryMap = proceduresData.reduce((acc, p) => {
-        acc[p.id] = p.category;
-        return acc;
-    }, {} as Record<string, string>);
-
-
     const parsedProcedures = rawProcedures.map((p: any) => ({
         ...p,
+        // The `steps` are stored as a JSON string in the SQLite DB, but as a JSON object from the API.
         steps: typeof p.steps === 'string' ? JSON.parse(p.steps) : p.steps,
-        category: categoryMap[p.id] || 'Autres',
+        // The category now comes directly from the DB/API. We just provide a fallback.
+        category: p.category || 'Autres',
     }));
     
     proceduresCache = parsedProcedures;
