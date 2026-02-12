@@ -26,6 +26,7 @@ export const getAblyClient = async (): Promise<Types.RealtimePromise> => {
     
     // Import dynamique pour la compatibilité SSR
     const Ably = await import('ably');
-    ablyClientInstance = new Ably.Realtime.Promise({ key: ABLY_API_KEY });
+    // Correction: utiliser l'exportation par défaut (`.default`) pour la compatibilité avec les bundlers/ESM.
+    ablyClientInstance = new Ably.default.Realtime.Promise({ key: ABLY_API_KEY });
     return ablyClientInstance;
 };
