@@ -1,4 +1,5 @@
 
+
 import { invoke } from '@tauri-apps/api/tauri';
 import type { 
   Equipment,
@@ -145,93 +146,6 @@ CREATE TABLE IF NOT EXISTS synoptic_items (
 COMMIT;
 `;
 
-// --- Client-side Data Simulation ---
-let clientSideEquipments: Equipment[] | null = null;
-let clientSideParameters: Parameter[] | null = null;
-
-function getClientSideData() {
-    if (clientSideEquipments && clientSideParameters) {
-        return { equipments: clientSideEquipments, parameters: clientSideParameters };
-    }
-
-    const allEquipmentsMap = new Map<string, any>();
-    const detailedData = [...equipmentC0Data, ...equipmentB0Data, ...equipmentB1Data, ...equipmentB2Data, ...equipmentB3Data, ...equipmentPidAssetsData.nodes, equipmentComponentsData, ...equipmentTG1Data, ...equipmentTG2Data];
-
-    for (const item of detailedData as any[]) {
-        const id = item.externalId || item.tag;
-        if (!id) continue;
-        
-        const existing = allEquipmentsMap.get(id) || { externalId: id };
-        
-        const mergedItem = {
-            ...existing,
-            name: item.name || item.label_fr || existing.name || 'N/A',
-            description: item.description || existing.description,
-            type: item.type || existing.type,
-            subtype: item.subtype || existing.subtype,
-            parentId: item.parentId || item.parent_id || existing.parentId,
-            systemCode: item.systemCode || item.system || existing.systemCode,
-            subSystem: item.subsystem || existing.subSystem,
-            location: item.location || existing.location,
-            manufacturer: item.manufacturer || existing.manufacturer,
-            serialNumber: item.serialNumber || existing.serialNumber,
-            documentRef: item.document || existing.documentRef,
-            coordinates: JSON.stringify(item.coordinates) || existing.coordinates,
-            svgLayer: item.svg_layer || existing.svgLayer,
-            fireZone: item.fire_zone || existing.fireZone,
-            linkedParameters: JSON.stringify(item.linked_parameters) || existing.linkedParameters,
-            status: item.status || existing.status || 'UNKNOWN',
-            approvedBy: item.approved_by || item.approvedBy || existing.approvedBy,
-            approvedAt: item.approved_at || item.approval_date || existing.approvedAt ? new Date(item.approved_at || item.approval_date || existing.approvedAt).toISOString() : undefined,
-            parameters: item.parameters || existing.parameters,
-        };
-        allEquipmentsMap.set(id, mergedItem);
-    }
-
-    const finalEquipments: Equipment[] = [];
-    const finalParameters: Parameter[] = [];
-
-    for (const equip of Array.from(allEquipmentsMap.values())) {
-        const { parameters, ...equipData } = equip;
-        finalEquipments.push({ ...equipData, externalId: equip.externalId, version: 1, isImmutable: false });
-
-        if(equip.parameters && Array.isArray(equip.parameters)) {
-            for(const param of equip.parameters as any[]) {
-                if (param.name) {
-                    finalParameters.push({
-                      equipmentId: equip.externalId,
-                      name: param.name,
-                      unit: param.unit,
-                      nominalValue: typeof param.value === 'number' ? param.value : null,
-                      minSafe: typeof param.min === 'number' ? param.min : null,
-                      maxSafe: typeof param.max === 'number' ? param.max : null,
-                    });
-                }
-            }
-        }
-    }
-    
-    for (const param of allParameterData as any[]) {
-        finalParameters.push({
-            equipmentId: param.componentTag,
-            name: param.name,
-            unit: param.unit,
-            nominalValue: param.nominalValue,
-            minSafe: param.minSafe,
-            maxSafe: param.maxSafe,
-            alarmHigh: param.alarmHigh,
-            alarmLow: param.alarmLow,
-            standardRef: param.standardRef,
-        });
-    }
-    
-    clientSideEquipments = finalEquipments;
-    clientSideParameters = finalParameters;
-
-    return { equipments: clientSideEquipments, parameters: clientSideParameters };
-}
-// --- End Client-side Data Simulation ---
-
 
 async function createEntrySignature(
   entryData: { timestamp: string; type: string; source: string; message: string; equipmentId: string | null; },
@@ -270,62 +184,30 @@ export async function initializeDatabase(): Promise<void> {
 
 export async function getEquipments(): Promise<Equipment[]> {
     if (typeof window !== 'undefined' && window.__TAURI__) {
-        await initializeDatabase();
-        const db = await invoke('plugin:sql|load', { db: DB_NAME });
-        const nodes: any[] = await invoke('plugin:sql|select', { db, query: 'SELECT * FROM equipments' });
-        return nodes.map(node => ({
-            ...node,
-            externalId: node.external_id,
-            parentId: node.parent_id,
-            systemCode: node.system_code,
-            subSystem: node.sub_system,
-            serialNumber: node.serial_number,
-            tagNumber: node.tag_number,
-            documentRef: node.document_ref,
-            svgLayer: node.svg_layer,
-            fireZone: node.fire_zone,
-            linkedParameters: JSON.parse(node.linked_parameters || '[]'),
-            isImmutable: !!node.is_immutable,
-            approvedBy: node.approved_by,
-            approvedAt: node.approved_at,
-            nominalData: JSON.parse(node.nominal_data || '{}'),
-            coordinates: JSON.parse(node.coordinates || '{}'),
-        }));
+        const tauriClient = await import('@/lib/tauri-client');
+        // The tauri command now returns the full equipment object, so no more mapping is needed here.
+        return await tauriClient.getEquipments();
     }
-    return Promise.resolve(getClientSideData().equipments);
+    // For web, fetch from the API route
+    const response = await fetch('/api/equipments');
+    if (!response.ok) {
+        throw new Error('Failed to fetch equipments for web');
+    }
+    return await response.json();
 }
 
 export async function getEquipmentById(id: string): Promise<Equipment | null> {
     if (typeof window !== 'undefined' && window.__TAURI__) {
-        await initializeDatabase();
-        const db = await invoke('plugin:sql|load', { db: DB_NAME });
-        const result: any[] = await invoke('plugin:sql|select', { 
-            db, 
-            query: 'SELECT * FROM equipments WHERE external_id = $1 LIMIT 1',
-            values: [id]
-        });
-        if (result.length === 0) return null;
-        const node = result[0];
-        return {
-            ...node,
-            externalId: node.external_id,
-            parentId: node.parent_id,
-            systemCode: node.system_code,
-            subSystem: node.sub_system,
-            serialNumber: node.serial_number,
-            documentRef: node.document_ref,
-            svgLayer: node.svg_layer,
-            fireZone: node.fire_zone,
-            linkedParameters: JSON.parse(node.linked_parameters || '[]'),
-            isImmutable: !!node.is_immutable,
-            approvedBy: node.approved_by,
-            approvedAt: node.approved_at,
-            nominalData: JSON.parse(node.nominal_data || '{}'),
-            coordinates: JSON.parse(node.coordinates || '{}'),
-        };
+        const tauriClient = await import('@/lib/tauri-client');
+        const equip = await tauriClient.getEquipment(id);
+        // The type from tauri-client might be simpler, ensure it's compatible
+        // For now we assume it is.
+        return equip as Equipment | null;
     }
-    const equipments = getClientSideData().equipments;
-    return Promise.resolve(equipments.find(e => e.externalId === id) || null);
+    // Web version would need a specific API route like /api/equipments/[id]
+    // For now, we filter from the full list.
+    const equipments = await getEquipments();
+    return equipments.find(e => e.externalId === id) || null;
 }
 
 export async function getParametersForComponent(equipmentId: string): Promise<Parameter[]> {
@@ -338,8 +220,9 @@ export async function getParametersForComponent(equipmentId: string): Promise<Pa
             values: [equipmentId]
         });
     }
-    const allParams = getClientSideData().parameters;
-    return Promise.resolve(allParams.filter(p => p.equipmentId === equipmentId));
+    const response = await fetch(`/api/parameters?equipmentId=${equipmentId}`); // This API route doesn't exist yet, but should
+    if(!response.ok) return [];
+    return await response.json();
 }
 
 export async function getParameters(): Promise<Parameter[]> {
@@ -348,7 +231,8 @@ export async function getParameters(): Promise<Parameter[]> {
     const db = await invoke('plugin:sql|load', { db: DB_NAME });
     return invoke('plugin:sql|select', { db, query: 'SELECT * FROM parameters' });
   }
-  return Promise.resolve(getClientSideData().parameters);
+  // This is a placeholder, should fetch from an API route
+  return Promise.resolve(allParameterData as Parameter[]);
 }
 
 
@@ -364,9 +248,10 @@ export async function getAssistantContextData(): Promise<any> {
         return { equipments, parameters, alarms };
     }
     // For web, we can provide a subset of data or mock it if needed
-    const { equipments, parameters } = getClientSideData();
+    const equipments = await getEquipments();
     const alarmsData = (await import('@/assets/master-data/alarms.json')).default;
-    return Promise.resolve({ equipments, parameters, alarms: alarmsData });
+    // Parameters would need an API route
+    return Promise.resolve({ equipments, parameters: allParameterData, alarms: alarmsData });
 }
 
 export async function getLogEntries(): Promise<LogEntry[]> {
