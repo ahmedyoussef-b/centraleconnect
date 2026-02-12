@@ -24,7 +24,7 @@ npm install
 
 # 4. Prisma
 echo -e "\n${YELLOW}🗄️  Mise à jour de la base de données locale...${NC}"
-export DATABASE_URL="file:./dev.db" # Force l'utilisation de la base de données de développement locale
+# La variable DATABASE_URL est maintenant lue depuis le fichier .env.local
 npx prisma generate
 npx prisma db push
 
