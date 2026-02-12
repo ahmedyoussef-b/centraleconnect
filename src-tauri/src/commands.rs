@@ -107,7 +107,8 @@ pub struct Procedure {
     pub description: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub version: Option<String>,
-    pub steps: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub steps: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub category: Option<String>,
 }

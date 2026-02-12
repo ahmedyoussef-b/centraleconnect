@@ -24,9 +24,9 @@ async function fetchProcedures(): Promise<Procedure[]> {
     
     const parsedProcedures = rawProcedures.map((p: any) => ({
         ...p,
-        // The `steps` are stored as a JSON string in the SQLite DB, but as a JSON object from the API.
-        steps: typeof p.steps === 'string' ? JSON.parse(p.steps) : p.steps,
-        // The category now comes directly from the DB/API. We just provide a fallback.
+        // The `steps` can be a JSON string (Tauri/SQLite) or already an object (Web API/Prisma)
+        // It can also be null if a procedure has no steps defined.
+        steps: (typeof p.steps === 'string' && p.steps) ? JSON.parse(p.steps) : (p.steps || []),
         category: p.category || 'Autres',
     }));
     

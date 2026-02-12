@@ -27,6 +27,9 @@ export default function ProceduresPage() {
         getProcedures().then(data => {
             setProcedures(data);
             setLoading(false);
+        }).catch(error => {
+            console.error("Erreur lors du chargement des procédures:", error);
+            setLoading(false);
         });
     }, []);
 
@@ -64,6 +67,7 @@ export default function ProceduresPage() {
                     <Accordion type="multiple" defaultValue={categories} className="space-y-4">
                         {categories.map(category => {
                             const procs = groupedProcedures[category];
+                            if (!procs || procs.length === 0) return null;
                             const Icon = categoryIcons[category] || ClipboardCheck;
                             return (
                                 <Card key={category}>
