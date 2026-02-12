@@ -1,8 +1,7 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
-import { TrendingUp } from 'lucide-react';
+import { TrendingUp, Info } from 'lucide-react';
 import { CartesianGrid, Line, LineChart, XAxis, YAxis, Tooltip, Legend } from 'recharts';
 
 import {
@@ -19,28 +18,7 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from '@/components/ui/chart';
-import { fr } from 'date-fns/locale';
-import { Skeleton } from './ui/skeleton';
-
-// Generate mock data for the last 24 hours
-const generateChartData = () => {
-  const data = [];
-  const now = new Date();
-  for (let i = 24; i >= 0; i--) {
-    const time = new Date(now.getTime() - i * 60 * 60 * 1000);
-    const tg1Power = 130 + Math.random() * 15 - 7.5;
-    const tg2Power = 135 + Math.random() * 10 - 5;
-    const tvPower = 180 + Math.random() * 20 - 10;
-    data.push({
-      time: time.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }),
-      TG1: tg1Power > 0 ? parseFloat(tg1Power.toFixed(1)) : 0,
-      TG2: tg2Power > 0 ? parseFloat(tg2Power.toFixed(1)) : 0,
-      TV: tvPower > 0 ? parseFloat(tvPower.toFixed(1)) : 0,
-      Total: parseFloat((tg1Power + tg2Power + tvPower).toFixed(1)),
-    });
-  }
-  return data;
-};
+import { Alert, AlertDescription } from './ui/alert';
 
 const chartConfig = {
   TG1: {
@@ -55,99 +33,82 @@ const chartConfig = {
     label: 'Puissance TV',
     color: 'hsl(var(--chart-3))',
   },
-  Total: {
-    label: 'Total CCPP',
-    color: 'hsl(var(--primary))',
-  },
 } satisfies ChartConfig;
 
-export function HistoryChart() {
-  const [chartData, setChartData] = useState<any[]>([]);
+export function HistoryChart({ data }: { data: any[] }) {
 
-  useEffect(() => {
-    setChartData(generateChartData());
-  }, []);
-
-  if (chartData.length === 0) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Historique de Puissance (24h)</CardTitle>
-          <CardDescription>Évolution des puissances actives (MW)</CardDescription>
-        </CardHeader>
-        <CardContent>
-            <Skeleton className="h-[300px]" />
-        </CardContent>
-      </Card>
-    );
-  }
+  const totalPower = data.length > 0 ? (data[data.length - 1].TG1 + data[data.length - 1].TG2 + data[data.length - 1].TV).toFixed(1) : '0.0';
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Historique de Puissance (24h)</CardTitle>
-        <CardDescription>Évolution des puissances actives (MW)</CardDescription>
+        <CardTitle>Historique Temps Réel</CardTitle>
+        <CardDescription>Évolution des puissances actives (MW). Total CCPP : <span className="font-bold text-primary">{totalPower} MW</span></CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig} className="h-[300px] w-full">
-          <LineChart
-            data={chartData}
-            margin={{
-              top: 5,
-              right: 10,
-              left: 10,
-              bottom: 0,
-            }}
-          >
-            <CartesianGrid vertical={false} />
-            <XAxis
-              dataKey="time"
-              tickLine={false}
-              axisLine={false}
-              tickMargin={8}
-              tickFormatter={(value, index) => (index % 4 === 0 ? value : '')}
-            />
-            <YAxis
-              tickLine={false}
-              axisLine={false}
-              tickMargin={8}
-              label={{ value: 'MW', angle: -90, position: 'insideLeft', offset: -5 }}
-            />
-            <ChartTooltip
-              cursor={false}
-              content={<ChartTooltipContent indicator="dot" />}
-            />
-             <Legend />
-            <Line
-              dataKey="TG1"
-              type="monotone"
-              stroke="var(--color-TG1)"
-              strokeWidth={2}
-              dot={false}
-            />
-            <Line
-              dataKey="TG2"
-              type="monotone"
-              stroke="var(--color-TG2)"
-              strokeWidth={2}
-              dot={false}
-            />
-             <Line
-              dataKey="TV"
-              type="monotone"
-              stroke="var(--color-TV)"
-              strokeWidth={2}
-              dot={false}
-            />
-             <Line
-              dataKey="Total"
-              type="monotone"
-              stroke="var(--color-Total)"
-              strokeWidth={3}
-              dot={false}
-            />
-          </LineChart>
-        </ChartContainer>
+        {data.length > 2 ? (
+            <ChartContainer config={chartConfig} className="h-[300px] w-full">
+            <LineChart
+                data={data}
+                margin={{
+                top: 5,
+                right: 10,
+                left: 10,
+                bottom: 0,
+                }}
+            >
+                <CartesianGrid vertical={false} />
+                <XAxis
+                dataKey="time"
+                tickLine={false}
+                axisLine={false}
+                tickMargin={8}
+                tickFormatter={(value, index) => (index % Math.floor(data.length / 6) === 0 ? value : '')}
+                />
+                <YAxis
+                tickLine={false}
+                axisLine={false}
+                tickMargin={8}
+                label={{ value: 'MW', angle: -90, position: 'insideLeft', offset: -5 }}
+                />
+                <ChartTooltip
+                cursor={false}
+                content={<ChartTooltipContent indicator="dot" />}
+                />
+                <Legend />
+                <Line
+                dataKey="TG1"
+                type="monotone"
+                stroke="var(--color-TG1)"
+                strokeWidth={2}
+                dot={false}
+                />
+                <Line
+                dataKey="TG2"
+                type="monotone"
+                stroke="var(--color-TG2)"
+                strokeWidth={2}
+                dot={false}
+                />
+                <Line
+                dataKey="TV"
+                type="monotone"
+                stroke="var(--color-TV)"
+                strokeWidth={2}
+                dot={false}
+                />
+            </LineChart>
+            </ChartContainer>
+        ) : (
+            <div className="h-[300px] flex items-center justify-center">
+                <Alert className="w-auto">
+                    <Info className="h-4 w-4" />
+                    <AlertDescription>
+                        En attente de données suffisantes pour afficher le graphique...
+                    </AlertDescription>
+                </Alert>
+            </div>
+        )}
       </CardContent>
     </Card>
   );

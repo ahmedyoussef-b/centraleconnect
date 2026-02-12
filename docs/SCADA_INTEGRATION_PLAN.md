@@ -1,62 +1,52 @@
 # 📄 Plan d'Intégration SCADA
 
-Ce document détaille les étapes concrètes pour connecter l'application de monitoring à une source de données SCADA réelle, en remplacement du simulateur actuel.
+Ce document détaille les étapes concrètes pour connecter l'application de monitoring à une source de données SCADA temps réel.
 
-## Phase 1 : Préparation et Mapping
+L'architecture choisie est la suivante :
+- **Un backend Rust (Tauri)** se connecte à la source de données (OPC UA ou un simulateur).
+- Ce backend publie les données sur un **canal Ably** (`scada:data`).
+- **Le frontend Next.js** s'abonne à ce canal pour recevoir les données et mettre à jour l'interface.
 
-Cette phase consiste à préparer les informations nécessaires à la connexion et à établir une correspondance entre les identifiants de l'application et les tags du système SCADA.
+Cette approche découple totalement le frontend du backend.
 
-### 1.1. Confirmation de l'accès OPC UA (Action Manuelle)
+## Phase 1 : Mode Démo avec Données Synthétiques (Terminée ✅)
 
-**Objectif :** Valider les paramètres de connexion au serveur OPC UA de la centrale.
+Cette phase est **terminée**. L'objectif était de valider la chaîne de communication complète avec des données simulées.
 
-**État :** À faire. C'est une étape cruciale qui doit être réalisée avec les équipes d'exploitation et d'ingénierie système.
+- **[✅] Backend Rust** : Un simulateur a été implémenté dans `src-tauri/src/scada.rs`. Il s'active si `SCADA_MODE=DEMO` dans le fichier `.env.local`. Toutes les 2 secondes, il génère des valeurs réalistes (avec du bruit) pour `TG1`, `TG2` et `TV` et les publie sur le canal Ably `scada:data`.
+- **[✅] Configuration** : Le fichier `.env.local` contient les variables `ABLY_API_KEY` et `SCADA_MODE`. Le `README.md` a été mis à jour pour guider l'utilisateur.
+- **[✅] Frontend Next.js** : La page du tableau de bord (`/dashboard`) a été refactorisée. Elle utilise maintenant le client Ably (`src/lib/ably-client.ts`) pour s'abonner au canal et met à jour les composants `CcppDiagram` et `HistoryChart` avec les données reçues en temps réel.
 
-**Informations à collecter :**
--   **Adresse du serveur OPC UA :** `opc.tcp://<adresse_ip>:<port>`
--   **Politique de sécurité :** (ex: `Basic256Sha256`, `None`)
--   **Mode d'authentification :** Anonyme, Nom d'utilisateur/Mot de passe, ou Certificat.
--   **Certificats :** Si nécessaire, obtenir les fichiers de certificat client (`.pem`) et clé privée (`.key`), ainsi que le certificat du serveur.
--   **Espace de noms (Namespace) :** Identifier l'index de l'espace de noms où se trouvent les tags de la centrale.
--   **Format des Tags :** Confirmer la structure exacte des `nodeId` OPC UA (ex: `ns=2;s=CCPP.TG1.PowerOutput`).
+**Résultat :** Le tableau de bord affiche maintenant des données dynamiques, prouvant que l'architecture temps réel est fonctionnelle.
 
-### 1.2. Génération du Mapping `external_id` ↔ Tag SCADA
+## Phase 2 : Connexion à un Serveur OPC UA (Prochaines Étapes)
 
-**Objectif :** Créer un fichier de correspondance entre les identifiants uniques des équipements dans notre application (`external_id`) et leurs tags correspondants dans le système SCADA.
+Cette phase consiste à remplacer le simulateur par une vraie connexion à un serveur OPC UA.
 
-**État :** **Implémenté ✅**
+### 2.1. Compléter le Mapping (Action Manuelle)
 
-Un script a été créé pour automatiser la génération d'un fichier de mapping de base. Ce script analyse toutes les données de référence (`master-data`) pour extraire les `external_id` et proposer un `scada_tag_candidate`.
+**Objectif :** Valider et compléter le fichier de correspondance entre les identifiants de l'application et les tags du système SCADA.
 
-**Comment l'utiliser :**
-1.  Exécutez la commande suivante depuis la racine du projet :
-    ```bash
-    npm run generate:scada-map
-    ```
-2.  Cette commande génère (ou met à jour) le fichier `public/scada-mapping.json`.
+**État :** Fichier de base généré.
 
-**Prochaine étape :** Ce fichier généré est un **candidat**. Il doit être revu et validé manuellement par un ingénieur système pour s'assurer que chaque `scada_tag_candidate` correspond bien au tag réel dans le superviseur SCADA.
+- Le fichier `public/scada-mapping.json` a été généré via `npm run generate:scada-map`.
+- **Action requise :** Un ingénieur système doit **valider et corriger manuellement** ce fichier pour s'assurer que chaque `scada_tag_candidate` correspond bien au `nodeId` réel du serveur OPC UA.
 
-## Phase 2 : Implémentation du Connecteur
+### 2.2. Implémenter le Mode OPC UA dans le Backend Rust
 
-**Objectif :** Remplacer les données simulées par des données réelles provenant du serveur OPC UA.
+**Objectif :** Développer la logique de connexion au serveur OPC UA.
 
-### 2.1. Création du Service OPC UA (Backend)
+**État :** Prêt pour développement.
 
--   **Logique :** Mettre en place un service (soit dans le backend Rust de Tauri, soit dans un micro-service Node.js dédié) qui se connecte au serveur OPC UA.
--   **Fonctionnalités :**
-    -   Établir et maintenir une session sécurisée avec le serveur.
-    -   Utiliser le fichier `scada-mapping.json` validé pour s'abonner aux changements de valeur des tags pertinents.
-    -   Écouter les notifications de changement de données (`data change notifications`).
+- **Logique à implémenter dans `src-tauri/src/scada.rs`** :
+    1.  Si `SCADA_MODE=OPCUA`, lire l'`OPCUA_SERVER_URL` depuis `.env.local`.
+    2.  Charger et parser le fichier `public/scada-mapping.json`.
+    3.  Utiliser la crate `opcua` pour se connecter au serveur (avec gestion des certificats et de l'authentification si nécessaire).
+    4.  Parcourir les `mappings` du fichier JSON et s'abonner aux `nodeId` correspondants sur le serveur OPC UA.
+    5.  Dans le callback de réception des données (`data change notification`), formater un message et le publier sur le canal Ably `scada:data` en utilisant le même format que le simulateur.
 
-### 2.2. Publication des Données sur Ably
+### 2.3. Validation et Déploiement en Production
 
--   **Logique :** Lorsque le service OPC UA reçoit une mise à jour de tag, il doit immédiatement la publier sur le canal Ably `scada:data`.
--   **Format du message :** Le message doit respecter le format attendu par le front-end, par exemple `{ "TG1_POWER": 132.5, "TG1_EXHAUST_TEMP": 580.2 }`.
--   **Impact :** Cette approche découple complètement le client de l'interface SCADA. Aucune modification ne sera nécessaire sur les composants React (`<ScadaRealtime />`) car ils écoutent déjà ce canal Ably.
-
-## Phase 3 : Validation et Déploiement
-
--   **Tests :** Mettre en place un environnement de test pour valider la chaîne de données complète (OPC UA → Service connecteur → Ably → Interface utilisateur).
--   **Monitoring :** Ajouter une supervision du service connecteur lui-même (état de la connexion OPC UA, latence, etc.).
--   **Déploiement :** Intégrer le service connecteur dans le processus de déploiement de l'application.
+-   **Tests :** Mettre en place un environnement de test avec un simulateur OPC UA (comme Prosys) pour valider la chaîne de données complète.
+-   **Sécurité :** Configurer les variables d'environnement pour la production avec l'URL du serveur réel, les certificats et les identifiants.
+-   **Déploiement :** Déployer l'application Tauri. Le passage en production se fera simplement en changeant la variable `SCADA_MODE` en `OPCUA`. **Aucune modification du frontend ne sera nécessaire.**

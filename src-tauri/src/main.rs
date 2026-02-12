@@ -5,9 +5,22 @@
 )]
 
 mod commands;
+mod scada;
+
+use dotenv::dotenv;
 
 fn main() {
+    dotenv().ok(); // Charge les variables du fichier .env
+
     tauri::Builder::default()
+        .setup(|app| {
+            let app_handle = app.handle();
+            // Lance la boucle SCADA dans une tâche de fond asynchrone
+            tauri::async_runtime::spawn(async move {
+                scada::run_scada_loop(app_handle).await;
+            });
+            Ok(())
+        })
         .plugin(tauri_plugin_sql::Builder::default().build())
         .invoke_handler(tauri::generate_handler![
             commands::get_equipments,
