@@ -4,8 +4,8 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { FileUp, Search, LoaderCircle, AlertTriangle, FileDown } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { FileUp, Search, LoaderCircle, AlertTriangle, FileDown, Wrench } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useToast } from '@/hooks/use-toast';
@@ -16,7 +16,7 @@ import { performIndustrialOCR, type OCRExtractionResult } from '@/lib/ocr/indust
 import { detectIndustrialCodes, type IndustrialCode } from '@/lib/vision/code-detector';
 import { EquipmentDetector, type EquipmentDetection } from '@/lib/vision/equipment-detector';
 import { PIDAnalyzer, type PIDAnalysis } from '@/lib/vision/pid-analyzer';
-import { FaultDetector, type Fault } from '@/lib/vision/fault-detector';
+import { FaultDetector, type VisualAnomalyDetection } from '@/lib/vision/fault-detector';
 import { ParameterExtractor, type Parameter } from '@/lib/ocr/parameter-extractor';
 import { SafetyLabelDetector, type SafetyLabel } from '@/lib/ocr/safety-label-detector';
 import { SignatureExtractor, type Signature } from '@/lib/ocr/signature-extractor';
@@ -30,7 +30,7 @@ interface AnalysisResults {
   codes: IndustrialCode[];
   detections: EquipmentDetection[];
   pid: PIDAnalysis | null;
-  faults: Fault[];
+  anomalies: VisualAnomalyDetection[];
   parameters: Parameter[];
   safetyLabels: SafetyLabel[];
   signatures: Signature[];
@@ -84,19 +84,6 @@ export default function DiagnosticVisuelPage() {
   }, [toast]);
 
 
-  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setFileImage(e.target?.result as string);
-        setResults(null);
-        setError(null);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
   const handleAnalyze = async () => {
     if (!fileImage || !imageRef.current) {
       toast({
@@ -123,7 +110,7 @@ export default function DiagnosticVisuelPage() {
       ctx.drawImage(imageBitmap, 0, 0);
       const imageDataForAnalysis = ctx.getImageData(0, 0, imageBitmap.width, imageBitmap.height);
 
-      const [metadata, ocr, codes, detections, pid, faults, parameters, safetyLabels, signatures, shapes] = await Promise.all([
+      const [metadata, ocr, codes, detections, pid, anomalies, parameters, safetyLabels, signatures, shapes] = await Promise.all([
         extractIndustrialMetadata(imageBlob),
         performIndustrialOCR(fileImage, { zone: 'B1' }),
         detectIndustrialCodes(imageDataForAnalysis),
@@ -144,7 +131,7 @@ export default function DiagnosticVisuelPage() {
       const environmentAnalyzer = new EnvironmentAnalyzer();
       const environment = environmentAnalyzer.analyze(detections);
 
-      setResults({ metadata, ocr, codes, detections, pid, faults, parameters, safetyLabels, signatures, environment, shapes });
+      setResults({ metadata, ocr, codes, detections, pid, anomalies, parameters, safetyLabels, signatures, environment, shapes });
 
     } catch (e: any) {
       console.error("Analysis failed:", e);
@@ -214,21 +201,32 @@ export default function DiagnosticVisuelPage() {
       
       {results && (
         <div className="space-y-4">
-          {results.faults.length > 0 && (
-             <Alert variant="destructive">
-                <AlertTriangle className="h-4 w-4" />
-                <AlertTitle>Anomalies Détectées !</AlertTitle>
-                <AlertDescription>
-                    <ul className="list-disc pl-5 mt-2 space-y-1">
-                        {results.faults.map((fault, index) => (
-                            <li key={index}>
-                                <strong>{fault.faultType}</strong> détecté avec une confiance de {fault.confidence.toFixed(0)}% (Sévérité: {fault.severity}).
-                            </li>
+            {results.anomalies.length > 0 && (
+                <Card className="border-destructive">
+                    <CardHeader>
+                        <CardTitle className="text-destructive flex items-center gap-2"><AlertTriangle />Anomalies Détectées !</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        {results.anomalies.map((anomaly, index) => (
+                            <div key={index} className="p-3 rounded-md bg-destructive/10">
+                                <div className="flex justify-between items-start">
+                                    <div>
+                                        <h4 className="font-bold">{anomaly.type}</h4>
+                                        <p className="text-sm text-destructive/80">Confiance: {anomaly.confidence.toFixed(0)}% | Sévérité: {anomaly.severity}</p>
+                                    </div>
+                                    <span className="text-xs font-semibold px-2 py-1 rounded-full bg-destructive text-destructive-foreground">{anomaly.severity}</span>
+                                </div>
+                                {anomaly.suggestedAction && (
+                                    <div className="mt-2 flex items-center gap-2 text-sm text-destructive/90 bg-destructive/10 p-2 rounded-md">
+                                        <Wrench className="h-4 w-4 flex-shrink-0" />
+                                        <span>Action suggérée : {anomaly.suggestedAction}</span>
+                                    </div>
+                                )}
+                            </div>
                         ))}
-                    </ul>
-                </AlertDescription>
-            </Alert>
-          )}
+                    </CardContent>
+                </Card>
+            )}
 
           {results.safetyLabels.length > 0 && (
             <Card>
