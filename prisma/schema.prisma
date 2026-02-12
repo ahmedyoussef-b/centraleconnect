@@ -29,76 +29,76 @@ enum SyncStatus {
 // --------------------------------------
 
 model Equipment {
-  id                String            @id @default(cuid())
-  externalId        String            @unique
+  id                String           @id @default(cuid())
+  externalId        String           @unique
   name              String
   description       String?
   parentId          String?
   type              String?
   subtype           String?
-  systemCode        String?           @map("system_code")
-  subSystem         String?           @map("sub_system")
+  systemCode        String?          @map("system_code")
+  subSystem         String?          @map("sub_system")
   location          String?
   manufacturer      String?
-  serialNumber      String?           @map("serial_number")
-  documentRef       String?           @map("document_ref")
+  serialNumber      String?          @map("serial_number")
+  documentRef       String?          @map("document_ref")
   coordinates       Json?
-  svgLayer          String?           @map("svg_layer")
-  fireZone          String?           @map("fire_zone")
-  linkedParameters  Json?             @map("linked_parameters")
+  svgLayer          String?          @map("svg_layer")
+  fireZone          String?          @map("fire_zone")
+  linkedParameters  Json?            @map("linked_parameters")
   status            String?
-  version           Int               @default(1)
-  isImmutable       Boolean           @default(false) @map("is_immutable")
-  approvedBy        String?           @map("approved_by")
-  approvedAt        DateTime?         @map("approved_at")
-  commissioningDate DateTime?         @map("commissioning_date")
-  checksum          String?           @unique
-  nominalData       Json?             @map("nominal_data")
-  createdAt         DateTime          @default(now()) @map("created_at")
-  updatedAt         DateTime          @updatedAt @map("updated_at")
+  version           Int              @default(1)
+  isImmutable       Boolean          @default(false) @map("is_immutable")
+  approvedBy        String?          @map("approved_by")
+  approvedAt        DateTime?        @map("approved_at")
+  commissioningDate DateTime?        @map("commissioning_date")
+  checksum          String?          @unique
+  nominalData       Json?            @map("nominal_data")
+  createdAt         DateTime         @default(now()) @map("created_at")
+  updatedAt         DateTime         @updatedAt @map("updated_at")
   parameters        Parameter[]
   alarms            Alarm[]
   logEntries        LogEntry[]
   visualEvidence    VisualEvidence[] // Relation inverse
-  trainingData      VisualTraining[]  @relation("TrainingEquipment") // Relation inverse
+  trainingData      VisualTraining[] @relation("TrainingEquipment") // Relation inverse
 }
 
 model Parameter {
-  id           Int      @id @default(autoincrement())
-  equipmentId  String   @map("equipment_id")
+  id           Int       @id @default(autoincrement())
+  equipmentId  String    @map("equipment_id")
   name         String
   unit         String?
-  nominalValue Float?   @map("nominal_value")
-  minSafe      Float?   @map("min_safe")
-  maxSafe      Float?   @map("max_safe")
-  alarmHigh    Float?   @map("alarm_high")
-  alarmLow     Float?   @map("alarm_low")
-  standardRef  String?  @map("standard_ref")
+  nominalValue Float?    @map("nominal_value")
+  minSafe      Float?    @map("min_safe")
+  maxSafe      Float?    @map("max_safe")
+  alarmHigh    Float?    @map("alarm_high")
+  alarmLow     Float?    @map("alarm_low")
+  standardRef  String?   @map("standard_ref")
   equipment    Equipment @relation(fields: [equipmentId], references: [externalId])
 }
 
 model Alarm {
-  id             Int      @id @default(autoincrement())
-  code           String   @unique
-  equipmentId    String   @map("equipment_id")
+  id             Int          @id @default(autoincrement())
+  code           String       @unique
+  equipmentId    String       @map("equipment_id")
   severity       String
   description    String
   parameter      String?
-  resetProcedure String?  @map("reset_procedure")
-  standardRef    String?  @map("standard_ref")
-  equipment      Equipment @relation(fields: [equipmentId], references: [externalId])
+  resetProcedure String?      @map("reset_procedure")
+  standardRef    String?      @map("standard_ref")
+  equipment      Equipment    @relation(fields: [equipmentId], references: [externalId])
   events         AlarmEvent[]
 }
 
 model LogEntry {
-  id          Int      @id @default(autoincrement())
-  timestamp   DateTime @default(now())
-  type        String
-  source      String
-  message     String
-  equipmentId String?  @map("equipment_id")
-  equipment   Equipment? @relation(fields: [equipmentId], references: [externalId])
-  signature   String   @unique
+  id               Int             @id @default(autoincrement())
+  timestamp        DateTime        @default(now())
+  type             String
+  source           String
+  message          String
+  equipmentId      String?         @map("equipment_id")
+  equipment        Equipment?      @relation(fields: [equipmentId], references: [externalId])
+  signature        String          @unique
   // Relation pour preuve visuelle
   visualEvidenceId String?
   visualEvidence   VisualEvidence? @relation(fields: [visualEvidenceId], references: [id])
@@ -114,16 +114,16 @@ model Procedure {
 }
 
 model SynopticItem {
-  id           Int      @id @default(autoincrement())
-  externalId   String   @unique @map("external_id")
+  id           Int     @id @default(autoincrement())
+  externalId   String  @unique @map("external_id")
   name         String?
   type         String?
-  parentId     String?  @map("parent_id")
-  groupPath    String?  @map("group_path")
-  elementId    String?  @map("element_id")
+  parentId     String? @map("parent_id")
+  groupPath    String? @map("group_path")
+  elementId    String? @map("element_id")
   level        Int?
-  approvedBy   String?  @map("approved_by")
-  approvalDate String?  @map("approval_date")
+  approvedBy   String? @map("approved_by")
+  approvalDate String? @map("approval_date")
 }
 
 model Annotation {
@@ -181,37 +181,37 @@ model User {
 }
 
 model VisualEvidence {
-  id          String     @id @default(cuid())
+  id              String           @id @default(cuid())
   // Média
-  type        MediaType
-  mimeType    String
-  size        Int // bytes
-  width       Int?
-  height      Int?
-  duration    Int? // secondes (vidéo)
+  type            MediaType
+  mimeType        String
+  size            Int // bytes
+  width           Int?
+  height          Int?
+  duration        Int? // secondes (vidéo)
   // Hashs
-  sha256      String     @unique
-  phash       String? // Perceptual hash
+  sha256          String           @unique
+  phash           String? // Perceptual hash
   // Contexte
-  equipmentId String?
-  equipment   Equipment? @relation(fields: [equipmentId], references: [externalId])
-  procedureId String?
+  equipmentId     String?
+  equipment       Equipment?       @relation(fields: [equipmentId], references: [externalId])
+  procedureId     String?
   // Utilisateur
-  createdById String
-  createdBy   User       @relation(fields: [createdById], references: [id])
-  createdAt   DateTime   @default(now())
+  createdById     String
+  createdBy       User             @relation(fields: [createdById], references: [id])
+  createdAt       DateTime         @default(now())
   // Annotations
-  annotations Json?
+  annotations     Json?
   // Analyse IA
   analysis        Json?
   analysisVersion String?
   analysisAt      DateTime?
   // Traçabilité
-  signature   String // Chaîne confiance
-  syncStatus  SyncStatus @default(PENDING)
+  signature       String // Chaîne confiance
+  syncStatus      SyncStatus       @default(PENDING)
   // Relation inverse
-  logEntries  LogEntry[]
-  trainingData VisualTraining[]
+  logEntries      LogEntry[]
+  trainingData    VisualTraining[]
 
   @@index([equipmentId])
   @@index([phash])
@@ -219,7 +219,7 @@ model VisualEvidence {
 }
 
 model VisualTraining {
-  id          String   @id @default(cuid())
+  id          String         @id @default(cuid())
   // Donnée labellisée
   imageId     String
   image       VisualEvidence @relation(fields: [imageId], references: [id])
@@ -230,7 +230,7 @@ model VisualTraining {
   boundingBox Json? // [x,y,w,h]
   // Validation
   validatedBy String?
-  validator   User?      @relation(fields: [validatedBy], references: [id])
+  validator   User?          @relation(fields: [validatedBy], references: [id])
   validatedAt DateTime?
 
   createdAt DateTime @default(now())

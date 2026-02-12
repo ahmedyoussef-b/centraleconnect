@@ -131,10 +131,10 @@ export default function AlarmsPage() {
 
     const groupedAlarms = useMemo(() => {
         return {
-            tg: alarms.filter(a => a.equipmentId.startsWith('TG')),
-            tv: alarms.filter(a => a.equipmentId.startsWith('TV')),
-            elec: alarms.filter(a => a.equipmentId.startsWith('ELEC')), // Assuming a convention
-            aux: alarms.filter(a => !a.equipmentId.startsWith('TG') && !a.equipmentId.startsWith('TV') && !a.equipmentId.startsWith('ELEC')),
+            tg: alarms.filter(a => a.equipmentId && a.equipmentId.startsWith('TG')),
+            tv: alarms.filter(a => a.equipmentId && a.equipmentId.startsWith('TV')),
+            elec: alarms.filter(a => a.equipmentId && a.equipmentId.startsWith('ELEC')), // Assuming a convention
+            aux: alarms.filter(a => a.equipmentId && !a.equipmentId.startsWith('TG') && !a.equipmentId.startsWith('TV') && !a.equipmentId.startsWith('ELEC')),
         };
     }, [alarms]);
 
