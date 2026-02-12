@@ -1,5 +1,5 @@
 
-import type { Procedure } from '@/types/db';
+import type { Procedure, ProcedureStep } from '@/types/db';
 
 let proceduresCache: Procedure[] | null = null;
 
@@ -25,25 +25,30 @@ async function fetchProcedures(): Promise<Procedure[]> {
     
     // Correction de la logique de parsing pour être plus robuste
     const parsedProcedures = rawProcedures.map((p: any) => {
-        let finalSteps: any[] = [];
-        if (typeof p.steps === 'string' && p.steps && p.steps !== 'null') {
+        let parsedSteps: ProcedureStep[] = [];
+        
+        // Gère les données venant de Tauri (stringified JSON) et de l'API web (objet JSON)
+        let stepsData = p.steps;
+
+        if (typeof stepsData === 'string' && stepsData) {
             try {
-                const parsed = JSON.parse(p.steps);
+                // Tentative de parser la chaîne
+                const parsed = JSON.parse(stepsData);
                 if (Array.isArray(parsed)) {
-                    finalSteps = parsed;
+                    parsedSteps = parsed;
                 }
             } catch (e) {
-                console.error(`Failed to parse steps for procedure ${p.id}:`, p.steps, e);
-                // Laisser finalSteps comme un tableau vide en cas d'erreur
+                console.error(`[Procedures Service] Impossible de parser les étapes JSON pour la procédure ${p.id}:`, stepsData, e);
+                // Laisser parsedSteps comme un tableau vide en cas d'erreur de parsing
             }
-        } else if (Array.isArray(p.steps)) {
-            // Gérer le cas où les données sont déjà un objet (API web)
-            finalSteps = p.steps;
+        } else if (Array.isArray(stepsData)) {
+            // Si c'est déjà un tableau (cas de l'API web), on l'utilise directement
+            parsedSteps = stepsData;
         }
 
         return {
             ...p,
-            steps: finalSteps,
+            steps: parsedSteps, // Garantit que `steps` est toujours un tableau
             category: p.category || 'Autres',
         };
     });
