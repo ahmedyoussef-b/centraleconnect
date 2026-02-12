@@ -1,6 +1,7 @@
+
 'use client';
 
-import { Activity, CheckCircle, XCircle, AlertTriangle, LoaderCircle, Wifi, Cpu } from 'lucide-react';
+import { Activity, CheckCircle, XCircle, AlertTriangle, LoaderCircle, Wifi, Cpu, BadgeCheck } from 'lucide-react';
 import { useScadaData, ScadaConnectionStatus } from '@/lib/scada/hooks/use-scada-data';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -48,6 +49,21 @@ const StatusInfo = {
   },
 };
 
+function StatCard({ title, value, icon: Icon, description }: { title: string; value: string; icon: React.ElementType, description?: React.ReactNode }) {
+    return (
+        <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">{title}</CardTitle>
+                <Icon className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+                <div className="text-2xl font-bold">{value}</div>
+                {description && <p className="text-xs text-muted-foreground">{description}</p>}
+            </CardContent>
+        </Card>
+    );
+}
+
 export default function ScadaDiagnosticsPage() {
   const { latestData, history, status, dataSource } = useScadaData();
   const currentStatusInfo = StatusInfo[status];
@@ -60,35 +76,45 @@ export default function ScadaDiagnosticsPage() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Activity />
-            Diagnostic du Bus de Données SCADA
+            Tableau de Bord de Diagnostic SCADA
           </CardTitle>
           <CardDescription>
-            Surveillez l'état de la connexion temps réel et visualisez les données brutes.
+            Surveillez l'état de la connexion temps réel, la source des données et visualisez les données brutes.
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center gap-4">
-            <span className="font-semibold">État de la connexion:</span>
-            <Badge variant="outline" className="flex items-center gap-2">
-              <span
-                className={cn(
-                  'h-3 w-3 rounded-full',
-                  currentStatusInfo.color,
-                  currentStatusInfo.animate && 'animate-pulse'
-                )}
-              />
-              {currentStatusInfo.text}
-            </Badge>
-          </div>
-           <div className="flex items-center gap-4">
-            <span className="font-semibold">Source des données:</span>
-            <Badge variant={dataSource === 'REALTIME' ? 'default' : 'secondary'} className="flex items-center gap-2">
-               {dataSource === 'REALTIME' ? <Wifi className="h-3 w-3" /> : <Cpu className="h-3 w-3" />}
-               {dataSource === 'REALTIME' ? 'Temps Réel (Ably)' : 'Simulateur Client'}
-            </Badge>
-          </div>
-        </CardContent>
       </Card>
+      
+      <div className="grid gap-4 md:grid-cols-3">
+          <StatCard
+            title="État de la Connexion"
+            value={currentStatusInfo.text}
+            icon={currentStatusInfo.icon}
+            description={
+                <span className="flex items-center gap-2">
+                    <span
+                        className={cn(
+                        'h-2 w-2 rounded-full',
+                        currentStatusInfo.color,
+                        currentStatusInfo.animate && 'animate-pulse'
+                        )}
+                    />
+                    Bus de données temps réel
+                </span>
+            }
+          />
+          <StatCard
+            title="Source des Données"
+            value={dataSource === 'REALTIME' ? 'Temps Réel' : 'Simulateur'}
+            icon={dataSource === 'REALTIME' ? Wifi : Cpu}
+            description={dataSource === 'REALTIME' ? 'Données provenant du backend (OPC UA ou Démo)' : 'Fallback : données générées par le client'}
+          />
+           <StatCard
+            title="Tags Reçus"
+            value={latestDataEntries.length.toString()}
+            icon={BadgeCheck}
+            description="Nombre de tags dans le dernier message"
+          />
+      </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Card>
@@ -101,6 +127,7 @@ export default function ScadaDiagnosticsPage() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Tag</TableHead>
+                    <TableHead>Qualité</TableHead>
                     <TableHead className="text-right">Valeur</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -108,7 +135,10 @@ export default function ScadaDiagnosticsPage() {
                   {latestDataEntries.map(([key, value]) => (
                     <TableRow key={key}>
                       <TableCell className="font-mono text-xs">{key}</TableCell>
-                      <TableCell className="text-right font-semibold">{value.toFixed(2)}</TableCell>
+                      <TableCell>
+                          <Badge variant="secondary" className="bg-green-500/10 text-green-400 border-green-500/20">BONNE</Badge>
+                      </TableCell>
+                      <TableCell className="text-right font-semibold">{typeof value === 'number' ? value.toFixed(2) : value}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -121,12 +151,13 @@ export default function ScadaDiagnosticsPage() {
         
         <Card>
           <CardHeader>
-            <CardTitle>Historique Brut</CardTitle>
+            <CardTitle>Historique Brut des Messages</CardTitle>
+            <CardDescription>Les 100 derniers messages reçus du bus de données.</CardDescription>
           </CardHeader>
           <CardContent>
-            <ScrollArea className="h-[300px] w-full rounded-md border">
+            <ScrollArea className="h-[300px] w-full rounded-md border bg-muted/20">
                 <pre className="p-4 text-xs">
-                    {JSON.stringify(history.slice().reverse(), null, 2)}
+                    {history.length > 0 ? JSON.stringify(history.slice().reverse(), null, 2) : "Aucun message dans l'historique."}
                 </pre>
             </ScrollArea>
           </CardContent>
