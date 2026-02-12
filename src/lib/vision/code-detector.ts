@@ -95,15 +95,10 @@ export const detectIndustrialCodes = async (
     if (ctx) {
         ctx.putImageData(imageData, 0, 0);
         
-        // ✅ CORRECTION : Utiliser decodeFromImageElement ou decodeFromCanvasElement
-        // Option 1: Utiliser decodeFromImageElement (nécessite de convertir le canvas en image)
         const imageElement = new Image();
         imageElement.src = canvas.toDataURL();
         await new Promise((resolve) => { imageElement.onload = resolve; });
         const result = await zxing.decodeFromImageElement(imageElement);
-        
-        // Option 2: Utiliser decodeFromCanvasElement si disponible dans votre version
-        // const result = await zxing.decodeFromCanvasElement(canvas);
         
         codes.push({
           type: 'BARCODE',

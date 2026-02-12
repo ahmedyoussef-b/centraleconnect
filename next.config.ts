@@ -15,6 +15,11 @@ const nextConfig: NextConfig = {
         destination: '/dashboard',
         permanent: true,
       },
+      {
+        source: '/test-lecture',
+        destination: '/diagnostic-visuel',
+        permanent: true,
+      }
     ]
   },
   images: {

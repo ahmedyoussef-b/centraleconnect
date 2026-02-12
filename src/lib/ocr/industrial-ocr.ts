@@ -16,15 +16,14 @@ export const performIndustrialOCR = async (
 ): Promise<OCRExtractionResult> => {
   // Configuration spécialisée pour environnement industriel
   const worker = await Tesseract.createWorker('fra', 1, {
-    logger: m => console.log(`[OCR] ${m.progress * 100}%`),
+    logger: m => console.log(`[OCR] ${m.status === 'recognizing text' ? `Recognizing: ${Math.round(m.progress * 100)}%` : m.status}`),
     cacheMethod: 'none', // Désactiver cache pour données critiques
   });
 
-  // ✅ CORRECTION : Utiliser l'enum PSM au lieu d'une chaîne
   await worker.setParameters({
     tessedit_char_whitelist: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_.:/°%barMPakg', // Caractères industriels
     preserve_interword_spaces: '1',
-    tessedit_pageseg_mode: PSM.SINGLE_BLOCK, // ✅ Utilisation de l'enum PSM (valeur 6)
+    tessedit_pageseg_mode: PSM.SINGLE_BLOCK,
   });
 
   const { data: { text, confidence } } = await worker.recognize(imageData);

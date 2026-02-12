@@ -68,7 +68,7 @@ const pageTitles: { [key: string]: string } = {
     '/provisioning': 'Analyse Visuelle',
     '/sync': 'Synchronisation',
     '/test': 'Page de Test',
-    '/test-lecture': 'Diagnostic Visuel',
+    '/diagnostic-visuel': 'Diagnostic Visuel',
     '/test-shapes': 'Test de Formes',
 };
 
@@ -216,8 +216,8 @@ function MainLayoutContent({ children }: { children: React.ReactNode }) {
                   </SidebarMenuButton>
               </SidebarMenuItem>
                <SidebarMenuItem>
-                  <SidebarMenuButton asChild tooltip="Diagnostic Visuel" isActive={pathname === '/test-lecture'}>
-                      <Link href="/test-lecture">
+                  <SidebarMenuButton asChild tooltip="Diagnostic Visuel" isActive={pathname === '/diagnostic-visuel'}>
+                      <Link href="/diagnostic-visuel">
                           <Search />
                           Diagnostic Visuel
                       </Link>
