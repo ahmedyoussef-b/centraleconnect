@@ -6,16 +6,10 @@ const prisma = new PrismaClient();
 
 export async function GET() {
   try {
+    // Prisma client returns data with camelCase fields as defined in the schema.
+    // No manual mapping is needed.
     const alarms = await prisma.alarm.findMany();
-    // Prisma returns snake_case fields, but our frontend type expects camelCase for some fields.
-    // We must map them here.
-    const mappedAlarms = alarms.map(alarm => ({
-      ...alarm,
-      resetProcedure: alarm.reset_procedure,
-      standardRef: alarm.standard_ref,
-      equipmentId: alarm.equipment_id,
-    }));
-    return NextResponse.json(mappedAlarms);
+    return NextResponse.json(alarms);
   } catch (error) {
     console.error("Failed to fetch alarms", error);
     return NextResponse.json(
