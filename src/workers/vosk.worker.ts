@@ -32,6 +32,26 @@ let recognizer: KaldiRecognizer | null = null;
 let model: Model | null = null;
 
 /**
+ * Attaches result and partialresult listeners to the recognizer.
+ */
+function attachListeners(rec: KaldiRecognizer) {
+    // ✅ Correction: Utiliser le bon type pour les événements
+    rec.on('result', (message: VoskResult) => {
+        const text = message.result?.text || message.text;
+        if (text) {
+          self.postMessage({ type: 'result', text } as WorkerResponse);
+        }
+    });
+    
+    rec.on('partialresult', (message: VoskResult) => {
+        const partial = message.result?.partial || message.partial;
+        if (partial) {
+          self.postMessage({ type: 'partial', text: partial } as WorkerResponse);
+        }
+    });
+}
+
+/**
  * Convert Float32Array to AudioBuffer for Vosk
  */
 function float32ArrayToAudioBuffer(audioData: Float32Array, sampleRate: number): AudioBuffer {
@@ -58,21 +78,7 @@ self.onmessage = async (event: MessageEvent<WorkerMessage>) => {
       }
       
       recognizer = new model.KaldiRecognizer(16000); // Vosk requires 16kHz
-
-      // ✅ Correction: Utiliser le bon type pour les événements
-      recognizer.on('result', (message: VoskResult) => {
-        const text = message.result?.text || message.text;
-        if (text) {
-          self.postMessage({ type: 'result', text } as WorkerResponse);
-        }
-      });
-      
-      recognizer.on('partialresult', (message: VoskResult) => {
-        const partial = message.result?.partial || message.partial;
-        if (partial) {
-          self.postMessage({ type: 'partial', text: partial } as WorkerResponse);
-        }
-      });
+      attachListeners(recognizer);
 
       self.postMessage({ type: 'ready' } as WorkerResponse);
 
@@ -86,9 +92,10 @@ self.onmessage = async (event: MessageEvent<WorkerMessage>) => {
       recognizer.acceptWaveform(audioBuffer);
     }
   } else if (data.type === 'reset') {
-    // ✅ Recréer le recognizer au lieu d'appeler reset()
+    // ✅ Recréer le recognizer au lieu d'appeler reset() et ré-attacher les listeners
     if (model) {
       recognizer = new model.KaldiRecognizer(16000);
+      attachListeners(recognizer); // FIX: Re-attach listeners
       self.postMessage({ type: 'ready' } as WorkerResponse);
     }
   }
