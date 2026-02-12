@@ -64,6 +64,56 @@ Tu dois répondre en français, avec précision technique, en proposant du code,
 
 ---
 
+## 🏗️ Structure du Projet
+
+L'application est organisée autour d'une architecture moderne et modulaire pour séparer les préoccupations, faciliter la maintenance et permettre une évolution robuste.
+
+-   **/src-tauri/** : Cœur de l'application de bureau (Rust).
+    -   `src/main.rs`: Point d'entrée de l'application Tauri, enregistrement des commandes.
+    -   `src/commands.rs`: Pont entre le frontend et le système (accès base de données, fichiers).
+    -   `tauri.conf.json`: Configuration de l'application (permissions, fenêtres, etc.).
+
+-   **/src/app/** : Cœur de l'application web (Next.js App Router).
+    -   `(main)/`: Contient les pages principales de l'application avec leur layout.
+        -   `layout.tsx`: Layout principal incluant la barre de navigation.
+        -   `dashboard/page.tsx`: Tableau de bord principal.
+        -   `equipments/page.tsx`: Explorateur d'équipements.
+        -   `equipments/[id]/page.tsx`: Page de détail d'un équipement.
+        -   ... (autres pages : `alarms`, `procedures`, `logbook`, etc.)
+    -   `api/`: Routes API pour la version web (ex: `/api/sync`, `/api/alarms`).
+
+-   **/src/components/** : Composants React réutilisables.
+    -   `ui/`: Composants de base fournis par `shadcn/ui` (Button, Card, etc.).
+    -   `vocal-assistant.tsx`: L'interface de l'assistant vocal.
+    -   `camera-view.tsx`: Le composant d'analyse visuelle (provisionnement/identification).
+    -   `logbook.tsx`: Le composant du journal de bord.
+    -   `equipment-detail-view.tsx`: Vue détaillée d'un équipement.
+
+-   **/src/lib/** : Logique métier, services et utilitaires.
+    -   `db-service.ts`: **Service CRUCIAL**. Couche d'abstraction qui appelle soit les commandes Tauri (bureau), soit les API web pour accéder aux données.
+    -   `tauri-client.ts`: Fonctions wrapper pour appeler les commandes Rust depuis le frontend.
+    -   `image-hashing.ts`: Logique de hachage perceptuel pour l'identification visuelle.
+    -   `vision/`: Modules d'analyse d'image (détection de codes, d'équipements).
+    -   `ocr/`: Modules de reconnaissance de texte.
+    -   `predictive/`: Logique (simulée) de maintenance prédictive.
+
+-   **/src/ai/** : Fonctionnalités d'Intelligence Artificielle avec Genkit.
+    -   `genkit.ts`: Configuration du client Genkit.
+    -   `flows/assistant-flow.ts`: Logique de l'assistant vocal (prompt, appel LLM, TTS).
+
+-   **/src/assets/master-data/** : **Source de vérité** pour les données statiques (équipements, alarmes, procédures) chargées au démarrage dans la base de données.
+
+-   **/public/** : Fichiers statiques.
+    -   `assets/pids/`: Schémas P&ID au format SVG.
+    -   `models/`: Modèles IA (reconnaissance vocale Vosk, détection d'objets).
+
+-   **/prisma/** : Gestion de la base de données distante.
+    -   `schema.prisma`: **Schéma de référence** pour la base de données PostgreSQL de production.
+
+-   **/scripts/** : Scripts utilitaires pour le développement (`db:seed`, `update-app.sh`, etc.).
+
+---
+
 ## Statut de l'Implémentation
 
 Voici une analyse de l'état d'avancement du projet par rapport aux 8 fonctionnalités clés définies.
