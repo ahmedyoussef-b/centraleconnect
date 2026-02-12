@@ -2,21 +2,12 @@
 import type {NextConfig} from 'next';
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  output: 'export',
   typescript: {
     ignoreBuildErrors: true,
   },
   eslint: {
     ignoreDuringBuilds: true,
-  },
-  async redirects() {
-    return [
-      {
-        source: '/',
-        destination: '/dashboard',
-        permanent: true,
-      },
-    ]
   },
   images: {
     unoptimized: true,
@@ -60,17 +51,6 @@ const nextConfig: NextConfig = {
     });
     
     return config;
-  },
-  async headers() {
-    return [
-      {
-        source: '/models/:path*',
-        headers: [
-          { key: 'Cross-Origin-Embedder-Policy', value: 'require-corp' },
-          { key: 'Cross-Origin-Opener-Policy', value: 'same-origin' },
-        ],
-      },
-    ];
   },
 };
 
