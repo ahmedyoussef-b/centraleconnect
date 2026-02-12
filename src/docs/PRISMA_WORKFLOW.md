@@ -4,29 +4,30 @@ Ce document explique la procédure à suivre pour modifier la structure de la ba
 
 ## 1. Architecture
 
-L'application utilise une architecture de base de données hybride :
+L'application utilise une architecture de base de données hybride, une approche nécessaire en raison des contraintes des outils actuels :
 
 1.  **Base de Données Distante (PostgreSQL)** :
-    *   Gérée par **Prisma**.
-    *   C'est la source de vérité pour le seeding et la synchronisation.
-    *   Utilisée par les API routes Next.js (ex: `/api/provision`, `/api/sync`).
+    *   Gérée par **Prisma**. C'est la **source de vérité** pour la structure des données.
+    *   Utilisée par les API routes Next.js pour le provisionnement et la synchronisation (ex: `/api/provision`, `/api/sync`).
+    *   Toute modification de schéma doit être faite dans `prisma/schema.prisma`.
 
 2.  **Base de Données Locale (SQLite)** :
     *   Gérée via des requêtes **SQL brutes** dans l'application de bureau Tauri (`src/lib/db-service.ts`).
     *   Permet le fonctionnement hors-ligne.
-    *   Synchronisée (en lecture seule) depuis la base de données distante.
+    *   C'est une **copie en lecture** des données distantes (pour la plupart) et un stockage pour les données locales (journal, etc.).
 
-Le fichier `prisma/schema.prisma` reste la **source de vérité unique** pour la *structure* des données. Cependant, les modifications apportées à ce fichier doivent être répercutées **manuellement** dans le schéma SQL de la base de données locale.
+**Contrainte Technique Fondamentale :**
+Prisma ne peut gérer qu'un seul type de base de données (`provider`) à la fois à partir d'un seul `schema.prisma`. Puisque nous avons besoin de PostgreSQL pour la production et de SQLite pour l'embarqué, nous ne pouvons pas utiliser Prisma pour gérer directement le schéma de la base de données locale. C'est pourquoi le schéma local est maintenu manuellement.
 
 ---
 
 ## 2. Workflow de Modification de la Base de Données
 
-Suivez ces étapes dans l'ordre pour toute modification de schéma (ajout/suppression/modification d'un champ ou d'une table).
+Suivez ces étapes **rigoureusement** pour toute modification de schéma afin de maintenir la cohérence entre les deux bases de données.
 
-### Étape 1 : Modifier le Schéma Prisma
+### Étape 1 : Modifier le Schéma Prisma (Source de Vérité)
 
-Commencez toujours par modifier le fichier `prisma/schema.prisma`. C'est ici que vous définissez vos modèles de manière centralisée.
+Commencez toujours par modifier le fichier `prisma/schema.prisma`. C'est le plan directeur de vos données.
 
 **Exemple :** Ajout d'un champ `commissioningDate` à la table `Equipment`.
 
@@ -35,18 +36,16 @@ Commencez toujours par modifier le fichier `prisma/schema.prisma`. C'est ici que
 
 model Equipment {
   // ... autres champs
-  isImmutable       Boolean  @default(false) @map("is_immutable")
-  approvedBy        String?  @map("approved_by")
-  approvedAt        DateTime? @map("approved_at")
+  approvedAt        DateTime?  @map("approved_at")
   commissioningDate DateTime? @map("commissioning_date") // <-- NOUVEAU CHAMP
-  checksum          String?  @unique
+  checksum          String?    @unique
   // ...
 }
 ```
 
-### Étape 2 : Mettre à jour le Schéma SQL de la Base Locale (Action Manuelle Critique)
+### Étape 2 : Répercuter la Modification dans la Base Locale (Action Manuelle Critique)
 
-C'est l'étape la plus importante et la plus sensible. Vous devez traduire la modification du schéma Prisma en SQL pour la base de données SQLite.
+C'est l'étape la plus sensible. Vous devez **traduire manuellement** la modification du schéma Prisma en SQL pour la base de données SQLite.
 
 Ouvrez le fichier `src/lib/db-service.ts` et mettez à jour la chaîne de caractères `CREATE_TABLES_SQL`.
 
@@ -60,7 +59,7 @@ BEGIN;
 CREATE TABLE IF NOT EXISTS equipments (
     -- ... autres colonnes
     approved_at TEXT,
-    commissioning_date TEXT, -- <-- NOUVELLE COLONNE
+    commissioning_date TEXT, -- <-- NOUVELLE COLONNE AJOUTÉE
     checksum TEXT UNIQUE,
     nominal_data TEXT
 );
@@ -69,11 +68,11 @@ COMMIT;
 `;
 ```
 
-**Attention :** Assurez-vous que les types de données correspondent (ex: `DateTime` dans Prisma devient `TEXT` pour stocker une date ISO en SQLite).
+**Attention :** Assurez-vous que les types de données correspondent (ex: `DateTime` dans Prisma devient `TEXT` pour stocker une date ISO en SQLite, `Boolean` devient `BOOLEAN NOT NULL DEFAULT 0`).
 
 ### Étape 3 : Mettre à jour les Types TypeScript
 
-Modifiez les interfaces dans `src/types/db.ts` pour qu'elles correspondent à votre nouveau schéma.
+Modifiez les interfaces dans `src/types/db.ts` pour qu'elles correspondent à votre nouveau schéma. C'est crucial pour que TypeScript ne signale pas d'erreurs.
 
 **Exemple :**
 
@@ -89,22 +88,20 @@ export interface Equipment {
 }
 ```
 
-### Étape 4 : Mettre à jour les Données et Scripts
+### Étape 4 : Mettre à jour les Données et Scripts de Seeding
 
 1.  **Données de Référence (`master-data`)** : Si le nouveau champ doit être initialisé avec des données, mettez à jour les fichiers JSON correspondants dans `src/assets/master-data/`.
 2.  **Script de Seeding (`scripts/seed.ts`)** : Adaptez le script pour qu'il prenne en compte le nouveau champ lors de l'alimentation de la base de données distante.
 
-### Étape 5 : Exécuter le Seeding
+### Étape 5 : Appliquer les Modifications
 
-Une fois les scripts mis à jour, exécutez la commande suivante pour appliquer les changements à votre base de données **distante** (PostgreSQL) :
+1.  **Pour la base distante (PostgreSQL)** : Exécutez la commande suivante. Elle mettra à jour le schéma de votre base distante et la remplira avec les données du script de seed.
+    ```bash
+    npm run db:seed
+    ```
+2.  **Pour la base locale (SQLite)** : La manière la plus simple de garantir que le nouveau schéma est appliqué est de **supprimer l'ancien fichier de base de données**.
+    *   Allez dans le dossier `src-tauri/`.
+    *   Supprimez le fichier `ccpp.db`.
+    *   Redémarrez l'application Tauri (ex: `npm run tauri dev`). L'application recréera automatiquement `ccpp.db` avec le nouveau schéma que vous avez défini à l'étape 2.
 
-```bash
-npm run db:seed
-```
-
-### Étape 6 : Vérifier
-
--   **Base distante :** Vous pouvez vous connecter à votre base PostgreSQL pour vérifier que les modifications ont bien été appliquées.
--   **Base locale :** Pour la base locale, supprimez l'ancien fichier `ccpp.db` dans le dossier `src-tauri` et redémarrez l'application Tauri. Elle recréera la base de données avec le nouveau schéma SQL que vous avez défini à l'étape 2.
-
-Ce workflow garantit que vos deux bases de données, distante et locale, restent cohérentes et fonctionnelles.
+Ce workflow, bien que comportant une étape manuelle, est actuellement la méthode la plus fiable pour gérer cette architecture hybride.

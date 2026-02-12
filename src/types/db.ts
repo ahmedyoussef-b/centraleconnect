@@ -67,6 +67,7 @@ export interface Equipment {
   isImmutable: boolean;
   approvedBy?: string;
   approvedAt?: string;
+  commissioningDate?: string;
   checksum?: string;
   nominalData?: any;
 }
@@ -76,8 +77,6 @@ export interface Parameter {
   equipmentId: string;
   name: string;
   unit?: string;
-  // ❌ SUPPRIMÉ : dataType n'existe pas dans Prisma
-  // dataType?: 'TEXT' | 'NUMERIC' | 'BOOLEAN';
   nominalValue?: number | null;
   minSafe?: number | null;
   maxSafe?: number | null;
