@@ -18,6 +18,7 @@ import {
   Search,
   Shapes,
   FileSearch,
+  Camera,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -66,12 +67,11 @@ const pageTitles: { [key: string]: string } = {
     '/procedures': 'Procédures',
     '/equipments': 'Équipements',
     '/logbook': 'Journal de Bord',
-    '/provisioning': 'Analyse Visuelle',
+    '/vision': 'Scanner Visuel',
+    '/vision/search': 'Recherche Visuelle',
+    '/vision/analysis': 'Analyse d\'Image',
     '/sync': 'Synchronisation',
     '/test': 'Page de Test',
-    '/diagnostic-visuel': 'Diagnostic Visuel',
-    '/visual-search': 'Recherche Visuelle',
-    '/test-shapes': 'Test de Formes',
 };
 
 function PidModal() {
@@ -189,18 +189,26 @@ function MainLayoutContent({ children }: { children: React.ReactNode }) {
                   </SidebarMenuButton>
               </SidebarMenuItem>
               <SidebarMenuItem>
-                  <SidebarMenuButton asChild tooltip="Analyse Visuelle" isActive={pathname === '/provisioning'}>
-                      <Link href="/provisioning">
-                          <ScanSearch />
-                          Analyse Visuelle
+                  <SidebarMenuButton asChild tooltip="Scanner Visuel" isActive={pathname.startsWith('/vision') && !pathname.includes('search') && !pathname.includes('analysis')}>
+                      <Link href="/vision">
+                          <Camera />
+                          Scanner Visuel
                       </Link>
                   </SidebarMenuButton>
               </SidebarMenuItem>
                <SidebarMenuItem>
-                  <SidebarMenuButton asChild tooltip="Recherche Visuelle" isActive={pathname === '/visual-search'}>
-                      <Link href="/visual-search">
+                  <SidebarMenuButton asChild tooltip="Recherche Visuelle" isActive={pathname.startsWith('/vision/search')}>
+                      <Link href="/vision/search">
                           <FileSearch />
                           Recherche Visuelle
+                      </Link>
+                  </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                  <SidebarMenuButton asChild tooltip="Analyse d'Image" isActive={pathname.startsWith('/vision/analysis')}>
+                      <Link href="/vision/analysis">
+                          <ScanSearch />
+                          Analyse d'Image
                       </Link>
                   </SidebarMenuButton>
               </SidebarMenuItem>
@@ -222,22 +230,6 @@ function MainLayoutContent({ children }: { children: React.ReactNode }) {
                       <Link href="/test">
                           <FlaskConical />
                           Test
-                      </Link>
-                  </SidebarMenuButton>
-              </SidebarMenuItem>
-               <SidebarMenuItem>
-                  <SidebarMenuButton asChild tooltip="Diagnostic Visuel" isActive={pathname === '/diagnostic-visuel'}>
-                      <Link href="/diagnostic-visuel">
-                          <Search />
-                          Diagnostic Visuel
-                      </Link>
-                  </SidebarMenuButton>
-              </SidebarMenuItem>
-              <SidebarMenuItem>
-                  <SidebarMenuButton asChild tooltip="Test de Formes" isActive={pathname === '/test-shapes'}>
-                      <Link href="/test-shapes">
-                          <Shapes />
-                          Test de Formes
                       </Link>
                   </SidebarMenuButton>
               </SidebarMenuItem>
