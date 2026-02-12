@@ -17,6 +17,7 @@ import {
   RefreshCw,
   Search,
   Shapes,
+  FileSearch,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -69,6 +70,7 @@ const pageTitles: { [key: string]: string } = {
     '/sync': 'Synchronisation',
     '/test': 'Page de Test',
     '/diagnostic-visuel': 'Diagnostic Visuel',
+    '/visual-search': 'Recherche Visuelle',
     '/test-shapes': 'Test de Formes',
 };
 
@@ -191,6 +193,14 @@ function MainLayoutContent({ children }: { children: React.ReactNode }) {
                       <Link href="/provisioning">
                           <ScanSearch />
                           Analyse Visuelle
+                      </Link>
+                  </SidebarMenuButton>
+              </SidebarMenuItem>
+               <SidebarMenuItem>
+                  <SidebarMenuButton asChild tooltip="Recherche Visuelle" isActive={pathname === '/visual-search'}>
+                      <Link href="/visual-search">
+                          <FileSearch />
+                          Recherche Visuelle
                       </Link>
                   </SidebarMenuButton>
               </SidebarMenuItem>

@@ -1,7 +1,7 @@
 // src-tauri/src/commands.rs
 use serde::{Serialize, Deserialize};
 use tauri::command;
-use tauri_plugin_sql::{Db, Error};
+use tauri_plugin_sql::{Db, Error, Value};
 use std::fs;
 use sha2::{Sha256, Digest};
 
@@ -136,6 +136,21 @@ pub struct NewLogEntry {
     pub equipment_id: Option<String>,
 }
 
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct Document {
+    pub id: i64,
+    pub equipment_id: String,
+    pub image_data: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ocr_text: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
+    pub created_at: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub perceptual_hash: Option<String>,
+}
+
 
 // This helper function gets a database connection from the app handle.
 async fn get_db(app_handle: &tauri::AppHandle) -> Result<Db, String> {
@@ -262,6 +277,39 @@ pub async fn get_log_entries_for_node(equipment_id: String, app_handle: tauri::A
         "SELECT * FROM log_entries WHERE equipment_id = $1 ORDER BY timestamp DESC",
         &[equipment_id.into()],
     )
+    .await
+    .map_err(|e| e.to_string())
+}
+
+
+#[command]
+pub async fn search_documents(query: String, equipment_id: Option<String>, app_handle: tauri::AppHandle) -> Result<Vec<Document>, String> {
+    let db = get_db(&app_handle).await?;
+    let mut params: Vec<Value> = vec![];
+    let mut conditions: Vec<String> = vec![];
+
+    if !query.is_empty() {
+        conditions.push("(ocr_text LIKE $1 OR description LIKE $1)".to_string());
+        params.push(format!("%{}%", query).into());
+    }
+
+    if let Some(eid) = equipment_id {
+        if !eid.is_empty() {
+            let param_index = params.len() + 1;
+            conditions.push(format!("equipment_id = ${}", param_index));
+            params.push(eid.into());
+        }
+    }
+
+    let where_clause = if conditions.is_empty() {
+        "1 = 1".to_string() // Return all if no query/filters
+    } else {
+        conditions.join(" AND ")
+    };
+    
+    let sql_query = format!("SELECT id, equipment_id, image_data, ocr_text, description, created_at, perceptual_hash FROM documents WHERE {} ORDER BY created_at DESC", where_clause);
+
+    db.select(&sql_query, &params)
     .await
     .map_err(|e| e.to_string())
 }

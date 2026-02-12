@@ -2,6 +2,7 @@
 
 
 
+
 import { invoke } from '@tauri-apps/api/tauri';
 import type { 
   Equipment,
@@ -606,6 +607,26 @@ export async function syncWithRemote(): Promise<{ synced: number; cleaned: boole
     }
     
     return { synced: totalSynced, cleaned };
+}
+
+export async function searchDocuments(query: { text?: string, equipmentId?: string }): Promise<Document[]> {
+  const isTauri = typeof window !== 'undefined' && !!window.__TAURI__;
+  
+  if (isTauri) {
+      const { searchDocuments: searchDocumentsTauri } = await import('@/lib/tauri-client');
+      return searchDocumentsTauri(query.text, query.equipmentId);
+  }
+  
+  const url = new URL('/api/search', window.location.origin);
+  if (query.text) url.searchParams.append('text', query.text);
+  if (query.equipmentId) url.searchParams.append('equipmentId', query.equipmentId);
+
+  const response = await fetch(url.toString());
+  if (!response.ok) {
+    console.error("Failed to search documents from web API");
+    return [];
+  }
+  return response.json();
 }
 
 

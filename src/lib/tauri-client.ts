@@ -1,9 +1,9 @@
-// src/lib/tauri-client.ts
+// src-tauri/tauri-client.ts
 import { invoke } from '@tauri-apps/api/tauri';
-import type { Equipment, Component, Alarm, Procedure as ProcedureType, LogEntry, LogEntryType } from '@/types/db';
+import type { Equipment, Component, Alarm, Procedure as ProcedureType, LogEntry, LogEntryType, Document } from '@/types/db';
 
 // Re-export main types for consistency
-export type { Equipment, Component, Alarm, LogEntry };
+export type { Equipment, Component, Alarm, LogEntry, Document };
 
 // Tauri-specific types where needed
 export type Procedure = Omit<ProcedureType, 'steps'> & { steps: string };
@@ -51,4 +51,9 @@ export async function addLogEntry(entry: NewLogEntry): Promise<void> {
 
 export async function getLogEntriesForNode(equipmentId: string): Promise<LogEntry[]> {
     return await invoke('get_log_entries_for_node', { equipmentId });
+}
+
+// ===== DOCUMENTS / VISUAL SEARCH =====
+export async function searchDocuments(query?: string, equipmentId?: string): Promise<Document[]> {
+  return await invoke('search_documents', { query: query || '', equipmentId });
 }
