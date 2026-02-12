@@ -1,5 +1,14 @@
-// This page is no longer needed as the redirect is handled in next.config.js
-// You can safely delete this file.
+// src/app/page.tsx
+'use client';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+
 export default function Home() {
-  return null;
+  const router = useRouter();
+
+  useEffect(() => {
+    router.replace('/dashboard');
+  }, [router]);
+
+  return null; // A loading spinner could also be placed here
 }
