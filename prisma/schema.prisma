@@ -7,93 +7,94 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = env("DATABASE_URL_REMOTE")
 }
 
 // --------------------------------------
 // Nouveaux Enums
 // --------------------------------------
-
 enum MediaType {
   PHOTO
   VIDEO
-  THERMIQUE
-  SPECTRO
 }
 
 enum SyncStatus {
   PENDING
   SYNCED
-  CONFLICT
+  FAILED
 }
 
-
 // --------------------------------------
-// Modèles de base
+// Modèles de Base
 // --------------------------------------
 
 model User {
-  id                  String           @id @default(cuid())
-  email               String?          @unique
-  name                String?
-  visualEvidence      VisualEvidence[]
-  validatedTraining   VisualTraining[] @relation("ValidatedBy")
+  id              String   @id @default(cuid())
+  name            String?
+  email           String   @unique
+  role            String   @default("OPERATOR")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  createdEvidence VisualEvidence[]
+  validatedTraining VisualTraining[]
 }
 
 model Equipment {
-  externalId        String            @id @map("external_id")
+  externalId        String           @id @unique
   name              String
   description       String?
-  parentId          String?           @map("parent_id")
+  parentId          String?
   type              String?
   subtype           String?
-  systemCode        String?           @map("system_code")
-  subSystem         String?           @map("sub_system")
+  systemCode        String?
+  subSystem         String?
   location          String?
   manufacturer      String?
-  serialNumber      String?           @map("serial_number")
-  documentRef       String?           @map("document_ref")
+  serialNumber      String?
+  documentRef       String?
   coordinates       Json?
-  svgLayer          String?           @map("svg_layer")
-  fireZone          String?           @map("fire_zone")
-  linkedParameters  Json?             @map("linked_parameters")
-  status            String?
-  version           Int               @default(1)
-  isImmutable       Boolean           @default(false) @map("is_immutable")
-  approvedBy        String?           @map("approved_by")
-  approvedAt        DateTime?         @map("approved_at")
-  commissioningDate DateTime?         @map("commissioning_date")
-  checksum          String?           @unique
-  nominalData       Json?             @map("nominal_data")
+  svgLayer          String?
+  fireZone          String?
+  linkedParameters  Json?
+  status            String?          @default("UNKNOWN")
+  version           Int              @default(1)
+  isImmutable       Boolean          @default(false)
+  approvedBy        String?
+  approvedAt        DateTime?        @map("approved_at")
+  commissioningDate DateTime?        @map("commissioning_date")
+  checksum          String?          @unique
+  nominalData       Json?
   
   parameters        Parameter[]
   alarms            Alarm[]
   logEntries        LogEntry[]
-  documents         Document[]
+  
+  // Relations inverses pour les nouvelles tables
   visualEvidence    VisualEvidence[]
-  trainingData      VisualTraining[]  @relation("TrainingEquipment")
+  trainingData      VisualTraining[] @relation("TrainingEquipment")
 
   @@map("equipments")
 }
 
 model Parameter {
-  id            Int       @id @default(autoincrement())
-  equipmentId   String    @map("equipment_id")
-  name          String
-  unit          String?
-  nominalValue  Float?    @map("nominal_value")
-  minSafe       Float?    @map("min_safe")
-  maxSafe       Float?    @map("max_safe")
-  alarmHigh     Float?    @map("alarm_high")
-  alarmLow      Float?    @map("alarm_low")
-  standardRef   String?   @map("standard_ref")
-  equipment     Equipment @relation(fields: [equipmentId], references: [externalId], onDelete: Cascade)
+  id           Int      @id @default(autoincrement())
+  equipmentId  String
+  name         String
+  unit         String?
+  nominalValue Float?
+  minSafe      Float?
+  maxSafe      Float?
+  alarmHigh    Float?
+  alarmLow     Float?
+  standardRef  String?
+  equipment    Equipment @relation(fields: [equipmentId], references: [externalId], onDelete: Cascade)
 
   @@map("parameters")
 }
 
 model Alarm {
-  code            String    @id
+  code            String    @id @unique
   equipmentId     String    @map("equipment_id")
   severity        String
   description     String
@@ -101,97 +102,106 @@ model Alarm {
   resetProcedure  String?   @map("reset_procedure")
   standardRef     String?   @map("standard_ref")
   equipment       Equipment @relation(fields: [equipmentId], references: [externalId], onDelete: Cascade)
+
   alarmEvents     AlarmEvent[]
 
   @@map("alarms")
 }
 
 model LogEntry {
-  id                Int             @id @default(autoincrement())
-  timestamp         DateTime
-  type              String
-  source            String
-  message           String
-  equipmentId       String?         @map("equipment_id")
-  signature         String          @unique
-  equipment         Equipment?      @relation(fields: [equipmentId], references: [externalId], onDelete: Cascade)
-  visualEvidenceId  String?
-  visualEvidence    VisualEvidence? @relation(fields: [visualEvidenceId], references: [id])
+  id          Int       @id @default(autoincrement())
+  timestamp   DateTime
+  type        String
+  source      String
+  message     String
+  signature   String    @unique
+  equipmentId String?
+  equipment   Equipment? @relation(fields: [equipmentId], references: [externalId], onDelete: SetNull)
+
+  // Relation optionnelle vers une preuve visuelle
+  visualEvidenceId String?
+  visualEvidence   VisualEvidence? @relation(fields: [visualEvidenceId], references: [id])
 
   @@map("log_entries")
 }
 
 model Procedure {
-  id          String   @id
+  id          String  @id
   name        String
   description String?
   version     String?
-  steps       Json
+  steps       Json? // Stocke le JSON brut des étapes
+  category    String?
 
   @@map("procedures")
 }
 
-model Document {
-  id              Int        @id @default(autoincrement())
-  equipmentId     String     @map("equipment_id")
-  imageData       String     @map("image_data")
-  ocrText         String?    @map("ocr_text")
-  description     String?
-  createdAt       DateTime   @default(now()) @map("created_at")
-  perceptualHash  String?    @map("perceptual_hash")
-  equipment       Equipment  @relation(fields: [equipmentId], references: [externalId], onDelete: Cascade)
-
-  @@map("documents")
-}
-
-model Annotation {
-  id          Int      @id @default(autoincrement())
-  timestamp   DateTime @default(now())
-  text        String
-  operator    String
-  xPos        Float    @map("x_pos")
-  yPos        Float    @map("y_pos")
-  equipmentId String   @map("equipment_id")
-
-  @@map("annotations")
-}
+// --------------------------------------
+// Tables Spécifiques
+// --------------------------------------
 
 model SynopticItem {
-  externalId    String  @id @map("external_id")
+  externalId    String    @id @unique
   name          String?
   type          String?
-  parentId      String? @map("parent_id")
-  groupPath     String? @map("group_path")
-  elementId     String? @map("element_id")
+  parentId      String?
+  groupPath     String?
+  elementId     String?
   level         Int?
-  approvedBy    String? @map("approved_by")
-  approvalDate  String? @map("approval_date")
+  approvedBy    String?
+  approvalDate  String?
 
   @@map("synoptic_items")
 }
 
-model AlarmEvent {
+model Annotation {
   id          Int      @id @default(autoincrement())
-  timestamp   DateTime @default(now())
-  isActive    Boolean  @map("is_active")
-  details     String?
-  alarmCode   String   @map("alarm_code")
-  alarm       Alarm    @relation(fields: [alarmCode], references: [code])
+  timestamp   DateTime
+  text        String
+  operator    String
+  xPos        Float
+  yPos        Float
+  equipmentId String
+
+  @@map("annotations")
+}
+
+model Document {
+  id             Int       @id @default(autoincrement())
+  imageData      String // Base64 ou URL
+  ocrText        String?
+  description    String?
+  createdAt      DateTime  @default(now())
+  perceptualHash String?
+  equipmentId    String
+  
+  @@map("documents")
+}
+
+
+model AlarmEvent {
+  id         Int      @id @default(autoincrement())
+  timestamp  DateTime
+  isActive   Boolean
+  details    String?
+  alarmCode  String
+  alarm      Alarm    @relation(fields: [alarmCode], references: [code], onDelete: Cascade)
 
   @@map("alarm_events")
 }
 
 model ScadaData {
   id          Int      @id @default(autoincrement())
-  timestamp   DateTime @default(now())
+  timestamp   DateTime
   value       Float
-  equipmentId String   @map("equipment_id")
-
+  equipmentId String
+  
   @@map("scada_data")
 }
 
+
 // --------------------------------------
-// Nouveaux Modèles Visuels
+// Nouveaux Modèles
 // --------------------------------------
 
 model VisualEvidence {
@@ -200,18 +210,18 @@ model VisualEvidence {
   // Média
   type           MediaType
   mimeType       String
-  size           Int
+  size           Int      // bytes
   width          Int?
   height         Int?
-  duration       Int?
+  duration       Int?     // secondes (vidéo)
   
   // Hashs
   sha256         String   @unique
-  phash          String?
+  phash          String?  // Perceptual hash
   
   // Contexte
   equipmentId    String?
-  equipment      Equipment? @relation(fields: [equipmentId], references: [externalId])
+  equipment      Equipment? @relation(fields: [equipmentId], references: [externalId], onDelete: SetNull)
   procedureId    String?
   consignmentId  String?
   workOrderId    String?
@@ -222,7 +232,7 @@ model VisualEvidence {
   createdAt      DateTime @default(now())
   
   // Annotations
-  annotations    Json
+  annotations    Json[]   // Stockage flexible
   
   // Analyse IA
   analysis       Json?
@@ -230,20 +240,20 @@ model VisualEvidence {
   analysisAt     DateTime?
   
   // Traçabilité
-  signature      String
+  signature      String   // Chaîne confiance
   syncStatus     SyncStatus @default(PENDING)
   
-  // Relations inverses
+  // Relation inverse
   logEntries     LogEntry[]
-  trainingData   VisualTraining[]
-  
+  trainingEntries VisualTraining[]
+
   @@index([equipmentId])
   @@index([phash])
   @@index([createdAt])
 }
 
 model VisualTraining {
-  id             String      @id @default(cuid())
+  id             String   @id @default(cuid())
   
   // Donnée labellisée
   imageId        String
@@ -251,16 +261,16 @@ model VisualTraining {
   
   // Labels humains
   equipmentId    String?
-  equipment      Equipment?  @relation("TrainingEquipment", fields: [equipmentId], references: [externalId])
+  equipment      Equipment? @relation("TrainingEquipment", fields: [equipmentId], references: [externalId])
   anomalyType    String?
-  boundingBox    Json?
+  boundingBox    Json?    // [x,y,w,h]
   
   // Validation
-  validatedById  String?
-  validatedBy    User?       @relation("ValidatedBy", fields: [validatedById], references: [id])
+  validatedById    String?
+  validatedBy      User?     @relation(fields: [validatedById], references: [id])
   validatedAt    DateTime?
   
-  createdAt      DateTime    @default(now())
+  createdAt      DateTime @default(now())
   
   @@unique([imageId, validatedById])
 }

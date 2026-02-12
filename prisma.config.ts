@@ -9,9 +9,9 @@ export default defineConfig({
     path: "prisma/migrations",
   },
   datasource: {
-    // Utilise DATABASE_URL_LOCAL en dev, DATABASE_URL en prod
-    url: process.env.NODE_ENV === 'production' 
-      ? process.env.DATABASE_URL ?? ''
-      : process.env.DATABASE_URL_LOCAL ?? 'file:./dev.db',
+    // La configuration de Prisma est maintenant alignée pour utiliser systématiquement
+    // la base de données distante PostgreSQL, comme défini par DATABASE_URL_REMOTE.
+    // La base de données locale SQLite (DATABASE_URL_LOCAL) est gérée par le code Tauri.
+    url: process.env.DATABASE_URL_REMOTE ?? '',
   },
 });
