@@ -1,13 +1,14 @@
 // src/lib/tauri-client.ts
 import { invoke } from '@tauri-apps/api/tauri';
 
-// Types (copiez depuis vos types existants)
+// Types (alignés avec les structures Rust)
 export interface Equipment {
-  id: string;
+  externalId: string;
   name: string;
-  zone: string;
-  status: string;
-  parameters?: Parameter[];
+  systemCode?: string;
+  status?: string;
+  // Les autres champs sont optionnels car la requête peut ne pas tout retourner
+  [key: string]: any; 
 }
 
 export interface Parameter {
@@ -20,7 +21,7 @@ export interface Parameter {
 export interface Component {
   id: string;
   name: string;
-  equipment_id: string;
+  equipmentId: string; // Correspond à equipment_id en Rust, sérialisé en camelCase
   manufacturer: string;
 }
 
