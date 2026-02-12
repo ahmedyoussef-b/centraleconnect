@@ -2,7 +2,7 @@
 'use client';
 import { useScadaContext } from '../providers/scada-provider';
 // Ré-exporter pour un accès facile depuis les composants consommateurs
-export { ScadaConnectionStatus } from '../providers/scada-provider';
+export { ScadaStatus as ScadaConnectionStatus } from '../interfaces';
 
 /**
  * Hook pour accéder aux données SCADA temps réel.

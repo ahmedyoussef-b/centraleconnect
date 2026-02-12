@@ -4,14 +4,7 @@
 import React, { createContext, useState, useEffect, useContext, ReactNode } from 'react';
 import type { Types } from 'ably';
 import { getAblyClient } from '../client/ably-client';
-
-export enum ScadaConnectionStatus {
-  INITIALIZING = 'INITIALIZING',
-  CONNECTED = 'CONNECTED',
-  DISCONNECTED = 'DISCONNECTED',
-  SUSPENDED = 'SUSPENDED',
-  FAILED = 'FAILED',
-}
+import { ScadaStatus } from '../interfaces';
 
 export interface ScadaDataPoint {
   timestamp: string;
@@ -22,7 +15,7 @@ export interface ScadaDataPoint {
 interface ScadaContextType {
   latestData: Record<string, number>;
   history: any[];
-  status: ScadaConnectionStatus;
+  status: ScadaStatus;
 }
 
 const MAX_HISTORY_POINTS = 100;
@@ -36,7 +29,7 @@ const ScadaContext = createContext<ScadaContextType | undefined>(undefined);
 export function ScadaProvider({ children }: { children: ReactNode }) {
   const [latestData, setLatestData] = useState<Record<string, number>>({});
   const [history, setHistory] = useState<any[]>([]);
-  const [status, setStatus] = useState<ScadaConnectionStatus>(ScadaConnectionStatus.INITIALIZING);
+  const [status, setStatus] = useState<ScadaStatus>(ScadaStatus.INITIALIZING);
 
   useEffect(() => {
     const ably = getAblyClient();
@@ -45,16 +38,16 @@ export function ScadaProvider({ children }: { children: ReactNode }) {
     const handleConnectionChange = () => {
       switch (ably.connection.state) {
         case 'connected':
-          setStatus(ScadaConnectionStatus.CONNECTED);
+          setStatus(ScadaStatus.CONNECTED);
           break;
         case 'suspended':
-          setStatus(ScadaConnectionStatus.SUSPENDED);
+          setStatus(ScadaStatus.SUSPENDED);
           break;
         case 'failed':
-          setStatus(ScadaConnectionStatus.FAILED);
+          setStatus(ScadaStatus.FAILED);
           break;
         default:
-          setStatus(ScadaConnectionStatus.DISCONNECTED);
+          setStatus(ScadaStatus.DISCONNECTED);
           break;
       }
     };
