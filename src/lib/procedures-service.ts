@@ -1,3 +1,4 @@
+
 import type { Procedure } from '@/types/db';
 
 let proceduresCache: Procedure[] | null = null;
@@ -22,13 +23,30 @@ async function fetchProcedures(): Promise<Procedure[]> {
         rawProcedures = await response.json();
     }
     
-    const parsedProcedures = rawProcedures.map((p: any) => ({
-        ...p,
-        // The `steps` can be a JSON string (Tauri/SQLite) or already an object (Web API/Prisma)
-        // It can also be null if a procedure has no steps defined.
-        steps: (typeof p.steps === 'string' && p.steps) ? JSON.parse(p.steps) : (p.steps || []),
-        category: p.category || 'Autres',
-    }));
+    // Correction de la logique de parsing pour être plus robuste
+    const parsedProcedures = rawProcedures.map((p: any) => {
+        let finalSteps: any[] = [];
+        if (typeof p.steps === 'string' && p.steps && p.steps !== 'null') {
+            try {
+                const parsed = JSON.parse(p.steps);
+                if (Array.isArray(parsed)) {
+                    finalSteps = parsed;
+                }
+            } catch (e) {
+                console.error(`Failed to parse steps for procedure ${p.id}:`, p.steps, e);
+                // Laisser finalSteps comme un tableau vide en cas d'erreur
+            }
+        } else if (Array.isArray(p.steps)) {
+            // Gérer le cas où les données sont déjà un objet (API web)
+            finalSteps = p.steps;
+        }
+
+        return {
+            ...p,
+            steps: finalSteps,
+            category: p.category || 'Autres',
+        };
+    });
     
     proceduresCache = parsedProcedures;
     return parsedProcedures;
