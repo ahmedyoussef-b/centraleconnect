@@ -5,8 +5,6 @@ use tauri_plugin_sql::{Db, Error};
 use std::fs;
 
 // --- Data Models ---
-// These structs should mirror the ones in `src/types/db.ts`
-// `serde(rename_all = "camelCase")` handles the serialization from Rust's snake_case to JS's camelCase
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct Equipment {
@@ -59,36 +57,30 @@ pub struct Equipment {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
-pub struct Parameter {
-    pub id: i32,
-    pub equipment_id: String,
-    pub name: String,
-    pub unit: Option<String>,
-    pub nominal_value: Option<f64>,
-    pub min_safe: Option<f64>,
-    pub max_safe: Option<f64>,
-    pub alarm_high: Option<f64>,
-    pub alarm_low: Option<f64>,
-    pub standard_ref: Option<String>,
+pub struct ComponentUI {
+    path: String,
+    color: String,
+    #[serde(rename = "criticalityX")]
+    criticality_x: i32,
+    #[serde(rename = "criticalityY")]
+    criticality_y: i32,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
-#[serde(rename_all = "camelCase")]
 pub struct Component {
     pub id: String,
     pub name: String,
-    pub equipment_id: String,
-    pub manufacturer: String,
+    #[serde(rename = "type")]
+    pub type_field: String,
+    pub description: String,
+    pub criticality: String,
+    pub ui: ComponentUI,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct SyncData {
-    pub equipments: Vec<Equipment>,
-    pub components: Vec<Component>,
-    pub timestamp: String,
+#[derive(Debug, Serialize, Deserialize)]
+struct PupitreData {
+    components: Vec<Component>,
 }
-
 
 // This helper function gets a database connection from the app handle.
 async fn get_db(app_handle: &tauri::AppHandle) -> Result<Db, String> {
@@ -100,8 +92,6 @@ async fn get_db(app_handle: &tauri::AppHandle) -> Result<Db, String> {
 #[command]
 pub async fn get_equipments(app_handle: tauri::AppHandle) -> Result<Vec<Equipment>, String> {
     let db = get_db(&app_handle).await?;
-    // The `select` method from tauri-plugin-sql will automatically deserialize snake_case DB columns
-    // into a struct, which we then serialize as camelCase for the frontend.
     db.select("SELECT * FROM equipments", &[]).await.map_err(|e| e.to_string())
 }
 
@@ -113,15 +103,14 @@ pub async fn get_equipment(id: String, app_handle: tauri::AppHandle) -> Result<O
 }
 
 #[command]
-pub async fn get_components(app_handle: tauri::AppHandle) -> Result<Vec<Component>, String> {
-     let db = get_db(&app_handle).await?;
-     db.select("SELECT * FROM components", &[]).await.map_err(|e| e.to_string())
-}
-
-#[command]
-pub async fn get_components_by_equipment(equipment_id: String, app_handle: tauri::AppHandle) -> Result<Vec<Component>, String> {
-    let db = get_db(&app_handle).await?;
-    db.select("SELECT * FROM components WHERE equipment_id = $1", &[equipment_id.into()]).await.map_err(|e| e.to_string())
+pub fn get_components(app_handle: tauri::AppHandle) -> Result<Vec<Component>, String> {
+    let resource_path = app_handle
+        .path_resolver()
+        .resolve_resource("src/assets/master-data/pupitre-data.json")
+        .ok_or_else(|| "Failed to resolve pupitre-data.json".to_string())?;
+    let file_content = fs::read_to_string(resource_path).map_err(|e| e.to_string())?;
+    let data: PupitreData = serde_json::from_str(&file_content).map_err(|e| e.to_string())?;
+    Ok(data.components)
 }
 
 
@@ -133,38 +122,4 @@ pub fn get_pid_svg(app_handle: tauri::AppHandle, path: String) -> Result<String,
 
     fs::read_to_string(&resource_path)
         .map_err(|e| e.to_string())
-}
-
-// --- Placeholder Commands ---
-// These commands are kept as placeholders to avoid breaking the frontend tauri-client,
-// but their logic needs to be implemented against the database.
-
-#[command]
-pub fn add_equipment(_equipment: Equipment) -> Result<Equipment, String> {
-    println!("[RUST_COMMAND] 'add_equipment' is a placeholder and has not been implemented.");
-    Err("Not implemented".to_string())
-}
-
-#[command]
-pub fn provision_equipment(_equipment: Equipment) -> Result<Equipment, String> {
-    println!("[RUST_COMMAND] 'provision_equipment' is a placeholder and has not been implemented.");
-    Err("Not implemented".to_string())
-}
-
-#[command]
-pub fn sync_data(_data: SyncData) -> Result<String, String> {
-    println!("[RUST_COMMAND] 'sync_data' is a placeholder and has not been implemented.");
-    Err("Not implemented".to_string())
-}
-
-#[command]
-pub fn get_sync_data() -> Result<Option<SyncData>, String> {
-    println!("[RUST_COMMAND] 'get_sync_data' is a placeholder and has not been implemented.");
-    Ok(None)
-}
-
-#[command]
-pub fn clear_sync_data() -> Result<String, String> {
-    println!("[RUST_COMMAND] 'clear_sync_data' is a placeholder and has not been implemented.");
-    Err("Not implemented".to_string())
 }
