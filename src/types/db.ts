@@ -149,6 +149,18 @@ export interface Document {
   description?: string;
   createdAt: string;
   perceptualHash?: string | null;
+  // Fields for VisualEvidenceCard compatibility
+  analysis?: {
+    anomalies?: {
+      type: string;
+      severity: string;
+      confidence: number;
+    }[];
+  };
+  annotations?: any[];
+  createdBy?: {
+      name: string;
+  }
 }
 
 export interface SynopticItem {
