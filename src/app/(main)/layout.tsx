@@ -41,6 +41,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import PidViewer from '@/components/PidViewer';
 import { SyncProvider, useSync } from '@/contexts/sync-context';
 import { Badge } from '@/components/ui/badge';
+import { ScadaProvider } from '@/lib/scada/providers/scada-provider';
 
 const VocalAssistant = dynamic(
   () =>
@@ -289,7 +290,9 @@ function MainLayoutContent({ children }: { children: React.ReactNode }) {
 export default function MainLayout({ children }: { children: React.ReactNode; }) {
     return (
         <SyncProvider>
-            <MainLayoutContent>{children}</MainLayoutContent>
+            <ScadaProvider>
+                <MainLayoutContent>{children}</MainLayoutContent>
+            </ScadaProvider>
         </SyncProvider>
     );
 }

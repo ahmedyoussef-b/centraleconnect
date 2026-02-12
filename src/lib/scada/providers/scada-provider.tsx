@@ -1,14 +1,9 @@
+// src/lib/scada/providers/scada-provider.tsx
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { getAblyClient } from '@/lib/ably-client';
+import React, { createContext, useState, useEffect, useContext, ReactNode } from 'react';
 import type { Types } from 'ably';
-
-export interface ScadaDataPoint {
-  timestamp: string;
-  source: 'DEMO' | 'OPCUA';
-  values: Record<string, number>;
-}
+import { getAblyClient } from '../client/ably-client';
 
 export enum ScadaConnectionStatus {
   INITIALIZING = 'INITIALIZING',
@@ -18,9 +13,27 @@ export enum ScadaConnectionStatus {
   FAILED = 'FAILED',
 }
 
+export interface ScadaDataPoint {
+  timestamp: string;
+  source: 'DEMO' | 'OPCUA';
+  values: Record<string, number>;
+}
+
+interface ScadaContextType {
+  latestData: Record<string, number>;
+  history: any[];
+  status: ScadaConnectionStatus;
+}
+
 const MAX_HISTORY_POINTS = 100;
 
-export function useScadaData() {
+const ScadaContext = createContext<ScadaContextType | undefined>(undefined);
+
+/**
+ * Fournit les données SCADA temps réel à l'ensemble de l'application.
+ * Il gère la connexion à Ably, les abonnements et l'état des données.
+ */
+export function ScadaProvider({ children }: { children: ReactNode }) {
   const [latestData, setLatestData] = useState<Record<string, number>>({});
   const [history, setHistory] = useState<any[]>([]);
   const [status, setStatus] = useState<ScadaConnectionStatus>(ScadaConnectionStatus.INITIALIZING);
@@ -55,7 +68,7 @@ export function useScadaData() {
     
     ably.connection.on(handleConnectionChange);
     channel.subscribe(handleMessage);
-    handleConnectionChange(); // Set initial status
+    handleConnectionChange(); // Définir le statut initial
 
     return () => {
       channel.unsubscribe();
@@ -63,5 +76,22 @@ export function useScadaData() {
     };
   }, []);
 
-  return { latestData, history, status };
+  const value = { latestData, history, status };
+
+  return (
+    <ScadaContext.Provider value={value}>
+      {children}
+    </ScadaContext.Provider>
+  );
+}
+
+/**
+ * Hook interne pour consommer le contexte SCADA.
+ */
+export function useScadaContext() {
+    const context = useContext(ScadaContext);
+    if (context === undefined) {
+        throw new Error('useScadaContext doit être utilisé à l\'intérieur d\'un ScadaProvider');
+    }
+    return context;
 }

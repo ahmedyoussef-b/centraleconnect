@@ -1,7 +1,7 @@
 'use client';
 
 import { Activity, CheckCircle, XCircle, AlertTriangle, LoaderCircle } from 'lucide-react';
-import { useScadaData, ScadaConnectionStatus } from '@/hooks/use-scada-data';
+import { useScadaData, ScadaConnectionStatus } from '@/lib/scada/hooks/use-scada-data';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
