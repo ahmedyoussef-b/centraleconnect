@@ -82,6 +82,21 @@ struct PupitreData {
     components: Vec<Component>,
 }
 
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct Alarm {
+    pub code: String,
+    pub equipment_id: String,
+    pub severity: String,
+    pub description: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub parameter: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub reset_procedure: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub standard_ref: Option<String>,
+}
+
 // This helper function gets a database connection from the app handle.
 async fn get_db(app_handle: &tauri::AppHandle) -> Result<Db, String> {
     app_handle.db().await.map_err(|e| e.to_string())
@@ -122,4 +137,10 @@ pub fn get_pid_svg(app_handle: tauri::AppHandle, path: String) -> Result<String,
 
     fs::read_to_string(&resource_path)
         .map_err(|e| e.to_string())
+}
+
+#[command]
+pub async fn get_alarms(app_handle: tauri::AppHandle) -> Result<Vec<Alarm>, String> {
+    let db = get_db(&app_handle).await?;
+    db.select("SELECT code, equipment_id, severity, description, parameter, reset_procedure, standard_ref FROM alarms", &[]).await.map_err(|e| e.to_string())
 }

@@ -5,12 +5,13 @@ import { getAlarms } from '@/lib/alarms-service';
 import type { Alarm } from '@/types/db';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge, type BadgeProps } from '@/components/ui/badge';
-import { BellRing, Wind, Cog, Zap, Factory, ChevronDown, AlertTriangle, Shield, ArrowRight } from 'lucide-react';
+import { BellRing, Wind, Cog, Zap, Factory, ChevronDown, AlertTriangle, Shield, ArrowRight, LoaderCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 
 type AlarmWithRef = Alarm & { standardRef?: string };
 
@@ -113,21 +114,36 @@ interface AlarmCategory {
 }
 
 export default function AlarmsPage() {
-    const alarms = getAlarms();
+    const [alarms, setAlarms] = useState<Alarm[]>([]);
+    const [loading, setLoading] = useState(true);
 
-    const groupedAlarms = {
-        tg: alarms.filter(a => a.equipmentId.startsWith('TG')),
-        tv: alarms.filter(a => a.equipmentId.startsWith('TV')),
-        elec: alarms.filter(a => a.equipmentId.startsWith('ELEC')), // Assuming a convention
-        aux: alarms.filter(a => !a.equipmentId.startsWith('TG') && !a.equipmentId.startsWith('TV') && !a.equipmentId.startsWith('ELEC')),
-    };
+    useEffect(() => {
+        getAlarms()
+            .then(data => {
+                setAlarms(data);
+                setLoading(false);
+            })
+            .catch(err => {
+                console.error("Failed to load alarms:", err);
+                setLoading(false);
+            });
+    }, []);
 
-    const categories: AlarmCategory[] = [
+    const groupedAlarms = useMemo(() => {
+        return {
+            tg: alarms.filter(a => a.equipmentId.startsWith('TG')),
+            tv: alarms.filter(a => a.equipmentId.startsWith('TV')),
+            elec: alarms.filter(a => a.equipmentId.startsWith('ELEC')), // Assuming a convention
+            aux: alarms.filter(a => !a.equipmentId.startsWith('TG') && !a.equipmentId.startsWith('TV') && !a.equipmentId.startsWith('ELEC')),
+        };
+    }, [alarms]);
+
+    const categories: AlarmCategory[] = useMemo(() => [
         { name: "Alarmes Turbine à Gaz", description: "Alarmes relatives aux turbines à gaz (TG1, TG2).", alarms: groupedAlarms.tg, icon: Cog },
         { name: "Alarmes Turbine à Vapeur", description: "Alarmes relatives à la turbine à vapeur (TV).", alarms: groupedAlarms.tv, icon: Wind },
         { name: "Alarmes Auxiliaires", description: "Alarmes pour les systèmes de support (chaudières, condenseurs, pompes...).", alarms: groupedAlarms.aux, icon: Factory },
         { name: "Alarmes Électriques", description: "Alarmes relatives aux systèmes de distribution et de contrôle électrique.", alarms: groupedAlarms.elec, icon: Zap },
-    ];
+    ], [groupedAlarms]);
     
     return (
         <div className="space-y-4">
@@ -143,35 +159,43 @@ export default function AlarmsPage() {
                 </CardHeader>
             </Card>
 
-            <Accordion type="multiple" defaultValue={categories.map(c => c.name)} className="space-y-4">
-                {categories.map(category => (
-                     <Card key={category.name}>
-                        <AccordionItem value={category.name} className="border-b-0">
-                                <AccordionTrigger className="p-6 hover:no-underline">
-                                    <div className="text-left flex-1">
-                                        <CardTitle className="flex items-center gap-3">
-                                            <category.icon className="h-6 w-6 text-primary"/>
-                                            {category.name}
-                                            <Badge variant="secondary">{category.alarms.length}</Badge>
-                                        </CardTitle>
-                                        <CardDescription className="mt-1.5">{category.description}</CardDescription>
-                                    </div>
-                                </AccordionTrigger>
-                            <AccordionContent>
-                                <CardContent className="pt-0">
-                                    <div className="grid grid-cols-4 items-center gap-4 px-3 py-2 text-xs font-semibold text-muted-foreground border-b mb-2">
-                                        <span>Sévérité</span>
-                                        <span>Code Alarme</span>
-                                        <span>Description</span>
-                                        <span>Équipement</span>
-                                    </div>
-                                    <AlarmList alarms={category.alarms} />
-                                </CardContent>
-                            </AccordionContent>
-                        </AccordionItem>
-                     </Card>
-                ))}
-            </Accordion>
+            {loading ? (
+                <div className="space-y-4">
+                    <Skeleton className="h-24 w-full" />
+                    <Skeleton className="h-24 w-full" />
+                    <Skeleton className="h-24 w-full" />
+                </div>
+            ) : (
+                <Accordion type="multiple" defaultValue={categories.map(c => c.name)} className="space-y-4">
+                    {categories.map(category => (
+                         <Card key={category.name}>
+                            <AccordionItem value={category.name} className="border-b-0">
+                                    <AccordionTrigger className="p-6 hover:no-underline">
+                                        <div className="text-left flex-1">
+                                            <CardTitle className="flex items-center gap-3">
+                                                <category.icon className="h-6 w-6 text-primary"/>
+                                                {category.name}
+                                                <Badge variant="secondary">{category.alarms.length}</Badge>
+                                            </CardTitle>
+                                            <CardDescription className="mt-1.5">{category.description}</CardDescription>
+                                        </div>
+                                    </AccordionTrigger>
+                                <AccordionContent>
+                                    <CardContent className="pt-0">
+                                        <div className="grid grid-cols-4 items-center gap-4 px-3 py-2 text-xs font-semibold text-muted-foreground border-b mb-2">
+                                            <span>Sévérité</span>
+                                            <span>Code Alarme</span>
+                                            <span>Description</span>
+                                            <span>Équipement</span>
+                                        </div>
+                                        <AlarmList alarms={category.alarms} />
+                                    </CardContent>
+                                </AccordionContent>
+                            </AccordionItem>
+                         </Card>
+                    ))}
+                </Accordion>
+            )}
         </div>
     );
 }
