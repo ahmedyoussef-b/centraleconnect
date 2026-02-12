@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { ClipboardCheck, ArrowRight, Wrench, Shield, Play, Factory } from "lucide-react";
 
@@ -11,6 +11,7 @@ import type { Procedure } from '@/types/db';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const categoryIcons: Record<string, React.ElementType> = {
     "Démarrage et Opérations": Play,
@@ -20,7 +21,15 @@ const categoryIcons: Record<string, React.ElementType> = {
 };
 
 export default function ProceduresPage() {
-    const procedures = getProcedures();
+    const [procedures, setProcedures] = useState<Procedure[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        getProcedures().then(data => {
+            setProcedures(data);
+            setLoading(false);
+        });
+    }, []);
 
     const groupedProcedures = useMemo(() => {
         return procedures.reduce((acc, proc) => {
@@ -47,7 +56,12 @@ export default function ProceduresPage() {
                 </CardDescription>
             </CardHeader>
             <CardContent>
-                {procedures.length > 0 ? (
+                {loading ? (
+                    <div className="space-y-4">
+                        <Skeleton className="h-24 w-full" />
+                        <Skeleton className="h-24 w-full" />
+                    </div>
+                ) : procedures.length > 0 ? (
                     <Accordion type="multiple" defaultValue={categories} className="space-y-4">
                         {categories.map(category => {
                             const procs = groupedProcedures[category];

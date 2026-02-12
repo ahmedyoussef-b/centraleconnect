@@ -183,7 +183,7 @@ async function main() {
         name: proc.name,
         description: proc.description,
         version: proc.version,
-        steps: JSON.stringify(proc.steps),
+        steps: proc.steps, // Pass the JSON object directly
       }
     });
   }

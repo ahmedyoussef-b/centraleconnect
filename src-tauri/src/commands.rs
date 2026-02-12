@@ -97,6 +97,20 @@ pub struct Alarm {
     pub standard_ref: Option<String>,
 }
 
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct Procedure {
+    pub id: String,
+    pub name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub version: Option<String>,
+    pub steps: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub category: Option<String>,
+}
+
 // This helper function gets a database connection from the app handle.
 async fn get_db(app_handle: &tauri::AppHandle) -> Result<Db, String> {
     app_handle.db().await.map_err(|e| e.to_string())
@@ -143,4 +157,11 @@ pub fn get_pid_svg(app_handle: tauri::AppHandle, path: String) -> Result<String,
 pub async fn get_alarms(app_handle: tauri::AppHandle) -> Result<Vec<Alarm>, String> {
     let db = get_db(&app_handle).await?;
     db.select("SELECT code, equipment_id, severity, description, parameter, reset_procedure, standard_ref FROM alarms", &[]).await.map_err(|e| e.to_string())
+}
+
+#[command]
+pub async fn get_procedures(app_handle: tauri::AppHandle) -> Result<Vec<Procedure>, String> {
+    let db = get_db(&app_handle).await?;
+    // Note: The 'category' is not in the db schema, it's inferred in the frontend
+    db.select("SELECT id, name, description, version, steps FROM procedures", &[]).await.map_err(|e| e.to_string())
 }
