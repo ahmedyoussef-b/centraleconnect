@@ -3,6 +3,7 @@ use serde::{Serialize, Deserialize};
 use tauri::command;
 use tauri_plugin_sql::{Db, Error};
 use std::fs;
+use sha2::{Sha256, Digest};
 
 // --- Data Models ---
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -111,9 +112,55 @@ pub struct Procedure {
     pub category: Option<String>,
 }
 
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct LogEntry {
+    pub id: i64,
+    pub timestamp: String,
+    #[serde(rename = "type")]
+    pub type_field: String,
+    pub source: String,
+    pub message: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub equipment_id: Option<String>,
+    pub signature: String,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct NewLogEntry {
+    #[serde(rename = "type")]
+    pub type_field: String,
+    pub source: String,
+    pub message: String,
+    pub equipment_id: Option<String>,
+}
+
+
 // This helper function gets a database connection from the app handle.
 async fn get_db(app_handle: &tauri::AppHandle) -> Result<Db, String> {
     app_handle.db().await.map_err(|e| e.to_string())
+}
+
+fn create_entry_signature(
+    entry_data: &NewLogEntry,
+    timestamp: &str,
+    previous_signature: &str,
+) -> String {
+    let equipment_id_str = entry_data.equipment_id.as_deref().unwrap_or("");
+    let data_string = format!(
+        "{}|{}|{}|{}|{}|{}",
+        previous_signature,
+        timestamp,
+        &entry_data.type_field,
+        &entry_data.source,
+        &entry_data.message,
+        equipment_id_str
+    );
+    let mut hasher = Sha256::new();
+    hasher.update(data_string.as_bytes());
+    let result = hasher.finalize();
+    format!("{:x}", result)
 }
 
 // --- Tauri Commands ---
@@ -164,4 +211,57 @@ pub async fn get_procedures(app_handle: tauri::AppHandle) -> Result<Vec<Procedur
     let db = get_db(&app_handle).await?;
     // Note: The 'category' is not in the db schema, it's inferred in the frontend
     db.select("SELECT id, name, description, version, steps FROM procedures", &[]).await.map_err(|e| e.to_string())
+}
+
+#[command]
+pub async fn get_log_entries(app_handle: tauri::AppHandle) -> Result<Vec<LogEntry>, String> {
+    let db = get_db(&app_handle).await?;
+    db.select("SELECT * FROM log_entries ORDER BY timestamp DESC", &[])
+        .await
+        .map_err(|e| e.to_string())
+}
+
+#[command]
+pub async fn add_log_entry(entry: NewLogEntry, app_handle: tauri::AppHandle) -> Result<(), String> {
+    let db = get_db(&app_handle).await?;
+
+    let last_entry: Result<Vec<LogEntry>, Error> = db
+        .select("SELECT id, timestamp, type, source, message, equipment_id, signature FROM log_entries ORDER BY timestamp DESC LIMIT 1", &[])
+        .await;
+
+    let previous_signature = match last_entry {
+        Ok(entries) => entries.get(0).map_or("GENESIS".to_string(), |e| e.signature.clone()),
+        Err(_) => "GENESIS".to_string(),
+    };
+
+    let timestamp = chrono::Utc::now().format("%Y-%m-%d %H:%M:%S").to_string();
+
+    let signature = create_entry_signature(&entry, &timestamp, &previous_signature);
+
+    db.execute(
+        "INSERT INTO log_entries (timestamp, type, source, message, equipment_id, signature) VALUES ($1, $2, $3, $4, $5, $6)",
+        &[
+            timestamp.into(),
+            entry.type_field.into(),
+            entry.source.into(),
+            entry.message.into(),
+            entry.equipment_id.into(),
+            signature.into(),
+        ],
+    )
+    .await
+    .map_err(|e| e.to_string())?;
+
+    Ok(())
+}
+
+#[command]
+pub async fn get_log_entries_for_node(equipment_id: String, app_handle: tauri::AppHandle) -> Result<Vec<LogEntry>, String> {
+    let db = get_db(&app_handle).await?;
+    db.select(
+        "SELECT * FROM log_entries WHERE equipment_id = $1 ORDER BY timestamp DESC",
+        &[equipment_id.into()],
+    )
+    .await
+    .map_err(|e| e.to_string())
 }

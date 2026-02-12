@@ -16,6 +16,9 @@ fn main() {
             commands::get_pid_svg,
             commands::get_alarms,
             commands::get_procedures,
+            commands::get_log_entries,
+            commands::add_log_entry,
+            commands::get_log_entries_for_node,
         ])
         .run(tauri::generate_context!())
         .expect("Erreur lors du lancement de l'application Tauri");

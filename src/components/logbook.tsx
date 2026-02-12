@@ -21,6 +21,7 @@ import type { LogEntry, LogEntryType } from '@/types/db';
 import { useToast } from '@/hooks/use-toast';
 import { Badge, type BadgeProps } from './ui/badge';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
+import { addLogEntry, getLogEntries } from '@/lib/db-service';
 
 const typeVariantMap: Record<LogEntryType, BadgeProps['variant']> = {
   AUTO: 'secondary',
@@ -40,19 +41,16 @@ export function Logbook() {
 
 
   const fetchEntries = async () => {
-    if (window.__TAURI__) {
-      try {
-        const { getLogEntries } = await import('@/lib/db-service');
-        const data = await getLogEntries();
-        setEntries(data);
-      } catch (e) {
-        console.error(e);
-        toast({
-          variant: 'destructive',
-          title: 'Erreur',
-          description: 'Impossible de charger le journal de bord.',
-        });
-      }
+    try {
+      const data = await getLogEntries();
+      setEntries(data);
+    } catch (e) {
+      console.error(e);
+      toast({
+        variant: 'destructive',
+        title: 'Erreur',
+        description: 'Impossible de charger le journal de bord.',
+      });
     }
   };
 
@@ -65,7 +63,6 @@ export function Logbook() {
     if (!newMessage.trim() || !isTauri) return;
 
     try {
-      const { addLogEntry } = await import('@/lib/db-service');
       await addLogEntry({
         type: 'MANUAL',
         source: 'Opérateur 1', // This should be dynamic in a real app
@@ -93,6 +90,7 @@ export function Logbook() {
   };
 
   const handleVerify = async () => {
+    if (!isTauri) return;
     setIsVerifying(true);
     setVerificationStatus(new Map());
 
@@ -151,27 +149,6 @@ export function Logbook() {
       });
   };
 
-  if (!isTauri) {
-    return (
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Book className="h-6 w-6" />
-            <CardTitle>Journal de Bord</CardTitle>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="flex h-[380px] items-center justify-center rounded-lg border-2 border-dashed border-border p-4">
-            <p className="text-center text-muted-foreground">
-              La fonctionnalité de journal de bord n'est disponible que dans
-              l'application de bureau Tauri.
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
   return (
     <>
       <Card id="logbook-card">
@@ -181,14 +158,16 @@ export function Logbook() {
             <CardTitle>Journal de Bord</CardTitle>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" onClick={handleVerify} disabled={isVerifying}>
-                {isVerifying ? (
-                    <LoaderCircle className="mr-2 animate-spin" />
-                ) : (
-                    <ShieldCheck className="mr-2" />
-                )}
-                Vérifier l'intégrité
-            </Button>
+             {isTauri && (
+                <Button variant="outline" size="sm" onClick={handleVerify} disabled={isVerifying}>
+                    {isVerifying ? (
+                        <LoaderCircle className="mr-2 animate-spin" />
+                    ) : (
+                        <ShieldCheck className="mr-2" />
+                    )}
+                    Vérifier l'intégrité
+                </Button>
+            )}
             <Button variant="outline" size="sm" onClick={handlePrint}>
               <FileDown className="mr-2" />
               Exporter en PDF
@@ -196,25 +175,27 @@ export function Logbook() {
           </div>
         </CardHeader>
         <CardContent>
-          <div className="flex w-full items-start gap-2">
-            <Textarea
-              placeholder="Ajouter une note manuelle..."
-              value={newMessage}
-              onChange={(e) => setNewMessage(e.target.value)}
-              className="flex-grow"
-              rows={2}
-            />
-            <Button size="icon" onClick={handleAddEntry} disabled={!newMessage.trim()}>
-              <Send />
-              <span className="sr-only">Envoyer</span>
-            </Button>
-          </div>
+          {isTauri && (
+            <div className="flex w-full items-start gap-2">
+                <Textarea
+                placeholder="Ajouter une note manuelle..."
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                className="flex-grow"
+                rows={2}
+                />
+                <Button size="icon" onClick={handleAddEntry} disabled={!newMessage.trim()}>
+                <Send />
+                <span className="sr-only">Envoyer</span>
+                </Button>
+            </div>
+          )}
 
           <div className="mt-4 h-[300px] overflow-y-auto rounded-md border">
             <Table>
               <TableHeader className="sticky top-0 bg-muted">
                 <TableRow>
-                  <TableHead className="w-[40px]">Statut</TableHead>
+                  {isTauri && <TableHead className="w-[40px]">Statut</TableHead>}
                   <TableHead className="w-[180px]">Horodatage</TableHead>
                   <TableHead className="w-[150px]">Type</TableHead>
                   <TableHead className="w-[150px]">Source</TableHead>
@@ -225,31 +206,33 @@ export function Logbook() {
                 {entries.length > 0 ? (
                   entries.map((entry) => (
                     <TableRow key={entry.id}>
-                      <TableCell>
-                        <TooltipProvider>
-                            <Tooltip>
-                                <TooltipTrigger>
-                                {isVerifying ? (
-                                    <LoaderCircle className="animate-spin text-muted-foreground" />
-                                ) : verificationStatus.has(entry.id) ? (
-                                    verificationStatus.get(entry.id) ? (
-                                        <ShieldCheck className="text-green-500" />
+                      {isTauri && (
+                        <TableCell>
+                            <TooltipProvider>
+                                <Tooltip>
+                                    <TooltipTrigger>
+                                    {isVerifying ? (
+                                        <LoaderCircle className="animate-spin text-muted-foreground" />
+                                    ) : verificationStatus.has(entry.id) ? (
+                                        verificationStatus.get(entry.id) ? (
+                                            <ShieldCheck className="text-green-500" />
+                                        ) : (
+                                            <ShieldX className="text-destructive" />
+                                        )
                                     ) : (
-                                        <ShieldX className="text-destructive" />
-                                    )
-                                ) : (
-                                    <Shield className="text-muted-foreground" />
-                                )}
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                    {isVerifying ? "Vérification en cours..." :
-                                     verificationStatus.has(entry.id) ? 
-                                     (verificationStatus.get(entry.id) ? "Signature valide" : "Signature INVALIDE") : 
-                                     "Non vérifié"}
-                                </TooltipContent>
-                            </Tooltip>
-                        </TooltipProvider>
-                      </TableCell>
+                                        <Shield className="text-muted-foreground" />
+                                    )}
+                                    </TooltipTrigger>
+                                    <TooltipContent>
+                                        {isVerifying ? "Vérification en cours..." :
+                                        verificationStatus.has(entry.id) ? 
+                                        (verificationStatus.get(entry.id) ? "Signature valide" : "Signature INVALIDE") : 
+                                        "Non vérifié"}
+                                    </TooltipContent>
+                                </Tooltip>
+                            </TooltipProvider>
+                        </TableCell>
+                      )}
                       <TableCell className="font-mono text-xs">
                         {format(new Date(entry.timestamp.replace(' ', 'T')), 'dd/MM/yy HH:mm:ss', {
                           locale: fr,
@@ -266,7 +249,7 @@ export function Logbook() {
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center">
+                    <TableCell colSpan={isTauri ? 5 : 4} className="text-center">
                       Aucune entrée dans le journal.
                     </TableCell>
                   </TableRow>

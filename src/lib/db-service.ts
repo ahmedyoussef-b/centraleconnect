@@ -1,5 +1,6 @@
 
 
+
 import { invoke } from '@tauri-apps/api/tauri';
 import type { 
   Equipment,
@@ -183,11 +184,13 @@ export async function initializeDatabase(): Promise<void> {
 }
 
 export async function getEquipments(): Promise<Equipment[]> {
-    if (typeof window !== 'undefined' && window.__TAURI__) {
-        const tauriClient = await import('@/lib/tauri-client');
-        // The tauri command now returns the full equipment object, so no more mapping is needed here.
-        return await tauriClient.getEquipments();
+    const isTauri = typeof window !== 'undefined' && window.__TAURI__;
+    
+    if (isTauri) {
+        const { getEquipments: getEquipmentsTauri } = await import('@/lib/tauri-client');
+        return getEquipmentsTauri();
     }
+    
     // For web, fetch from the API route
     const response = await fetch('/api/equipments');
     if (!response.ok) {
@@ -255,23 +258,36 @@ export async function getAssistantContextData(): Promise<any> {
 }
 
 export async function getLogEntries(): Promise<LogEntry[]> {
-  if (typeof window === 'undefined' || !window.__TAURI__) return Promise.resolve([]);
-  await initializeDatabase();
-  const db = await invoke('plugin:sql|load', { db: DB_NAME });
-  const entries: any[] = await invoke('plugin:sql|select', { db, query: 'SELECT * FROM log_entries ORDER BY timestamp DESC' });
-  return entries.map(e => ({...e, equipmentId: e.equipment_id}));
+  const isTauri = typeof window !== 'undefined' && window.__TAURI__;
+  if (isTauri) {
+      const { getLogEntries: getLogEntriesTauri } = await import('@/lib/tauri-client');
+      return getLogEntriesTauri();
+  }
+  // Fallback to web API
+  const response = await fetch('/api/logbook');
+  if (!response.ok) {
+    console.error("Failed to fetch log entries from web API");
+    return [];
+  }
+  const entries: any[] = await response.json();
+  // The API returns Date objects, which need to be converted to strings for consistency with Tauri.
+  return entries.map(e => ({...e, timestamp: e.timestamp.toString()}));
 }
 
 export async function getLogEntriesForNode(equipmentId: string): Promise<LogEntry[]> {
-  if (typeof window === 'undefined' || !window.__TAURI__) return Promise.resolve([]);
-  await initializeDatabase();
-  const db = await invoke('plugin:sql|load', { db: DB_NAME });
-  const entries: any[] = await invoke('plugin:sql|select', { 
-    db, 
-    query: 'SELECT * FROM log_entries WHERE equipment_id = $1 ORDER BY timestamp DESC',
-    values: [equipmentId]
-  });
-  return entries.map(e => ({...e, equipmentId: e.equipment_id}));
+  const isTauri = typeof window !== 'undefined' && window.__TAURI__;
+  if (isTauri) {
+      const { getLogEntriesForNode: getForNodeTauri } = await import('@/lib/tauri-client');
+      return getForNodeTauri(equipmentId);
+  }
+  
+  const response = await fetch(`/api/logbook?equipmentId=${equipmentId}`);
+  if (!response.ok) {
+    console.error("Failed to fetch log entries for node from web API");
+    return [];
+  }
+  const entries: any[] = await response.json();
+  return entries.map(e => ({...e, timestamp: e.timestamp.toString()}));
 }
 
 export async function addLogEntry(entry: {
@@ -280,30 +296,24 @@ export async function addLogEntry(entry: {
   message: string;
   equipmentId?: string;
 }): Promise<void> {
-  if (typeof window === 'undefined' || !window.__TAURI__) {
-    console.log('[WEB MODE] Log Entry (not saved):', entry);
-    return Promise.resolve();
+  const isTauri = typeof window !== 'undefined' && window.__TAURI__;
+  if (isTauri) {
+      const { addLogEntry: addLogEntryTauri } = await import('@/lib/tauri-client');
+      await addLogEntryTauri(entry);
+      return;
   }
-  await initializeDatabase();
-
-  const db = await invoke('plugin:sql|load', { db: DB_NAME });
-  const lastEntry: { signature: string }[] = await invoke('plugin:sql|select', {
-    db,
-    query: 'SELECT signature FROM log_entries ORDER BY timestamp DESC LIMIT 1'
-  });
   
-  const previousSignature = lastEntry[0]?.signature ?? 'GENESIS';
-  const timestamp = new Date().toISOString().replace('T', ' ').slice(0, 19);
-
-  const newEntryData = { ...entry, equipmentId: entry.equipmentId || null, timestamp };
-
-  const signature = await createEntrySignature(newEntryData, previousSignature);
-
-  await invoke('plugin:sql|execute', {
-    db,
-    query: 'INSERT INTO log_entries (timestamp, type, source, message, equipment_id, signature) VALUES ($1, $2, $3, $4, $5, $6)',
-    values: [timestamp, entry.type, entry.source, entry.message, entry.equipmentId || null, signature],
+  // Web version
+  const response = await fetch('/api/logbook', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(entry)
   });
+
+  if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || `Failed to add log entry via web API: ${response.statusText}`);
+  }
 }
 
 export async function addComponentAndDocument(
@@ -356,7 +366,7 @@ export async function addComponentAndDocument(
         const previousSignature = lastEntry[0]?.signature ?? 'GENESIS';
         const timestamp = new Date().toISOString().replace('T', ' ').slice(0, 19);
         const logMessage = `Nouvel équipement '${component.externalId}' ajouté via provisionnement local.`;
-        const newEntryData = { type: 'DOCUMENT_ADDED', source: 'Provisioning Local', message: logMessage, equipmentId: component.externalId, timestamp };
+        const newEntryData = { type: 'DOCUMENT_ADDED' as LogEntryType, source: 'Provisioning Local', message: logMessage, equipmentId: component.externalId, timestamp };
         const signature = await createEntrySignature(newEntryData, previousSignature);
 
         await invoke('plugin:sql|execute', {
