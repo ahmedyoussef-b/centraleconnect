@@ -13,15 +13,15 @@ import { useToast } from '@/hooks/use-toast';
 // Import analysis functions
 import { extractIndustrialMetadata, type IndustrialImageMetadata } from '@/lib/vision/core/metadata-extractor';
 import { performIndustrialOCR, type OCRExtractionResult } from '@/lib/vision/detection/ocr-processor';
-import { detectIndustrialCodes, type IndustrialCode } from '@/lib/vision/detection/code-detector';
-import { EquipmentDetector, type EquipmentDetection } from '@/lib/vision/detection/equipment-detector';
-import { PIDAnalyzer, type PIDAnalysis } from '@/lib/vision/detection/pid-analyzer';
-import { FaultDetector, type VisualAnomalyDetection } from '@/lib/vision/detection/anomaly-detector';
-import { ParameterExtractor, type Parameter } from '@/lib/vision/detection/parameter-extractor';
-import { SafetyLabelDetector, type SafetyLabel } from '@/lib/vision/detection/safety-label-detector';
-import { SignatureExtractor, type Signature } from '@/lib/vision/detection/signature-extractor';
-import { EnvironmentAnalyzer, type EnvironmentAnalysis } from '@/lib/vision/detection/environment-analyzer';
-import { SimpleShapeDetector, type Detection as ShapeDetection } from '@/lib/vision/detection/simple-detector';
+import { detectIndustrialCodes, type IndustrialCode } from '@/lib/vision/code-detector';
+import { EquipmentDetector, type EquipmentDetection } from '@/lib/vision/equipment-detector';
+import { PIDAnalyzer, type PIDAnalysis } from '@/lib/vision/pid-analyzer';
+import { FaultDetector, type VisualAnomalyDetection } from '@/lib/vision/fault-detector';
+import { ParameterExtractor, type Parameter } from '@/lib/ocr/parameter-extractor';
+import { SafetyLabelDetector, type SafetyLabel } from '@/lib/ocr/safety-label-detector';
+import { SignatureExtractor, type Signature } from '@/lib/ocr/signature-extractor';
+import { EnvironmentAnalyzer, type EnvironmentAnalysis } from '@/lib/vision/environment-analyzer';
+import { SimpleShapeDetector, type Detection as ShapeDetection } from '@/lib/vision/simple-detector';
 
 
 interface AnalysisResults {
@@ -372,3 +372,4 @@ export default function DiagnosticVisuelPage() {
     </div>
   );
 }
+
