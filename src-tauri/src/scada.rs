@@ -5,9 +5,17 @@ use tokio::time;
 use anyhow::Result;
 use serde::Serialize;
 use rand::Rng;
+use chrono::Utc;
 
 #[derive(Serialize, Clone, Debug)]
-struct ScadaData {
+struct ScadaDataPoint {
+    timestamp: String,
+    source: String,
+    values: ScadaValues,
+}
+
+#[derive(Serialize, Clone, Debug)]
+struct ScadaValues {
     #[serde(rename = "TG1")]
     tg1: f64,
     #[serde(rename = "TG2")]
@@ -17,7 +25,7 @@ struct ScadaData {
 }
 
 /// Publie les données SCADA sur le canal Ably.
-async fn publish_to_ably(client: &ably::AblyRealtime, data: &ScadaData) -> Result<()> {
+async fn publish_to_ably(client: &ably::AblyRealtime, data: &ScadaDataPoint) -> Result<()> {
     let channel = client.channels().get("scada:data");
     channel.publish("update", data).await?;
     Ok(())
@@ -47,10 +55,14 @@ async fn demo_mode(ably_client: ably::AblyRealtime) -> Result<()> {
         tg2_base = tg2_base.clamp(125.0, 150.0);
         tv_base = tv_base.clamp(160.0, 200.0);
 
-        let data = ScadaData {
-            tg1: tg1_base + rng.gen_range(-0.2..0.2),
-            tg2: tg2_base + rng.gen_range(-0.2..0.2),
-            tv: tv_base + rng.gen_range(-0.5..0.5),
+        let data = ScadaDataPoint {
+            timestamp: Utc::now().to_rfc3339(),
+            source: "DEMO".to_string(),
+            values: ScadaValues {
+                tg1: tg1_base + rng.gen_range(-0.2..0.2),
+                tg2: tg2_base + rng.gen_range(-0.2..0.2),
+                tv: tv_base + rng.gen_range(-0.5..0.5),
+            }
         };
         
         if let Err(e) = publish_to_ably(&ably_client, &data).await {
