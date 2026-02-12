@@ -11,6 +11,7 @@ export { ScadaStatus as ScadaConnectionStatus } from '../interfaces';
  * @returns {Record<string, number>} .latestData - Les dernières valeurs reçues.
  * @returns {any[]} .history - L'historique récent des valeurs.
  * @returns {ScadaConnectionStatus} .status - L'état de la connexion temps réel.
+ * @returns {'REALTIME' | 'SIMULATED'} .dataSource - La source des données (bus temps réel ou simulateur local).
  */
 export function useScadaData() {
     return useScadaContext();

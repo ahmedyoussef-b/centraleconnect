@@ -1,6 +1,6 @@
 'use client';
 
-import { Activity, CheckCircle, XCircle, AlertTriangle, LoaderCircle } from 'lucide-react';
+import { Activity, CheckCircle, XCircle, AlertTriangle, LoaderCircle, Wifi, Cpu } from 'lucide-react';
 import { useScadaData, ScadaConnectionStatus } from '@/lib/scada/hooks/use-scada-data';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -49,7 +49,7 @@ const StatusInfo = {
 };
 
 export default function ScadaDiagnosticsPage() {
-  const { latestData, history, status } = useScadaData();
+  const { latestData, history, status, dataSource } = useScadaData();
   const currentStatusInfo = StatusInfo[status];
 
   const latestDataEntries = Object.entries(latestData);
@@ -66,7 +66,7 @@ export default function ScadaDiagnosticsPage() {
             Surveillez l'état de la connexion temps réel et visualisez les données brutes.
           </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
           <div className="flex items-center gap-4">
             <span className="font-semibold">État de la connexion:</span>
             <Badge variant="outline" className="flex items-center gap-2">
@@ -78,6 +78,13 @@ export default function ScadaDiagnosticsPage() {
                 )}
               />
               {currentStatusInfo.text}
+            </Badge>
+          </div>
+           <div className="flex items-center gap-4">
+            <span className="font-semibold">Source des données:</span>
+            <Badge variant={dataSource === 'REALTIME' ? 'default' : 'secondary'} className="flex items-center gap-2">
+               {dataSource === 'REALTIME' ? <Wifi className="h-3 w-3" /> : <Cpu className="h-3 w-3" />}
+               {dataSource === 'REALTIME' ? 'Temps Réel (Ably)' : 'Simulateur Client'}
             </Badge>
           </div>
         </CardContent>
