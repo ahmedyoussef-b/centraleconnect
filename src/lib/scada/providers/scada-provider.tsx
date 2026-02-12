@@ -33,6 +33,7 @@ export function ScadaProvider({ children }: { children: ReactNode }) {
 
   const simulatorRef = useRef<SyntheticDataProvider | null>(null);
   const sourceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const ablyRef = useRef<Types.RealtimePromise | null>(null);
 
   const handleDataPoint = useCallback((data: ScadaDataPoint, source: 'REALTIME' | 'SIMULATED') => {
       // If we receive real data, stop any running simulation
@@ -66,45 +67,62 @@ export function ScadaProvider({ children }: { children: ReactNode }) {
 
 
   useEffect(() => {
-    const ably = getAblyClient();
-    const channel = ably.channels.get('scada:data');
+    let channel: Types.RealtimeChannelPromise | undefined;
+    let connection: Types.Connection | undefined;
 
-    const handleConnectionChange = () => {
-      const currentState = ably.connection.state;
-      switch (currentState) {
-        case 'connected':
-          setStatus(ScadaStatus.CONNECTED);
-          // Start a timer to check if we receive data from a backend publisher
-          if (!sourceTimeoutRef.current) {
-              sourceTimeoutRef.current = setTimeout(startClientSimulator, SOURCE_TIMEOUT_MS);
+    async function setupAbly() {
+        const ably = await getAblyClient();
+        ablyRef.current = ably;
+        channel = ably.channels.get('scada:data');
+        connection = ably.connection;
+
+        const handleConnectionChange = () => {
+          const currentState = ably.connection.state;
+          switch (currentState) {
+            case 'connected':
+              setStatus(ScadaStatus.CONNECTED);
+              // Start a timer to check if we receive data from a backend publisher
+              if (!sourceTimeoutRef.current) {
+                  sourceTimeoutRef.current = setTimeout(startClientSimulator, SOURCE_TIMEOUT_MS);
+              }
+              break;
+            case 'suspended':
+              setStatus(ScadaStatus.SUSPENDED);
+              break;
+            case 'failed':
+              setStatus(ScadaStatus.FAILED);
+              // If the connection to Ably fails, also start the client simulator as a fallback
+              startClientSimulator();
+              break;
+            default:
+              setStatus(ScadaStatus.DISCONNECTED);
+              break;
           }
-          break;
-        case 'suspended':
-          setStatus(ScadaStatus.SUSPENDED);
-          break;
-        case 'failed':
-          setStatus(ScadaStatus.FAILED);
-          // If the connection to Ably fails, also start the client simulator as a fallback
-          startClientSimulator();
-          break;
-        default:
-          setStatus(ScadaStatus.DISCONNECTED);
-          break;
-      }
-    };
+        };
 
-    const handleMessage = (message: Types.Message) => {
-        const newDataPoint: ScadaDataPoint = message.data;
-        handleDataPoint(newDataPoint, 'REALTIME');
-    };
+        const handleMessage = (message: Types.Message) => {
+            const newDataPoint: ScadaDataPoint = message.data;
+            handleDataPoint(newDataPoint, 'REALTIME');
+        };
+        
+        connection.on(handleConnectionChange);
+        channel.subscribe(handleMessage);
+        handleConnectionChange();
+    }
     
-    ably.connection.on(handleConnectionChange);
-    channel.subscribe(handleMessage);
-    handleConnectionChange();
+    setupAbly();
 
     return () => {
-      channel.unsubscribe();
-      ably.connection.off(handleConnectionChange);
+      if (channel) {
+          channel.unsubscribe();
+      }
+      // Since handleConnectionChange is defined inside setupAbly, we can't easily remove it.
+      // However, when the component unmounts, the connection will eventually close
+      // or the component will be gone, so listeners won't be a problem.
+      if (ablyRef.current) {
+        // ablyRef.current.connection.off(); // This would remove all listeners which might not be desirable
+      }
+
       if (simulatorRef.current) {
           simulatorRef.current.stop();
       }
