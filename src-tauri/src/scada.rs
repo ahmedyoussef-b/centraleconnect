@@ -61,36 +61,95 @@ fn load_scada_mapping(app_handle: &tauri::AppHandle) -> Result<ScadaMappingFile>
     serde_json::from_str(&file_content).map_err(Into::into)
 }
 
+// --- Mode de Simulation Amélioré ---
+
+struct PlantSimulator {
+    tg1_power: f64,
+    tg2_power: f64,
+    tv_power: f64,
+    tg1_target: f64,
+    tg2_target: f64,
+    rng: rand::rngs::ThreadRng,
+}
+
+impl PlantSimulator {
+    fn new() -> Self {
+        Self {
+            tg1_power: 130.0,
+            tg2_power: 135.0,
+            tv_power: (130.0 + 135.0) * 0.65, // La puissance de la TV est corrélée
+            tg1_target: 130.0,
+            tg2_target: 135.0,
+            rng: rand::thread_rng(),
+        }
+    }
+
+    /// Simule un pas de temps et met à jour l'état de la centrale.
+    fn step(&mut self) {
+        // --- Simulation des rampes et de l'inertie ---
+        // Se rapproche de la cible à chaque pas (crée l'effet de rampe/inertie)
+        self.tg1_power += (self.tg1_target - self.tg1_power) * 0.1;
+        self.tg2_power += (self.tg2_target - self.tg2_power) * 0.1;
+        
+        // --- Ajout de bruit réaliste ---
+        self.tg1_power += self.rng.gen_range(-0.1..0.1);
+        self.tg2_power += self.rng.gen_range(-0.1..0.1);
+        
+        // --- Corrélation physique : la TV dépend des TG ---
+        // Modèle simple : la puissance de la TV est un ratio de la somme des TG, avec une inertie propre.
+        let target_tv_power = (self.tg1_power + self.tg2_power) * 0.65; // ~65% de rendement du cycle vapeur
+        self.tv_power += (target_tv_power - self.tv_power) * 0.08; // La TV a plus d'inertie
+        self.tv_power += self.rng.gen_range(-0.2..0.2);
+
+        // Contraintes physiques (clamp)
+        self.tg1_power = self.tg1_power.clamp(120.0, 150.0);
+        self.tg2_power = self.tg2_power.clamp(120.0, 150.0);
+        self.tv_power = self.tv_power.clamp(150.0, 200.0);
+    }
+    
+    /// Définit de nouvelles cibles de puissance pour simuler des transitoires.
+    fn set_new_targets(&mut self) {
+        self.tg1_target = self.rng.gen_range(125.0..148.0);
+        self.tg2_target = self.rng.gen_range(125.0..148.0);
+        println!("[SCADA SIM] Nouvelles cibles - TG1: {:.1} MW, TG2: {:.1} MW", self.tg1_target, self.tg2_target);
+    }
+
+    /// Récupère l'état actuel sous forme de HashMap pour la publication.
+    fn get_values(&self) -> HashMap<String, f64> {
+        let mut values = HashMap::new();
+        values.insert("TG1".to_string(), self.tg1_power);
+        values.insert("TG2".to_string(), self.tg2_power);
+        values.insert("TV".to_string(), self.tv_power);
+        values
+    }
+}
+
+
 /// Mode Démo : génère des données synthétiques et les publie.
 async fn demo_mode(ably_client: ably::AblyRealtime) -> Result<()> {
-    println!("[SCADA] Exécution en mode DEMO.");
-    let mut interval = time::interval(Duration::from_secs(2));
-    let mut rng = rand::thread_rng();
-
-    let mut values = HashMap::new();
-    values.insert("TG1".to_string(), 132.0);
-    values.insert("TG2".to_string(), 135.0);
-    values.insert("TV".to_string(), 180.0);
+    println!("[SCADA] Exécution en mode DEMO (Simulateur Intelligent).");
+    
+    let mut simulation_interval = time::interval(Duration::from_secs(2));
+    let mut target_change_interval = time::interval(Duration::from_secs(20));
+    let mut simulator = PlantSimulator::new();
 
     loop {
-        interval.tick().await;
-
-        for (key, val) in values.iter_mut() {
-            let fluctuation = if key == "TV" { 1.0 } else { 0.5 };
-            *val += rng.gen_range(-fluctuation..fluctuation);
-            if key == "TG1" { *val = val.clamp(120.0, 145.0); }
-            if key == "TG2" { *val = val.clamp(125.0, 150.0); }
-            if key == "TV" { *val = val.clamp(160.0, 200.0); }
-        }
-
-        let data = ScadaDataPoint {
-            timestamp: Utc::now().to_rfc3339(),
-            source: "DEMO".to_string(),
-            values: ScadaValues { values: values.clone() },
-        };
-        
-        if let Err(e) = publish_to_ably(&ably_client, &data).await {
-            eprintln!("[SCADA DEMO] Échec de la publication sur Ably: {}", e);
+        tokio::select! {
+            _ = simulation_interval.tick() => {
+                simulator.step();
+                let data = ScadaDataPoint {
+                    timestamp: Utc::now().to_rfc3339(),
+                    source: "DEMO".to_string(),
+                    values: ScadaValues { values: simulator.get_values() },
+                };
+                
+                if let Err(e) = publish_to_ably(&ably_client, &data).await {
+                    eprintln!("[SCADA DEMO] Échec de la publication sur Ably: {}", e);
+                }
+            }
+            _ = target_change_interval.tick() => {
+                simulator.set_new_targets();
+            }
         }
     }
 }
