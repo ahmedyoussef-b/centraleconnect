@@ -1,22 +1,22 @@
 'use client';
 
-import { notFound } from 'next/navigation';
+import { notFound, useParams } from 'next/navigation';
 import { getComponentById } from '@/lib/component-service';
 import type { Component } from '@/types/db';
 import { ComponentDetailView } from '@/components/component-detail-view';
 import { useEffect, useState } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 
-export default function ComponentDetailPage({
-  params,
-}: {
-  params: { id: string };
-}) {
+export default function ComponentDetailPage() {
+  const params = useParams();
+  const componentId = params.id as string;
   const [component, setComponent] = useState<Component | null | undefined>(undefined);
 
   useEffect(() => {
-    getComponentById(params.id).then(setComponent);
-  }, [params.id]);
+    if (componentId) {
+        getComponentById(componentId).then(setComponent);
+    }
+  }, [componentId]);
 
   if (component === undefined) {
     return (

@@ -1,40 +1,94 @@
 
-import { notFound } from 'next/navigation';
+'use client';
 
-import { getEquipments, getEquipmentById, getParametersForComponent, getLogEntriesForNode, getDocumentsForComponent } from '@/lib/db-service';
+import { notFound, useParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { getEquipmentById, getParametersForComponent, getLogEntriesForNode, getDocumentsForComponent } from '@/lib/db-service';
 import { getAlarmsForComponent } from '@/lib/alarms-service';
 import { EquipmentDetailView } from '@/components/equipment-detail-view';
+import type { Equipment, Parameter, LogEntry, Document } from '@/types/db';
+import type { Alarm } from '@/lib/alarms-service';
+import { Skeleton } from '@/components/ui/skeleton';
+import { ArrowLeft } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { useRouter } from 'next/navigation';
 
-export async function generateStaticParams() {
-    const equipments = await getEquipments();
-    return equipments.map((equip) => ({
-      id: encodeURIComponent(equip.externalId),
-    }));
+function EquipmentDetailSkeleton() {
+    return (
+        <div className="space-y-4">
+            <Skeleton className="h-10 w-48" />
+            <div className="space-y-4">
+                <Skeleton className="h-48 w-full" />
+                <Skeleton className="h-32 w-full" />
+                <Skeleton className="h-64 w-full" />
+            </div>
+        </div>
+    );
 }
 
-export default async function EquipmentDetailPage({ params }: { params: { id: string } }) {
-    const equipmentId = decodeURIComponent(params.id);
+export default function EquipmentDetailPage() {
+    const params = useParams();
+    const router = useRouter();
+    const equipmentId = decodeURIComponent(params.id as string);
+
+    const [node, setNode] = useState<Equipment | null>();
+    const [parameters, setParameters] = useState<Parameter[]>([]);
+    const [alarms, setAlarms] = useState<Alarm[]>([]);
+    const [logEntries, setLogEntries] = useState<LogEntry[]>([]);
+    const [documents, setDocuments] = useState<Document[]>([]);
+    const [loading, setLoading] = useState(true);
     
-    const nodeData = await getEquipmentById(equipmentId);
-    if (!nodeData) {
-        notFound();
+    useEffect(() => {
+        if (!equipmentId) return;
+        
+        async function loadData() {
+            setLoading(true);
+            try {
+                const nodeData = await getEquipmentById(equipmentId);
+                if (!nodeData) {
+                    notFound();
+                    return;
+                }
+                setNode(nodeData);
+
+                const [paramsData, alarmsData, logsData, docsData] = await Promise.all([
+                    getParametersForComponent(equipmentId),
+                    getAlarmsForComponent(equipmentId),
+                    getLogEntriesForNode(equipmentId),
+                    getDocumentsForComponent(equipmentId),
+                ]);
+                
+                setParameters(paramsData);
+                setAlarms(alarmsData);
+                setLogEntries(logsData);
+                setDocuments(docsData);
+
+            } catch (error) {
+                console.error("Failed to load equipment details:", error);
+                // Optionally show a toast or error message
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        loadData();
+    }, [equipmentId]);
+
+    if (loading) {
+        return <EquipmentDetailSkeleton />;
     }
 
-    // Fetch related data in parallel
-    const [paramsData, alarmsData, logsData, docsData] = await Promise.all([
-        getParametersForComponent(equipmentId),
-        Promise.resolve(getAlarmsForComponent(equipmentId)), // This one is synchronous
-        getLogEntriesForNode(equipmentId),
-        getDocumentsForComponent(equipmentId),
-    ]);
+    if (!node) {
+        return notFound();
+    }
 
     return (
         <EquipmentDetailView 
-            node={nodeData}
-            parameters={paramsData}
-            alarms={alarmsData}
-            logEntries={logsData}
-            documents={docsData}
+            node={node}
+            parameters={parameters}
+            alarms={alarms}
+            logEntries={logEntries}
+            documents={documents}
         />
     );
 }
