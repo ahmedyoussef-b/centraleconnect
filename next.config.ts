@@ -1,7 +1,19 @@
 
 import type {NextConfig} from 'next';
+import fs from 'fs';
+import path from 'path';
+
+// Read package.json to get the version
+const packageJsonPath = path.join(process.cwd(), 'package.json');
+const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+const appVersion = packageJson.version;
+
 
 const nextConfig: NextConfig = {
+  env: {
+    APP_VERSION: appVersion,
+    BUILD_TIME: new Date().toISOString(),
+  },
   typescript: {
     ignoreBuildErrors: true,
   },

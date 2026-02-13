@@ -23,6 +23,8 @@ import {
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import dynamic from 'next/dynamic';
+import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -266,6 +268,14 @@ function MainLayoutContent({ children }: { children: React.ReactNode }) {
                 </div>
               </SidebarMenuItem>
             </SidebarMenu>
+             <div className="mt-2 border-t border-sidebar-border pt-2 text-center text-xs text-muted-foreground group-data-[collapsible=icon]:hidden">
+                <p>v{process.env.APP_VERSION}</p>
+                {process.env.BUILD_TIME && (
+                    <p title={new Date(process.env.BUILD_TIME).toISOString()}>
+                        Build: {format(new Date(process.env.BUILD_TIME), 'dd/MM/yy HH:mm', { locale: fr })}
+                    </p>
+                )}
+            </div>
           </SidebarFooter>
         </Sidebar>
         <SidebarInset>
