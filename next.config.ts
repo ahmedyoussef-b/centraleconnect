@@ -20,15 +20,6 @@ const nextConfig: NextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
-  async redirects() {
-    return [
-      {
-        source: '/test-lecture',
-        destination: '/diagnostic-visuel',
-        permanent: true,
-      }
-    ]
-  },
   images: {
     unoptimized: true,
     remotePatterns: [
