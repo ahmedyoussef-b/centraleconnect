@@ -7,14 +7,10 @@ export async function getComponents(): Promise<Component[]> {
     if (isTauri) {
         const { getComponents: getComponentsTauri } = await import('@/lib/tauri-client');
         return getComponentsTauri();
-    } else {
-        const response = await fetch('/api/components');
-        if (!response.ok) {
-            console.error("Failed to fetch components from web API");
-            return [];
-        }
-        return response.json();
-    }
+    } 
+
+    console.warn('[Service] Not in Tauri environment. Web API fallback is disabled for getComponents.');
+    return [];
 }
 
 export async function getComponentById(

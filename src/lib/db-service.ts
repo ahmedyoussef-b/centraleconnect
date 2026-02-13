@@ -190,26 +190,19 @@ export async function getEquipments(): Promise<Equipment[]> {
         return getEquipmentsTauri();
     }
     
-    // For web, fetch from the API route
-    const response = await fetch('/api/equipments');
-    if (!response.ok) {
-        throw new Error('Failed to fetch equipments for web');
-    }
-    return await response.json();
+    console.warn('[Service] Not in Tauri environment. Web API fallback is disabled for getEquipments.');
+    return [];
 }
 
 export async function getEquipmentById(id: string): Promise<Equipment | null> {
     if (typeof window !== 'undefined' && window.__TAURI__) {
         const tauriClient = await import('@/lib/tauri-client');
         const equip = await tauriClient.getEquipment(id);
-        // The type from tauri-client might be simpler, ensure it's compatible
-        // For now we assume it is.
         return equip as Equipment | null;
     }
-    // Web version would need a specific API route like /api/equipments/[id]
-    // For now, we filter from the full list.
-    const equipments = await getEquipments();
-    return equipments.find(e => e.externalId === id) || null;
+    
+    console.warn('[Service] Not in Tauri environment. Web API fallback is disabled for getEquipmentById.');
+    return null;
 }
 
 export async function getParametersForComponent(equipmentId: string): Promise<Parameter[]> {
@@ -222,9 +215,8 @@ export async function getParametersForComponent(equipmentId: string): Promise<Pa
             values: [equipmentId]
         });
     }
-    const response = await fetch(`/api/parameters?equipmentId=${equipmentId}`); // This API route doesn't exist yet, but should
-    if(!response.ok) return [];
-    return await response.json();
+    console.warn('[Service] Not in Tauri environment. Web API fallback is disabled for getParametersForComponent.');
+    return [];
 }
 
 export async function getParameters(): Promise<Parameter[]> {
@@ -233,8 +225,8 @@ export async function getParameters(): Promise<Parameter[]> {
     const db = await invoke('plugin:sql|load', { db: DB_NAME });
     return invoke('plugin:sql|select', { db, query: 'SELECT * FROM parameters' });
   }
-  // This is a placeholder, should fetch from an API route
-  return Promise.resolve(allParameterData as Parameter[]);
+  console.warn('[Service] Not in Tauri environment. Web API fallback is disabled for getParameters.');
+  return [];
 }
 
 
@@ -249,11 +241,8 @@ export async function getAssistantContextData(): Promise<any> {
         ]);
         return { equipments, parameters, alarms };
     }
-    // For web, we can provide a subset of data or mock it if needed
-    const equipments = await getEquipments();
-    const alarmsData = (await import('@/assets/master-data/alarms.json')).default;
-    // Parameters would need an API route
-    return Promise.resolve({ equipments, parameters: allParameterData, alarms: alarmsData });
+    console.warn('[Service] Not in Tauri environment. Web API fallback is disabled for getAssistantContextData.');
+    return { equipments: [], parameters: [], alarms: [] };
 }
 
 export async function getLogEntries(): Promise<LogEntry[]> {
@@ -262,15 +251,8 @@ export async function getLogEntries(): Promise<LogEntry[]> {
       const { getLogEntries: getLogEntriesTauri } = await import('@/lib/tauri-client');
       return getLogEntriesTauri();
   }
-  // Fallback to web API
-  const response = await fetch('/api/logbook');
-  if (!response.ok) {
-    console.error("Failed to fetch log entries from web API");
-    return [];
-  }
-  const entries: any[] = await response.json();
-  // The API returns Date objects, which need to be converted to strings for consistency with Tauri.
-  return entries.map(e => ({...e, timestamp: e.timestamp.toString()}));
+  console.warn('[Service] Not in Tauri environment. Web API fallback is disabled for getLogEntries.');
+  return [];
 }
 
 export async function getLogEntriesForNode(equipmentId: string): Promise<LogEntry[]> {
@@ -280,13 +262,8 @@ export async function getLogEntriesForNode(equipmentId: string): Promise<LogEntr
       return getForNodeTauri(equipmentId);
   }
   
-  const response = await fetch(`/api/logbook?equipmentId=${equipmentId}`);
-  if (!response.ok) {
-    console.error("Failed to fetch log entries for node from web API");
-    return [];
-  }
-  const entries: any[] = await response.json();
-  return entries.map(e => ({...e, timestamp: e.timestamp.toString()}));
+  console.warn('[Service] Not in Tauri environment. Web API fallback is disabled for getLogEntriesForNode.');
+  return [];
 }
 
 export async function addLogEntry(entry: {
@@ -302,17 +279,8 @@ export async function addLogEntry(entry: {
       return;
   }
   
-  // Web version
-  const response = await fetch('/api/logbook', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(entry)
-  });
-
-  if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || `Failed to add log entry via web API: ${response.statusText}`);
-  }
+  console.error('[Service] addLogEntry is only available in a Tauri environment.');
+  throw new Error("addLogEntry is not available in web mode.");
 }
 
 export async function addComponentAndDocument(
@@ -322,7 +290,7 @@ export async function addComponentAndDocument(
     const isTauri = typeof window !== 'undefined' && window.__TAURI__;
     
     if (!isTauri) {
-        throw new Error("addComponentAndDocument is only available in the Tauri environment for direct local database access.");
+        throw new Error("addComponentAndDocument is only available in the Tauri environment.");
     }
     
     console.log('[PROVISION_FLOW_LOCAL] Saving to local Tauri database with data:', { component, document: {...document, imageData: '...omitted...'} });
@@ -415,8 +383,8 @@ export async function addAnnotation(annotation: {
   yPos: number;
 }): Promise<void> {
     if (typeof window === 'undefined' || !window.__TAURI__) {
-        console.log('[WEB MODE] Add Annotation (not saved):', annotation);
-        return Promise.resolve();
+        console.warn('[Service] addAnnotation is only available in a Tauri environment.');
+        return;
     }
     await initializeDatabase();
     const timestamp = new Date().toISOString().replace('T', ' ').slice(0, 19);
@@ -438,7 +406,10 @@ export async function addAnnotation(annotation: {
 }
 
 export async function getDocumentsForComponent(equipmentId: string): Promise<Document[]> {
-  if (typeof window === 'undefined' || !window.__TAURI__) return Promise.resolve([]);
+  if (typeof window === 'undefined' || !window.__TAURI__) {
+    console.warn('[Service] Not in Tauri environment. Web API fallback is disabled for getDocumentsForComponent.');
+    return [];
+  }
   await initializeDatabase();
   const db = await invoke('plugin:sql|load', { db: DB_NAME });
   const docs: any[] = await invoke('plugin:sql|select', { 
@@ -456,7 +427,10 @@ export async function getDocumentsForComponent(equipmentId: string): Promise<Doc
 }
 
 export async function getLocalVisualDatabase(): Promise<any[]> {
-    if (typeof window === 'undefined' || !window.__TAURI__) return Promise.resolve([]);
+    if (typeof window === 'undefined' || !window.__TAURI__) {
+      console.warn('[Service] Not in Tauri environment. Web API fallback is disabled for getLocalVisualDatabase.');
+      return [];
+    }
     await initializeDatabase();
     console.log('[DB_SERVICE] Querying local visual database.');
     const db = await invoke('plugin:sql|load', { db: DB_NAME });
@@ -616,16 +590,8 @@ export async function searchDocuments(query: { text?: string, equipmentId?: stri
       return searchDocumentsTauri(query.text, query.equipmentId);
   }
   
-  const url = new URL('/api/search', window.location.origin);
-  if (query.text) url.searchParams.append('text', query.text);
-  if (query.equipmentId) url.searchParams.append('equipmentId', query.equipmentId);
-
-  const response = await fetch(url.toString());
-  if (!response.ok) {
-    console.error("Failed to search documents from web API");
-    return [];
-  }
-  return response.json();
+  console.warn('[Service] Not in Tauri environment. Web API fallback is disabled for searchDocuments.');
+  return [];
 }
 
 

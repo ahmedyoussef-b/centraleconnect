@@ -1,38 +1,9 @@
-
+// src/app/api/sync/clear/route.ts
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
 
 export async function POST() {
-  console.log("[SYNC_CLEAR_API] Received request to clear remote database.");
-  try {
-    // The order of deletion is crucial to respect foreign key constraints.
-    // Delete from "child" tables before "parent" tables.
-    const transaction = await prisma.$transaction([
-      prisma.logEntry.deleteMany({}),
-      prisma.annotation.deleteMany({}),
-      prisma.document.deleteMany({}),
-      prisma.alarmEvent.deleteMany({}),
-      prisma.scadaData.deleteMany({}),
-      prisma.parameter.deleteMany({}),
-      prisma.alarm.deleteMany({}),
-      prisma.synopticItem.deleteMany({}),
-      prisma.procedure.deleteMany({}),
-      // Equipment must be deleted after all tables that reference it.
-      prisma.equipment.deleteMany({}),
-    ]);
-    
-    console.log("[SYNC_CLEAR_API] Remote database cleared successfully. Records deleted:", transaction);
-    return NextResponse.json({ message: 'La base de données distante a été nettoyée avec succès.' }, { status: 200 });
-
-  } catch (error) {
-    console.error("[SYNC_CLEAR_API] Failed to clear remote database:", error);
-    if (error instanceof Error) {
-        return NextResponse.json({ error: `Erreur lors du nettoyage de la base de données : ${error.message}` }, { status: 500 });
-    }
-    return NextResponse.json({ error: 'Une erreur inconnue est survenue.' }, { status: 500 });
-  } finally {
-    await prisma.$disconnect();
-  }
+    return NextResponse.json(
+    { error: 'This API route is disabled. The application is designed to run in a Tauri environment and interact directly with the local database.' },
+    { status: 404 }
+  );
 }

@@ -28,130 +28,48 @@ function parseProcedureSteps(stepsData: any): ProcedureStep[] {
  * Récupère toutes les procédures avec garantie de résolution
  */
 async function fetchProcedures(): Promise<Procedure[]> {
-    // Cache
     if (proceduresCache) {
-        console.log('[Procedures] Cache hit');
         return proceduresCache;
     }
-
-    // Évite les appels concurrents
     if (loadingPromise) {
-        console.log('[Procedures] Déjà en cours');
         return loadingPromise;
     }
-    
-    // NOUVEAU: Timeout global pour TOUTE la fonction
-    let timeoutId: NodeJS.Timeout;
-    const timeoutPromise = new Promise<Procedure[]>((_, reject) => {
-        timeoutId = setTimeout(() => {
-            console.warn('[Procedures] TIMEOUT GLOBAL - retour tableau vide');
-            reject(new Error('Timeout global'));
-        }, 10000); // 10 secondes max
-    });
 
-    const fetchPromise = (async (): Promise<Procedure[]> => {
+    loadingPromise = (async () => {
         try {
             const isTauri = typeof window !== 'undefined' && !!(window as any).__TAURI__;
-            console.log('[Procedures] Mode:', isTauri ? 'Tauri' : 'Web API');
-            
-            let rawProcedures: any[] = [];
-
-            if (isTauri) {
-                try {
-                    const { getProcedures: getProceduresTauri } = await import('@/lib/tauri-client');
-                    
-                    // Timeout spécifique Tauri
-                    const tauriTimeout = new Promise<never>((_, reject) => {
-                        setTimeout(() => reject(new Error('Timeout Tauri')), 5000);
-                    });
-                    
-                    rawProcedures = await Promise.race([
-                        getProceduresTauri(),
-                        tauriTimeout
-                    ]) as any[];
-                    
-                } catch (tauriError) {
-                    console.error('[Procedures] Erreur Tauri:', tauriError);
-                    // Fallback API web
-                    try {
-                        const response = await fetch('/api/procedures');
-                        if (response.ok) {
-                            rawProcedures = await response.json();
-                        }
-                    } catch (fetchError) {
-                        console.error('[Procedures] Fallback échoué:', fetchError);
-                    }
-                }
-            } else {
-                // Mode web
-                try {
-                    const controller = new AbortController();
-                    const webTimeout = setTimeout(() => controller.abort(), 5000);
-                    
-                    const response = await fetch('/api/procedures', {
-                        signal: controller.signal
-                    });
-                    
-                    clearTimeout(webTimeout);
-                    
-                    if (response.ok) {
-                        rawProcedures = await response.json();
-                    }
-                } catch (fetchError) {
-                    console.error('[Procedures] Erreur API web:', fetchError);
-                }
-            }
-
-            // TOUJOURS retourner un tableau, même vide
-            if (!Array.isArray(rawProcedures)) {
-                console.warn('[Procedures] Pas un tableau, retour tableau vide');
+            if (!isTauri) {
+                console.warn('[Procedures] Not in Tauri environment, returning empty list. Web API is disabled.');
                 return [];
             }
-
-            console.log(`[Procedures] ${rawProcedures.length} procédures reçues`);
-
-            const parsedProcedures: Procedure[] = [];
-
-            for (const p of rawProcedures) {
-                try {
-                    if (!p || typeof p !== 'object') continue;
-
-                    const procedure: Procedure = {
-                        id: p.id || `temp-${Date.now()}-${parsedProcedures.length}`,
-                        name: p.name || p.title || 'Procédure sans titre',
-                        description: p.description || '',
-                        version: p.version || '1.0.0',
-                        category: p.category || 'Général',
-                        steps: parseProcedureSteps(p.steps)
-                    };
-
-                    parsedProcedures.push(procedure);
-                } catch (procError) {
-                    console.error(`[Procedures] Erreur procédure:`, procError);
-                }
+            
+            const { getProcedures: getProceduresTauri } = await import('@/lib/tauri-client');
+            const rawProcedures = await getProceduresTauri();
+            
+            if (!Array.isArray(rawProcedures)) {
+                console.warn('[Procedures] Data from Tauri is not an array, returning empty.');
+                return [];
             }
             
-            console.log(`[Procedures] ${parsedProcedures.length} valides`);
+            const parsedProcedures: Procedure[] = rawProcedures.map(p => ({
+                id: p.id || `temp-${Date.now()}`,
+                name: p.name || 'Procédure sans titre',
+                description: p.description || '',
+                version: p.version || '1.0.0',
+                category: p.category || 'Général',
+                steps: parseProcedureSteps(p.steps)
+            }));
             
             proceduresCache = parsedProcedures;
             return parsedProcedures;
-            
         } catch (error) {
-            console.error('[Procedures] Erreur fatale:', error);
-            return []; // ← CRITIQUE: TOUJOURS retourner []
+            console.error('[Procedures] Fatal error during fetch:', error);
+            return []; // Always resolve with an empty array on error
         } finally {
-            clearTimeout(timeoutId!);
             loadingPromise = null;
         }
     })();
-
-    // Race entre le fetch et le timeout global
-    loadingPromise = Promise.race([fetchPromise, timeoutPromise])
-        .catch(() => {
-            console.warn('[Procedures] Race perdue, retour []');
-            return []; // ← GARANTIE ABSOLUE
-        });
-
+    
     return loadingPromise;
 }
 
@@ -163,7 +81,7 @@ export async function getProcedures(): Promise<Procedure[]> {
         return await fetchProcedures();
     } catch (error) {
         console.error('[Procedures] Erreur getProcedures:', error);
-        return []; // ← JAMAIS DE REJET
+        return []; // JAMAIS DE REJET
     }
 }
 
@@ -173,7 +91,7 @@ export async function getProcedures(): Promise<Procedure[]> {
 export async function getProcedureById(id: string): Promise<Procedure | undefined> {
     if (!id) return undefined;
     try {
-        const procedures = await getProcedures(); // ← utilise getProcedures() pas fetchProcedures()
+        const procedures = await getProcedures();
         return procedures.find(p => p.id === id || p.id.toString() === id);
     } catch {
         return undefined;

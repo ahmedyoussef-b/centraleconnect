@@ -11,13 +11,9 @@ export async function getAlarms(): Promise<Alarm[]> {
       return getAlarmsTauri();
   }
 
-  // Fallback to web API
-  const response = await fetch('/api/alarms');
-  if (!response.ok) {
-    console.error("Failed to fetch alarms from web API");
-    return [];
-  }
-  return response.json();
+  // Web fallback is disabled. Return empty data.
+  console.warn('[Service] Not in Tauri environment. Web API fallback is disabled for getAlarms.');
+  return [];
 }
 
 export async function getAlarmsForComponent(componentTag: string): Promise<Alarm[]> {
