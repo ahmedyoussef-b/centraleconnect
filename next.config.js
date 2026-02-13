@@ -10,6 +10,7 @@ const appVersion = packageJson.version;
 
 
 const nextConfig = {
+  output: 'export',
   env: {
     APP_VERSION: appVersion,
     BUILD_TIME: new Date().toISOString(),
