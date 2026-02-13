@@ -19,13 +19,7 @@
       "path": {
         "all": true
       },
-      "sql": {
-        "all": true,
-        "load": true
-      },
-      "microphone": {
-        "all": true
-      }
+      "microphone": true
     },
     "plugins": {
       "sql": {
