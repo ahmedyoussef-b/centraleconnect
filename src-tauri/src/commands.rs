@@ -1,7 +1,7 @@
 // src-tauri/src/commands.rs
 use serde::{Serialize, Deserialize};
 use tauri::command;
-use tauri_plugin_sql::{Db, Error, Value};
+use tauri_plugin_sql::{Db, Error, Value, TauriSql};
 use std::fs;
 use sha2::{Sha256, Digest};
 
