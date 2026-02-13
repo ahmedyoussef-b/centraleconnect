@@ -11,8 +11,8 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useToast } from '@/hooks/use-toast';
 
 // Import analysis functions
-import { extractIndustrialMetadata, type IndustrialImageMetadata } from '@/lib/image/metadata-extractor';
-import { performIndustrialOCR, type OCRExtractionResult } from '@/lib/ocr/industrial-ocr';
+import { extractIndustrialMetadata, type IndustrialImageMetadata } from '@/lib/vision/core/metadata-extractor';
+import { performIndustrialOCR, type OCRExtractionResult } from '@/lib/vision/detection/ocr-processor';
 import { detectIndustrialCodes, type IndustrialCode } from '@/lib/vision/code-detector';
 import { EquipmentDetector, type EquipmentDetection } from '@/lib/vision/equipment-detector';
 import { PIDAnalyzer, type PIDAnalysis } from '@/lib/vision/pid-analyzer';
@@ -155,6 +155,17 @@ export default function DiagnosticVisuelPage() {
     link.href = jsonString;
     link.download = `diagnostic-results-${new Date().toISOString()}.json`;
     link.click();
+  };
+
+   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setFileImage(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   return (
