@@ -1,9 +1,11 @@
+
 // src-tauri/src/commands.rs
 use serde::{Serialize, Deserialize};
 use tauri::command;
-use tauri_plugin_sql::{Db, Error, Value, TauriSql};
 use std::fs;
 use sha2::{Sha256, Digest};
+use crate::DbState;
+use rusqlite::{params, Connection, Result as RusqliteResult};
 
 // --- Data Models ---
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -15,8 +17,7 @@ pub struct Equipment {
     pub description: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub parent_id: Option<String>,
-    #[serde(rename = "type")]
-    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(rename = "type", skip_serializing_if = "Option::is_none")]
     pub type_field: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub subtype: Option<String>,
@@ -152,12 +153,6 @@ pub struct Document {
     pub perceptual_hash: Option<String>,
 }
 
-
-// This helper function gets a database connection from the app handle.
-async fn get_db(app_handle: &tauri::AppHandle) -> Result<Db, String> {
-    app_handle.db().await.map_err(|e| e.to_string())
-}
-
 fn create_entry_signature(
     entry_data: &NewLogEntry,
     timestamp: &str,
@@ -179,19 +174,105 @@ fn create_entry_signature(
     format!("{:x}", result)
 }
 
+// --- Row Mappers ---
+
+fn map_row_to_equipment(row: &rusqlite::Row) -> RusqliteResult<Equipment> {
+    Ok(Equipment {
+        external_id: row.get(0)?,
+        name: row.get(1)?,
+        description: row.get(2)?,
+        parent_id: row.get(3)?,
+        type_field: row.get(4)?,
+        subtype: row.get(5)?,
+        system_code: row.get(6)?,
+        sub_system: row.get(7)?,
+        location: row.get(8)?,
+        manufacturer: row.get(9)?,
+        serial_number: row.get(10)?,
+        document_ref: row.get(11)?,
+        coordinates: row.get(12)?,
+        svg_layer: row.get(13)?,
+        fire_zone: row.get(14)?,
+        linked_parameters: row.get(15)?,
+        status: row.get(16)?,
+        version: row.get(17)?,
+        is_immutable: row.get(18)?,
+        approved_by: row.get(19)?,
+        approved_at: row.get(20)?,
+        commissioning_date: row.get(21)?,
+        checksum: row.get(22)?,
+        nominal_data: row.get(23)?,
+    })
+}
+
+fn map_row_to_alarm(row: &rusqlite::Row) -> RusqliteResult<Alarm> {
+    Ok(Alarm {
+        code: row.get(0)?,
+        severity: row.get(1)?,
+        description: row.get(2)?,
+        parameter: row.get(3)?,
+        reset_procedure: row.get(4)?,
+        standard_ref: row.get(5)?,
+        equipment_id: row.get(6)?,
+    })
+}
+
+fn map_row_to_procedure(row: &rusqlite::Row) -> RusqliteResult<Procedure> {
+    Ok(Procedure {
+        id: row.get(0)?,
+        name: row.get(1)?,
+        description: row.get(2)?,
+        version: row.get(3)?,
+        steps: row.get(4)?,
+        category: row.get(5)?,
+    })
+}
+
+fn map_row_to_log_entry(row: &rusqlite::Row) -> RusqliteResult<LogEntry> {
+    Ok(LogEntry {
+        id: row.get(0)?,
+        timestamp: row.get(1)?,
+        type_field: row.get(2)?,
+        source: row.get(3)?,
+        message: row.get(4)?,
+        signature: row.get(5)?,
+        equipment_id: row.get(6)?,
+    })
+}
+
+fn map_row_to_document(row: &rusqlite::Row) -> RusqliteResult<Document> {
+    Ok(Document {
+        id: row.get(0)?,
+        equipment_id: row.get(1)?,
+        image_data: row.get(2)?,
+        ocr_text: row.get(3)?,
+        description: row.get(4)?,
+        created_at: row.get(5)?,
+        perceptual_hash: row.get(6)?,
+    })
+}
+
 // --- Tauri Commands ---
 
 #[command]
-pub async fn get_equipments(app_handle: tauri::AppHandle) -> Result<Vec<Equipment>, String> {
-    let db = get_db(&app_handle).await?;
-    db.select("SELECT * FROM equipments", &[]).await.map_err(|e| e.to_string())
+pub fn get_equipments(state: tauri::State<DbState>) -> Result<Vec<Equipment>, String> {
+    let conn = state.db.lock().unwrap();
+    let mut stmt = conn.prepare("SELECT * FROM equipments").map_err(|e| e.to_string())?;
+    let iter = stmt.query_map([], map_row_to_equipment).map_err(|e| e.to_string())?;
+    iter.map(|r| r.map_err(|e| e.to_string())).collect()
 }
 
 #[command]
-pub async fn get_equipment(id: String, app_handle: tauri::AppHandle) -> Result<Option<Equipment>, String> {
-    let db = get_db(&app_handle).await?;
-    let mut equipments: Vec<Equipment> = db.select("SELECT * FROM equipments WHERE external_id = $1", &[id.into()]).await.map_err(|e| e.to_string())?;
-    Ok(equipments.pop())
+pub fn get_equipment(id: String, state: tauri::State<DbState>) -> Result<Option<Equipment>, String> {
+    let conn = state.db.lock().unwrap();
+    let mut stmt = conn.prepare("SELECT * FROM equipments WHERE external_id = ?1").map_err(|e| e.to_string())?;
+    let mut iter = stmt.query_map(params![id], map_row_to_equipment).map_err(|e| e.to_string())?;
+    
+    if let Some(equip_result) = iter.next() {
+        Ok(Some(equip_result.map_err(|e| e.to_string())?))
+    } else {
+        Ok(None)
+    }
 }
 
 #[command]
@@ -205,111 +286,106 @@ pub fn get_components(app_handle: tauri::AppHandle) -> Result<Vec<Component>, St
     Ok(data.components)
 }
 
-
 #[command]
 pub fn get_pid_svg(app_handle: tauri::AppHandle, path: String) -> Result<String, String> {
     let resource_path = app_handle.path_resolver()
         .resolve_resource(&path)
         .ok_or_else(|| "Failed to resolve resource path".to_string())?;
-
-    fs::read_to_string(&resource_path)
-        .map_err(|e| e.to_string())
+    fs::read_to_string(&resource_path).map_err(|e| e.to_string())
 }
 
 #[command]
-pub async fn get_alarms(app_handle: tauri::AppHandle) -> Result<Vec<Alarm>, String> {
-    let db = get_db(&app_handle).await?;
-    db.select("SELECT code, equipment_id, severity, description, parameter, reset_procedure, standard_ref FROM alarms", &[]).await.map_err(|e| e.to_string())
+pub fn get_alarms(state: tauri::State<DbState>) -> Result<Vec<Alarm>, String> {
+    let conn = state.db.lock().unwrap();
+    let mut stmt = conn.prepare("SELECT code, severity, description, parameter, reset_procedure, standard_ref, equipment_id FROM alarms").map_err(|e| e.to_string())?;
+    let iter = stmt.query_map([], map_row_to_alarm).map_err(|e| e.to_string())?;
+    iter.map(|r| r.map_err(|e| e.to_string())).collect()
 }
 
 #[command]
-pub async fn get_procedures(app_handle: tauri::AppHandle) -> Result<Vec<Procedure>, String> {
-    let db = get_db(&app_handle).await?;
-    db.select("SELECT id, name, description, version, steps, category FROM procedures", &[]).await.map_err(|e| e.to_string())
+pub fn get_procedures(state: tauri::State<DbState>) -> Result<Vec<Procedure>, String> {
+    let conn = state.db.lock().unwrap();
+    let mut stmt = conn.prepare("SELECT id, name, description, version, steps, category FROM procedures").map_err(|e| e.to_string())?;
+    let iter = stmt.query_map([], map_row_to_procedure).map_err(|e| e.to_string())?;
+    iter.map(|r| r.map_err(|e| e.to_string())).collect()
 }
 
 #[command]
-pub async fn get_log_entries(app_handle: tauri::AppHandle) -> Result<Vec<LogEntry>, String> {
-    let db = get_db(&app_handle).await?;
-    db.select("SELECT * FROM log_entries ORDER BY timestamp DESC", &[])
-        .await
-        .map_err(|e| e.to_string())
+pub fn get_log_entries(state: tauri::State<DbState>) -> Result<Vec<LogEntry>, String> {
+    let conn = state.db.lock().unwrap();
+    let mut stmt = conn.prepare("SELECT id, timestamp, type, source, message, signature, equipment_id FROM log_entries ORDER BY timestamp DESC").map_err(|e| e.to_string())?;
+    let iter = stmt.query_map([], map_row_to_log_entry).map_err(|e| e.to_string())?;
+    iter.map(|r| r.map_err(|e| e.to_string())).collect()
 }
 
 #[command]
-pub async fn add_log_entry(entry: NewLogEntry, app_handle: tauri::AppHandle) -> Result<(), String> {
-    let db = get_db(&app_handle).await?;
-
-    let last_entry: Result<Vec<LogEntry>, Error> = db
-        .select("SELECT id, timestamp, type, source, message, equipment_id, signature FROM log_entries ORDER BY timestamp DESC LIMIT 1", &[])
-        .await;
-
-    let previous_signature = match last_entry {
-        Ok(entries) => entries.get(0).map_or("GENESIS".to_string(), |e| e.signature.clone()),
-        Err(_) => "GENESIS".to_string(),
-    };
+pub fn add_log_entry(entry: NewLogEntry, state: tauri::State<DbState>) -> Result<(), String> {
+    let conn = state.db.lock().unwrap();
+    
+    let previous_signature: String = conn.query_row(
+        "SELECT signature FROM log_entries ORDER BY timestamp DESC LIMIT 1",
+        [],
+        |row| row.get(0),
+    ).unwrap_or("GENESIS".to_string());
 
     let timestamp = chrono::Utc::now().format("%Y-%m-%d %H:%M:%S").to_string();
-
     let signature = create_entry_signature(&entry, &timestamp, &previous_signature);
 
-    db.execute(
-        "INSERT INTO log_entries (timestamp, type, source, message, equipment_id, signature) VALUES ($1, $2, $3, $4, $5, $6)",
-        &[
-            timestamp.into(),
-            entry.type_field.into(),
-            entry.source.into(),
-            entry.message.into(),
-            entry.equipment_id.into(),
-            signature.into(),
+    conn.execute(
+        "INSERT INTO log_entries (timestamp, type, source, message, equipment_id, signature) VALUES (?1, ?2, ?3, ?4, ?5, ?6)",
+        params![
+            timestamp,
+            entry.type_field,
+            entry.source,
+            entry.message,
+            entry.equipment_id,
+            signature,
         ],
-    )
-    .await
-    .map_err(|e| e.to_string())?;
+    ).map_err(|e| e.to_string())?;
 
     Ok(())
 }
 
 #[command]
-pub async fn get_log_entries_for_node(equipment_id: String, app_handle: tauri::AppHandle) -> Result<Vec<LogEntry>, String> {
-    let db = get_db(&app_handle).await?;
-    db.select(
-        "SELECT * FROM log_entries WHERE equipment_id = $1 ORDER BY timestamp DESC",
-        &[equipment_id.into()],
-    )
-    .await
-    .map_err(|e| e.to_string())
+pub fn get_log_entries_for_node(equipment_id: String, state: tauri::State<DbState>) -> Result<Vec<LogEntry>, String> {
+    let conn = state.db.lock().unwrap();
+    let mut stmt = conn.prepare("SELECT id, timestamp, type, source, message, signature, equipment_id FROM log_entries WHERE equipment_id = ?1 ORDER BY timestamp DESC").map_err(|e| e.to_string())?;
+    let iter = stmt.query_map(params![equipment_id], map_row_to_log_entry).map_err(|e| e.to_string())?;
+    iter.map(|r| r.map_err(|e| e.to_string())).collect()
 }
 
-
 #[command]
-pub async fn search_documents(query: String, equipment_id: Option<String>, app_handle: tauri::AppHandle) -> Result<Vec<Document>, String> {
-    let db = get_db(&app_handle).await?;
-    let mut params: Vec<Value> = vec![];
+pub fn search_documents(query: String, equipment_id: Option<String>, state: tauri::State<DbState>) -> Result<Vec<Document>, String> {
+    let conn = state.db.lock().unwrap();
+    let mut sql_params: Vec<rusqlite::types::Value> = vec![];
     let mut conditions: Vec<String> = vec![];
+    
+    let mut sql = "SELECT id, equipment_id, image_data, ocr_text, description, created_at, perceptual_hash FROM documents WHERE ".to_string();
 
     if !query.is_empty() {
-        conditions.push("(ocr_text LIKE $1 OR description LIKE $1)".to_string());
-        params.push(format!("%{}%", query).into());
+        conditions.push("(ocr_text LIKE ? OR description LIKE ?)".to_string());
+        let like_query = format!("%{}%", query);
+        sql_params.push(like_query.clone().into());
+        sql_params.push(like_query.into());
     }
 
     if let Some(eid) = equipment_id {
         if !eid.is_empty() {
-            let param_index = params.len() + 1;
-            conditions.push(format!("equipment_id = ${}", param_index));
-            params.push(eid.into());
+            conditions.push("equipment_id = ?".to_string());
+            sql_params.push(eid.into());
         }
     }
 
-    let where_clause = if conditions.is_empty() {
-        "1 = 1".to_string() // Return all if no query/filters
+    if conditions.is_empty() {
+        sql.push_str("1=1");
     } else {
-        conditions.join(" AND ")
-    };
-    
-    let sql_query = format!("SELECT id, equipment_id, image_data, ocr_text, description, created_at, perceptual_hash FROM documents WHERE {} ORDER BY created_at DESC", where_clause);
+        sql.push_str(&conditions.join(" AND "));
+    }
+    sql.push_str(" ORDER BY created_at DESC");
 
-    db.select(&sql_query, &params)
-    .await
-    .map_err(|e| e.to_string())
+    let mut stmt = conn.prepare(&sql).map_err(|e| e.to_string())?;
+    
+    let rows = stmt.query_map(rusqlite::params_from_iter(sql_params), map_row_to_document).map_err(|e| e.to_string())?;
+    
+    rows.map(|r| r.map_err(|e| e.to_string())).collect()
 }

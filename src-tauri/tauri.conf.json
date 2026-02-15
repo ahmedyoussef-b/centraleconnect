@@ -21,13 +21,6 @@
       },
       "microphone": true
     },
-    "plugins": {
-      "sql": {
-        "preload": [
-          "sqlite:ccpp.db"
-        ]
-      }
-    },
     "bundle": {
       "active": true,
       "identifier": "com.ccpp.monitor",
