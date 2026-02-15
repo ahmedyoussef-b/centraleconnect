@@ -23,7 +23,6 @@ import proceduresData from '../src/assets/master-data/procedures.json' assert { 
 import tg1Data from '../src/assets/master-data/TG1.json' assert { type: 'json' };
 import tg2Data from '../src/assets/master-data/TG2.json' assert { type: 'json' };
 
-
 async function main() {
   // Dynamically import PrismaClient AFTER dotenv has loaded the environment variables
   const { PrismaClient } = await import('@prisma/client');
@@ -192,8 +191,8 @@ async function main() {
           name: proc.name,
           description: proc.description,
           version: proc.version,
-          steps: proc.steps, // Pass the JSON object directly
           category: proc.category,
+          steps: proc.steps, // Pass the JSON object directly
         }
       });
     }

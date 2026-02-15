@@ -2,6 +2,20 @@
 import type { Metadata } from 'next';
 import { Toaster } from '@/components/ui/toaster';
 import './globals.css';
+import { Inter, Source_Code_Pro } from 'next/font/google';
+
+// Configure fonts
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-inter',
+});
+
+const sourceCodePro = Source_Code_Pro({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-source-code-pro',
+});
 
 export const metadata: Metadata = {
   title: 'SousseB Insights',
@@ -15,7 +29,7 @@ export default function RootLayout({
 }>) {
   
   return (
-    <html lang="fr" className="dark" suppressHydrationWarning>
+    <html lang="fr" className={`dark ${inter.variable} ${sourceCodePro.variable}`} suppressHydrationWarning>
       <head>
         {/* Optimisation TensorFlow.js pour forcer l'accélération GPU */}
         <script
@@ -28,16 +42,6 @@ export default function RootLayout({
               }
             `,
           }}
-        />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link 
-          rel="preconnect" 
-          href="https://fonts.gstatic.com" 
-          crossOrigin="anonymous" 
-        />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Code+Pro:wght@400;500&display=swap"
-          rel="stylesheet"
         />
       </head>
       <body className="font-body antialiased">

@@ -20,13 +20,26 @@ L'objectif est de supprimer tous les fichiers liés à l'application pour évite
     2.  Trouvez "ccpp-monitor.app" (ou le nom de votre application).
     3.  Faites-le glisser vers la Corbeille.
 
-### Étape 1.2 : Supprimer le dossier du projet
+### Étape 1.2 : Supprimer les données locales de l'application
 
-C'est l'étape la plus importante. Supprimez **complètement** le dossier contenant le code source de votre projet. Cela supprimera :
+Cette étape supprime la base de données locale SQLite et tout autre cache.
+-   **Sur Windows** :
+    1.  Ouvrez l'explorateur de fichiers.
+    2.  Dans la barre d'adresse, tapez `%APPDATA%` et appuyez sur Entrée.
+    3.  Trouvez et supprimez le dossier `com.ccpp.monitor`.
+
+-   **Sur macOS** :
+    1.  Ouvrez le Finder.
+    2.  Dans le menu "Aller", sélectionnez "Aller au dossier...".
+    3.  Tapez `~/Library/Application Support/` et appuyez sur Entrée.
+    4.  Trouvez et supprimez le dossier `com.ccpp.monitor`.
+
+### Étape 1.3 : Supprimer le dossier du projet
+
+Supprimez **complètement** le dossier contenant le code source de votre projet. Cela supprimera :
 -   Le code source.
 -   Les dépendances (`node_modules`).
--   Les builds précédents (`.next`, `out`).
--   La base de données locale SQLite (`src-tauri/ccpp.db`).
+-   Les builds précédents (`out`).
 -   Toute autre configuration locale.
 
 ---
@@ -70,7 +83,7 @@ OPCUA_SERVER_URL="opc.tcp://localhost:53530/OPCUA/SimulationServer"
 
 ### Étape 2.3 : Installer les dépendances
 
-Cette commande télécharge toutes les bibliothèques nécessaires au projet.
+Cette commande télécharge toutes les bibliothèques nécessaires au projet et rend les scripts exécutables.
 
 ```bash
 npm install
@@ -78,9 +91,13 @@ npm install
 
 ### Étape 2.4 : Télécharger les modèles d'IA
 
-Cette commande télécharge les modèles pour la reconnaissance vocale et visuelle.
+Ces commandes téléchargent les modèles pour la reconnaissance vocale et visuelle.
 
 ```bash
+# Modèle de reconnaissance vocale (Vosk)
+npm run models:download
+
+# Modèle de détection d'objets (TensorFlow.js)
 npm run setup:ai-models
 ```
 
@@ -94,7 +111,7 @@ npm run seed
 
 ### Étape 2.6 : Lancer l'application en mode développement
 
-C'est la dernière étape. Elle compile le projet et lance l'application de bureau. Au premier lancement, la base de données SQLite locale sera créée automatiquement.
+C'est la dernière étape. Elle compile le projet et lance l'application de bureau. Au premier lancement, la base de données SQLite locale sera créée automatiquement dans le dossier des données de l'application.
 
 ```bash
 npm run tauri dev
