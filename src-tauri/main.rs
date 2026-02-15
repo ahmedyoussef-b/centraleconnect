@@ -1,0 +1,175 @@
+
+// src-tauri/src/main.rs
+#![cfg_attr(
+    all(not(debug_assertions), target_os = "windows"),
+    windows_subsystem = "windows"
+)]
+
+mod commands;
+mod scada;
+
+use dotenv::dotenv;
+use std::sync::Mutex;
+use rusqlite::Connection;
+
+pub struct DbState {
+    pub db: Mutex<Connection>,
+}
+
+fn main() {
+    dotenv().ok(); // Charge les variables du fichier .env
+
+    tauri::Builder::default()
+        .setup(|app| {
+            let app_handle = app.handle();
+            let app_dir = app_handle.path_resolver().app_data_dir().expect("Failed to get app data dir");
+            if !app_dir.exists() {
+                std::fs::create_dir_all(&app_dir).expect("Failed to create app data dir");
+            }
+            let db_path = app_dir.join("ccpp.db");
+
+            let conn = Connection::open(&db_path)
+                .map_err(|e| format!("Failed to open database: {}", e)).unwrap();
+            
+            let create_tables_sql = "BEGIN;
+CREATE TABLE IF NOT EXISTS equipments (
+    external_id TEXT PRIMARY KEY NOT NULL,
+    name TEXT NOT NULL,
+    description TEXT,
+    parent_id TEXT,
+    type TEXT,
+    subtype TEXT,
+    system_code TEXT,
+    sub_system TEXT,
+    location TEXT,
+    manufacturer TEXT,
+    serial_number TEXT,
+    document_ref TEXT,
+    coordinates TEXT,
+    svg_layer TEXT,
+    fire_zone TEXT,
+    linked_parameters TEXT,
+    status TEXT,
+    version INTEGER NOT NULL DEFAULT 1,
+    is_immutable BOOLEAN NOT NULL DEFAULT 0,
+    approved_by TEXT,
+    approved_at TEXT,
+    commissioning_date TEXT,
+    checksum TEXT UNIQUE,
+    nominal_data TEXT
+);
+CREATE TABLE IF NOT EXISTS parameters (
+    id INTEGER PRIMARY KEY,
+    name TEXT NOT NULL,
+    unit TEXT,
+    nominal_value REAL,
+    min_safe REAL,
+    max_safe REAL,
+    alarm_high REAL,
+    alarm_low REAL,
+    standard_ref TEXT,
+    equipment_id TEXT NOT NULL,
+    FOREIGN KEY (equipment_id) REFERENCES equipments(external_id) ON DELETE CASCADE
+);
+CREATE TABLE IF NOT EXISTS alarms (
+    code TEXT PRIMARY KEY NOT NULL,
+    severity TEXT CHECK(severity IN ('INFO', 'WARNING', 'CRITICAL', 'EMERGENCY')) NOT NULL,
+    description TEXT NOT NULL,
+    parameter TEXT,
+    reset_procedure TEXT,
+    standard_ref TEXT,
+    equipment_id TEXT NOT NULL,
+    FOREIGN KEY (equipment_id) REFERENCES equipments(external_id) ON DELETE CASCADE
+);
+CREATE TABLE IF NOT EXISTS log_entries (
+    id INTEGER PRIMARY KEY,
+    timestamp TEXT NOT NULL,
+    type TEXT CHECK(type IN ('AUTO', 'MANUAL', 'DOCUMENT_ADDED')) NOT NULL,
+    source TEXT NOT NULL,
+    message TEXT NOT NULL,
+    signature TEXT UNIQUE NOT NULL,
+    equipment_id TEXT,
+    FOREIGN KEY (equipment_id) REFERENCES equipments(external_id) ON DELETE CASCADE
+);
+CREATE TABLE IF NOT EXISTS alarm_events (
+  id INTEGER PRIMARY KEY,
+  timestamp TEXT NOT NULL,
+  is_active BOOLEAN NOT NULL,
+  details TEXT,
+  alarm_code TEXT NOT NULL,
+  FOREIGN KEY (alarm_code) REFERENCES alarms(code) ON DELETE CASCADE
+);
+CREATE TABLE IF NOT EXISTS scada_data (
+  id INTEGER PRIMARY KEY,
+  timestamp TEXT NOT NULL,
+  value REAL NOT NULL,
+  equipment_id TEXT NOT NULL,
+  FOREIGN KEY (equipment_id) REFERENCES equipments(external_id) ON DELETE CASCADE
+);
+CREATE TABLE IF NOT EXISTS annotations (
+    id INTEGER PRIMARY KEY,
+    timestamp TEXT NOT NULL,
+    text TEXT NOT NULL,
+    operator TEXT NOT NULL,
+    x_pos REAL NOT NULL,
+    y_pos REAL NOT NULL,
+    equipment_id TEXT NOT NULL,
+    FOREIGN KEY (equipment_id) REFERENCES equipments(external_id) ON DELETE CASCADE
+);
+CREATE TABLE IF NOT EXISTS documents (
+    id INTEGER PRIMARY KEY,
+    image_data TEXT NOT NULL,
+    ocr_text TEXT,
+    description TEXT,
+    created_at TEXT NOT NULL,
+    perceptual_hash TEXT,
+    equipment_id TEXT NOT NULL,
+    FOREIGN KEY (equipment_id) REFERENCES equipments(external_id) ON DELETE CASCADE
+);
+CREATE TABLE IF NOT EXISTS procedures (
+  id TEXT PRIMARY KEY NOT NULL,
+  name TEXT NOT NULL,
+  description TEXT,
+  version TEXT,
+  steps TEXT,
+  category TEXT
+);
+CREATE TABLE IF NOT EXISTS synoptic_items (
+    external_id TEXT PRIMARY KEY NOT NULL,
+    name TEXT,
+    type TEXT,
+    parent_id TEXT,
+    group_path TEXT,
+    element_id TEXT,
+    level INTEGER,
+    approved_by TEXT,
+    approval_date TEXT
+);
+COMMIT;";
+            conn.execute_batch(create_tables_sql).expect("Failed to create tables");
+            conn.execute("PRAGMA foreign_keys = ON;", []).expect("Failed to enable foreign keys");
+
+            app.manage(DbState { db: Mutex::new(conn) });
+
+            let app_handle_clone = app_handle.clone();
+            tauri::async_runtime::spawn(async move {
+                scada::run_scada_loop(app_handle_clone).await;
+            });
+            Ok(())
+        })
+        .invoke_handler(tauri::generate_handler![
+            commands::get_equipments,
+            commands::get_equipment,
+            commands::get_components,
+            commands::get_pid_svg,
+            commands::get_alarms,
+            commands::get_procedures,
+            commands::get_log_entries,
+            commands::add_log_entry,
+            commands::get_log_entries_for_node,
+            commands::search_documents,
+            commands::sync_database,
+        ])
+        .run(tauri::generate_context!())
+        .expect("Erreur lors du lancement de l'application Tauri");
+}

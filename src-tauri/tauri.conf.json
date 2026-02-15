@@ -2,7 +2,7 @@
   "build": {
     "beforeDevCommand": "npm run dev",
     "beforeBuildCommand": "npm run build",
-    "devPath": "http://localhost:9002",
+    "devPath": "http://localhost:3000",
     "distDir": "../out",
     "withGlobalTauri": true
   },
@@ -19,7 +19,9 @@
       "path": {
         "all": true
       },
-      "microphone": true
+      "microphone": {
+        "all": true
+      }
     },
     "bundle": {
       "active": true,

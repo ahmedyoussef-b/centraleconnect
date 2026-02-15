@@ -236,36 +236,14 @@ export async function syncWithRemote(): Promise<{ synced: number; cleaned: boole
         return { synced: 0, cleaned: false };
     }
     
-    console.log('[SYNC_FLOW] Starting remote-to-local synchronization.');
-
-    const response = await fetch('/api/sync/data');
-    if (!response.ok) {
-        throw new Error(`Échec de la récupération des données de synchronisation: ${response.statusText}`);
-    }
-    const data = await response.json();
-    console.log('[SYNC_FLOW] Fetched data from remote server.', { recordCounts: { equipments: data.equipments?.length, documents: data.documents?.length, logs: data.logEntries?.length, parameters: data.parameters?.length, alarms: data.alarms?.length } });
+    console.log('[SYNC_FLOW] Starting remote-to-local synchronization via Rust backend.');
     
-    // This complex logic should be a single command in Rust
-    const result: { synced: number } = await invoke('sync_database', { data });
+    // The entire sync logic is now in the Rust backend.
+    const result: { synced: number, cleaned: boolean } = await invoke('sync_database');
     
     console.log(`[SYNC_FLOW] Local database synced. ${result.synced} records considered.`);
-
-    // Step 2: Clean up remote database
-    console.log('[SYNC_FLOW] Triggering remote DB cleanup...');
-    let cleaned = false;
-    try {
-        const cleanupResponse = await fetch('/api/sync/clear', { method: 'POST' });
-        if (!cleanupResponse.ok) {
-            console.error(`[SYNC_FLOW] Failed to clear remote database: ${cleanupResponse.statusText}`);
-        } else {
-            console.log('[SYNC_FLOW] Remote DB cleanup successful.');
-            cleaned = true;
-        }
-    } catch (e) {
-        console.error("[SYNC_FLOW] Error during remote cleanup:", e);
-    }
     
-    return { synced: result.synced, cleaned };
+    return result;
 }
 
 export async function searchDocuments(query: { text?: string, equipmentId?: string }): Promise<Document[]> {
