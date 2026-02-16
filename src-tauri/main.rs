@@ -9,11 +9,100 @@ mod scada;
 
 use dotenv::dotenv;
 use std::sync::Mutex;
-use rusqlite::Connection;
+use rusqlite::{Connection, params};
+use serde::Deserialize;
 
 pub struct DbState {
     pub db: Mutex<Connection>,
 }
+
+// Structs pour désérialiser les fichiers JSON de seeding
+#[derive(Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct AlarmSeed {
+    code: String,
+    component_tag: String,
+    severity: String,
+    message: String,
+    parameter: Option<String>,
+    reset_procedure: Option<String>,
+    standard_ref: Option<String>,
+}
+
+#[derive(Deserialize)]
+struct ProcedureSeed {
+    id: String,
+    name: String,
+    description: Option<String>,
+    version: String,
+    category: Option<String>,
+    steps: serde_json::Value,
+}
+
+/// Remplit la base de données locale avec les données de référence si elle est vide.
+fn seed_database(conn: &Connection, app_handle: &tauri::AppHandle) -> Result<(), String> {
+    // Vérifie si la table des alarmes est vide pour décider de lancer le seeding
+    let is_empty: bool = conn.query_row("SELECT COUNT(code) FROM alarms", [], |row| row.get(0)).unwrap_or(0) == 0;
+    
+    if !is_empty {
+        println!("[DB Seeder] Database already contains data. Skipping seed.");
+        return Ok(());
+    }
+
+    println!("[DB Seeder] Database is empty. Seeding from assets...");
+
+    // --- Seed Alarms ---
+    let alarms_path = app_handle.path_resolver().resolve_resource("src/assets/master-data/alarms.json")
+        .ok_or_else(|| "Failed to resolve alarms.json".to_string())?;
+    let alarms_content = std::fs::read_to_string(alarms_path).map_err(|e| e.to_string())?;
+    let alarms_data: Vec<AlarmSeed> = serde_json::from_str(&alarms_content).map_err(|e| format!("Failed to parse alarms.json: {}", e))?;
+    
+    let tx = conn.transaction().map_err(|e| e.to_string())?;
+    {
+        let mut stmt = tx.prepare("INSERT INTO alarms (code, equipment_id, severity, description, parameter, reset_procedure, standard_ref) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)").map_err(|e| e.to_string())?;
+        for alarm in alarms_data {
+            stmt.execute(params![
+                alarm.code,
+                alarm.component_tag,
+                alarm.severity,
+                alarm.message,
+                alarm.parameter,
+                alarm.reset_procedure,
+                alarm.standard_ref,
+            ]).map_err(|e| e.to_string())?;
+        }
+    }
+    tx.commit().map_err(|e| e.to_string())?;
+    println!("[DB Seeder] Alarms seeded successfully.");
+
+    // --- Seed Procedures ---
+    let procedures_path = app_handle.path_resolver().resolve_resource("src/assets/master-data/procedures.json")
+        .ok_or_else(|| "Failed to resolve procedures.json".to_string())?;
+    let procedures_content = std::fs::read_to_string(procedures_path).map_err(|e| e.to_string())?;
+    let procedures_data: Vec<ProcedureSeed> = serde_json::from_str(&procedures_content).map_err(|e| format!("Failed to parse procedures.json: {}", e))?;
+
+    let tx = conn.transaction().map_err(|e| e.to_string())?;
+    {
+        let mut stmt = tx.prepare("INSERT INTO procedures (id, name, description, version, category, steps) VALUES (?1, ?2, ?3, ?4, ?5, ?6)").map_err(|e| e.to_string())?;
+        for proc in procedures_data {
+            let steps_json = serde_json::to_string(&proc.steps).unwrap_or_else(|_| "[]".to_string());
+            stmt.execute(params![
+                proc.id,
+                proc.name,
+                proc.description,
+                proc.version,
+                proc.category,
+                steps_json
+            ]).map_err(|e| e.to_string())?;
+        }
+    }
+    tx.commit().map_err(|e| e.to_string())?;
+    println!("[DB Seeder] Procedures seeded successfully.");
+    
+    println!("[DB Seeder] Seeding complete.");
+    Ok(())
+}
+
 
 fn main() {
     dotenv().ok(); // Charge les variables du fichier .env
@@ -147,6 +236,11 @@ CREATE TABLE IF NOT EXISTS synoptic_items (
 COMMIT;";
             conn.execute_batch(create_tables_sql).expect("Failed to create tables");
             conn.execute("PRAGMA foreign_keys = ON;", []).expect("Failed to enable foreign keys");
+
+            // Seed the database from assets
+            if let Err(e) = seed_database(&conn, &app_handle) {
+                eprintln!("[ERROR] Error seeding database: {}", e);
+            }
 
             app.manage(DbState { db: Mutex::new(conn) });
 
