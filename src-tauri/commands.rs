@@ -1,4 +1,3 @@
-
 // src-tauri/src/commands.rs
 use serde::{Serialize, Deserialize};
 use tauri::command;
@@ -59,6 +58,81 @@ pub struct Equipment {
     pub checksum: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub nominal_data: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct Parameter {
+    pub id: i64,
+    pub equipment_id: String,
+    pub name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub unit: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub nominal_value: Option<f64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub min_safe: Option<f64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub max_safe: Option<f64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub alarm_high: Option<f64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub alarm_low: Option<f64>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub standard_ref: Option<String>,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct NewComponentData {
+    pub external_id: String,
+    pub name: String,
+    #[serde(rename = "type")]
+    pub type_field: String,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct NewDocumentData {
+    pub image_data: String,
+    pub ocr_text: String,
+    pub description: String,
+    pub perceptual_hash: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct Annotation {
+    pub id: i64,
+    pub equipment_id: String,
+    pub text: String,
+    pub operator: String,
+    pub timestamp: String,
+    pub x_pos: f64,
+    pub y_pos: f64,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct NewAnnotation {
+    pub equipment_id: String,
+    pub text: String,
+    pub operator: String,
+    pub x_pos: f64,
+    pub y_pos: f64,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct LocalVisualDbEntry {
+    pub document_id: i64,
+    pub equipment_id: String,
+    pub equipment_name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub description: Option<String>,
+    pub image_data: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub perceptual_hash: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -209,6 +283,21 @@ fn map_row_to_equipment(row: &rusqlite::Row) -> RusqliteResult<Equipment> {
     })
 }
 
+fn map_row_to_parameter(row: &rusqlite::Row) -> RusqliteResult<Parameter> {
+    Ok(Parameter {
+        id: row.get(0)?,
+        equipment_id: row.get(1)?,
+        name: row.get(2)?,
+        unit: row.get(3)?,
+        nominal_value: row.get(4)?,
+        min_safe: row.get(5)?,
+        max_safe: row.get(6)?,
+        alarm_high: row.get(7)?,
+        alarm_low: row.get(8)?,
+        standard_ref: row.get(9)?,
+    })
+}
+
 fn map_row_to_alarm(row: &rusqlite::Row) -> RusqliteResult<Alarm> {
     Ok(Alarm {
         code: row.get(0)?,
@@ -256,6 +345,30 @@ fn map_row_to_document(row: &rusqlite::Row) -> RusqliteResult<Document> {
     })
 }
 
+fn map_row_to_annotation(row: &rusqlite::Row) -> RusqliteResult<Annotation> {
+    Ok(Annotation {
+        id: row.get(0)?,
+        equipment_id: row.get(1)?,
+        text: row.get(2)?,
+        operator: row.get(3)?,
+        timestamp: row.get(4)?,
+        x_pos: row.get(5)?,
+        y_pos: row.get(6)?,
+    })
+}
+
+fn map_row_to_local_visual_db_entry(row: &rusqlite::Row) -> RusqliteResult<LocalVisualDbEntry> {
+    Ok(LocalVisualDbEntry {
+        document_id: row.get(0)?,
+        equipment_id: row.get(1)?,
+        equipment_name: row.get(2)?,
+        description: row.get(3)?,
+        image_data: row.get(4)?,
+        perceptual_hash: row.get(5)?,
+    })
+}
+
+
 // --- Tauri Commands ---
 
 #[command]
@@ -278,6 +391,23 @@ pub fn get_equipment(id: String, state: tauri::State<DbState>) -> Result<Option<
         Ok(None)
     }
 }
+
+#[command]
+pub fn get_parameters(state: tauri::State<DbState>) -> Result<Vec<Parameter>, String> {
+    let conn = state.db.lock().unwrap();
+    let mut stmt = conn.prepare("SELECT id, equipment_id, name, unit, nominal_value, min_safe, max_safe, alarm_high, alarm_low, standard_ref FROM parameters").map_err(|e| e.to_string())?;
+    let iter = stmt.query_map([], map_row_to_parameter).map_err(|e| e.to_string())?;
+    iter.map(|r| r.map_err(|e| e.to_string())).collect()
+}
+
+#[command]
+pub fn get_parameters_for_component(equipment_id: String, state: tauri::State<DbState>) -> Result<Vec<Parameter>, String> {
+    let conn = state.db.lock().unwrap();
+    let mut stmt = conn.prepare("SELECT id, equipment_id, name, unit, nominal_value, min_safe, max_safe, alarm_high, alarm_low, standard_ref FROM parameters WHERE equipment_id = ?1").map_err(|e| e.to_string())?;
+    let iter = stmt.query_map(params![equipment_id], map_row_to_parameter).map_err(|e| e.to_string())?;
+    iter.map(|r| r.map_err(|e| e.to_string())).collect()
+}
+
 
 #[command]
 pub fn get_components(app_handle: tauri::AppHandle) -> Result<Vec<Component>, String> {
@@ -393,6 +523,77 @@ pub fn search_documents(query: String, equipment_id: Option<String>, state: taur
     
     rows.map(|r| r.map_err(|e| e.to_string())).collect()
 }
+
+#[command]
+pub fn add_component_and_document(component: NewComponentData, document: NewDocumentData, state: tauri::State<DbState>) -> Result<(), String> {
+    let conn = state.db.lock().unwrap();
+    
+    let tx = conn.transaction().map_err(|e| e.to_string())?;
+
+    tx.execute(
+        "INSERT OR IGNORE INTO equipments (external_id, name, type, version, is_immutable) VALUES (?1, ?2, ?3, 1, 0)",
+        params![&component.external_id, &component.name, &component.type_field],
+    ).map_err(|e| e.to_string())?;
+    
+    let timestamp = chrono::Utc::now().format("%Y-%m-%d %H:%M:%S").to_string();
+
+    tx.execute(
+        "INSERT INTO documents (equipment_id, image_data, ocr_text, description, created_at, perceptual_hash) VALUES (?1, ?2, ?3, ?4, ?5, ?6)",
+        params![
+            &component.external_id,
+            document.image_data,
+            document.ocr_text,
+            document.description,
+            timestamp,
+            document.perceptual_hash,
+        ],
+    ).map_err(|e| e.to_string())?;
+
+    tx.commit().map_err(|e| e.to_string())
+}
+
+#[command]
+pub fn get_annotations_for_node(external_id: String, state: tauri::State<DbState>) -> Result<Vec<Annotation>, String> {
+    let conn = state.db.lock().unwrap();
+    let mut stmt = conn.prepare("SELECT id, equipment_id, text, operator, timestamp, x_pos, y_pos FROM annotations WHERE equipment_id = ?1").map_err(|e| e.to_string())?;
+    let iter = stmt.query_map(params![external_id], map_row_to_annotation).map_err(|e| e.to_string())?;
+    iter.map(|r| r.map_err(|e| e.to_string())).collect()
+}
+
+#[command]
+pub fn add_annotation(annotation: NewAnnotation, state: tauri::State<DbState>) -> Result<(), String> {
+    let conn = state.db.lock().unwrap();
+    let timestamp = chrono::Utc::now().format("%Y-%m-%d %H:%M:%S").to_string();
+    conn.execute(
+        "INSERT INTO annotations (equipment_id, text, operator, timestamp, x_pos, y_pos) VALUES (?1, ?2, ?3, ?4, ?5, ?6)",
+        params![
+            annotation.equipment_id,
+            annotation.text,
+            annotation.operator,
+            timestamp,
+            annotation.x_pos,
+            annotation.y_pos,
+        ],
+    ).map_err(|e| e.to_string())?;
+    Ok(())
+}
+
+#[command]
+pub fn get_documents_for_component(equipment_id: String, state: tauri::State<DbState>) -> Result<Vec<Document>, String> {
+    let conn = state.db.lock().unwrap();
+    let mut stmt = conn.prepare("SELECT id, equipment_id, image_data, ocr_text, description, created_at, perceptual_hash FROM documents WHERE equipment_id = ?1 ORDER BY created_at DESC").map_err(|e| e.to_string())?;
+    let iter = stmt.query_map(params![equipment_id], map_row_to_document).map_err(|e| e.to_string())?;
+    iter.map(|r| r.map_err(|e| e.to_string())).collect()
+}
+
+#[command]
+pub fn get_local_visual_database(state: tauri::State<DbState>) -> Result<Vec<LocalVisualDbEntry>, String> {
+    let conn = state.db.lock().unwrap();
+    let mut stmt = conn.prepare("SELECT d.id as documentId, e.external_id as equipmentId, e.name as equipmentName, d.description, d.image_data as imageData, d.perceptual_hash as perceptualHash FROM documents d JOIN equipments e ON d.equipment_id = e.external_id").map_err(|e| e.to_string())?;
+    let iter = stmt.query_map([], map_row_to_local_visual_db_entry).map_err(|e| e.to_string())?;
+    iter.map(|r| r.map_err(|e| e.to_string())).collect()
+}
+
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SyncResult {
