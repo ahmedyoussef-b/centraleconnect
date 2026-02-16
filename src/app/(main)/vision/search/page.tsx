@@ -95,10 +95,10 @@ export default function VisualSearchPage() {
       const parsedQuery = await parseSearchQuery({ query });
       
       toast({ title: 'Recherche en cours...' });
-      const documents = await searchDocuments({
-        text: parsedQuery.text,
-        equipmentId: parsedQuery.equipmentId,
-      });
+      const documents = await searchDocuments(
+        parsedQuery.text,
+        parsedQuery.equipmentId
+      );
 
       // CORRECTION: Ajout de données mock avec le bon typage
       const documentsWithMockData: Document[] = documents.map(doc => ({
