@@ -8,9 +8,10 @@ const packageJsonPath = path.join(process.cwd(), 'package.json');
 const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
 const appVersion = packageJson.version;
 
+const isTauriBuild = process.env.TAURI_BUILD === 'true';
 
 const nextConfig = {
-  output: 'export',
+  output: isTauriBuild ? 'export' : undefined,
   env: {
     APP_VERSION: appVersion,
     BUILD_TIME: new Date().toISOString(),
