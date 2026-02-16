@@ -1,4 +1,5 @@
 
+
 // src/app/(main)/layout.tsx
 'use client';
 
@@ -25,6 +26,7 @@ import { usePathname } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { useEffect, useState } from 'react';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -95,6 +97,28 @@ function PidModal() {
             </DialogContent>
         </Dialog>
     );
+}
+
+function BuildTime() {
+  const [time, setTime] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (process.env.BUILD_TIME) {
+      setTime(
+        format(new Date(process.env.BUILD_TIME), 'dd/MM/yy HH:mm', { locale: fr })
+      );
+    }
+  }, []);
+
+  if (!time || !process.env.BUILD_TIME) {
+    return null; // Render nothing on server and initial client render to prevent mismatch
+  }
+
+  return (
+    <p title={new Date(process.env.BUILD_TIME).toISOString()}>
+      Build: {time}
+    </p>
+  );
 }
 
 
@@ -270,11 +294,7 @@ function MainLayoutContent({ children }: { children: React.ReactNode }) {
             </SidebarMenu>
              <div className="mt-2 border-t border-sidebar-border pt-2 text-center text-xs text-muted-foreground group-data-[collapsible=icon]:hidden">
                 <p>v{process.env.APP_VERSION}</p>
-                {process.env.BUILD_TIME && (
-                    <p title={new Date(process.env.BUILD_TIME).toISOString()}>
-                        Build: {format(new Date(process.env.BUILD_TIME), 'dd/MM/yy HH:mm', { locale: fr })}
-                    </p>
-                )}
+                <BuildTime />
             </div>
           </SidebarFooter>
         </Sidebar>
