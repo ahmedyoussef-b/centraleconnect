@@ -22,7 +22,7 @@
     "setup:ai-models": "bash scripts/setup-ai-models.sh",
     "postinstall": "chmod +x scripts/*.sh",
     "test:ai": "next dev --port 3001",
-    "tauri": "npx tauri"
+    "tauri": "tauri"
   },
   "dependencies": {
     "@genkit-ai/google-genai": "^1.20.0",
