@@ -191,6 +191,7 @@ async function main() {
           name: proc.name,
           description: proc.description,
           version: proc.version,
+          category: proc.category,
           steps: proc.steps, // Pass the JSON object directly
         }
       });
