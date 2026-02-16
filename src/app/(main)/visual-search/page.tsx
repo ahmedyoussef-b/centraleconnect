@@ -36,10 +36,10 @@ export default function VisualSearchPage() {
 
       // 2. Search documents with structured filters
       toast({ title: 'Recherche en cours...', description: 'Recherche dans la base de données visuelles.' });
-      const documents = await searchDocuments({
-        text: parsedQuery.text,
-        equipmentId: parsedQuery.equipmentId,
-      });
+      const documents = await searchDocuments(
+        parsedQuery.text,
+        parsedQuery.equipmentId
+      );
       setResults(documents);
 
       if (documents.length === 0) {
