@@ -28,7 +28,7 @@
       "message": "Alarme de surchauffe échappement",
       "standardRef": "SPEEDTRONIC MKIV",
       "parameter": "Température moyenne (TTXM) dépasse la référence (TTRXB) + le seuil TTKOT3.",
-      "reset_procedure": "Le Speedtronic réduit automatiquement le FSR. Vérifier le système de contrôle de température (TTXM)."
+      "resetProcedure": "Le Speedtronic réduit automatiquement le FSR. Vérifier le système de contrôle de température (TTXM)."
     },
     {
       "code": "L86TXT",
@@ -37,7 +37,7 @@
       "message": "Déclenchement par surchauffe échappement",
       "standardRef": "SPEEDTRONIC MKIV",
       "parameter": "TTXM > référence + seuil TTKOT2 ou atteinte du seuil isothermique TTKOT1.",
-      "reset_procedure": "Nécessite l'actionnement du signal de réarmement principal L86MR1 après retour à des conditions normales."
+      "resetProcedure": "Nécessite l'actionnement du signal de réarmement principal L86MR1 après retour à des conditions normales."
     },
     {
       "code": "L30SPA",
@@ -46,7 +46,7 @@
       "message": "Alarme écart de température combustion (Spreads)",
       "standardRef": "SPEEDTRONIC MKIV",
       "parameter": "Écart de température réel entre chambres > limite admissible calculée (TTXSPL) pendant 3 secondes.",
-      "reset_procedure": "Inspecter les injecteurs ou les thermocouples défectueux. Acquittement manuel sur écran de contrôle."
+      "resetProcedure": "Inspecter les injecteurs ou les thermocouples défectueux. Acquittement manuel sur écran de contrôle."
     },
     {
       "code": "L30SPT",
@@ -55,7 +55,7 @@
       "message": "Déclenchement par écart de température combustion excessif",
       "standardRef": "SPEEDTRONIC MKIV",
       "parameter": "Écart excessif avec thermocouples froids adjacents, ou écart important persistant plus de 5 minutes.",
-      "reset_procedure": "Manuel via l'écran de contrôle (accusé réception et Reset)."
+      "resetProcedure": "Manuel via l'écran de contrôle (accusé réception et Reset)."
     },
     {
       "code": "L12H",
@@ -64,7 +64,7 @@
       "message": "Déclenchement par survitesse électrique",
       "standardRef": "SPEEDTRONIC MKIV",
       "parameter": "La vitesse (TNH) mesurée par les 3 capteurs (77NH-1/2/3) a dépassé le point de consigne de sécurité TNKOS.",
-      "reset_procedure": "Déclenchement immédiat (FSR à zéro). Réarmement via le signal maître L86MR après stabilisation de la vitesse."
+      "resetProcedure": "Déclenchement immédiat (FSR à zéro). Réarmement via le signal maître L86MR après stabilisation de la vitesse."
     },
     {
       "code": "BOS",
@@ -73,7 +73,7 @@
       "message": "Déclenchement par survitesse mécanique (Bolt Overspeed)",
       "standardRef": "Mécanique",
       "parameter": "Une masselotte (doigt de survitesse) se déplace par force centrifuge et purge le circuit d'huile de sécurité (OLT).",
-      "reset_procedure": "Réarmement OBLIGATOIREMENT MANUEL en tirant la poignée sur le réducteur des auxiliaires. Un fin de course (12HA) doit confirmer le réarmement pour autoriser un nouveau démarrage."
+      "resetProcedure": "Réarmement OBLIGATOIREMENT MANUEL en tirant la poignée sur le réducteur des auxiliaires. Un fin de course (12HA) doit confirmer le réarmement pour autoriser un nouveau démarrage."
     },
     {
       "code": "63QA-1",
@@ -82,7 +82,7 @@
       "message": "Basse pression d'huile de lubrification",
       "standardRef": "API 614",
       "parameter": "Chute de pression sous les seuils de régulation du collecteur principal.",
-      "reset_procedure": "Démarrage automatique de la pompe auxiliaire (88QA) puis de secours (88QE). Acquittement de l'alarme à l'écran après rétablissement de la pression."
+      "resetProcedure": "Démarrage automatique de la pompe auxiliaire (88QA) puis de secours (88QE). Acquittement de l'alarme à l'écran après rétablissement de la pression."
     },
     {
       "code": "63QT-2A/B",
@@ -91,7 +91,7 @@
       "message": "Déclenchement par très basse pression d'huile de lubrification",
       "standardRef": "API 614",
       "parameter": "Pression d'huile insuffisante détectée par une logique 2 sur 3.",
-      "reset_procedure": "Réarmement principal (L86MR) après analyse de la cause racine."
+      "resetProcedure": "Réarmement principal (L86MR) après analyse de la cause racine."
     },
     {
       "code": "63QQ-1",
@@ -100,7 +100,7 @@
       "message": "Encrassement des filtres à huile (basculement nécessaire)",
       "standardRef": "API 614",
       "parameter": "Pression différentielle d'environ 1,5 bar (21 psi) aux bornes du filtre en service.",
-      "reset_procedure": "Aucun réarmement. L'alarme disparaît après basculement du filtre et normalisation de la pression différentielle."
+      "resetProcedure": "Aucun réarmement. L'alarme disparaît après basculement du filtre et normalisation de la pression différentielle."
     },
     {
       "code": "VIB-START-INHIBIT",
@@ -108,7 +108,7 @@
       "severity": "CRITICAL",
       "message": "Inhibition de démarrage (défaut capteurs vibrations)",
       "parameter": "Au moins 3 capteurs de vibration de la turbine ou 2 capteurs du réducteur/alternateur sont défectueux. Le démarrage est bloqué.",
-      "reset_procedure": "Vérifier les connecteurs et remplacer les transducteurs de vibration défectueux. L'inhibition disparaît lorsque les capteurs sont de nouveau fonctionnels.",
+      "resetProcedure": "Vérifier les connecteurs et remplacer les transducteurs de vibration défectueux. L'inhibition disparaît lorsque les capteurs sont de nouveau fonctionnels.",
       "standardRef": "ISO 10816"
     },
     {
@@ -117,7 +117,7 @@
         "severity": "WARNING",
         "message": "Niveau de vibrations élevé (seuil d'alarme)",
         "parameter": "Le niveau de vibration a dépassé le premier seuil d'alerte.",
-        "reset_procedure": "Automatique si le niveau de vibration revient à la normale.",
+        "resetProcedure": "Automatique si le niveau de vibration revient à la normale.",
         "standardRef": "ISO 10816"
     },
     {
@@ -126,7 +126,7 @@
       "severity": "EMERGENCY",
       "message": "Déclenchement par vibrations critiques",
       "parameter": "Le niveau de vibration a dépassé le seuil critique ou tous les capteurs d'un groupe sont invalides.",
-      "reset_procedure": "Manuel ou automatique (L86AMR) ou via le réarmement principal (L86MRI) selon la configuration, après analyse de la cause.",
+      "resetProcedure": "Manuel ou automatique (L86AMR) ou via le réarmement principal (L86MRI) selon la configuration, après analyse de la cause.",
       "standardRef": "ISO 10816"
     },
     {
@@ -136,7 +136,7 @@
       "message": "Déclenchement par perte de flamme",
       "standardRef": "SPEEDTRONIC MKIV / NFPA 85",
       "parameter": "Moins de 2 capteurs UV sur 4 détectent une flamme pendant le fonctionnement.",
-      "reset_procedure": "Réarmement principal (L86MR) après purge complète et analyse de la cause."
+      "resetProcedure": "Réarmement principal (L86MR) après purge complète et analyse de la cause."
     },
     {
       "code": "L60FFLH",
@@ -145,7 +145,7 @@
       "message": "Défaut débit combustible liquide au démarrage",
       "standardRef": "SPEEDTRONIC MKIV",
       "parameter": "Débit de combustible liquide injecté est supérieur à une valeur prédéfinie pendant plus de 2 secondes lors de la séquence d'allumage.",
-      "reset_procedure": "Vérifier la servovalve de dérivation (65 FP) et réarmer manuellement le système."
+      "resetProcedure": "Vérifier la servovalve de dérivation (65 FP) et réarmer manuellement le système."
     },
     {
       "code": "L45HHAL",
@@ -154,7 +154,7 @@
       "message": "Alarme détection de gaz combustible (1er seuil)",
       "standardRef": "NFPA 715",
       "parameter": "Premier seuil de détection de gaz (% LEL) atteint dans l'enceinte de la turbine.",
-      "reset_procedure": "Automatique si la concentration de gaz diminue. Investiguer la source de la fuite."
+      "resetProcedure": "Automatique si la concentration de gaz diminue. Investiguer la source de la fuite."
     },
     {
       "code": "L45HHTRP",
@@ -163,7 +163,7 @@
       "message": "Déclenchement par détection de gaz combustible (2ème seuil)",
       "standardRef": "NFPA 715",
       "parameter": "Deuxième seuil de détection de gaz (% LEL) atteint, indiquant une fuite importante.",
-      "reset_procedure": "Fermeture immédiate des vannes d'arrêt combustible et ventilation forcée. Réarmement principal (L86MR) après ventilation et analyse de la cause."
+      "resetProcedure": "Fermeture immédiate des vannes d'arrêt combustible et ventilation forcée. Réarmement principal (L86MR) après ventilation et analyse de la cause."
     },
     {
       "code": "45FA/FT/PT",
@@ -172,7 +172,7 @@
       "message": "Déclenchement par détection incendie (et activation CO2)",
       "standardRef": "NFPA 72",
       "parameter": "Confirmation par au moins 2 détecteurs (thermique ou flamme) dans une même zone.",
-      "reset_procedure": "Les clapets du système d'extinction CO2 doivent être réarmés manuellement avant tout nouveau démarrage."
+      "resetProcedure": "Les clapets du système d'extinction CO2 doivent être réarmés manuellement avant tout nouveau démarrage."
     },
     {
       "code": "L26QN-1",
@@ -181,7 +181,7 @@
       "message": "Température huile de lubrification basse",
       "standardRef": "SPEEDTRONIC MKIV",
       "parameter": "La température de l'huile est trop basse (viscosité > 800 SSU), empêchant le démarrage.",
-      "reset_procedure": "Activer les résistances de chauffage de la cuve (23 QT) et/ou la pompe auxiliaire pour faire circuler et réchauffer l'huile."
+      "resetProcedure": "Activer les résistances de chauffage de la cuve (23 QT) et/ou la pompe auxiliaire pour faire circuler et réchauffer l'huile."
     },
     {
       "code": "L33CB-FAULT",
@@ -190,7 +190,7 @@
       "message": "Vannes anti-pompage non ouvertes avant démarrage",
       "standardRef": "SPEEDTRONIC MKIV",
       "parameter": "Une ou plusieurs vannes anti-pompage (33 CB-1 à 4) ne sont pas confirmées 100% ouvertes avant le lancement.",
-      "reset_procedure": "Vérifier l'alimentation en air comprimé des vannes et l'état des fins de course. Corriger le défaut pour permettre le démarrage."
+      "resetProcedure": "Vérifier l'alimentation en air comprimé des vannes et l'état des fins de course. Corriger le défaut pour permettre le démarrage."
     },
     {
       "code": "L14HR-FAULT",
@@ -199,7 +199,7 @@
       "message": "Défaut de rotation au lancement (Breakaway fail)",
       "standardRef": "SPEEDTRONIC MKIV",
       "parameter": "L'arbre de la turbine ne se met pas en rotation après l'activation du moteur de lancement.",
-      "reset_procedure": "Vérifier l'engagement de l'embrayage, le niveau de fluide du convertisseur de couple et l'état du moteur de lancement."
+      "resetProcedure": "Vérifier l'engagement de l'embrayage, le niveau de fluide du convertisseur de couple et l'état du moteur de lancement."
     },
     {
       "code": "L2TV-FAIL",
@@ -208,7 +208,7 @@
       "message": "Cycle de purge interrompu ou incomplet",
       "standardRef": "SPEEDTRONIC MKIV",
       "parameter": "La vitesse de purge n'a pas été maintenue stable pendant toute la durée de la temporisation L2TV.",
-      "reset_procedure": "Assurer la stabilité de la vitesse de rotation via le moteur de lancement et relancer un cycle de purge complet."
+      "resetProcedure": "Assurer la stabilité de la vitesse de rotation via le moteur de lancement et relancer un cycle de purge complet."
     },
     {
       "code": "L2F-FAIL",
@@ -217,7 +217,7 @@
       "message": "Faux départ (échec de l'allumage)",
       "standardRef": "SPEEDTRONIC MKIV / NFPA 85",
       "parameter": "Aucune flamme détectée par les capteurs UV (L28FD) avant la fin de la temporisation d'allumage (L2F).",
-      "reset_procedure": "Le système draine automatiquement les imbrûlés via les vannes VA 17-1/2. Une nouvelle séquence de purge complète est obligatoire avant toute nouvelle tentative d'allumage."
+      "resetProcedure": "Le système draine automatiquement les imbrûlés via les vannes VA 17-1/2. Une nouvelle séquence de purge complète est obligatoire avant toute nouvelle tentative d'allumage."
     },
     {
       "code": "L86GVT-FAULT",
@@ -226,8 +226,6 @@
       "message": "Défaut de position des aubes orientables (I.G.V.)",
       "standardRef": "SPEEDTRONIC MKIV",
       "parameter": "La position des aubes (I.G.V.) ne correspond pas à la consigne ou les fins de course ne sont pas cohérents.",
-      "reset_procedure": "Vérifier les transmetteurs de position LVDT (96 TV-1, 2) et le fonctionnement de la servovalve hydraulique 90 TV."
+      "resetProcedure": "Vérifier les transmetteurs de position LVDT (96 TV-1, 2) et le fonctionnement de la servovalve hydraulique 90 TV."
     }
   ]
-
-    

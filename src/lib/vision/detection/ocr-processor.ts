@@ -1,42 +1,92 @@
-
 // src/lib/vision/detection/ocr-processor.ts
-import Tesseract, { PSM } from 'tesseract.js';
-import { EquipmentTagParser, type EquipmentTag, type ParameterValue, type SafetyLabel } from './tag-parser';
+'use client';
+
+import Tesseract from 'tesseract.js';
 
 export interface OCRExtractionResult {
   rawText: string;
-  equipmentTags: EquipmentTag[];   // TG1-ALTERNATOR-001
-  parameterValues: ParameterValue[]; // Pression: 12.5 bar
-  safetyLabels: SafetyLabel[];     // DANGER HAUTE TENSION
-  confidence: number;              // Score de fiabilité (0-100)
+  confidence: number;
+  data: {
+    equipmentIds: string[];
+    values: Array<{
+      parameter: string;
+      value: string;
+      unit?: string;
+    }>;
+  };
 }
 
-export const performIndustrialOCR = async (
-  imageData: string,
-  context: { zone: string; equipmentType?: string }
-): Promise<OCRExtractionResult> => {
-  // Configuration spécialisée pour environnement industriel
-  const worker = await Tesseract.createWorker('fra', 1, {
-    logger: m => console.log(`[OCR] ${m.status === 'recognizing text' ? `Recognizing: ${Math.round(m.progress * 100)}%` : m.status}`),
-    cacheMethod: 'none', // Désactiver cache pour données critiques
-  });
+export async function performIndustrialOCR(
+  imageUrl: string,
+  options: { zone?: string } = {}
+): Promise<OCRExtractionResult> {
+  try {
+    console.log('[OCR] Starting text extraction...');
+    
+    const result = await Tesseract.recognize(
+      imageUrl,
+      'fra', // Langue française
+      {
+        logger: (m) => console.log('[OCR Progress]', m),
+      }
+    );
 
-  await worker.setParameters({
-    tessedit_char_whitelist: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_.:/°%barMPakg', // Caractères industriels
-    preserve_interword_spaces: '1',
-    tessedit_pageseg_mode: PSM.SINGLE_BLOCK,
-  });
+    const rawText = result.data.text;
+    const confidence = result.data.confidence / 100; // Normaliser entre 0 et 1
 
-  const { data: { text, confidence } } = await worker.recognize(imageData);
-  await worker.terminate();
+    // Extraction des données industrielles
+    const extractedData = parseIndustrialText(rawText);
 
-  // Parsing contextuel avec Master Data
-  const parser = new EquipmentTagParser(context.zone);
+    console.log('[OCR] Extraction complete', {
+      textLength: rawText.length,
+      confidence,
+      equipmentFound: extractedData.equipmentIds.length
+    });
+
+    return {
+      rawText,
+      confidence,
+      data: extractedData
+    };
+  } catch (error) {
+    console.error('[OCR] Failed to extract text:', error);
+    return {
+      rawText: '',
+      confidence: 0,
+      data: {
+        equipmentIds: [],
+        values: []
+      }
+    };
+  }
+}
+
+function parseIndustrialText(text: string): OCRExtractionResult['data'] {
+  const equipmentIds: string[] = [];
+  const values: Array<{ parameter: string; value: string; unit?: string }> = [];
+
+  // Patterns industriels courants
+  const equipmentPattern = /[A-Z]{2,3}[-_][0-9]{2,}/g; // TG-01, CR-02, etc.
+  const valuePattern = /(\w+)[:\s]+([0-9,.]+)\s*([A-Za-z°\/]+)?/g;
+
+  // Extraire les IDs d'équipement
+  const matches = text.match(equipmentPattern);
+  if (matches) {
+    equipmentIds.push(...matches);
+  }
+
+  // Extraire les valeurs mesurées
+  let match;
+  while ((match = valuePattern.exec(text)) !== null) {
+    values.push({
+      parameter: match[1].toLowerCase(),
+      value: match[2].replace(',', '.'),
+      unit: match[3]
+    });
+  }
+
   return {
-    rawText: text,
-    equipmentTags: parser.extractEquipmentTags(text),
-    parameterValues: parser.extractParameters(text),
-    safetyLabels: parser.extractSafetyLabels(text),
-    confidence: confidence,
+    equipmentIds: [...new Set(equipmentIds)], // Dédupliquer
+    values
   };
-};
+}

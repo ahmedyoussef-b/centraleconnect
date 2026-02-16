@@ -6,19 +6,74 @@ import { DayPicker } from "react-day-picker"
 
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
+import { IndustrialLogger, LogLevel } from "@/lib/logger"
 
-export type CalendarProps = React.ComponentProps<typeof DayPicker>
+export type IndustrialCalendarProps = React.ComponentProps<typeof DayPicker> & {
+  maintenanceDays?: Date[]
+  incidentDays?: Date[]
+  onIndustrialDayClick?: (date: Date, events: { hasMaintenance: boolean; hasIncident: boolean }) => void
+}
 
-function Calendar({
+function IndustrialCalendar({
   className,
   classNames,
   showOutsideDays = true,
+  maintenanceDays = [],
+  incidentDays = [],
+  onIndustrialDayClick,
+  onDayClick,
   ...props
-}: CalendarProps) {
+}: IndustrialCalendarProps) {
+  const logger = IndustrialLogger.getInstance()
+
+  // Créer les modifieurs pour react-day-picker
+  const modifiers = {
+    maintenance: maintenanceDays,
+    incident: incidentDays,
+    ...props.modifiers
+  }
+
+  // Styles personnalisés pour les modifieurs
+  const modifiersStyles = {
+    maintenance: {
+      backgroundColor: 'rgba(255, 255, 0, 0.2)',
+      color: 'rgb(255, 255, 0)',
+      fontWeight: 'bold'
+    },
+    incident: {
+      backgroundColor: 'rgba(255, 0, 0, 0.2)',
+      color: 'rgb(255, 0, 0)',
+      fontWeight: 'bold',
+      position: 'relative' as const
+    },
+    ...props.modifiersStyles
+  }
+
+  // Gestionnaire de clic personnalisé
+  const handleDayClick = (day: Date, modifiers: any, e: React.MouseEvent) => {
+    logger.log(LogLevel.INFO, 'Calendar day clicked', { 
+      date: day.toISOString(),
+      hasMaintenance: modifiers.maintenance,
+      hasIncident: modifiers.incident
+    })
+
+    // Appeler le callback personnalisé
+    onIndustrialDayClick?.(day, {
+      hasMaintenance: modifiers.maintenance || false,
+      hasIncident: modifiers.incident || false
+    })
+
+    // Appeler le callback original si fourni
+    onDayClick?.(day, modifiers, e)
+  }
+
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
       className={cn("p-3", className)}
+      modifiers={modifiers}
+      modifiersStyles={modifiersStyles}
+      onDayClick={handleDayClick}
       classNames={{
         months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
         month: "space-y-4",
@@ -53,15 +108,19 @@ function Calendar({
         day_hidden: "invisible",
         ...classNames,
       }}
+      // CORRECTION: Dans les versions récentes, on utilise `components` avec `Chevron`
       components={{
-        IconLeft: ({ ...props }) => <ChevronLeft className="h-4 w-4" />,
-        IconRight: ({ ...props }) => <ChevronRight className="h-4 w-4" />,
+        Chevron: ({ orientation }) => (
+          orientation === 'left' 
+            ? <ChevronLeft className="h-4 w-4" />
+            : <ChevronRight className="h-4 w-4" />
+        )
       }}
       {...props}
     />
   )
 }
 
-Calendar.displayName = "Calendar"
+IndustrialCalendar.displayName = "IndustrialCalendar"
 
-export { Calendar }
+export { IndustrialCalendar }

@@ -1,28 +1,30 @@
 // src/types/db.ts
 export type LogEntryType = 'AUTO' | 'MANUAL' | 'DOCUMENT_ADDED';
+
 export interface FunctionalNode {
-  id: string;                              // Identifiant unique
-  external_id: string;                     // Format: B2.LUB.TPF
-  name: string;                            // Nom lisible
-  type: string;                            // Type: 'pump', 'valve', 'sensor', etc.
-  description?: string;                    // Description optionnelle
-  parentId?: string;                       // Nœud parent hiérarchique
-  coordinates?: {                          // Position dans le schéma
+  id: string;
+  external_id: string;
+  name: string;
+  type: string;
+  description?: string;
+  parentId?: string;
+  coordinates?: {
     x: number;
     y: number;
     width?: number;
     height?: number;
   };
-  parameters?: string[];                   // Paramètres SCADA associés
-  equipmentId?: string;                    // Lien vers l'équipement
+  parameters?: string[];
+  equipmentId?: string;
   criticality?: 'critical' | 'high' | 'medium' | 'low';
   status?: 'normal' | 'warning' | 'critical' | 'maintenance';
-  ui?: {                                   // Propriétés d'affichage
+  ui?: {
     color?: string;
     icon?: string;
     shape?: 'circle' | 'rectangle' | 'triangle' | 'custom';
   };
 }
+
 export interface Component {
   id: string;
   name: string;
@@ -141,26 +143,83 @@ export interface Annotation {
   yPos: number;
 }
 
+// AMÉLIORATION: Types plus complets pour l'analyse d'image
+export interface Anomaly {
+  type: string;
+  severity: 'CRITIQUE' | 'URGENT' | 'AVERTISSEMENT' | 'INFO';
+  confidence: number;
+  location?: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  };
+  description?: string;
+}
+
+export interface AnalysisMetadata {
+  modelName?: string;
+  modelVersion?: string;
+  processingTime?: number;
+  timestamp?: string;
+  confidence?: number;
+}
+
+export interface DocumentAnalysis {
+  anomalies?: Anomaly[];
+  metadata?: AnalysisMetadata;
+  summary?: string;
+  ocrText?: string;
+  tags?: string[];
+}
+
+export interface User {
+  id: string;
+  name: string;
+  role?: string;
+  email?: string;
+}
+
+// AMÉLIORATION: Type Document plus complet
 export interface Document {
   id: number;
   equipmentId: string;
-  imageData: string;
-  ocrText?: string;
+  imageData: string; // Base64
   description?: string;
   createdAt: string;
   perceptualHash?: string | null;
-  // Fields for VisualEvidenceCard compatibility
-  analysis?: {
-    anomalies?: {
-      type: string;
-      severity: string;
-      confidence: number;
-    }[];
-  };
-  annotations?: any[];
-  createdBy?: {
-      name: string;
-  }
+  
+  // Analyse
+  analysis?: DocumentAnalysis;
+  
+  // Annotations
+  annotations?: Annotation[];
+  
+  // Métadonnées utilisateur
+  createdBy?: User;
+  
+  // OCR
+  ocrText?: string;
+  
+  // Statut
+  status?: 'pending' | 'analyzed' | 'reviewed' | 'archived';
+  
+  // Tags pour recherche
+  tags?: string[];
+  
+  // Pour la traçabilité
+  version?: number;
+  validatedBy?: string;
+  validatedAt?: string;
+}
+
+// Type pour la création d'un document (sans les champs auto-générés)
+export interface DocumentCreateInput {
+  equipmentId: string;
+  imageData: string;
+  description?: string;
+  createdBy?: User;
+  tags?: string[];
 }
 
 export interface SynopticItem {
@@ -189,3 +248,13 @@ export interface ScadaData {
   value: number;
   equipmentId: string;
 }
+export const createAnomaly = (
+  type: string,
+  severity: Anomaly['severity'] = 'AVERTISSEMENT',
+  confidence: number = 85
+): Anomaly => ({
+  type,
+  severity,
+  confidence,
+  description: `${type} détectée`
+});

@@ -1,19 +1,43 @@
-// Ce fichier de configuration assure la compatibilité entre Next.js et Prisma CLI.
+// prisma.config.ts - Version compatible avec Prisma 5/6
 import { defineConfig } from "prisma/config";
 import * as dotenv from "dotenv";
 import * as path from "path";
+import * as fs from "fs";
 
-// Prisma CLI ne charge pas automatiquement le fichier `.env.local` utilisé par Next.js.
-// Ce script le charge manuellement pour s'assurer que les commandes comme `prisma db push`
-// peuvent accéder à la bonne URL de base de données.
-dotenv.config({ path: path.resolve(process.cwd(), ".env.local") });
+// Chargement des variables d'environnement
+function loadEnvFiles() {
+  const envFiles = [
+    '.env.local',
+    '.env',
+  ];
 
+  for (const envFile of envFiles) {
+    const envPath = path.resolve(process.cwd(), envFile);
+    if (fs.existsSync(envPath)) {
+      console.log(`📁 Chargement: ${envFile}`);
+      dotenv.config({ path: envPath });
+      break;
+    }
+  }
 
+  if (!process.env.DATABASE_URL_REMOTE) {
+    console.error('❌DATABASE_URL_REMOTE non définie!');
+    process.exit(1);
+  }
+}
+
+loadEnvFiles();
+
+// La configuration correcte pour Prisma 5/6
 export default defineConfig({
+  // Seulement ces propriétés sont autorisées
   schema: "prisma/schema.prisma",
+  
+  // Optionnel: pour les migrations
   migrations: {
     path: "prisma/migrations",
   },
-  // Nous ne redéfinissons pas la source de données ici. Prisma la lira depuis le schéma
-  // une fois que ce fichier de configuration aura chargé les variables d'environnement.
+  
+  // Pas de 'earlyAccess', pas de 'generator' ici
+  // Tout se configure dans schema.prisma
 });
