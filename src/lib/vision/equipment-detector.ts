@@ -143,8 +143,8 @@ export class EquipmentDetector {
       await tf.ready();
       console.log(`[EQUIPMENT_DETECTOR] TensorFlow.js backend prêt: ${tf.getBackend()}`);
 
-      // Charger le modèle
-      this.model = await cocoSsd.load({ base: 'mobilenet_v2' });
+      // Charger le modèle depuis le chemin local
+      this.model = await cocoSsd.load({ modelUrl: '/models/mobilenet-ssd/model.json' });
       
       this.initialized = true;
       console.log('✅ COCO-SSD prêt !');
