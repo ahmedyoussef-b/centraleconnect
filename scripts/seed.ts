@@ -198,13 +198,13 @@ async function main() {
     }
     console.log(`✅ ${proceduresData.length} procédures initialisées.`);
     
-    console.log('🎉 Initialisation terminée !');
-    
   } catch (e) {
     console.error(e);
+    await prisma.$disconnect();
     process.exit(1);
   } finally {
     await prisma.$disconnect();
+    console.log('🎉 Initialisation terminée !');
   }
 }
 
