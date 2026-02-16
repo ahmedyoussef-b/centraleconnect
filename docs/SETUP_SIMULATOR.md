@@ -1,5 +1,7 @@
 # 🛠️ Guide de Configuration — Simulateur OPC UA Local
 
+**Note :** L'intégration SCADA a été reportée à une version ultérieure de l'application. Ce document est conservé à titre de plan d'architecture pour les développements futurs.
+
 Ce guide explique comment installer et configurer un simulateur de serveur OPC UA local pour le développement. Cela vous permettra de tester la connexion `SCADA_MODE=OPCUA` sans avoir accès à l'équipement industriel réel.
 
 Nous utiliserons **Prosys OPC UA Simulation Server**, un outil gratuit et multi-plateforme (Windows, macOS, Linux).

@@ -1,5 +1,7 @@
 # 🏗️ Architecture d'Intégration SCADA
 
+**Note :** L'intégration SCADA a été reportée à une version ultérieure de l'application. Ce document est conservé à titre de plan d'architecture pour les développements futurs.
+
 Ce document décrit l'architecture logicielle mise en place pour intégrer les données SCADA temps réel dans l'application de monitoring, tout en assurant une flexibilité maximale pour le développement, la démonstration et la production.
 
 L'architecture est conçue autour d'un principe fondamental : le **découplage total** entre la source de données et la couche de visualisation.

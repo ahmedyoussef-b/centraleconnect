@@ -244,10 +244,11 @@ COMMIT;";
 
             app.manage(DbState { db: Mutex::new(conn) });
 
-            let app_handle_clone = app_handle.clone();
-            tauri::async_runtime::spawn(async move {
-                scada::run_scada_loop(app_handle_clone).await;
-            });
+            // SCADA loop has been postponed to a future version.
+            // let app_handle_clone = app_handle.clone();
+            // tauri::async_runtime::spawn(async move {
+            //     scada::run_scada_loop(app_handle_clone).await;
+            // });
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![

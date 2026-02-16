@@ -1,7 +1,6 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { useScadaData } from '@/lib/scada/hooks/use-scada-data';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -31,7 +30,7 @@ const CcppDiagram = dynamic(
        <Card>
         <CardHeader>
             <CardTitle>Schéma Synoptique du Cycle Combiné</CardTitle>
-            <CardDescription>Connexion au flux de données temps réel...</CardDescription>
+            <CardDescription>Les données temps réel sont désactivées pour cette version.</CardDescription>
         </CardHeader>
         <CardContent>
             <Skeleton className="h-[400px]" />
@@ -48,14 +47,14 @@ interface ScadaData {
 }
 
 export default function DashboardPage() {
-  const { latestData, history } = useScadaData();
-
-  // Provide default values while data is loading
+  // La fonctionnalité SCADA temps réel est reportée.
+  // Utilisation de données statiques en guise de placeholder.
   const displayData: ScadaData = {
-    TG1: latestData.TG1 ?? 0,
-    TG2: latestData.TG2 ?? 0,
-    TV: latestData.TV ?? 0,
+    TG1: 0,
+    TG2: 0,
+    TV: 0,
   };
+  const history: any[] = [];
 
   return (
     <div className="space-y-4">

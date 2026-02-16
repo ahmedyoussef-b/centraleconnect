@@ -138,12 +138,9 @@ Voici une analyse de l'état d'avancement du projet par rapport aux 8 fonctionna
 *   ✅ **Fait :** L'assistant est connecté à la base de données locale pour des réponses contextuelles et peut afficher des schémas P&ID.
 *   ✅ **Fait :** L'architecture a été simplifiée en supprimant la détection d'activité vocale (VAD) complexe au profit d'une interaction manuelle plus fiable.
 
-**5. Supervision Temps Réel SCADA - 60%**
-*   ✅ **Fait :** Composants d'interface (widgets) en place pour la supervision (`CcppDiagram`) et l'analyse historique (`HistoryChart`).
-*   ✅ **Fait :** Les widgets affichent des données **simulées localement** pour démontrer les capacités de visualisation.
-*   ✅ **Fait :** Détection d'anomalies (démontrée sur la page de test `test/page.tsx`) en comparant les données simulées aux seuils, avec surlignage sur P&ID.
-*   ❌ **Régression :** La connexion temps réel via Ably a été retirée pour simplifier l'architecture.
-*   ⏳ **À faire :** Connexion à une source de données réelle (OPC UA/MQTT) en suivant le plan `docs/SCADA_INTEGRATION_PLAN.md`.
+**5. Supervision Temps Réel SCADA - 0%**
+*   ❌ **Retiré :** La connexion temps réel (Ably) et les données simulées ont été retirées du MVP pour être réintégrées dans une version future.
+*   ⏳ **À faire (Prochaine version) :** Connexion à une source de données réelle (OPC UA/MQTT) en suivant le plan `docs/SCADA_INTEGRATION_PLAN.md`.
 
 **6. Procédures Guidées Interactives - 100%**
 *   ✅ **Fait :** L'opérateur peut sélectionner une procédure et être guidé pas à pas.
@@ -169,14 +166,14 @@ Voici une analyse de l'état d'avancement du projet par rapport aux 8 fonctionna
 
 Voici un plan de progression logique pour faire évoluer ce MVP robuste vers une solution encore plus complète.
 
-**1. Finaliser l'Intégration SCADA (Priorité Haute) :**
-*   **Objectif :** Remplacer les données simulées par une connexion à une source de données réelle via OPC UA. C'est l'étape la plus critique pour rendre l'application pleinement opérationnelle.
-*   **État d'avancement : 60%** - Préparation terminée.
+**1. Finaliser l'Intégration SCADA (Priorité Haute - Version Future) :**
+*   **Objectif :** Remplacer les données statiques par une connexion à une source de données réelle via OPC UA. C'est l'étape la plus critique pour rendre l'application pleinement opérationnelle.
+*   **État d'avancement : 0%** - Reporté.
 *   **Étapes clés :**
     1.  **Préparation du Mapping (FAIT ✅) :** Un script `npm run generate:scada-map` a été créé pour générer une première version du fichier de mapping (`public/scada-mapping.json`).
     2.  **Validation du Mapping (À FAIRE ⏳) :** Le fichier `scada-mapping.json` doit être validé et complété manuellement par un ingénieur système.
     3.  **Implémentation du Connecteur OPC UA (À FAIRE ⏳) :** Développer le service (côté Rust/Tauri) qui se connecte au serveur OPC UA.
-    4.  **Publication des Données (À FAIRE ⏳) :** Le connecteur publiera les données temps réel sur un canal interne (remplaçant Ably).
+    4.  **Publication des Données (À FAIRE ⏳) :** Le connecteur publiera les données temps réel sur un canal interne.
 *   **Documentation :** Un plan d'intégration détaillé est disponible dans `docs/SCADA_INTEGRATION_PLAN.md`.
 
 **2. Intégrer la Visualisation P&ID dans les Vues Détaillées :**

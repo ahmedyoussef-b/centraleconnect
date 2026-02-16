@@ -1,5 +1,7 @@
 # 📄 Plan d'Intégration SCADA
 
+**Note :** L'intégration SCADA a été reportée à une version ultérieure de l'application. Ce document est conservé à titre de plan d'architecture pour les développements futurs.
+
 Ce document détaille les étapes concrètes pour connecter l'application de monitoring à une source de données SCADA temps réel.
 
 L'architecture choisie est la suivante :
