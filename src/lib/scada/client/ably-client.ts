@@ -24,11 +24,11 @@ export const getAblyClient = async (): Promise<Types.RealtimePromise> => {
         throw new Error('NEXT_PUBLIC_ABLY_API_KEY n\'est pas défini dans vos variables d\'environnement.');
     }
     
-    // Import dynamique pour la compatibilité SSR
-    const Ably = await import('ably');
+    // Import dynamique pour la compatibilité SSR. La bonne façon de gérer
+    // les modules mixtes (CJS/ESM) est souvent d'utiliser l'exportation par défaut.
+    const Ably = (await import('ably')).default;
     
-    // Correction : l'accès via `.default` n'est pas correct avec la manière dont `ably` exporte ses modules.
-    // On doit utiliser directement `Ably.Realtime.Promise`.
+    // Cette nouvelle approche utilise l'exportation par défaut du module Ably.
     ablyClientInstance = new Ably.Realtime.Promise({ key: ABLY_API_KEY });
     return ablyClientInstance;
 };
