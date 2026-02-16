@@ -16,6 +16,39 @@ L’application doit respecter les 8 fonctionnalités clés suivantes :
 Application installable (Tauri ou PWA) fonctionnant hors ligne avec stockage local (SQLite/IndexedDB).
 Synchronisation bidirectionnelle sécurisée avec un backend cloud (Next.js API) dès connexion disponible.
 Version web optionnelle déployée sur Vercel, partageant les mêmes données.
+
+```text
+┌─────────────────────────────────────────────────────────────┐
+│                    APPLICATION HYBRIDE                      │
+├─────────────────────────────────────────────────────────────┤
+│                                                              │
+│  ┌──────────────────────┐      ┌──────────────────────┐    │
+│  │   MODE Tauri         │      │   MODE Web           │    │
+│  │   (Desktop)          │      │   (Browser)          │    │
+│  ├──────────────────────┤      ├──────────────────────┤    │
+│  │ npm run tauri:dev    │      │ npm run dev          │    │
+│  ├──────────────────────┤      ├──────────────────────┤    │
+│  │                      │      │                      │    │
+│  │  ┌──────────────┐    │      │  ┌──────────────┐   │    │
+│  │  │ Tauri Commands│    │      │  │   Next.js    │   │    │
+│  │  │ (Rust)       │    │      │  │   App Router │   │    │
+│  │  └──────┬───────┘    │      │  └──────┬───────┘   │    │
+│  │         │            │      │         │           │    │
+│  │  ┌──────▼───────┐    │      │  ┌──────▼───────┐   │    │
+│  │  │   SQLite     │    │      │  │   API Routes │   │    │
+│  │  │   Locale     │    │      │  │   (/api/*)   │   │    │
+│  │  └──────────────┘    │      │  └──────┬───────┘   │    │
+│  │                      │      │         │           │    │
+│  └──────────────────────┘      └─────────┼───────────┘    │
+│                                          │                 │
+│                                  ┌───────▼───────┐         │
+│                                  │  PostgreSQL   │         │
+│                                  │   (Neon.tech) │         │
+│                                  └───────────────┘         │
+│                                                              │
+└─────────────────────────────────────────────────────────────┘
+```
+
 2. Base de Données Statique Locale (Master Data)
 
 Stocke toutes les données immuables : équipements (TG1, TG2, TV, CR1, CR2, pompes, vannes), circuits, caractéristiques techniques, références d’alarmes, paramètres de démarrage.
@@ -197,3 +230,5 @@ Voici un plan de progression logique pour faire évoluer ce MVP robuste vers une
         1.  Mettre en place un système de versioning pour les fichiers SVG (ex: `lubrication-filtration_v1.0.svg`, `lubrication-filtration_v1.1.svg`).
         2.  Implémenter un moteur de "diff" SVG capable de parser et de comparer structurellement deux schémas pour identifier les ajouts, suppressions et modifications d'éléments.
         3.  Créer une interface utilisateur pour visualiser ces différences de manière claire.
+
+    
