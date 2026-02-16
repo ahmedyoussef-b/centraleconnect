@@ -7,12 +7,23 @@ export async function getAlarms(): Promise<Alarm[]> {
   
   if (isTauri) {
       const { getAlarms: getAlarmsTauri } = await import('@/lib/tauri-client');
-      // The Rust command already returns data in the correct camelCase format.
-      return getAlarmsTauri();
+      const rawAlarms: any[] = await getAlarmsTauri();
+
+      // Mappage robuste pour garantir que le format des données est correct pour le frontend.
+      // Cela corrige directement le type de problème décrit dans DEBUG_ALARMS_PAGE.md
+      return rawAlarms.map(alarm => ({
+        code: alarm.code,
+        equipmentId: alarm.equipmentId || alarm.equipment_id, // Gère les deux cas de nommage
+        severity: alarm.severity,
+        description: alarm.description,
+        parameter: alarm.parameter,
+        resetProcedure: alarm.resetProcedure || alarm.reset_procedure,
+        standardRef: alarm.standardRef || alarm.standard_ref,
+      }));
   }
 
-  // Web fallback is disabled. Return empty data.
-  console.warn('[Service] Not in Tauri environment. Web API fallback is disabled for getAlarms.');
+  // Le fallback web est désactivé. Retourne des données vides.
+  console.warn('[Service] Pas dans un environnement Tauri. Le fallback API Web est désactivé pour getAlarms.');
   return [];
 }
 
