@@ -1,9 +1,79 @@
-// src/app/api/provision/route.ts
-import { NextResponse } from 'next/server';
 
-export async function POST() {
-    return NextResponse.json(
-    { error: 'This API route is disabled. The application is designed to run in a Tauri environment and interact directly with the local database.' },
-    { status: 404 }
-  );
+import { NextRequest, NextResponse } from 'next/server';
+import { PrismaClient } from '@prisma/client';
+import { createHash } from 'crypto';
+
+const prisma = new PrismaClient();
+
+interface ProvisionPayload {
+    component: {
+        externalId: string;
+        name: string;
+        type: string;
+    };
+    document: {
+        imageData: string;
+        ocrText: string;
+        description: string;
+        perceptualHash: string;
+    };
+}
+
+// Helper to create checksum for equipment
+const createChecksum = (data: any): string => {
+    return createHash('sha256').update(JSON.stringify(data)).digest('hex');
+};
+
+export async function POST(req: NextRequest) {
+    try {
+        const payload: ProvisionPayload = await req.json();
+        const { component, document } = payload;
+        
+        if (!component || !document) {
+            return NextResponse.json({ error: 'Invalid payload structure' }, { status: 400 });
+        }
+        
+        const checksum = createChecksum(component);
+
+        // Use a transaction to ensure both operations succeed or fail together
+        const result = await prisma.$transaction(async (tx) => {
+            const upsertedEquipment = await tx.equipment.upsert({
+                where: { externalId: component.externalId },
+                update: {
+                    name: component.name,
+                    type: component.type,
+                    checksum: checksum,
+                },
+                create: {
+                    externalId: component.externalId,
+                    name: component.name,
+                    type: component.type,
+                    checksum: checksum,
+                    version: 1,
+                    isImmutable: false,
+                }
+            });
+
+            const createdDocument = await tx.document.create({
+                data: {
+                    equipmentId: upsertedEquipment.externalId,
+                    imageData: document.imageData,
+                    ocrText: document.ocrText,
+                    description: document.description,
+                    perceptualHash: document.perceptualHash,
+                }
+            });
+
+            return { upsertedEquipment, createdDocument };
+        });
+
+        return NextResponse.json({ success: true, ...result }, { status: 201 });
+
+    } catch (error) {
+        console.error('[API Provision] Error during provisioning:', error);
+        return NextResponse.json(
+          { error: 'Failed to provision new equipment and document.' },
+          { status: 500 }
+        );
+    }
 }

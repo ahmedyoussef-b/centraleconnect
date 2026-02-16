@@ -1,3 +1,4 @@
+
 // src/lib/procedures-service.ts
 import type { Procedure, ProcedureStep } from '@/types/db';
 
@@ -9,10 +10,10 @@ let loadingPromise: Promise<Procedure[]> | null = null;
  * Parse les steps d'une procédure en gérant tous les cas d'erreur
  */
 function parseProcedureSteps(stepsData: any): ProcedureStep[] {
-    if (!stepsData || typeof stepsData !== 'string') {
-        // Si c'est déjà un tableau (ou pas une chaîne), le retourner ou retourner un tableau vide
-        return Array.isArray(stepsData) ? stepsData : [];
-    }
+    if (!stepsData) return [];
+    if (Array.isArray(stepsData)) return stepsData; // Already JSON
+    if (typeof stepsData !== 'string') return [];
+    
     try {
         const parsed = JSON.parse(stepsData);
         return Array.isArray(parsed) ? parsed : [];
@@ -33,13 +34,21 @@ async function fetchProcedures(): Promise<Procedure[]> {
     loadingPromise = (async () => {
         try {
             const isTauri = typeof window !== 'undefined' && !!(window as any).__TAURI__;
-            if (!isTauri) {
-                console.warn('[Procedures] Pas dans un environnement Tauri, le fallback web est désactivé.');
-                return [];
-            }
             
-            const { getProcedures: getProceduresTauri } = await import('@/lib/tauri-client');
-            const rawProcedures: any[] = await getProceduresTauri();
+            let rawProcedures: any[];
+
+            if (isTauri) {
+                console.log('[Procedures] Fetching from Tauri backend...');
+                const { getProcedures: getProceduresTauri } = await import('@/lib/tauri-client');
+                rawProcedures = await getProceduresTauri();
+            } else {
+                console.log('[Procedures] Fetching from Web API...');
+                const response = await fetch('/api/procedures');
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch procedures from web API: ${response.statusText}`);
+                }
+                rawProcedures = await response.json();
+            }
             
             const parsedProcedures = rawProcedures.map(p => ({
                 id: p.id,
@@ -47,7 +56,8 @@ async function fetchProcedures(): Promise<Procedure[]> {
                 description: p.description,
                 version: p.version,
                 category: p.category,
-                // Appliquer un parsing robuste pour les étapes de chaque procédure
+                // The web API returns JSON directly, Tauri returns a string.
+                // This logic handles both cases.
                 steps: parseProcedureSteps(p.steps),
             }));
             

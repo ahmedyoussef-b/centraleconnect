@@ -1,9 +1,20 @@
-// src/app/api/equipments/route.ts
+
 import { NextResponse } from 'next/server';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 export async function GET() {
-  return NextResponse.json(
-    { error: 'This API route is disabled. The application is designed to run in a Tauri environment and interact directly with the local database.' },
-    { status: 404 }
-  );
+  try {
+    const equipments = await prisma.equipment.findMany({
+      orderBy: { name: 'asc' },
+    });
+    return NextResponse.json(equipments);
+  } catch (error) {
+    console.error('[API Equipments] Error fetching equipments:', error);
+    return NextResponse.json(
+      { error: 'Failed to fetch equipments from remote database.' },
+      { status: 500 }
+    );
+  }
 }

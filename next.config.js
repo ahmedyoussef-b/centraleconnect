@@ -50,6 +50,7 @@ const nextConfig = {
       ...config.resolve.fallback,
       fs: false,
       worker_threads: false,
+      buffer: require.resolve('buffer/'),
     };
 
     if (isServer) {
