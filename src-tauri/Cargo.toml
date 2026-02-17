@@ -24,7 +24,7 @@ tokio = { version = "1", features = ["full"] }
 dotenv = "0.15.0"
 rand = "0.8"
 tokio-stream = "0.1"
-rusqlite = { version = "0.31.0", features = ["bundled"] }
+rusqlite = "0.31.0"
 sqlx = { version = "0.7", features = [ "runtime-tokio-rustls", "postgres", "chrono" ] }
 
 
