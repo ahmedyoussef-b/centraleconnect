@@ -21,7 +21,7 @@ fn map_query_error<T>(e: rusqlite::Error) -> rusqlite::Error {
 
 #[command]
 pub fn get_equipments(state: State<DbState>) -> CommandResult<Vec<Equipment>> {
-    let conn = state.0.lock().unwrap();
+    let conn = state.local.lock().unwrap();
     let mut stmt = conn.prepare("SELECT external_id, name, description, parent_id, type, subtype, system_code, sub_system, location, manufacturer, serial_number, tag_number, document_ref, coordinates, svg_layer, fire_zone, linked_parameters, status, version, is_immutable, approved_by, approved_at, commissioning_date, checksum, nominal_data FROM equipments ORDER BY name ASC")
         .map_err(|e| e.to_string())?;
     
@@ -37,7 +37,7 @@ pub fn get_equipments(state: State<DbState>) -> CommandResult<Vec<Equipment>> {
 
 #[command]
 pub fn get_equipment(state: State<DbState>, id: String) -> CommandResult<Option<Equipment>> {
-    let conn = state.0.lock().unwrap();
+    let conn = state.local.lock().unwrap();
     let mut stmt = conn.prepare("SELECT external_id, name, description, parent_id, type, subtype, system_code, sub_system, location, manufacturer, serial_number, tag_number, document_ref, coordinates, svg_layer, fire_zone, linked_parameters, status, version, is_immutable, approved_by, approved_at, commissioning_date, checksum, nominal_data FROM equipments WHERE external_id = ?1")
         .map_err(|e| e.to_string())?;
     
@@ -74,7 +74,7 @@ pub fn get_pid_svg(app_handle: AppHandle, path: String) -> CommandResult<String>
 
 #[command]
 pub fn get_parameters(state: State<DbState>) -> CommandResult<Vec<Parameter>> {
-    let conn = state.0.lock().unwrap();
+    let conn = state.local.lock().unwrap();
     let mut stmt = conn.prepare("SELECT id, equipment_id, name, unit, nominal_value, min_safe, max_safe, alarm_high, alarm_low, standard_ref FROM parameters")
         .map_err(|e| e.to_string())?;
 
@@ -89,7 +89,7 @@ pub fn get_parameters(state: State<DbState>) -> CommandResult<Vec<Parameter>> {
 
 #[command]
 pub fn get_parameters_for_component(state: State<DbState>, equipment_id: String) -> CommandResult<Vec<Parameter>> {
-     let conn = state.0.lock().unwrap();
+     let conn = state.local.lock().unwrap();
     let mut stmt = conn.prepare("SELECT id, equipment_id, name, unit, nominal_value, min_safe, max_safe, alarm_high, alarm_low, standard_ref FROM parameters WHERE equipment_id = ?1")
         .map_err(|e| e.to_string())?;
 
@@ -105,7 +105,7 @@ pub fn get_parameters_for_component(state: State<DbState>, equipment_id: String)
 
 #[command]
 pub fn get_alarms(state: State<DbState>) -> CommandResult<Vec<Alarm>> {
-    let conn = state.0.lock().unwrap();
+    let conn = state.local.lock().unwrap();
     let mut stmt = conn.prepare("SELECT code, equipment_id, severity, description, parameter, reset_procedure, standard_ref FROM alarms")
         .map_err(|e| e.to_string())?;
     
@@ -120,7 +120,7 @@ pub fn get_alarms(state: State<DbState>) -> CommandResult<Vec<Alarm>> {
 
 #[command]
 pub fn get_procedures(state: State<DbState>) -> CommandResult<Vec<Procedure>> {
-    let conn = state.0.lock().unwrap();
+    let conn = state.local.lock().unwrap();
     let mut stmt = conn.prepare("SELECT id, name, description, version, category, steps FROM procedures")
         .map_err(|e| e.to_string())?;
 
@@ -146,7 +146,7 @@ fn get_last_signature(conn: &rusqlite::Connection) -> rusqlite::Result<String> {
 
 #[command]
 pub fn add_log_entry(state: State<DbState>, entry: NewLogEntry) -> CommandResult<()> {
-    let conn = state.0.lock().unwrap();
+    let conn = state.local.lock().unwrap();
     let previous_signature = get_last_signature(&conn).map_err(|e| e.to_string())?;
     
     let timestamp = Utc::now().to_rfc3339();
@@ -185,7 +185,7 @@ pub fn add_log_entry(state: State<DbState>, entry: NewLogEntry) -> CommandResult
 
 #[command]
 pub fn get_log_entries(state: State<DbState>) -> CommandResult<Vec<LogEntry>> {
-    let conn = state.0.lock().unwrap();
+    let conn = state.local.lock().unwrap();
     let mut stmt = conn.prepare("SELECT id, timestamp, type, source, message, equipment_id, signature FROM log_entries ORDER BY id DESC")
         .map_err(|e| e.to_string())?;
     
@@ -200,7 +200,7 @@ pub fn get_log_entries(state: State<DbState>) -> CommandResult<Vec<LogEntry>> {
 
 #[command]
 pub fn get_log_entries_for_node(state: State<DbState>, equipment_id: String) -> CommandResult<Vec<LogEntry>> {
-    let conn = state.0.lock().unwrap();
+    let conn = state.local.lock().unwrap();
     let mut stmt = conn.prepare("SELECT id, timestamp, type, source, message, equipment_id, signature FROM log_entries WHERE equipment_id = ?1 ORDER BY id DESC")
         .map_err(|e| e.to_string())?;
     
@@ -215,7 +215,7 @@ pub fn get_log_entries_for_node(state: State<DbState>, equipment_id: String) -> 
 
 #[command]
 pub fn search_documents(state: State<DbState>, query: String, equipment_id: Option<String>) -> CommandResult<Vec<Document>> {
-    let conn = state.0.lock().unwrap();
+    let conn = state.local.lock().unwrap();
     let mut sql = "SELECT id, equipment_id, image_data, description, created_at, perceptual_hash, ocr_text, analysis, annotations, created_by, status, tags, version, validated_by, validated_at FROM documents WHERE 1=1".to_string();
     let mut params: Vec<Box<dyn rusqlite::ToSql>> = Vec::new();
 
@@ -246,7 +246,7 @@ pub fn search_documents(state: State<DbState>, query: String, equipment_id: Opti
 
 #[command]
 pub fn add_component_and_document(state: State<DbState>, component: NewComponentData, document: NewDocumentData) -> CommandResult<()> {
-    let conn = state.0.lock().unwrap();
+    let conn = state.local.lock().unwrap();
     let tx = conn.transaction().map_err(|e| e.to_string())?;
 
     tx.execute(
@@ -271,7 +271,7 @@ pub fn add_component_and_document(state: State<DbState>, component: NewComponent
 
 #[command]
 pub fn get_annotations_for_node(state: State<DbState>, external_id: String) -> CommandResult<Vec<Annotation>> {
-    let conn = state.0.lock().unwrap();
+    let conn = state.local.lock().unwrap();
     let mut stmt = conn.prepare("SELECT id, equipment_id, text, operator, timestamp, x_pos, y_pos FROM annotations WHERE equipment_id = ?1 ORDER BY timestamp DESC")
         .map_err(|e| e.to_string())?;
 
@@ -286,7 +286,7 @@ pub fn get_annotations_for_node(state: State<DbState>, external_id: String) -> C
 
 #[command]
 pub fn add_annotation(state: State<DbState>, annotation: NewAnnotation) -> CommandResult<()> {
-    let conn = state.0.lock().unwrap();
+    let conn = state.local.lock().unwrap();
     conn.execute(
         "INSERT INTO annotations (equipment_id, text, operator, x_pos, y_pos) VALUES (?1, ?2, ?3, ?4, ?5)",
         rusqlite::params![
@@ -302,7 +302,7 @@ pub fn add_annotation(state: State<DbState>, annotation: NewAnnotation) -> Comma
 
 #[command]
 pub fn get_documents_for_component(state: State<DbState>, equipment_id: String) -> CommandResult<Vec<Document>> {
-    let conn = state.0.lock().unwrap();
+    let conn = state.local.lock().unwrap();
     let mut stmt = conn.prepare("SELECT id, equipment_id, image_data, description, created_at, perceptual_hash, ocr_text, analysis, annotations, created_by, status, tags, version, validated_by, validated_at FROM documents WHERE equipment_id = ?1 ORDER BY created_at DESC")
         .map_err(|e| e.to_string())?;
     
@@ -317,7 +317,7 @@ pub fn get_documents_for_component(state: State<DbState>, equipment_id: String) 
 
 #[command]
 pub fn get_local_visual_database(state: State<DbState>) -> CommandResult<Vec<LocalVisualDbEntry>> {
-    let conn = state.0.lock().unwrap();
+    let conn = state.local.lock().unwrap();
     let mut stmt = conn.prepare(
         "SELECT d.id, d.equipment_id, e.name, d.description, d.image_data, d.perceptual_hash
          FROM documents d JOIN equipments e ON d.equipment_id = e.external_id
@@ -333,9 +333,73 @@ pub fn get_local_visual_database(state: State<DbState>) -> CommandResult<Vec<Loc
     iter.map(|e| e.map_err(|e| e.to_string())).collect()
 }
 
-// This is now a placeholder as remote sync is complex and was causing issues.
 #[command]
-pub fn sync_database() -> CommandResult<SyncResult> {
-    println!("[Sync] Sync with remote database is currently disabled.");
-    Ok(SyncResult { synced: 0, cleaned: false })
+pub async fn sync_database(state: tauri::State<'_, DbState>) -> CommandResult<SyncResult> {
+    println!("[Sync] Starting sync with remote PostgreSQL database...");
+
+    let remote_equipments: Vec<Equipment> = sqlx::query_as(
+        r#"
+        SELECT 
+            external_id, name, description, parent_id, "type", subtype, system_code, sub_system,
+            location, manufacturer, serial_number, tag_number, document_ref, coordinates,
+            svg_layer, fire_zone, linked_parameters, status, version, is_immutable,
+            approved_by, approved_at, commissioning_date, checksum, nominal_data
+        FROM "Equipment"
+        "#,
+    )
+    .fetch_all(&state.remote)
+    .await
+    .map_err(|e| {
+        eprintln!("[Sync Error] Failed to fetch from remote: {}", e);
+        e.to_string()
+    })?;
+    
+    println!("[Sync] Fetched {} equipments from remote.", remote_equipments.len());
+    
+    let conn = state.local.lock().unwrap();
+    let tx = conn.transaction().map_err(|e| e.to_string())?;
+    
+    let mut upserted_count = 0;
+    
+    for equip in remote_equipments {
+        let res = tx.execute(
+            r#"
+            INSERT INTO equipments (
+                external_id, name, description, parent_id, type, subtype, system_code, sub_system, location,
+                manufacturer, serial_number, tag_number, document_ref, coordinates, svg_layer, fire_zone,
+                linked_parameters, status, version, is_immutable, approved_by, approved_at, commissioning_date,
+                checksum, nominal_data
+            ) VALUES (
+                ?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15, ?16, ?17, ?18, ?19, ?20, ?21, ?22, ?23, ?24, ?25
+            ) ON CONFLICT(external_id) DO UPDATE SET
+                name=excluded.name, description=excluded.description, parent_id=excluded.parent_id, type=excluded.type,
+                subtype=excluded.subtype, system_code=excluded.system_code, sub_system=excluded.sub_system,
+                location=excluded.location, manufacturer=excluded.manufacturer, serial_number=excluded.serial_number,
+                tag_number=excluded.tag_number, document_ref=excluded.document_ref, coordinates=excluded.coordinates,
+                svg_layer=excluded.svg_layer, fire_zone=excluded.fire_zone, linked_parameters=excluded.linked_parameters,
+                status=excluded.status, version=excluded.version, is_immutable=excluded.is_immutable,
+                approved_by=excluded.approved_by, approved_at=excluded.approved_at,
+                commissioning_date=excluded.commissioning_date, checksum=excluded.checksum, nominal_data=excluded.nominal_data
+            "#,
+            rusqlite::params![
+                equip.external_id, equip.name, equip.description, equip.parent_id, equip.r#type, equip.subtype, equip.system_code, equip.sub_system,
+                equip.location, equip.manufacturer, equip.serial_number, equip.tag_number, equip.document_ref, equip.coordinates,
+                equip.svg_layer, equip.fire_zone, equip.linked_parameters, equip.status, equip.version, equip.is_immutable,
+                equip.approved_by, equip.approved_at, equip.commissioning_date, equip.checksum, equip.nominal_data
+            ],
+        ).map_err(|e| e.to_string())?;
+
+        if res > 0 {
+            upserted_count += 1;
+        }
+    }
+    
+    tx.commit().map_err(|e| e.to_string())?;
+    
+    println!("[Sync] Sync complete. Upserted {} records into local SQLite DB.", upserted_count);
+    
+    Ok(SyncResult {
+        synced: upserted_count as i32,
+        cleaned: true,
+    })
 }

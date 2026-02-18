@@ -1,13 +1,14 @@
 use serde::{Serialize, Deserialize};
 use serde_json::Value;
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, sqlx::FromRow)]
 #[serde(rename_all = "camelCase")]
 pub struct Equipment {
     pub external_id: String,
     pub name: String,
     pub description: Option<String>,
     pub parent_id: Option<String>,
+    #[sqlx(rename = "type")]
     pub r#type: Option<String>,
     pub subtype: Option<String>,
     pub system_code: Option<String>,

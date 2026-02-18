@@ -8,14 +8,27 @@ mod db;
 mod models;
 mod commands;
 
-fn main() {
+use dotenv::dotenv;
+use tauri::Manager;
+
+#[tokio::main]
+async fn main() {
+    dotenv().ok(); // This loads the .env file
+
     let context = tauri::generate_context!();
     
     tauri::Builder::default()
         .setup(|app| {
-            let db_state = db::init_database(&app.handle())
-                .expect("Failed to initialize database");
-            app.manage(db_state);
+            let app_handle = app.handle();
+            app_handle.manage(tokio::runtime::Handle::current());
+            
+            // Spawn an async task to initialize the databases
+            // because the setup hook itself cannot be async.
+            tokio::spawn(async move {
+                let db_state = db::init_database(&app_handle).await
+                    .expect("Failed to initialize database");
+                app_handle.manage(db_state);
+            });
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![

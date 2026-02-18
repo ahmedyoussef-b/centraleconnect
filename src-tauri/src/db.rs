@@ -4,20 +4,29 @@ use std::sync::Mutex;
 use rusqlite::Connection;
 use tauri::AppHandle;
 use thiserror::Error;
+use sqlx::{postgres::PgPoolOptions, PgPool};
+use std::env;
 
 // --- Custom Error Type ---
 #[derive(Debug, Error)]
 pub enum DbError {
     #[error("Database connection failed: {0}")]
-    Connection(#[from] rusqlite::Error),
+    Rusqlite(#[from] rusqlite::Error),
+    #[error("Remote database connection failed: {0}")]
+    Sqlx(#[from] sqlx::Error),
     #[error("Tauri path resolution failed: {0}")]
     TauriPath(String),
     #[error("Filesystem error: {0}")]
     Io(#[from] std::io::Error),
+    #[error("Environment variable not found: {0}")]
+    EnvVar(#[from] std::env::VarError),
 }
 
 // --- Database State ---
-pub struct DbState(pub Mutex<Connection>);
+pub struct DbState {
+    pub local: Mutex<Connection>,
+    pub remote: PgPool,
+}
 
 const CREATE_TABLES_SQL: &str = r#"
 BEGIN;
@@ -119,7 +128,8 @@ CREATE TABLE IF NOT EXISTS annotations (
 COMMIT;
 "#;
 
-pub fn init_database(app: &AppHandle) -> Result<DbState, DbError> {
+pub async fn init_database(app: &AppHandle) -> Result<DbState, DbError> {
+    // --- Initialize Local SQLite DB ---
     let app_dir = app.path_resolver().app_data_dir()
         .ok_or_else(|| DbError::TauriPath("Failed to resolve app data directory".to_string()))?;
     
@@ -128,9 +138,23 @@ pub fn init_database(app: &AppHandle) -> Result<DbState, DbError> {
     }
 
     let db_path = app_dir.join("ccpp.db");
-    let conn = Connection::open(db_path)?;
-    conn.execute_batch(CREATE_TABLES_SQL)?;
+    let local_conn = Connection::open(db_path)?;
+    local_conn.execute_batch(CREATE_TABLES_SQL)?;
 
-    println!("✅ Database initialized successfully.");
-    Ok(DbState(Mutex::new(conn)))
+    println!("✅ Local SQLite database initialized successfully.");
+
+    // --- Initialize Remote PostgreSQL Pool ---
+    let database_url = env::var("DATABASE_URL_REMOTE")
+        .map_err(|_| DbError::EnvVar(std::env::VarError::NotPresent))?;
+
+    let remote_pool = PgPoolOptions::new()
+        .max_connections(5)
+        .connect(&database_url)
+        .await?;
+    println!("✅ Remote PostgreSQL connection pool established.");
+    
+    Ok(DbState {
+        local: Mutex::new(local_conn),
+        remote: remote_pool,
+    })
 }
