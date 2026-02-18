@@ -15,10 +15,12 @@ use tauri::Manager;
 #[tokio::main]
 async fn main() {
     dotenv().ok(); // This loads the .env file
-
-    let context = tauri::generate_context!();
     
     tauri::Builder::default()
+        .plugin(tauri_plugin_shell::init())
+        .plugin(tauri_plugin_window::init())
+        .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_fs::init())
         .setup(|app| {
             let app_handle = app.handle();
             app_handle.manage(tokio::runtime::Handle::current());
@@ -52,6 +54,6 @@ async fn main() {
             commands::get_local_visual_database,
             commands::sync_database
         ])
-        .run(context)
+        .run(tauri::generate_context!())
         .expect("Erreur lors du lancement de l'application Tauri");
 }

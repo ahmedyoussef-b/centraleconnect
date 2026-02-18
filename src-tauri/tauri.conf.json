@@ -9,43 +9,7 @@
     "productName": "centraleconnect",
     "version": "0.1.0"
   },
-  "tauri": {
-    "allowlist": {
-      "all": false,
-      "shell": {
-        "all": false,
-        "open": true
-      },
-      "dialog": {
-        "all": false,
-        "open": true,
-        "save": true
-      },
-      "fs": {
-        "all": true,
-        "scope": [
-          "$APPDATA/*",
-          "$RESOURCE/*"
-        ]
-      },
-      "window": {
-        "all": true
-      }
-    },
-    "bundle": {
-      "active": true,
-      "identifier": "com.centraleconnect.app",
-      "resources": [
-        "../src/assets/master-data/pupitre-data.json",
-        "../public/models/**/*",
-        "../public/assets/pids/**/*"
-      ],
-      "externalBin": [],
-      "copyright": "© 2026 CentraleConnect",
-      "shortDescription": "Supervision centrale électrique",
-      "longDescription": "Application de monitoring pour cycle combiné",
-      "publisher": "CentraleConnect Team"
-    },
+  "app": {
     "security": {
       "csp": "default-src 'self'; img-src 'self' https: data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; connect-src 'self' http://localhost:3000 https:"
     },
@@ -61,5 +25,31 @@
         "center": true
       }
     ]
-  }
+  },
+  "bundle": {
+    "active": true,
+    "identifier": "com.centraleconnect.app",
+    "resources": [
+      "../src/assets/master-data/pupitre-data.json",
+      "../public/models/**/*",
+      "../public/assets/pids/**/*"
+    ],
+    "externalBin": [],
+    "copyright": "© 2026 CentraleConnect",
+    "shortDescription": "Supervision centrale électrique",
+    "longDescription": "Application de monitoring pour cycle combiné",
+    "publisher": "CentraleConnect Team"
+  },
+  "plugins": {
+    "fs": {
+      "scope": ["$APPDATA/**", "$RESOURCE/**"]
+    }
+  },
+  "permissions": [
+    "shell:open",
+    "dialog:open",
+    "dialog:save",
+    "window:all",
+    "fs:all"
+  ]
 }
