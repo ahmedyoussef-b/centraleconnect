@@ -8,26 +8,22 @@ license = ""
 repository = "https://github.com/ahmedyoussef-b/centraleconnect.git"
 edition = "2021"
 
-[[bin]]
-name = "centraleconnect"
-path = "src/main.rs"
-
 [build-dependencies]
 tauri-build = { version = "1.6.0", features = [] }
 
 [dependencies]
-tauri = { version = "1.6.0", features = ["shell-open", "dialog-open", "fs-all", "window-all"] }
+tauri = { version = "1.6.0", features = [ "dialog-save", "shell-open", "dialog-open", "fs-all", "window-all"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
-rusqlite = { version = "0.29.0", features = ["bundled"] }
 chrono = { version = "0.4", features = ["serde"] }
 sha2 = "0.10"
 hex = "0.4"
 lazy_static = "1.4"
 thiserror = "1.0"
-reqwest = { version = "0.11", features = ["json", "blocking"] }
+
+# This version is known to be stable and the `bundled` feature prevents system-level conflicts.
+rusqlite = { version = "0.29.0", features = ["bundled"] }
 
 
 [features]
 custom-protocol = ["tauri/custom-protocol"]
-
