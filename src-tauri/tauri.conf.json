@@ -36,9 +36,9 @@
       "active": true,
       "identifier": "com.centraleconnect.app",
       "resources": [
-        "src/assets/master-data/pupitre-data.json",
-        "public/models/**/*",
-        "public/assets/pids/**/*"
+        "../src/assets/master-data/pupitre-data.json",
+        "../public/models/**/*",
+        "../public/assets/pids/**/*"
       ],
       "externalBin": [],
       "copyright": "© 2026 CentraleConnect",
