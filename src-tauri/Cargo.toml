@@ -7,7 +7,7 @@ authors = ["Firebase Studio"]
 edition = "2021"
 
 [build-dependencies]
-tauri-build = "2.0.0-rc.8"
+tauri-build = "2.0.0-rc.15"
 
 [dependencies]
 tauri = "2.0.0-rc.15"
