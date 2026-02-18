@@ -41,7 +41,8 @@ export async function getEquipmentById(id: string): Promise<Equipment | null> {
 
 export async function getParametersForComponent(equipmentId: string): Promise<Parameter[]> {
     if (typeof window !== 'undefined' && window.__TAURI__) {
-        return invoke('get_parameters_for_component', { equipmentId });
+        const { getParametersForComponent: getParamsTauri } = await import('@/lib/tauri-client');
+        return getParamsTauri(equipmentId);
     }
     // Web fallback - not implemented for this service for now
     console.warn('[Service] getParametersForComponent is not available in web mode.');

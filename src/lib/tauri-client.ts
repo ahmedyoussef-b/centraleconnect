@@ -129,3 +129,8 @@ export async function getLocalVisualDatabase(): Promise<LocalVisualDbEntry[]> {
 export async function syncDatabase(): Promise<SyncResult> {
     return await invoke('sync_database');
 }
+
+// ===== PID SVG =====
+export async function getPidSvg(path: string): Promise<string> {
+    return await invoke('get_pid_svg', { path });
+}

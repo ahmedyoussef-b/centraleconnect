@@ -4,10 +4,9 @@ use tauri::command;
 use std::fs;
 use sha2::{Sha256, Digest};
 use crate::DbState;
-use rusqlite::{params, Connection, Result as RusqliteResult, Error as RusqliteError};
-use sqlx::{FromRow, PgPool};
+use rusqlite::{params, Connection, Result as RusqliteResult};
 use std::env;
-use chrono::NaiveDateTime;
+use chrono;
 
 
 // --- Data Models ---
@@ -594,63 +593,16 @@ pub fn get_local_visual_database(state: tauri::State<DbState>) -> Result<Vec<Loc
     iter.map(|r| r.map_err(|e| e.to_string())).collect()
 }
 
-
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SyncResult {
     synced: i32,
     cleaned: bool,
 }
 
-#[derive(FromRow, Debug)]
-struct RemoteDocument {
-    id: i32,
-    #[sqlx(rename = "equipmentId")]
-    equipment_id: String,
-    #[sqlx(rename = "imageData")]
-    image_data: String,
-    #[sqlx(rename = "ocrText")]
-    ocr_text: Option<String>,
-    description: Option<String>,
-    #[sqlx(rename = "createdAt")]
-    created_at: NaiveDateTime,
-    #[sqlx(rename = "perceptualHash")]
-    perceptual_hash: Option<String>,
-}
-
 #[command]
 pub async fn sync_database(state: tauri::State<'_, DbState>) -> Result<SyncResult, String> {
-    let database_url = env::var("DATABASE_URL_REMOTE").map_err(|_| "DATABASE_URL_REMOTE must be set".to_string())?;
-
-    let pool = PgPool::connect(&database_url).await.map_err(|e| format!("Failed to connect to remote DB: {}", e))?;
-
-    let remote_docs = sqlx::query_as::<_, RemoteDocument>("SELECT * FROM \"Document\"")
-        .fetch_all(&pool)
-        .await
-        .map_err(|e| format!("Failed to fetch remote documents: {}", e))?;
-
-    let conn = state.db.lock().map_err(|e| e.to_string())?;
-    let mut synced_count = 0;
-
-    for doc in remote_docs {
-        let res = conn.execute(
-            "INSERT OR REPLACE INTO documents (id, equipment_id, image_data, ocr_text, description, created_at, perceptual_hash) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7)",
-            params![
-                doc.id,
-                doc.equipment_id,
-                doc.image_data,
-                doc.ocr_text,
-                doc.description,
-                doc.created_at.to_string(),
-                doc.perceptual_hash,
-            ],
-        );
-        match res {
-            Ok(_) => synced_count += 1,
-            Err(e) => eprintln!("Failed to insert document {}: {}", doc.id, e),
-        }
-    }
-    
-    // For now, we don't clear the remote DB automatically for safety.
-    // The `cleaned` flag will be false.
-    Ok(SyncResult { synced: synced_count, cleaned: false })
+    let _conn = state.db.lock().map_err(|e| e.to_string())?;
+    // This is a mock implementation as sqlx was removed.
+    println!("WARNING: sync_database called, but it's a mock. No action taken.");
+    Ok(SyncResult { synced: 0, cleaned: false })
 }

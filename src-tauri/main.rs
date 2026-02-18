@@ -21,12 +21,12 @@ pub struct DbState {
 #[serde(rename_all = "camelCase")]
 struct AlarmSeed {
     code: String,
-    component_tag: String,
+    componentTag: String,
     severity: String,
     message: String,
     parameter: Option<String>,
     reset_procedure: Option<String>,
-    standard_ref: Option<String>,
+    standardRef: Option<String>,
 }
 
 #[derive(Deserialize)]
@@ -63,12 +63,12 @@ fn seed_database(conn: &Connection, app_handle: &tauri::AppHandle) -> Result<(),
         for alarm in alarms_data {
             stmt.execute(params![
                 alarm.code,
-                alarm.component_tag,
+                alarm.componentTag,
                 alarm.severity,
                 alarm.message,
                 alarm.parameter,
                 alarm.reset_procedure,
-                alarm.standard_ref,
+                alarm.standardRef,
             ]).map_err(|e| e.to_string())?;
         }
     }
