@@ -1,14 +1,23 @@
 
-// src-tauri/src/main.rs
 #![cfg_attr(
     all(not(debug_assertions), target_os = "windows"),
     windows_subsystem = "windows"
 )]
 
+mod db;
+mod models;
 mod commands;
 
 fn main() {
+    let context = tauri::generate_context!();
+    
     tauri::Builder::default()
+        .setup(|app| {
+            let db_state = db::init_database(&app.handle())
+                .expect("Failed to initialize database");
+            app.manage(db_state);
+            Ok(())
+        })
         .invoke_handler(tauri::generate_handler![
             commands::get_equipments,
             commands::get_equipment,
@@ -29,6 +38,6 @@ fn main() {
             commands::get_local_visual_database,
             commands::sync_database
         ])
-        .run(tauri::generate_context!())
+        .run(context)
         .expect("Erreur lors du lancement de l'application Tauri");
 }

@@ -22,48 +22,23 @@
         "save": true
       },
       "fs": {
-        "all": false,
-        "readFile": true,
-        "writeFile": true,
-        "readDir": true,
-        "copyFile": true,
-        "createDir": true,
-        "removeDir": true,
-        "removeFile": true,
-        "renameFile": true,
+        "all": true,
         "scope": [
           "$APPDATA/*",
           "$RESOURCE/*"
         ]
       },
       "window": {
-        "all": false,
-        "create": true,
-        "center": true,
-        "requestUserAttention": true,
-        "setFocus": true,
-        "setSize": true,
-        "setMinSize": true,
-        "setMaxSize": true,
-        "setPosition": true,
-        "setTitle": true,
-        "setAlwaysOnTop": true,
-        "setDecorations": true,
-        "setFullscreen": true,
-        "setCursorGrab": true,
-        "setCursorVisible": true,
-        "setCursorIcon": true,
-        "setCursorPosition": true,
-        "setIgnoreCursorEvents": true,
-        "startDragging": true
+        "all": true
       }
     },
     "bundle": {
       "active": true,
       "identifier": "com.centraleconnect.app",
       "resources": [
-        "../src/assets/**/*",
-        "../public/models/**/*"
+        "src/assets/master-data/pupitre-data.json",
+        "public/models/**/*",
+        "public/assets/pids/**/*"
       ],
       "externalBin": [],
       "copyright": "© 2026 CentraleConnect",
