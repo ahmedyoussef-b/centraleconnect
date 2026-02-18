@@ -4,8 +4,6 @@ name = "centraleconnect"
 version = "0.1.0"
 description = "Industrial Monitoring for CCPP"
 authors = ["Firebase Studio"]
-license = ""
-repository = "https://github.com/ahmedyoussef-b/centraleconnect.git"
 edition = "2021"
 
 [build-dependencies]
