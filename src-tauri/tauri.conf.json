@@ -1,55 +1,125 @@
 {
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "CentraleConnect",
+  "version": "0.1.0",
+  "identifier": "com.centraleconnect.ccpp.sousseb",
   "build": {
     "beforeDevCommand": "npm run dev",
     "beforeBuildCommand": "npm run build",
-    "devPath": "http://localhost:3000",
-    "distDir": "../out"
-  },
-  "package": {
-    "productName": "centraleconnect",
-    "version": "0.1.0"
+    "devUrl": "http://localhost:3000",
+    "frontendDist": "../out"
   },
   "app": {
-    "security": {
-      "csp": "default-src 'self'; img-src 'self' https: data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; connect-src 'self' http://localhost:3000 https:"
-    },
+    "withGlobalTauri": true,
+    "macOSPrivateApi": false,
     "windows": [
       {
-        "fullscreen": false,
-        "resizable": true,
-        "title": "CentraleConnect",
+        "label": "main",
+        "title": "CentraleConnect • CCPP SousseB",
         "width": 1280,
         "height": 800,
         "minWidth": 1024,
         "minHeight": 768,
-        "center": true
+        "maxWidth": 1920,
+        "maxHeight": 1080,
+        "resizable": true,
+        "fullscreen": false,
+        "center": true,
+        "decorations": true,
+        "transparent": false,
+        "visible": true,
+        "focus": true,
+        "alwaysOnTop": false,
+        "contentProtected": false,
+        "skipTaskbar": false,
+        "titleBarStyle": "Visible",
+        "hiddenTitle": false,
+        "acceptFirstMouse": false,
+        "tabbingIdentifier": null,
+        "additionalBrowserArgs": null
       }
-    ]
+    ],
+    "security": {
+      "csp": "default-src 'self'; img-src 'self' https: data: blob:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; connect-src 'self' http://localhost:3000 https://*.neon.tech wss://*.neon.tech;",
+      "freezePrototype": false,
+      "dangerousDisableAssetCspModification": false,
+      "dangerousRemoteDomainIpcAccess": [
+        {
+          "domain": "localhost:3000",
+          "windows": ["main"],
+          "enableTauriAPI": true
+        }
+      ]
+    }
   },
   "bundle": {
     "active": true,
-    "identifier": "com.centraleconnect.app",
+    "targets": "all",
+    "identifier": "com.centraleconnect.ccpp.sousseb",
+    "publisher": "CentraleConnect Team",
+    "copyright": "© 2026 CentraleConnect",
+    "shortDescription": "Supervision centrale électrique",
+    "longDescription": "Application de monitoring pour centrale à cycle combiné - Conformité IEC 61511 / ISO 55001",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
     "resources": [
       "../src/assets/master-data/pupitre-data.json",
       "../public/models/**/*",
-      "../public/assets/pids/**/*"
+      "../public/assets/pids/**/*",
+      "../data/**/*.json",
+      "../data/**/*.db"
     ],
     "externalBin": [],
-    "copyright": "© 2026 CentraleConnect",
-    "shortDescription": "Supervision centrale électrique",
-    "longDescription": "Application de monitoring pour cycle combiné",
-    "publisher": "CentraleConnect Team"
-  },
-  "plugins": {
-    "fs": {
-      "scope": ["$APPDATA/**", "$RESOURCE/**"]
+    "createUpdaterArtifacts": false,
+    "linux": {
+      "deb": {
+        "depends": ["openssl", "ca-certificates"],
+        "files": {}
+      },
+      "rpm": {
+        "depends": ["openssl", "ca-certificates"],
+        "epoch": 0,
+        "release": "1"
+      },
+      "appimage": {
+        "bundleMediaFramework": false
+      }
+    },
+    "macOS": {
+      "frameworks": [],
+      "minimumSystemVersion": "10.13",
+      "exceptionDomain": "",
+      "signingIdentity": null,
+      "entitlements": null,
+      "providerShortName": null
+    },
+    "windows": {
+      "certificateThumbprint": null,
+      "digestAlgorithm": "sha256",
+      "timestampUrl": "",
+      "webviewInstallMode": {
+        "type": "downloadBootstrapper"
+      },
+      "nsis": {
+        "displayLanguageSelector": false,
+        "installerIcon": "icons/icon.ico",
+        "installMode": "perUser",
+        "languages": ["English", "French"],
+        "license": null,
+        "headerImage": null,
+        "sidebarImage": null,
+        "installerHooks": null,
+        "shortcutMode": "Both"
+      }
     }
   },
-  "permissions": [
-    "shell:open",
-    "dialog:open",
-    "dialog:save",
-    "window:all",
-    "fs:all"
-  ]
+  "plugins": {
+    "shell": {
+      "open": true
+    }
+  }
 }
