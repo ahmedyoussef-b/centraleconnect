@@ -1,3 +1,4 @@
+
 // src-tauri/src/commands.rs
 use serde::{Serialize, Deserialize};
 use tauri::command;
@@ -599,9 +600,9 @@ pub struct SyncResult {
 }
 
 #[command]
-pub async fn sync_database(state: tauri::State<'_, DbState>) -> Result<SyncResult, String> {
+pub fn sync_database(state: tauri::State<'_, DbState>) -> Result<SyncResult, String> {
     let _conn = state.db.lock().map_err(|e| e.to_string())?;
-    // This is a mock implementation as sqlx was removed.
+    // This is a mock implementation.
     println!("WARNING: sync_database called, but it's a mock. No action taken.");
     Ok(SyncResult { synced: 0, cleaned: false })
 }

@@ -1,3 +1,2 @@
 // This file is reserved for future SCADA integration (OPC UA / Real-time data bus).
 // The functionality has been postponed to a later version.
-// All related dependencies and code have been removed to simplify the build.
