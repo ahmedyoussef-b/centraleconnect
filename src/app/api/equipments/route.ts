@@ -4,9 +4,15 @@ import prisma from '@/lib/prisma';
 
 export async function GET() {
   try {
-    const equipments = await prisma.equipment.findMany({
+    const equipmentsFromDb = await prisma.equipment.findMany({
       orderBy: { name: 'asc' },
     });
+    // Ensure date fields are serialized to strings
+    const equipments = equipmentsFromDb.map(e => ({
+      ...e,
+      approvedAt: e.approvedAt?.toISOString(),
+      commissioningDate: e.commissioningDate?.toISOString(),
+    }));
     return NextResponse.json(equipments);
   } catch (error) {
     console.error('[API Equipments] Error fetching equipments:', error);

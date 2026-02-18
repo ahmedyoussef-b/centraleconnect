@@ -64,8 +64,22 @@ export async function POST(req: NextRequest) {
 
             return { upsertedEquipment, createdDocument };
         });
+        
+        // Ensure date fields are serialized to strings
+        const serializableResult = {
+            ...result,
+            createdDocument: {
+                ...result.createdDocument,
+                createdAt: result.createdDocument.createdAt.toISOString(),
+            },
+            upsertedEquipment: {
+                ...result.upsertedEquipment,
+                approvedAt: result.upsertedEquipment.approvedAt?.toISOString(),
+                commissioningDate: result.upsertedEquipment.commissioningDate?.toISOString(),
+            }
+        };
 
-        return NextResponse.json({ success: true, ...result }, { status: 201 });
+        return NextResponse.json({ success: true, ...serializableResult }, { status: 201 });
 
     } catch (error) {
         console.error('[API Provision] Error during provisioning:', error);

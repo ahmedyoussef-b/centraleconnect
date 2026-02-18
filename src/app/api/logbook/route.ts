@@ -4,9 +4,14 @@ import prisma from '@/lib/prisma';
 
 export async function GET() {
   try {
-    const logEntries = await prisma.logEntry.findMany({
+    const logEntriesFromDb = await prisma.logEntry.findMany({
       orderBy: { timestamp: 'desc' },
     });
+    // Ensure date fields are serialized to strings
+    const logEntries = logEntriesFromDb.map(l => ({
+      ...l,
+      timestamp: l.timestamp.toISOString(),
+    }));
     return NextResponse.json(logEntries);
   } catch (error) {
     console.error('[API Logbook] Error fetching log entries:', error);
