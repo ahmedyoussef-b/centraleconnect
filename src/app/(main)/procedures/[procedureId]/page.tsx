@@ -12,8 +12,9 @@ import { ProcedureExecutionView } from '@/components/procedure-execution-view';
 import type { Procedure } from '@/types/db';
 import { Skeleton } from '@/components/ui/skeleton';
 
-export default function ProcedureExecutionPage({ params }: { params: { procedureId: string }}) {
-    const procedureId = params.procedureId;
+export default function ProcedureExecutionPage() {
+    const params = useParams();
+    const procedureId = params.procedureId as string;
     const [procedure, setProcedure] = useState<Procedure | null | undefined>(undefined);
     
     useEffect(() => {
