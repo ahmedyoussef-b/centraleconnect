@@ -1,14 +1,47 @@
 use serde::{Serialize, Deserialize};
 use serde_json::Value;
+use chrono::{DateTime, Utc};
 
+// This struct is used for fetching data from the remote PostgreSQL DB
+// It uses DateTime<Utc> for timestamp fields to align with sqlx.
 #[derive(Debug, Serialize, Deserialize, Clone, sqlx::FromRow)]
+#[serde(rename_all = "camelCase")]
+pub struct RemoteEquipment {
+    pub external_id: String,
+    pub name: String,
+    pub description: Option<String>,
+    pub parent_id: Option<String>,
+    #[sqlx(rename = "type")]
+    pub r#type: Option<String>,
+    pub subtype: Option<String>,
+    pub system_code: Option<String>,
+    pub sub_system: Option<String>,
+    pub location: Option<String>,
+    pub manufacturer: Option<String>,
+    pub serial_number: Option<String>,
+    pub tag_number: Option<String>,
+    pub document_ref: Option<String>,
+    pub coordinates: Option<String>,
+    pub svg_layer: Option<String>,
+    pub fire_zone: Option<String>,
+    pub linked_parameters: Option<String>,
+    pub status: Option<String>,
+    pub version: i32,
+    pub is_immutable: bool,
+    pub approved_by: Option<String>,
+    pub approved_at: Option<DateTime<Utc>>,
+    pub commissioning_date: Option<DateTime<Utc>>,
+    pub checksum: Option<String>,
+    pub nominal_data: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct Equipment {
     pub external_id: String,
     pub name: String,
     pub description: Option<String>,
     pub parent_id: Option<String>,
-    #[sqlx(rename = "type")]
     pub r#type: Option<String>,
     pub subtype: Option<String>,
     pub system_code: Option<String>,

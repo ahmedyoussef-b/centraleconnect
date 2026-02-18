@@ -8,7 +8,7 @@ use hex;
 use crate::db::{DbState};
 use crate::models::{
     Equipment, Parameter, Alarm, Procedure, LogEntry, NewLogEntry, Document, NewDocumentData, NewComponentData, Annotation, NewAnnotation,
-    LocalVisualDbEntry, Component, PupitreData, SyncResult,
+    LocalVisualDbEntry, Component, PupitreData, SyncResult, RemoteEquipment
 };
 
 type CommandResult<T> = Result<T, String>;
@@ -337,7 +337,7 @@ pub fn get_local_visual_database(state: State<DbState>) -> CommandResult<Vec<Loc
 pub async fn sync_database(state: tauri::State<'_, DbState>) -> CommandResult<SyncResult> {
     println!("[Sync] Starting sync with remote PostgreSQL database...");
 
-    let remote_equipments: Vec<Equipment> = sqlx::query_as(
+    let remote_equipments: Vec<RemoteEquipment> = sqlx::query_as(
         r#"
         SELECT 
             external_id, name, description, parent_id, "type", subtype, system_code, sub_system,
@@ -385,7 +385,10 @@ pub async fn sync_database(state: tauri::State<'_, DbState>) -> CommandResult<Sy
                 equip.external_id, equip.name, equip.description, equip.parent_id, equip.r#type, equip.subtype, equip.system_code, equip.sub_system,
                 equip.location, equip.manufacturer, equip.serial_number, equip.tag_number, equip.document_ref, equip.coordinates,
                 equip.svg_layer, equip.fire_zone, equip.linked_parameters, equip.status, equip.version, equip.is_immutable,
-                equip.approved_by, equip.approved_at, equip.commissioning_date, equip.checksum, equip.nominal_data
+                equip.approved_by, 
+                equip.approved_at.map(|dt| dt.to_rfc3339()),
+                equip.commissioning_date.map(|dt| dt.to_rfc3339()),
+                equip.checksum, equip.nominal_data
             ],
         ).map_err(|e| e.to_string())?;
 

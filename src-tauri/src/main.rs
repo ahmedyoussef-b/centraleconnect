@@ -7,6 +7,7 @@
 mod db;
 mod models;
 mod commands;
+mod scada;
 
 use dotenv::dotenv;
 use tauri::Manager;

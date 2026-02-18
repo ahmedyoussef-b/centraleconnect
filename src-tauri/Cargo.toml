@@ -24,7 +24,7 @@ dotenv = "0.15"
 rusqlite = { version = "0.29.0", features = ["bundled"] }
 
 # Remote DB (Postgres) - Carefully configured to avoid conflicts
-sqlx = { version = "0.7.4", default-features = false, features = ["runtime-tokio-rustls", "postgres", "json", "chrono"] }
+sqlx = { version = "0.7.4", default-features = false, features = ["runtime-tokio-rustls", "postgres", "json", "chrono", "macros"] }
 tokio = { version = "1", features = ["full"] }
 
 [features]
