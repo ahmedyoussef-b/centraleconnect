@@ -8,11 +8,16 @@ license = ""
 repository = "https://github.com/ahmedyoussef-b/centraleconnect.git"
 edition = "2021"
 
+# Explicitly define the binary to avoid confusion with misplaced files
+[[bin]]
+name = "centraleconnect"
+path = "src/main.rs"
+
 [build-dependencies]
 tauri-build = { version = "1.6.0", features = [] }
 
 [dependencies]
-tauri = { version = "1.6.0", features = [] }
+tauri = { version = "1.6.0", features = ["shell-open", "dialog-open", "dialog-save", "fs-all", "window-all"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 
