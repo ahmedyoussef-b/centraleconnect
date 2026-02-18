@@ -67,8 +67,8 @@
         "icons/128x128@2x.png"
       ],
       "resources": [
-        "models/**/*",
-        "assets/**/*"
+        "../src/assets/**/*",
+        "../public/models/**/*"
       ],
       "externalBin": [],
       "copyright": "© 2026 CentraleConnect",
