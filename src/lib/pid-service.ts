@@ -11,7 +11,7 @@ export async function getPidSvgContent(svgPath: string): Promise<string> {
     const isTauri = !!window.__TAURI__;
 
     if (isTauri) {
-        const { invoke } = await import('@tauri-apps/api/tauri');
+        const { invoke } = await import('@tauri-apps/api/core');
         // The path for `invoke` should be relative to the resource root (which is the `public` folder)
         const resourcePath = svgPath.startsWith('/') ? svgPath.substring(1) : svgPath;
         return await invoke('get_pid_svg', { path: resourcePath });

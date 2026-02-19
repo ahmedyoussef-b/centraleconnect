@@ -1,5 +1,5 @@
-// src-tauri/tauri-client.ts
-import { invoke } from '@tauri-apps/api/tauri';
+// src/lib/tauri-client.ts
+import { invoke } from '@tauri-apps/api/core';
 import type { Equipment, Component, Alarm, Procedure as ProcedureType, LogEntry, LogEntryType, Document, Parameter, Annotation } from '@/types/db';
 
 // Re-export main types for consistency

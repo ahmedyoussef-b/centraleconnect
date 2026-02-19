@@ -79,8 +79,8 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
-    "@tauri-apps/api": "^2.0.0-rc.15",
-    "@tauri-apps/cli": "^2.0.0-rc.15",
+    "@tauri-apps/api": "2.0.0-rc.10",
+    "@tauri-apps/cli": "2.0.0-rc.10",
     "@types/node": "^20",
     "@types/react": "^19.2.1",
     "@types/react-dom": "^19.2.1",
