@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -8,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { parseSearchQuery } from '@/ai/flows/search-parser-flow';
+import type { SearchQueryOutput } from '@/ai/flows/search-parser-flow';
 import { searchDocuments } from '@/lib/db-service';
 import type { Document, Anomaly } from '@/types/db';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
@@ -92,7 +93,16 @@ export default function VisualSearchPage() {
     
     try {
       toast({ title: 'Analyse de la requête...' });
-      const parsedQuery = await parseSearchQuery({ query });
+      
+      const parseResponse = await fetch('/api/ai/search-parser', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query }),
+      });
+      if (!parseResponse.ok) {
+          throw new Error('Erreur lors de l\'analyse de la requête.');
+      }
+      const parsedQuery: SearchQueryOutput = await parseResponse.json();
       
       toast({ title: 'Recherche en cours...' });
       const documents = await searchDocuments(

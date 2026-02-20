@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useEffect, useRef, useState, useCallback } from 'react';
@@ -15,7 +16,7 @@ import { Input } from './ui/input';
 import { ScrollArea } from './ui/scroll-area';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { cn } from '@/lib/utils';
-import { askAssistant, type AssistantInput } from '@/ai/flows/assistant-flow';
+import type { AssistantInput, AssistantOutput } from '@/ai/flows/assistant-flow';
 import { useToast } from '@/hooks/use-toast';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { useVoskRecognizer, RecognizerState } from '@/hooks/use-vosk-recognizer';
@@ -68,28 +69,41 @@ export function VocalAssistant() {
         if (isTauri && masterDataContext) {
             assistantInput.context = masterDataContext;
         }
-      const assistantResponse = await askAssistant(assistantInput);
-      const assistantMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        text: assistantResponse.text,
-      };
-      setMessages((prev) => [...prev, assistantMessage]);
 
-      if (assistantResponse.action?.action === 'show_pid') {
-        showPid(assistantResponse.action.target);
-      }
+        const response = await fetch('/api/ai/assistant', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(assistantInput),
+        });
 
-      if (isTtsEnabled && audioRef.current) {
-        audioRef.current.src = assistantResponse.audio;
-        audioRef.current.play().catch(e => console.error("Audio playback failed", e));
-      }
-    } catch (error) {
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.details || 'La réponse de l\'API est invalide.');
+        }
+
+        const assistantResponse: AssistantOutput = await response.json();
+        
+        const assistantMessage: Message = {
+            id: (Date.now() + 1).toString(),
+            role: 'assistant',
+            text: assistantResponse.text,
+        };
+        setMessages((prev) => [...prev, assistantMessage]);
+
+        if (assistantResponse.action?.action === 'show_pid') {
+            showPid(assistantResponse.action.target);
+        }
+
+        if (isTtsEnabled && audioRef.current) {
+            audioRef.current.src = assistantResponse.audio;
+            audioRef.current.play().catch(e => console.error("Audio playback failed", e));
+        }
+    } catch (error: any) {
       console.error('Assistant error:', error);
       toast({
         variant: 'destructive',
         title: 'Erreur de l\'assistant',
-        description: 'Impossible d\'obtenir une réponse. Veuillez réessayer.',
+        description: error.message || 'Impossible d\'obtenir une réponse. Veuillez réessayer.',
       });
        const errorMessage: Message = {
         id: (Date.now() + 1).toString(),

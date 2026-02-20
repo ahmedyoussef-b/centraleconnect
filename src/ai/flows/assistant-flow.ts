@@ -1,5 +1,4 @@
 
-'use server';
 
 /**
  * @fileOverview A vocal assistant AI agent for the power plant.

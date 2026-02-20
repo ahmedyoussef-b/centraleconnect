@@ -1,4 +1,4 @@
-'use server';
+
 /**
  * @fileOverview An AI flow to parse natural language search queries into structured data.
  *
