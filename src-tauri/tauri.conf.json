@@ -116,10 +116,5 @@
         "shortcutMode": "Both"
       }
     }
-  },
-  "plugins": {
-    "shell": {
-      "open": true
-    }
   }
 }
