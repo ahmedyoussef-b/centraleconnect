@@ -2,7 +2,7 @@
 import type { Metadata } from 'next';
 import { Toaster } from '@/components/ui/toaster';
 import './globals.css';
-import { Inter, Source_Code_Pro } from 'next/font/google';
+import { Inter, Source_Code_Pro, Space_Grotesk } from 'next/font/google';
 
 // Configure fonts
 const inter = Inter({
@@ -17,6 +17,13 @@ const sourceCodePro = Source_Code_Pro({
   variable: '--font-source-code-pro',
 });
 
+const spaceGrotesk = Space_Grotesk({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-space-grotesk',
+});
+
+
 export const metadata: Metadata = {
   title: 'SousseB Insights',
   description: 'Application de monitoring pour la centrale électrique Sousse B',
@@ -29,7 +36,7 @@ export default function RootLayout({
 }>) {
   
   return (
-    <html lang="fr" className={`dark ${inter.variable} ${sourceCodePro.variable}`} suppressHydrationWarning>
+    <html lang="fr" className={`dark ${inter.variable} ${sourceCodePro.variable} ${spaceGrotesk.variable}`} suppressHydrationWarning>
       <head>
         {/* Optimisation TensorFlow.js pour forcer l'accélération GPU */}
         <script
