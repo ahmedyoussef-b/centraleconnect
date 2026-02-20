@@ -1,3 +1,4 @@
+
 /** @type {import('next').NextConfig} */
 
 const fs = require('fs');
@@ -47,13 +48,17 @@ const nextConfig = {
     ],
   },
   webpack: (config, { isServer }) => {
-    // This is needed to prevent errors from `vosk-browser` which tries to import 'fs' and 'worker_threads'
-    config.resolve.fallback = {
-      ...config.resolve.fallback,
-      fs: false,
-      worker_threads: false,
-      buffer: require.resolve('buffer'),
-    };
+    // For client-side builds, provide fallbacks for Node.js modules.
+    if (!isServer) {
+        config.resolve.fallback = {
+            ...config.resolve.fallback,
+            fs: false,
+            worker_threads: false,
+            buffer: require.resolve('buffer'),
+            net: false,
+            tls: false,
+        };
+    }
 
     if (isServer) {
       // Exclude problematic client-side libraries from server-side compilation
