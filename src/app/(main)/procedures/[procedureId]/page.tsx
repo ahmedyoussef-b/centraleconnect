@@ -4,17 +4,18 @@
 import { useEffect, useState } from 'react';
 import { notFound, useParams } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, ClipboardCheck, LoaderCircle } from 'lucide-react';
-import { getProcedureById, getProcedures } from '@/lib/procedures-service';
+import { ArrowLeft, ClipboardCheck } from 'lucide-react';
+import { getProcedureById } from '@/lib/procedures-service';
 import { Card, CardDescription, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ProcedureExecutionView } from '@/components/procedure-execution-view';
 import type { Procedure } from '@/types/db';
 import { Skeleton } from '@/components/ui/skeleton';
+import proceduresData from '@/assets/master-data/procedures.json';
 
 export async function generateStaticParams() {
-    const procedures = await getProcedures();
-    return procedures.map(p => ({
+    // Lire les données statiques directement pour le build
+    return proceduresData.map(p => ({
         procedureId: p.id,
     }));
 }
