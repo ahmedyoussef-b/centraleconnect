@@ -3,7 +3,7 @@
 
 import { notFound, useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { getEquipmentById, getParametersForComponent, getLogEntriesForNode, getDocumentsForComponent } from '@/lib/db-service';
+import { getEquipmentById, getParametersForComponent, getLogEntriesForNode, getDocumentsForComponent, getEquipments } from '@/lib/db-service';
 import { getAlarmsForComponent } from '@/lib/alarms-service';
 import { EquipmentDetailView } from '@/components/equipment-detail-view';
 import type { Equipment, Parameter, LogEntry, Document } from '@/types/db';
@@ -12,6 +12,13 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useRouter } from 'next/navigation';
+
+export async function generateStaticParams() {
+  const equipments = await getEquipments();
+  return equipments.map((eq) => ({
+    id: encodeURIComponent(eq.externalId),
+  }));
+}
 
 function EquipmentDetailSkeleton() {
     return (

@@ -4,6 +4,12 @@
 import { useParams } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
+export async function generateStaticParams() {
+    // Return an empty array because there's no data source for this yet.
+    // This prevents build errors for this placeholder page.
+    return [];
+}
+
 export default function GalleryDetailPage() {
     const params = useParams();
     const id = params.id as string;

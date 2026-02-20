@@ -5,12 +5,19 @@ import { useEffect, useState } from 'react';
 import { notFound, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, ClipboardCheck, LoaderCircle } from 'lucide-react';
-import { getProcedureById } from '@/lib/procedures-service';
+import { getProcedureById, getProcedures } from '@/lib/procedures-service';
 import { Card, CardDescription, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ProcedureExecutionView } from '@/components/procedure-execution-view';
 import type { Procedure } from '@/types/db';
 import { Skeleton } from '@/components/ui/skeleton';
+
+export async function generateStaticParams() {
+    const procedures = await getProcedures();
+    return procedures.map(p => ({
+        procedureId: p.id,
+    }));
+}
 
 export default function ProcedureExecutionPage() {
     const params = useParams();

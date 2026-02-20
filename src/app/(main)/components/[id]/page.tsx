@@ -6,6 +6,15 @@ import type { Component } from '@/types/db';
 import { ComponentDetailView } from '@/components/component-detail-view';
 import { useEffect, useState } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
+import componentsData from '@/assets/master-data/pupitre-data.json';
+
+export async function generateStaticParams() {
+    // Cannot rely on the service as it's client-side (Tauri/fetch)
+    // We read the static data directly for build-time generation.
+    return componentsData.components.map(component => ({
+        id: component.id,
+    }));
+}
 
 export default function ComponentDetailPage() {
   const params = useParams();
