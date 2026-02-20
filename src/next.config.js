@@ -14,7 +14,6 @@ const isTauriBuild = process.env.TAURI_BUILD === 'true';
 const nextConfig = {
   output: isTauriBuild ? 'export' : undefined,
   assetPrefix: isTauriBuild ? './' : undefined,
-  trailingSlash: true,
   env: {
     APP_VERSION: appVersion,
     BUILD_TIME: new Date().toISOString(),
